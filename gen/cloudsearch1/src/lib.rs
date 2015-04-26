@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudsearch* crate version *0.1.5+20150416*, where *20150416* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *cloudsearch* crate version *0.1.6+20150416*, where *20150416* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudsearch1).
 //! # Features
 //! 
@@ -165,7 +165,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -225,13 +225,13 @@ impl<'a, C, A> Cloudsearch<C, A>
         Cloudsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

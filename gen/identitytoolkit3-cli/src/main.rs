@@ -19,33 +19,34 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  identitytoolkit3 [options] relyingparty create-auth-uri -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty delete-account -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty download-account -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty get-account-info -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty get-oob-confirmation-code -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty get-public-keys [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty get-recaptcha-param [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty reset-password -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty set-account-info -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty upload-account -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty verify-assertion -r <kv>... [-p <v>]... [-o <out>]
-  identitytoolkit3 [options] relyingparty verify-password -r <kv>... [-p <v>]... [-o <out>]
+  identitytoolkit3 [options] relyingparty create-auth-uri -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty delete-account -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty download-account -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty get-account-info -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty get-oob-confirmation-code -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty get-public-keys [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty get-recaptcha-param [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty reset-password -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty set-account-info -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty upload-account -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty verify-assertion -r <kv>... [-p <v>...] [-o <out>]
+  identitytoolkit3 [options] relyingparty verify-password -r <kv>... [-p <v>...] [-o <out>]
   identitytoolkit3 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/index.html
 
 Configuration:
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -67,37 +68,24 @@ struct Engine {
 impl Engine {
     fn _relyingparty_create_auth_uri(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::IdentitytoolkitRelyingpartyCreateAuthUriRequest::default();
-        let mut call = self.hub.relyingparty().create_auth_uri(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::IdentitytoolkitRelyingpartyCreateAuthUriRequest::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "openid-realm" => {
                         request.openid_realm = Some(value.unwrap_or("").to_string());
                     },
@@ -129,8 +117,30 @@ impl Engine {
                         request.identifier = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.relyingparty().create_auth_uri(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -154,8 +164,33 @@ impl Engine {
 
     fn _relyingparty_delete_account(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyDeleteAccountRequest::default();
-        let mut call = self.hub.relyingparty().delete_account(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "local-id" => {
+                        request.local_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().delete_account(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -175,22 +210,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "local-id" => {
-                        request.local_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -214,8 +233,36 @@ impl Engine {
 
     fn _relyingparty_download_account(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyDownloadAccountRequest::default();
-        let mut call = self.hub.relyingparty().download_account(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "next-page-token" => {
+                        request.next_page_token = Some(value.unwrap_or("").to_string());
+                    },
+                "max-results" => {
+                        request.max_results = Some(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().download_account(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -235,25 +282,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "next-page-token" => {
-                        request.next_page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "max-results" => {
-                        request.max_results = Some(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -277,8 +305,45 @@ impl Engine {
 
     fn _relyingparty_get_account_info(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyGetAccountInfoRequest::default();
-        let mut call = self.hub.relyingparty().get_account_info(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "id-token" => {
+                        request.id_token = Some(value.unwrap_or("").to_string());
+                    },
+                "email" => {
+                        if request.email.is_none() {
+                           request.email = Some(Default::default());
+                        }
+                                        request.email.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "local-id" => {
+                        if request.local_id.is_none() {
+                           request.local_id = Some(Default::default());
+                        }
+                                        request.local_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().get_account_info(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -298,34 +363,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "id-token" => {
-                        request.id_token = Some(value.unwrap_or("").to_string());
-                    },
-                "email" => {
-                        if request.email.is_none() {
-                           request.email = Some(Default::default());
-                        }
-                                        request.email.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "local-id" => {
-                        if request.local_id.is_none() {
-                           request.local_id = Some(Default::default());
-                        }
-                                        request.local_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -349,37 +386,24 @@ impl Engine {
 
     fn _relyingparty_get_oob_confirmation_code(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Relyingparty::default();
-        let mut call = self.hub.relyingparty().get_oob_confirmation_code(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Relyingparty::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -405,8 +429,30 @@ impl Engine {
                         request.captcha_resp = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.relyingparty().get_oob_confirmation_code(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -516,8 +562,42 @@ impl Engine {
 
     fn _relyingparty_reset_password(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyResetPasswordRequest::default();
-        let mut call = self.hub.relyingparty().reset_password(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "new-password" => {
+                        request.new_password = Some(value.unwrap_or("").to_string());
+                    },
+                "old-password" => {
+                        request.old_password = Some(value.unwrap_or("").to_string());
+                    },
+                "oob-code" => {
+                        request.oob_code = Some(value.unwrap_or("").to_string());
+                    },
+                "email" => {
+                        request.email = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().reset_password(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -537,31 +617,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "new-password" => {
-                        request.new_password = Some(value.unwrap_or("").to_string());
-                    },
-                "old-password" => {
-                        request.old_password = Some(value.unwrap_or("").to_string());
-                    },
-                "oob-code" => {
-                        request.oob_code = Some(value.unwrap_or("").to_string());
-                    },
-                "email" => {
-                        request.email = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -585,37 +640,24 @@ impl Engine {
 
     fn _relyingparty_set_account_info(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::IdentitytoolkitRelyingpartySetAccountInfoRequest::default();
-        let mut call = self.hub.relyingparty().set_account_info(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::IdentitytoolkitRelyingpartySetAccountInfoRequest::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "display-name" => {
                         request.display_name = Some(value.unwrap_or("").to_string());
                     },
@@ -653,8 +695,30 @@ impl Engine {
                         request.email = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.relyingparty().set_account_info(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -678,8 +742,45 @@ impl Engine {
 
     fn _relyingparty_upload_account(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyUploadAccountRequest::default();
-        let mut call = self.hub.relyingparty().upload_account(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "salt-separator" => {
+                        request.salt_separator = Some(value.unwrap_or("").to_string());
+                    },
+                "hash-algorithm" => {
+                        request.hash_algorithm = Some(value.unwrap_or("").to_string());
+                    },
+                "memory-cost" => {
+                        request.memory_cost = Some(arg_from_str(value.unwrap_or("-0"), err, "memory-cost", "integer"));
+                    },
+                "signer-key" => {
+                        request.signer_key = Some(value.unwrap_or("").to_string());
+                    },
+                "rounds" => {
+                        request.rounds = Some(arg_from_str(value.unwrap_or("-0"), err, "rounds", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().upload_account(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -699,34 +800,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "salt-separator" => {
-                        request.salt_separator = Some(value.unwrap_or("").to_string());
-                    },
-                "hash-algorithm" => {
-                        request.hash_algorithm = Some(value.unwrap_or("").to_string());
-                    },
-                "memory-cost" => {
-                        request.memory_cost = Some(arg_from_str(value.unwrap_or("-0"), err, "memory-cost", "integer"));
-                    },
-                "signer-key" => {
-                        request.signer_key = Some(value.unwrap_or("").to_string());
-                    },
-                "rounds" => {
-                        request.rounds = Some(arg_from_str(value.unwrap_or("-0"), err, "rounds", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -750,8 +823,42 @@ impl Engine {
 
     fn _relyingparty_verify_assertion(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyVerifyAssertionRequest::default();
-        let mut call = self.hub.relyingparty().verify_assertion(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "request-uri" => {
+                        request.request_uri = Some(value.unwrap_or("").to_string());
+                    },
+                "post-body" => {
+                        request.post_body = Some(value.unwrap_or("").to_string());
+                    },
+                "return-refresh-token" => {
+                        request.return_refresh_token = Some(arg_from_str(value.unwrap_or("false"), err, "return-refresh-token", "boolean"));
+                    },
+                "pending-id-token" => {
+                        request.pending_id_token = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().verify_assertion(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -771,31 +878,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "request-uri" => {
-                        request.request_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "post-body" => {
-                        request.post_body = Some(value.unwrap_or("").to_string());
-                    },
-                "return-refresh-token" => {
-                        request.return_refresh_token = Some(arg_from_str(value.unwrap_or("false"), err, "return-refresh-token", "boolean"));
-                    },
-                "pending-id-token" => {
-                        request.pending_id_token = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -819,8 +901,45 @@ impl Engine {
 
     fn _relyingparty_verify_password(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::IdentitytoolkitRelyingpartyVerifyPasswordRequest::default();
-        let mut call = self.hub.relyingparty().verify_password(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "captcha-response" => {
+                        request.captcha_response = Some(value.unwrap_or("").to_string());
+                    },
+                "captcha-challenge" => {
+                        request.captcha_challenge = Some(value.unwrap_or("").to_string());
+                    },
+                "password" => {
+                        request.password = Some(value.unwrap_or("").to_string());
+                    },
+                "email" => {
+                        request.email = Some(value.unwrap_or("").to_string());
+                    },
+                "pending-id-token" => {
+                        request.pending_id_token = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.relyingparty().verify_password(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -840,34 +959,6 @@ impl Engine {
                     call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
                 },
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "captcha-response" => {
-                        request.captcha_response = Some(value.unwrap_or("").to_string());
-                    },
-                "captcha-challenge" => {
-                        request.captcha_challenge = Some(value.unwrap_or("").to_string());
-                    },
-                "password" => {
-                        request.password = Some(value.unwrap_or("").to_string());
-                    },
-                "email" => {
-                        request.email = Some(value.unwrap_or("").to_string());
-                    },
-                "pending-id-token" => {
-                        request.pending_id_token = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
             }
         }
         let protocol = "standard-request";
@@ -990,6 +1081,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -997,8 +1089,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

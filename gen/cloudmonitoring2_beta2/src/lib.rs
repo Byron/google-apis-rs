@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Monitoring* crate version *0.1.5+20150401*, where *20150401* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Cloud Monitoring* crate version *0.1.6+20150401*, where *20150401* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! 
 //! Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -105,7 +105,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.metric_descriptors().list(&req, "project")
+//! let result = hub.metric_descriptors().list(req, "project")
 //!              .query("dolores")
 //!              .page_token("kasd")
 //!              .count(-22)
@@ -115,14 +115,15 @@
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -210,7 +211,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -283,7 +284,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.metric_descriptors().list(&req, "project")
+/// let result = hub.metric_descriptors().list(req, "project")
 ///              .query("justo")
 ///              .page_token("amet.")
 ///              .count(-81)
@@ -293,14 +294,15 @@ impl Default for Scope {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -321,7 +323,7 @@ impl<'a, C, A> CloudMonitoring<C, A>
         CloudMonitoring {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -336,7 +338,7 @@ impl<'a, C, A> CloudMonitoring<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -808,10 +810,10 @@ impl<'a, C, A> TimeseriesDescriptorMethods<'a, C, A> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: &ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
+    pub fn list(&self, request: ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C, A> {
         TimeseriesDescriptorListCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project: project.to_string(),
             _metric: metric.to_string(),
             _youngest: youngest.to_string(),
@@ -877,10 +879,10 @@ impl<'a, C, A> TimeseryMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project ID. The value can be the numeric project ID or string-based project name.
-    pub fn write(&self, request: &WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C, A> {
+    pub fn write(&self, request: WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C, A> {
         TimeseryWriteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project: project.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -898,10 +900,10 @@ impl<'a, C, A> TimeseryMethods<'a, C, A> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: &ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C, A> {
+    pub fn list(&self, request: ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C, A> {
         TimeseryListCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project: project.to_string(),
             _metric: metric.to_string(),
             _youngest: youngest.to_string(),
@@ -967,10 +969,10 @@ impl<'a, C, A> MetricDescriptorMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn list(&self, request: &ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C, A> {
+    pub fn list(&self, request: ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C, A> {
         MetricDescriptorListCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project: project.to_string(),
             _query: Default::default(),
             _page_token: Default::default(),
@@ -1008,10 +1010,10 @@ impl<'a, C, A> MetricDescriptorMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn create(&self, request: &MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C, A> {
+    pub fn create(&self, request: MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C, A> {
         MetricDescriptorCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project: project.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1060,7 +1062,7 @@ impl<'a, C, A> MetricDescriptorMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.timeseries_descriptors().list(&req, "project", "metric", "youngest")
+/// let result = hub.timeseries_descriptors().list(req, "project", "metric", "youngest")
 ///              .window("dolores")
 ///              .timespan("gubergren")
 ///              .page_token("sadipscing")
@@ -1231,12 +1233,17 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1245,7 +1252,7 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1263,8 +1270,8 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
@@ -1447,7 +1454,7 @@ impl<'a, C, A> TimeseriesDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.timeseries().write(&req, "project")
+/// let result = hub.timeseries().write(req, "project")
 ///              .doit();
 /// # }
 /// ```
@@ -1575,12 +1582,17 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1589,7 +1601,7 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1607,8 +1619,8 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The project ID. The value can be the numeric project ID or string-based project name.
@@ -1705,7 +1717,7 @@ impl<'a, C, A> TimeseryWriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.timeseries().list(&req, "project", "metric", "youngest")
+/// let result = hub.timeseries().list(req, "project", "metric", "youngest")
 ///              .window("ipsum")
 ///              .timespan("Lorem")
 ///              .page_token("et")
@@ -1876,12 +1888,17 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1890,7 +1907,7 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1908,8 +1925,8 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &ListTimeseriesRequest) -> TimeseryListCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: ListTimeseriesRequest) -> TimeseryListCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
@@ -2092,7 +2109,7 @@ impl<'a, C, A> TimeseryListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.metric_descriptors().list(&req, "project")
+/// let result = hub.metric_descriptors().list(req, "project")
 ///              .query("erat")
 ///              .page_token("sadipscing")
 ///              .count(-48)
@@ -2235,12 +2252,17 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2249,7 +2271,7 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2267,8 +2289,8 @@ impl<'a, C, A> MetricDescriptorListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The project id. The value can be the numeric project ID or string-based project name.
@@ -2501,12 +2523,17 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2515,7 +2542,7 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2632,7 +2659,7 @@ impl<'a, C, A> MetricDescriptorDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.metric_descriptors().create(&req, "project")
+/// let result = hub.metric_descriptors().create(req, "project")
 ///              .doit();
 /// # }
 /// ```
@@ -2760,12 +2787,17 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2774,7 +2806,7 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2792,8 +2824,8 @@ impl<'a, C, A> MetricDescriptorCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &MetricDescriptor) -> MetricDescriptorCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: MetricDescriptor) -> MetricDescriptorCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The project id. The value can be the numeric project ID or string-based project name.

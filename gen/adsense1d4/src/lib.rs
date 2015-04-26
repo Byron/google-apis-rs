@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdSense* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *AdSense* crate version *0.1.6+20150326*, where *20150326* is the exact revision of the *adsense:v1.4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! 
 //! Everything else about the *AdSense* *v1d4* API can be found at the
 //! [official documentation site](https://developers.google.com/adsense/management/).
@@ -150,14 +150,15 @@
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -245,7 +246,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -332,14 +333,15 @@ impl Default for Scope {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -360,7 +362,7 @@ impl<'a, C, A> AdSense<C, A>
         AdSense {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -396,7 +398,7 @@ impl<'a, C, A> AdSense<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2503,12 +2505,17 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2517,7 +2524,7 @@ impl<'a, C, A> UrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2763,12 +2770,17 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2777,7 +2789,7 @@ impl<'a, C, A> AdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3023,12 +3035,17 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3037,7 +3054,7 @@ impl<'a, C, A> AdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3282,12 +3299,17 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3296,7 +3318,7 @@ impl<'a, C, A> AdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3539,12 +3561,17 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3553,7 +3580,7 @@ impl<'a, C, A> AdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3767,12 +3794,17 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3781,7 +3813,7 @@ impl<'a, C, A> AdclientListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4004,12 +4036,17 @@ impl<'a, C, A> AlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -4207,12 +4244,17 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4221,7 +4263,7 @@ impl<'a, C, A> AlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4422,12 +4464,17 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4436,7 +4483,7 @@ impl<'a, C, A> SavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4660,12 +4707,17 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4674,7 +4726,7 @@ impl<'a, C, A> SavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4878,12 +4930,17 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4892,7 +4949,7 @@ impl<'a, C, A> ReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -5185,12 +5242,17 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -5199,7 +5261,7 @@ impl<'a, C, A> ReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     } else { (res, Default::default()) };
@@ -5519,12 +5581,17 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5533,7 +5600,7 @@ impl<'a, C, A> ReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -5775,12 +5842,17 @@ impl<'a, C, A> AccountAlertDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -6014,12 +6086,17 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6028,7 +6105,7 @@ impl<'a, C, A> AccountAlertListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6272,12 +6349,17 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6286,7 +6368,7 @@ impl<'a, C, A> AccountReportSavedGenerateCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6521,12 +6603,17 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6535,7 +6622,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6759,12 +6846,17 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6773,7 +6865,7 @@ impl<'a, C, A> AccountPaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6995,12 +7087,17 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7009,7 +7106,7 @@ impl<'a, C, A> AccountSavedadstyleGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7243,12 +7340,17 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7257,7 +7359,7 @@ impl<'a, C, A> AccountAdunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7501,12 +7603,17 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7515,7 +7622,7 @@ impl<'a, C, A> AccountCustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7774,12 +7881,17 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7788,7 +7900,7 @@ impl<'a, C, A> AccountCustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8059,12 +8171,17 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8073,7 +8190,7 @@ impl<'a, C, A> AccountReportSavedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8319,12 +8436,17 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8333,7 +8455,7 @@ impl<'a, C, A> AccountUrlchannelListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8594,12 +8716,17 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8608,7 +8735,7 @@ impl<'a, C, A> AccountAdunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8945,12 +9072,17 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -8959,7 +9091,7 @@ impl<'a, C, A> AccountReportGenerateCall<'a, C, A> where C: BorrowMut<hyper::Cli
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     } else { (res, Default::default()) };
@@ -9276,12 +9408,17 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9290,7 +9427,7 @@ impl<'a, C, A> AccountAdclientListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -9536,12 +9673,17 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9550,7 +9692,7 @@ impl<'a, C, A> AccountCustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -9804,12 +9946,17 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9818,7 +9965,7 @@ impl<'a, C, A> AccountSavedadstyleListCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10056,12 +10203,17 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10070,7 +10222,7 @@ impl<'a, C, A> AccountAdunitGetAdCodeCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10324,12 +10476,17 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10338,7 +10495,7 @@ impl<'a, C, A> AccountAdunitCustomchannelListCall<'a, C, A> where C: BorrowMut<h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10597,12 +10754,17 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10611,7 +10773,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10812,12 +10974,17 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10826,7 +10993,7 @@ impl<'a, C, A> PaymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11010,12 +11177,17 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11024,7 +11196,7 @@ impl<'a, C, A> MetadataDimensionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11208,12 +11380,17 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11222,7 +11399,7 @@ impl<'a, C, A> MetadataMetricListCall<'a, C, A> where C: BorrowMut<hyper::Client
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11434,12 +11611,17 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11448,7 +11630,7 @@ impl<'a, C, A> CustomchannelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11688,12 +11870,17 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11702,7 +11889,7 @@ impl<'a, C, A> CustomchannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11953,12 +12140,17 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11967,7 +12159,7 @@ impl<'a, C, A> CustomchannelAdunitListCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };

@@ -19,171 +19,172 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  compute1 [options] addresses aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] addresses delete <project> <region> <address> [-p <v>]... [-o <out>]
-  compute1 [options] addresses get <project> <region> <address> [-p <v>]... [-o <out>]
-  compute1 [options] addresses insert <project> <region> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] addresses list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] backend-services delete <project> <backend-service> [-p <v>]... [-o <out>]
-  compute1 [options] backend-services get <project> <backend-service> [-p <v>]... [-o <out>]
-  compute1 [options] backend-services get-health <project> <backend-service> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] backend-services insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] backend-services list <project> [-p <v>]... [-o <out>]
-  compute1 [options] backend-services patch <project> <backend-service> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] backend-services update <project> <backend-service> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] disk-types aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] disk-types get <project> <zone> <disk-type> [-p <v>]... [-o <out>]
-  compute1 [options] disk-types list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] disks aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] disks create-snapshot <project> <zone> <disk> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] disks delete <project> <zone> <disk> [-p <v>]... [-o <out>]
-  compute1 [options] disks get <project> <zone> <disk> [-p <v>]... [-o <out>]
-  compute1 [options] disks insert <project> <zone> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] disks list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] firewalls delete <project> <firewall> [-p <v>]... [-o <out>]
-  compute1 [options] firewalls get <project> <firewall> [-p <v>]... [-o <out>]
-  compute1 [options] firewalls insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] firewalls list <project> [-p <v>]... [-o <out>]
-  compute1 [options] firewalls patch <project> <firewall> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] firewalls update <project> <firewall> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules delete <project> <region> <forwarding-rule> [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules get <project> <region> <forwarding-rule> [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules insert <project> <region> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] forwarding-rules set-target <project> <region> <forwarding-rule> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] global-addresses delete <project> <address> [-p <v>]... [-o <out>]
-  compute1 [options] global-addresses get <project> <address> [-p <v>]... [-o <out>]
-  compute1 [options] global-addresses insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] global-addresses list <project> [-p <v>]... [-o <out>]
-  compute1 [options] global-forwarding-rules delete <project> <forwarding-rule> [-p <v>]... [-o <out>]
-  compute1 [options] global-forwarding-rules get <project> <forwarding-rule> [-p <v>]... [-o <out>]
-  compute1 [options] global-forwarding-rules insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] global-forwarding-rules list <project> [-p <v>]... [-o <out>]
-  compute1 [options] global-forwarding-rules set-target <project> <forwarding-rule> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] global-operations aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] global-operations delete <project> <operation> [-p <v>]...
-  compute1 [options] global-operations get <project> <operation> [-p <v>]... [-o <out>]
-  compute1 [options] global-operations list <project> [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks delete <project> <http-health-check> [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks get <project> <http-health-check> [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks list <project> [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks patch <project> <http-health-check> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] http-health-checks update <project> <http-health-check> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] images delete <project> <image> [-p <v>]... [-o <out>]
-  compute1 [options] images deprecate <project> <image> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] images get <project> <image> [-p <v>]... [-o <out>]
-  compute1 [options] images insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] images list <project> [-p <v>]... [-o <out>]
-  compute1 [options] instance-templates delete <project> <instance-template> [-p <v>]... [-o <out>]
-  compute1 [options] instance-templates get <project> <instance-template> [-p <v>]... [-o <out>]
-  compute1 [options] instance-templates insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instance-templates list <project> [-p <v>]... [-o <out>]
-  compute1 [options] instances add-access-config <project> <zone> <instance> <network-interface> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] instances attach-disk <project> <zone> <instance> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances delete <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] instances delete-access-config <project> <zone> <instance> <access-config> <network-interface> [-p <v>]... [-o <out>]
-  compute1 [options] instances detach-disk <project> <zone> <instance> <device-name> [-p <v>]... [-o <out>]
-  compute1 [options] instances get <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] instances get-serial-port-output <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] instances insert <project> <zone> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] instances reset <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] instances set-disk-auto-delete <project> <zone> <instance> <auto-delete> <device-name> [-p <v>]... [-o <out>]
-  compute1 [options] instances set-metadata <project> <zone> <instance> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances set-scheduling <project> <zone> <instance> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances set-tags <project> <zone> <instance> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] instances start <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] instances stop <project> <zone> <instance> [-p <v>]... [-o <out>]
-  compute1 [options] licenses get <project> <license> [-p <v>]... [-o <out>]
-  compute1 [options] machine-types aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] machine-types get <project> <zone> <machine-type> [-p <v>]... [-o <out>]
-  compute1 [options] machine-types list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] networks delete <project> <network> [-p <v>]... [-o <out>]
-  compute1 [options] networks get <project> <network> [-p <v>]... [-o <out>]
-  compute1 [options] networks insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] networks list <project> [-p <v>]... [-o <out>]
-  compute1 [options] projects get <project> [-p <v>]... [-o <out>]
-  compute1 [options] projects move-disk <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] projects move-instance <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] projects set-common-instance-metadata <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] projects set-usage-export-bucket <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] region-operations delete <project> <region> <operation> [-p <v>]...
-  compute1 [options] region-operations get <project> <region> <operation> [-p <v>]... [-o <out>]
-  compute1 [options] region-operations list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] regions get <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] regions list <project> [-p <v>]... [-o <out>]
-  compute1 [options] routes delete <project> <route> [-p <v>]... [-o <out>]
-  compute1 [options] routes get <project> <route> [-p <v>]... [-o <out>]
-  compute1 [options] routes insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] routes list <project> [-p <v>]... [-o <out>]
-  compute1 [options] snapshots delete <project> <snapshot> [-p <v>]... [-o <out>]
-  compute1 [options] snapshots get <project> <snapshot> [-p <v>]... [-o <out>]
-  compute1 [options] snapshots list <project> [-p <v>]... [-o <out>]
-  compute1 [options] target-http-proxies delete <project> <target-http-proxy> [-p <v>]... [-o <out>]
-  compute1 [options] target-http-proxies get <project> <target-http-proxy> [-p <v>]... [-o <out>]
-  compute1 [options] target-http-proxies insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-http-proxies list <project> [-p <v>]... [-o <out>]
-  compute1 [options] target-http-proxies set-url-map <project> <target-http-proxy> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-instances aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] target-instances delete <project> <zone> <target-instance> [-p <v>]... [-o <out>]
-  compute1 [options] target-instances get <project> <zone> <target-instance> [-p <v>]... [-o <out>]
-  compute1 [options] target-instances insert <project> <zone> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-instances list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] target-pools add-health-check <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools add-instance <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] target-pools delete <project> <region> <target-pool> [-p <v>]... [-o <out>]
-  compute1 [options] target-pools get <project> <region> <target-pool> [-p <v>]... [-o <out>]
-  compute1 [options] target-pools get-health <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools insert <project> <region> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] target-pools remove-health-check <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools remove-instance <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-pools set-backup <project> <region> <target-pool> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-vpn-gateways aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] target-vpn-gateways delete <project> <region> <target-vpn-gateway> [-p <v>]... [-o <out>]
-  compute1 [options] target-vpn-gateways get <project> <region> <target-vpn-gateway> [-p <v>]... [-o <out>]
-  compute1 [options] target-vpn-gateways insert <project> <region> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] target-vpn-gateways list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] url-maps delete <project> <url-map> [-p <v>]... [-o <out>]
-  compute1 [options] url-maps get <project> <url-map> [-p <v>]... [-o <out>]
-  compute1 [options] url-maps insert <project> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] url-maps list <project> [-p <v>]... [-o <out>]
-  compute1 [options] url-maps patch <project> <url-map> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] url-maps update <project> <url-map> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] url-maps validate <project> <url-map> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] vpn-tunnels aggregated-list <project> [-p <v>]... [-o <out>]
-  compute1 [options] vpn-tunnels delete <project> <region> <vpn-tunnel> [-p <v>]... [-o <out>]
-  compute1 [options] vpn-tunnels get <project> <region> <vpn-tunnel> [-p <v>]... [-o <out>]
-  compute1 [options] vpn-tunnels insert <project> <region> -r <kv>... [-p <v>]... [-o <out>]
-  compute1 [options] vpn-tunnels list <project> <region> [-p <v>]... [-o <out>]
-  compute1 [options] zone-operations delete <project> <zone> <operation> [-p <v>]...
-  compute1 [options] zone-operations get <project> <zone> <operation> [-p <v>]... [-o <out>]
-  compute1 [options] zone-operations list <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] zones get <project> <zone> [-p <v>]... [-o <out>]
-  compute1 [options] zones list <project> [-p <v>]... [-o <out>]
+  compute1 [options] addresses aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] addresses delete <project> <region> <address> [-p <v>...] [-o <out>]
+  compute1 [options] addresses get <project> <region> <address> [-p <v>...] [-o <out>]
+  compute1 [options] addresses insert <project> <region> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] addresses list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] backend-services delete <project> <backend-service> [-p <v>...] [-o <out>]
+  compute1 [options] backend-services get <project> <backend-service> [-p <v>...] [-o <out>]
+  compute1 [options] backend-services get-health <project> <backend-service> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] backend-services insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] backend-services list <project> [-p <v>...] [-o <out>]
+  compute1 [options] backend-services patch <project> <backend-service> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] backend-services update <project> <backend-service> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] disk-types aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] disk-types get <project> <zone> <disk-type> [-p <v>...] [-o <out>]
+  compute1 [options] disk-types list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] disks aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] disks create-snapshot <project> <zone> <disk> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] disks delete <project> <zone> <disk> [-p <v>...] [-o <out>]
+  compute1 [options] disks get <project> <zone> <disk> [-p <v>...] [-o <out>]
+  compute1 [options] disks insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] disks list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] firewalls delete <project> <firewall> [-p <v>...] [-o <out>]
+  compute1 [options] firewalls get <project> <firewall> [-p <v>...] [-o <out>]
+  compute1 [options] firewalls insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] firewalls list <project> [-p <v>...] [-o <out>]
+  compute1 [options] firewalls patch <project> <firewall> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] firewalls update <project> <firewall> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules delete <project> <region> <forwarding-rule> [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules get <project> <region> <forwarding-rule> [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules insert <project> <region> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] forwarding-rules set-target <project> <region> <forwarding-rule> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] global-addresses delete <project> <address> [-p <v>...] [-o <out>]
+  compute1 [options] global-addresses get <project> <address> [-p <v>...] [-o <out>]
+  compute1 [options] global-addresses insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] global-addresses list <project> [-p <v>...] [-o <out>]
+  compute1 [options] global-forwarding-rules delete <project> <forwarding-rule> [-p <v>...] [-o <out>]
+  compute1 [options] global-forwarding-rules get <project> <forwarding-rule> [-p <v>...] [-o <out>]
+  compute1 [options] global-forwarding-rules insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] global-forwarding-rules list <project> [-p <v>...] [-o <out>]
+  compute1 [options] global-forwarding-rules set-target <project> <forwarding-rule> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] global-operations aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] global-operations delete <project> <operation> [-p <v>...]
+  compute1 [options] global-operations get <project> <operation> [-p <v>...] [-o <out>]
+  compute1 [options] global-operations list <project> [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks delete <project> <http-health-check> [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks get <project> <http-health-check> [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks list <project> [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks patch <project> <http-health-check> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] http-health-checks update <project> <http-health-check> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] images delete <project> <image> [-p <v>...] [-o <out>]
+  compute1 [options] images deprecate <project> <image> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] images get <project> <image> [-p <v>...] [-o <out>]
+  compute1 [options] images insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] images list <project> [-p <v>...] [-o <out>]
+  compute1 [options] instance-templates delete <project> <instance-template> [-p <v>...] [-o <out>]
+  compute1 [options] instance-templates get <project> <instance-template> [-p <v>...] [-o <out>]
+  compute1 [options] instance-templates insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instance-templates list <project> [-p <v>...] [-o <out>]
+  compute1 [options] instances add-access-config <project> <zone> <instance> <network-interface> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] instances attach-disk <project> <zone> <instance> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances delete <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] instances delete-access-config <project> <zone> <instance> <access-config> <network-interface> [-p <v>...] [-o <out>]
+  compute1 [options] instances detach-disk <project> <zone> <instance> <device-name> [-p <v>...] [-o <out>]
+  compute1 [options] instances get <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] instances get-serial-port-output <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] instances insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] instances reset <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] instances set-disk-auto-delete <project> <zone> <instance> <auto-delete> <device-name> [-p <v>...] [-o <out>]
+  compute1 [options] instances set-metadata <project> <zone> <instance> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances set-scheduling <project> <zone> <instance> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances set-tags <project> <zone> <instance> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] instances start <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] instances stop <project> <zone> <instance> [-p <v>...] [-o <out>]
+  compute1 [options] licenses get <project> <license> [-p <v>...] [-o <out>]
+  compute1 [options] machine-types aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] machine-types get <project> <zone> <machine-type> [-p <v>...] [-o <out>]
+  compute1 [options] machine-types list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] networks delete <project> <network> [-p <v>...] [-o <out>]
+  compute1 [options] networks get <project> <network> [-p <v>...] [-o <out>]
+  compute1 [options] networks insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] networks list <project> [-p <v>...] [-o <out>]
+  compute1 [options] projects get <project> [-p <v>...] [-o <out>]
+  compute1 [options] projects move-disk <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] projects move-instance <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] projects set-common-instance-metadata <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] projects set-usage-export-bucket <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] region-operations delete <project> <region> <operation> [-p <v>...]
+  compute1 [options] region-operations get <project> <region> <operation> [-p <v>...] [-o <out>]
+  compute1 [options] region-operations list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] regions get <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] regions list <project> [-p <v>...] [-o <out>]
+  compute1 [options] routes delete <project> <route> [-p <v>...] [-o <out>]
+  compute1 [options] routes get <project> <route> [-p <v>...] [-o <out>]
+  compute1 [options] routes insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] routes list <project> [-p <v>...] [-o <out>]
+  compute1 [options] snapshots delete <project> <snapshot> [-p <v>...] [-o <out>]
+  compute1 [options] snapshots get <project> <snapshot> [-p <v>...] [-o <out>]
+  compute1 [options] snapshots list <project> [-p <v>...] [-o <out>]
+  compute1 [options] target-http-proxies delete <project> <target-http-proxy> [-p <v>...] [-o <out>]
+  compute1 [options] target-http-proxies get <project> <target-http-proxy> [-p <v>...] [-o <out>]
+  compute1 [options] target-http-proxies insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-http-proxies list <project> [-p <v>...] [-o <out>]
+  compute1 [options] target-http-proxies set-url-map <project> <target-http-proxy> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-instances aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] target-instances delete <project> <zone> <target-instance> [-p <v>...] [-o <out>]
+  compute1 [options] target-instances get <project> <zone> <target-instance> [-p <v>...] [-o <out>]
+  compute1 [options] target-instances insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-instances list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] target-pools add-health-check <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools add-instance <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] target-pools delete <project> <region> <target-pool> [-p <v>...] [-o <out>]
+  compute1 [options] target-pools get <project> <region> <target-pool> [-p <v>...] [-o <out>]
+  compute1 [options] target-pools get-health <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools insert <project> <region> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] target-pools remove-health-check <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools remove-instance <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-pools set-backup <project> <region> <target-pool> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-vpn-gateways aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] target-vpn-gateways delete <project> <region> <target-vpn-gateway> [-p <v>...] [-o <out>]
+  compute1 [options] target-vpn-gateways get <project> <region> <target-vpn-gateway> [-p <v>...] [-o <out>]
+  compute1 [options] target-vpn-gateways insert <project> <region> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] target-vpn-gateways list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] url-maps delete <project> <url-map> [-p <v>...] [-o <out>]
+  compute1 [options] url-maps get <project> <url-map> [-p <v>...] [-o <out>]
+  compute1 [options] url-maps insert <project> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] url-maps list <project> [-p <v>...] [-o <out>]
+  compute1 [options] url-maps patch <project> <url-map> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] url-maps update <project> <url-map> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] url-maps validate <project> <url-map> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] vpn-tunnels aggregated-list <project> [-p <v>...] [-o <out>]
+  compute1 [options] vpn-tunnels delete <project> <region> <vpn-tunnel> [-p <v>...] [-o <out>]
+  compute1 [options] vpn-tunnels get <project> <region> <vpn-tunnel> [-p <v>...] [-o <out>]
+  compute1 [options] vpn-tunnels insert <project> <region> -r <kv>... [-p <v>...] [-o <out>]
+  compute1 [options] vpn-tunnels list <project> <region> [-p <v>...] [-o <out>]
+  compute1 [options] zone-operations delete <project> <zone> <operation> [-p <v>...]
+  compute1 [options] zone-operations get <project> <zone> <operation> [-p <v>...] [-o <out>]
+  compute1 [options] zone-operations list <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] zones get <project> <zone> [-p <v>...] [-o <out>]
+  compute1 [options] zones list <project> [-p <v>...] [-o <out>]
   compute1 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_compute1_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -241,6 +242,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -284,6 +288,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -327,6 +334,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -343,37 +353,24 @@ impl Engine {
 
     fn _addresses_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Address::default();
-        let mut call = self.hub.addresses().insert(&request, &self.opt.arg_project, &self.opt.arg_region);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Address::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -408,8 +405,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.addresses().insert(request, &self.opt.arg_project, &self.opt.arg_region);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -417,6 +436,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -469,6 +491,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -512,6 +537,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -555,6 +583,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -571,8 +602,33 @@ impl Engine {
 
     fn _backend_services_get_health(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ResourceGroupReference::default();
-        let mut call = self.hub.backend_services().get_health(&request, &self.opt.arg_project, &self.opt.arg_backend_service);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "group" => {
+                        request.group = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.backend_services().get_health(request, &self.opt.arg_project, &self.opt.arg_backend_service);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -594,27 +650,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "group" => {
-                        request.group = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -631,37 +674,24 @@ impl Engine {
 
     fn _backend_services_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::BackendService::default();
-        let mut call = self.hub.backend_services().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::BackendService::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -702,8 +732,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.backend_services().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -711,6 +763,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -763,6 +818,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -779,37 +837,24 @@ impl Engine {
 
     fn _backend_services_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::BackendService::default();
-        let mut call = self.hub.backend_services().patch(&request, &self.opt.arg_project, &self.opt.arg_backend_service);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::BackendService::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -850,8 +895,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.backend_services().patch(request, &self.opt.arg_project, &self.opt.arg_backend_service);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -859,6 +926,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -875,37 +945,24 @@ impl Engine {
 
     fn _backend_services_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::BackendService::default();
-        let mut call = self.hub.backend_services().update(&request, &self.opt.arg_project, &self.opt.arg_backend_service);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::BackendService::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -946,8 +1003,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.backend_services().update(request, &self.opt.arg_project, &self.opt.arg_backend_service);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -955,6 +1034,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1007,6 +1089,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1050,6 +1135,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1102,6 +1190,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1154,6 +1245,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1170,37 +1264,24 @@ impl Engine {
 
     fn _disks_create_snapshot(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Snapshot::default();
-        let mut call = self.hub.disks().create_snapshot(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_disk);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Snapshot::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -1244,8 +1325,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.disks().create_snapshot(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_disk);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1253,6 +1356,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1296,6 +1402,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1339,6 +1448,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1355,40 +1467,24 @@ impl Engine {
 
     fn _disks_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Disk::default();
-        let mut call = self.hub.disks().insert(&request, &self.opt.arg_project, &self.opt.arg_zone);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "source-image" => {
-                    call = call.source_image(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Disk::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -1441,8 +1537,33 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.disks().insert(request, &self.opt.arg_project, &self.opt.arg_zone);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "source-image" => {
+                    call = call.source_image(value.unwrap_or(""));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1450,6 +1571,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1502,6 +1626,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1545,6 +1672,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1588,6 +1718,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1604,37 +1737,24 @@ impl Engine {
 
     fn _firewalls_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Firewall::default();
-        let mut call = self.hub.firewalls().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Firewall::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1675,8 +1795,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.firewalls().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1684,6 +1826,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1736,6 +1881,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1752,37 +1900,24 @@ impl Engine {
 
     fn _firewalls_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Firewall::default();
-        let mut call = self.hub.firewalls().patch(&request, &self.opt.arg_project, &self.opt.arg_firewall);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Firewall::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1823,8 +1958,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.firewalls().patch(request, &self.opt.arg_project, &self.opt.arg_firewall);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1832,6 +1989,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1848,37 +2008,24 @@ impl Engine {
 
     fn _firewalls_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Firewall::default();
-        let mut call = self.hub.firewalls().update(&request, &self.opt.arg_project, &self.opt.arg_firewall);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Firewall::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1919,8 +2066,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.firewalls().update(request, &self.opt.arg_project, &self.opt.arg_firewall);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1928,6 +2097,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1980,6 +2152,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2023,6 +2198,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2066,6 +2244,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2082,37 +2263,24 @@ impl Engine {
 
     fn _forwarding_rules_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::ForwardingRule::default();
-        let mut call = self.hub.forwarding_rules().insert(&request, &self.opt.arg_project, &self.opt.arg_region);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::ForwardingRule::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -2147,8 +2315,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.forwarding_rules().insert(request, &self.opt.arg_project, &self.opt.arg_region);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2156,6 +2346,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2208,6 +2401,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2224,8 +2420,33 @@ impl Engine {
 
     fn _forwarding_rules_set_target(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetReference::default();
-        let mut call = self.hub.forwarding_rules().set_target(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_forwarding_rule);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "target" => {
+                        request.target = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.forwarding_rules().set_target(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_forwarding_rule);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2247,27 +2468,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "target" => {
-                        request.target = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2311,6 +2519,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2354,6 +2565,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2370,37 +2584,24 @@ impl Engine {
 
     fn _global_addresses_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Address::default();
-        let mut call = self.hub.global_addresses().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Address::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -2435,8 +2636,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.global_addresses().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2444,6 +2667,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2496,6 +2722,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2539,6 +2768,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2582,6 +2814,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2598,37 +2833,24 @@ impl Engine {
 
     fn _global_forwarding_rules_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::ForwardingRule::default();
-        let mut call = self.hub.global_forwarding_rules().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::ForwardingRule::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -2663,8 +2885,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.global_forwarding_rules().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2672,6 +2916,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2724,6 +2971,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2740,8 +2990,33 @@ impl Engine {
 
     fn _global_forwarding_rules_set_target(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetReference::default();
-        let mut call = self.hub.global_forwarding_rules().set_target(&request, &self.opt.arg_project, &self.opt.arg_forwarding_rule);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "target" => {
+                        request.target = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.global_forwarding_rules().set_target(request, &self.opt.arg_project, &self.opt.arg_forwarding_rule);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2763,27 +3038,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "target" => {
-                        request.target = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2836,6 +3098,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2879,6 +3144,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2920,6 +3188,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2972,6 +3243,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3015,6 +3289,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3058,6 +3335,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3074,37 +3354,24 @@ impl Engine {
 
     fn _http_health_checks_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::HttpHealthCheck::default();
-        let mut call = self.hub.http_health_checks().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::HttpHealthCheck::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -3145,8 +3412,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.http_health_checks().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3154,6 +3443,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3206,6 +3498,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3222,37 +3517,24 @@ impl Engine {
 
     fn _http_health_checks_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::HttpHealthCheck::default();
-        let mut call = self.hub.http_health_checks().patch(&request, &self.opt.arg_project, &self.opt.arg_http_health_check);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::HttpHealthCheck::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -3293,8 +3575,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.http_health_checks().patch(request, &self.opt.arg_project, &self.opt.arg_http_health_check);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3302,6 +3606,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3318,37 +3625,24 @@ impl Engine {
 
     fn _http_health_checks_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::HttpHealthCheck::default();
-        let mut call = self.hub.http_health_checks().update(&request, &self.opt.arg_project, &self.opt.arg_http_health_check);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::HttpHealthCheck::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -3389,8 +3683,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.http_health_checks().update(request, &self.opt.arg_project, &self.opt.arg_http_health_check);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3398,6 +3714,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3441,6 +3760,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3457,8 +3779,45 @@ impl Engine {
 
     fn _images_deprecate(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::DeprecationStatus::default();
-        let mut call = self.hub.images().deprecate(&request, &self.opt.arg_project, &self.opt.arg_image);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "deleted" => {
+                        request.deleted = Some(value.unwrap_or("").to_string());
+                    },
+                "deprecated" => {
+                        request.deprecated = Some(value.unwrap_or("").to_string());
+                    },
+                "state" => {
+                        request.state = Some(value.unwrap_or("").to_string());
+                    },
+                "obsolete" => {
+                        request.obsolete = Some(value.unwrap_or("").to_string());
+                    },
+                "replacement" => {
+                        request.replacement = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.images().deprecate(request, &self.opt.arg_project, &self.opt.arg_image);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3480,39 +3839,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "deleted" => {
-                        request.deleted = Some(value.unwrap_or("").to_string());
-                    },
-                "deprecated" => {
-                        request.deprecated = Some(value.unwrap_or("").to_string());
-                    },
-                "state" => {
-                        request.state = Some(value.unwrap_or("").to_string());
-                    },
-                "obsolete" => {
-                        request.obsolete = Some(value.unwrap_or("").to_string());
-                    },
-                "replacement" => {
-                        request.replacement = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3556,6 +3890,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3572,35 +3909,22 @@ impl Engine {
 
     fn _images_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Image::default();
-        let mut call = self.hub.images().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Image::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_deprecated_init(request: &mut api::Image) {
                 if request.deprecated.is_none() {
@@ -3614,7 +3938,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -3700,8 +4024,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.images().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3709,6 +4055,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3761,6 +4110,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3804,6 +4156,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3847,6 +4202,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3863,35 +4221,22 @@ impl Engine {
 
     fn _instance_templates_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::InstanceTemplate::default();
-        let mut call = self.hub.instance_templates().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::InstanceTemplate::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_properties_init(request: &mut api::InstanceTemplate) {
                 if request.properties.is_none() {
@@ -3920,7 +4265,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -3981,8 +4326,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.instance_templates().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3990,6 +4357,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4042,6 +4412,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4058,8 +4431,42 @@ impl Engine {
 
     fn _instances_add_access_config(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::AccessConfig::default();
-        let mut call = self.hub.instances().add_access_config(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance, &self.opt.arg_network_interface);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "type" => {
+                        request.type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "nat-ip" => {
+                        request.nat_ip = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.instances().add_access_config(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance, &self.opt.arg_network_interface);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4081,36 +4488,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "nat-ip" => {
-                        request.nat_ip = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4163,6 +4548,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4179,35 +4567,22 @@ impl Engine {
 
     fn _instances_attach_disk(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::AttachedDisk::default();
-        let mut call = self.hub.instances().attach_disk(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::AttachedDisk::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_initialize_params_init(request: &mut api::AttachedDisk) {
                 if request.initialize_params.is_none() {
@@ -4215,7 +4590,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "device-name" => {
                         request.device_name = Some(value.unwrap_or("").to_string());
                     },
@@ -4274,8 +4649,30 @@ impl Engine {
                         request.source = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.instances().attach_disk(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -4283,6 +4680,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4326,6 +4726,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4369,6 +4772,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4412,6 +4818,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4455,6 +4864,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4501,6 +4913,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4517,35 +4932,22 @@ impl Engine {
 
     fn _instances_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Instance::default();
-        let mut call = self.hub.instances().insert(&request, &self.opt.arg_project, &self.opt.arg_zone);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Instance::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_metadata_init(request: &mut api::Instance) {
                 if request.metadata.is_none() {
@@ -4565,7 +4967,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "cpu-platform" => {
                         request.cpu_platform = Some(value.unwrap_or("").to_string());
                     },
@@ -4636,8 +5038,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.instances().insert(request, &self.opt.arg_project, &self.opt.arg_zone);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -4645,6 +5069,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4697,6 +5124,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4740,6 +5170,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4784,6 +5217,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4800,8 +5236,36 @@ impl Engine {
 
     fn _instances_set_metadata(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Metadata::default();
-        let mut call = self.hub.instances().set_metadata(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.instances().set_metadata(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4823,30 +5287,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4863,8 +5311,36 @@ impl Engine {
 
     fn _instances_set_scheduling(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Scheduling::default();
-        let mut call = self.hub.instances().set_scheduling(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "automatic-restart" => {
+                        request.automatic_restart = Some(arg_from_str(value.unwrap_or("false"), err, "automatic-restart", "boolean"));
+                    },
+                "on-host-maintenance" => {
+                        request.on_host_maintenance = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.instances().set_scheduling(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4886,30 +5362,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "automatic-restart" => {
-                        request.automatic_restart = Some(arg_from_str(value.unwrap_or("false"), err, "automatic-restart", "boolean"));
-                    },
-                "on-host-maintenance" => {
-                        request.on_host_maintenance = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4926,8 +5386,39 @@ impl Engine {
 
     fn _instances_set_tags(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Tags::default();
-        let mut call = self.hub.instances().set_tags(&request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "items" => {
+                        if request.items.is_none() {
+                           request.items = Some(Default::default());
+                        }
+                                        request.items.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.instances().set_tags(request, &self.opt.arg_project, &self.opt.arg_zone, &self.opt.arg_instance);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4949,33 +5440,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "items" => {
-                        if request.items.is_none() {
-                           request.items = Some(Default::default());
-                        }
-                                        request.items.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5019,6 +5491,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5062,6 +5537,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5105,6 +5583,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5157,6 +5638,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5200,6 +5684,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5252,6 +5739,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5295,6 +5785,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5338,6 +5831,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5354,37 +5850,24 @@ impl Engine {
 
     fn _networks_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Network::default();
-        let mut call = self.hub.networks().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Network::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -5410,8 +5893,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.networks().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -5419,6 +5924,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5471,6 +5979,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5514,6 +6025,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5530,8 +6044,36 @@ impl Engine {
 
     fn _projects_move_disk(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::DiskMoveRequest::default();
-        let mut call = self.hub.projects().move_disk(&request, &self.opt.arg_project);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "target-disk" => {
+                        request.target_disk = Some(value.unwrap_or("").to_string());
+                    },
+                "destination-zone" => {
+                        request.destination_zone = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.projects().move_disk(request, &self.opt.arg_project);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5553,30 +6095,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "target-disk" => {
-                        request.target_disk = Some(value.unwrap_or("").to_string());
-                    },
-                "destination-zone" => {
-                        request.destination_zone = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5593,8 +6119,36 @@ impl Engine {
 
     fn _projects_move_instance(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::InstanceMoveRequest::default();
-        let mut call = self.hub.projects().move_instance(&request, &self.opt.arg_project);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "target-instance" => {
+                        request.target_instance = Some(value.unwrap_or("").to_string());
+                    },
+                "destination-zone" => {
+                        request.destination_zone = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.projects().move_instance(request, &self.opt.arg_project);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5616,30 +6170,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "target-instance" => {
-                        request.target_instance = Some(value.unwrap_or("").to_string());
-                    },
-                "destination-zone" => {
-                        request.destination_zone = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5656,8 +6194,36 @@ impl Engine {
 
     fn _projects_set_common_instance_metadata(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Metadata::default();
-        let mut call = self.hub.projects().set_common_instance_metadata(&request, &self.opt.arg_project);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.projects().set_common_instance_metadata(request, &self.opt.arg_project);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5679,30 +6245,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5719,8 +6269,36 @@ impl Engine {
 
     fn _projects_set_usage_export_bucket(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::UsageExportLocation::default();
-        let mut call = self.hub.projects().set_usage_export_bucket(&request, &self.opt.arg_project);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "bucket-name" => {
+                        request.bucket_name = Some(value.unwrap_or("").to_string());
+                    },
+                "report-name-prefix" => {
+                        request.report_name_prefix = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.projects().set_usage_export_bucket(request, &self.opt.arg_project);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5742,30 +6320,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "bucket-name" => {
-                        request.bucket_name = Some(value.unwrap_or("").to_string());
-                    },
-                "report-name-prefix" => {
-                        request.report_name_prefix = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5809,6 +6371,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -5850,6 +6415,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5902,6 +6470,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5945,6 +6516,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -5997,6 +6571,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6040,6 +6617,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6083,6 +6663,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6099,37 +6682,24 @@ impl Engine {
 
     fn _routes_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Route::default();
-        let mut call = self.hub.routes().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Route::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "next-hop-gateway" => {
                         request.next_hop_gateway = Some(value.unwrap_or("").to_string());
                     },
@@ -6179,8 +6749,30 @@ impl Engine {
                         request.network = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.routes().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -6188,6 +6780,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6240,6 +6835,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6283,6 +6881,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6326,6 +6927,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6378,6 +6982,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6421,6 +7028,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6464,6 +7074,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6480,37 +7093,24 @@ impl Engine {
 
     fn _target_http_proxies_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::TargetHttpProxy::default();
-        let mut call = self.hub.target_http_proxies().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::TargetHttpProxy::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -6533,8 +7133,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.target_http_proxies().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -6542,6 +7164,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6594,6 +7219,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6610,8 +7238,33 @@ impl Engine {
 
     fn _target_http_proxies_set_url_map(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::UrlMapReference::default();
-        let mut call = self.hub.target_http_proxies().set_url_map(&request, &self.opt.arg_project, &self.opt.arg_target_http_proxy);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "url-map" => {
+                        request.url_map = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_http_proxies().set_url_map(request, &self.opt.arg_project, &self.opt.arg_target_http_proxy);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6633,27 +7286,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "url-map" => {
-                        request.url_map = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6706,6 +7346,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6749,6 +7392,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6792,6 +7438,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6808,37 +7457,24 @@ impl Engine {
 
     fn _target_instances_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::TargetInstance::default();
-        let mut call = self.hub.target_instances().insert(&request, &self.opt.arg_project, &self.opt.arg_zone);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::TargetInstance::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "nat-policy" => {
                         request.nat_policy = Some(value.unwrap_or("").to_string());
                     },
@@ -6867,8 +7503,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.target_instances().insert(request, &self.opt.arg_project, &self.opt.arg_zone);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -6876,6 +7534,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6928,6 +7589,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -6944,8 +7608,30 @@ impl Engine {
 
     fn _target_pools_add_health_check(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetPoolsAddHealthCheckRequest::default();
-        let mut call = self.hub.target_pools().add_health_check(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().add_health_check(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6967,24 +7653,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7001,8 +7677,30 @@ impl Engine {
 
     fn _target_pools_add_instance(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetPoolsAddInstanceRequest::default();
-        let mut call = self.hub.target_pools().add_instance(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().add_instance(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7024,24 +7722,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7094,6 +7782,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7137,6 +7828,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7180,6 +7874,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7196,8 +7893,33 @@ impl Engine {
 
     fn _target_pools_get_health(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::InstanceReference::default();
-        let mut call = self.hub.target_pools().get_health(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "instance" => {
+                        request.instance = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().get_health(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7219,27 +7941,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7256,37 +7965,24 @@ impl Engine {
 
     fn _target_pools_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::TargetPool::default();
-        let mut call = self.hub.target_pools().insert(&request, &self.opt.arg_project, &self.opt.arg_region);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::TargetPool::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "failover-ratio" => {
                         request.failover_ratio = Some(arg_from_str(value.unwrap_or("0.0"), err, "failover-ratio", "number"));
                     },
@@ -7330,8 +8026,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.target_pools().insert(request, &self.opt.arg_project, &self.opt.arg_region);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -7339,6 +8057,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7391,6 +8112,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7407,8 +8131,30 @@ impl Engine {
 
     fn _target_pools_remove_health_check(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetPoolsRemoveHealthCheckRequest::default();
-        let mut call = self.hub.target_pools().remove_health_check(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().remove_health_check(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7430,24 +8176,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7464,8 +8200,30 @@ impl Engine {
 
     fn _target_pools_remove_instance(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetPoolsRemoveInstanceRequest::default();
-        let mut call = self.hub.target_pools().remove_instance(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().remove_instance(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7487,24 +8245,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7521,8 +8269,33 @@ impl Engine {
 
     fn _target_pools_set_backup(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::TargetReference::default();
-        let mut call = self.hub.target_pools().set_backup(&request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "target" => {
+                        request.target = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.target_pools().set_backup(request, &self.opt.arg_project, &self.opt.arg_region, &self.opt.arg_target_pool);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7547,27 +8320,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "target" => {
-                        request.target = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7620,6 +8380,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7663,6 +8426,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7706,6 +8472,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7722,37 +8491,24 @@ impl Engine {
 
     fn _target_vpn_gateways_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::TargetVpnGateway::default();
-        let mut call = self.hub.target_vpn_gateways().insert(&request, &self.opt.arg_project, &self.opt.arg_region);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::TargetVpnGateway::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -7793,8 +8549,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.target_vpn_gateways().insert(request, &self.opt.arg_project, &self.opt.arg_region);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -7802,6 +8580,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7854,6 +8635,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7897,6 +8681,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7940,6 +8727,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -7956,37 +8746,24 @@ impl Engine {
 
     fn _url_maps_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::UrlMap::default();
-        let mut call = self.hub.url_maps().insert(&request, &self.opt.arg_project);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::UrlMap::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -8012,8 +8789,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.url_maps().insert(request, &self.opt.arg_project);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -8021,6 +8820,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8073,6 +8875,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8089,37 +8894,24 @@ impl Engine {
 
     fn _url_maps_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::UrlMap::default();
-        let mut call = self.hub.url_maps().patch(&request, &self.opt.arg_project, &self.opt.arg_url_map);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::UrlMap::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -8145,8 +8937,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.url_maps().patch(request, &self.opt.arg_project, &self.opt.arg_url_map);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -8154,6 +8968,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8170,37 +8987,24 @@ impl Engine {
 
     fn _url_maps_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::UrlMap::default();
-        let mut call = self.hub.url_maps().update(&request, &self.opt.arg_project, &self.opt.arg_url_map);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::UrlMap::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -8226,33 +9030,11 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _url_maps_validate(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::UrlMapsValidateRequest::default();
-        let mut call = self.hub.url_maps().validate(&request, &self.opt.arg_project, &self.opt.arg_url_map);
+        let mut call = self.hub.url_maps().update(request, &self.opt.arg_project, &self.opt.arg_url_map);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -8274,12 +9056,46 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _url_maps_validate(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::UrlMapsValidateRequest::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_resource_init(request: &mut api::UrlMapsValidateRequest) {
                 if request.resource.is_none() {
@@ -8287,7 +9103,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "resource.kind" => {
                         request_resource_init(&mut request);
                         request.resource.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
@@ -8321,8 +9137,30 @@ impl Engine {
                         request.resource.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.url_maps().validate(request, &self.opt.arg_project, &self.opt.arg_url_map);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -8330,6 +9168,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8382,6 +9223,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8425,6 +9269,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8468,6 +9315,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8484,37 +9334,24 @@ impl Engine {
 
     fn _vpn_tunnels_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::VpnTunnel::default();
-        let mut call = self.hub.vpn_tunnels().insert(&request, &self.opt.arg_project, &self.opt.arg_region);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::VpnTunnel::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "detailed-status" => {
                         request.detailed_status = Some(value.unwrap_or("").to_string());
                     },
@@ -8564,8 +9401,30 @@ impl Engine {
                                         request.ike_networks.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.vpn_tunnels().insert(request, &self.opt.arg_project, &self.opt.arg_region);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -8573,6 +9432,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8625,6 +9487,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8668,6 +9533,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -8709,6 +9577,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8761,6 +9632,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8804,6 +9678,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -8856,6 +9733,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -9379,6 +10259,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -9386,8 +10267,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

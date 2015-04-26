@@ -4,7 +4,7 @@
 [package]
 
 name = "google-coordinate1-cli"
-version = "0.0.1+20141215"
+version = "0.1.0+20141215"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with coordinate (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/coordinate1-cli"

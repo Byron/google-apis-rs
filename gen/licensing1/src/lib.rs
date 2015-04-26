@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *0.1.5+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *licensing* crate version *0.1.6+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -108,14 +108,15 @@
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -203,7 +204,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -279,14 +280,15 @@ impl Default for Scope {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -307,7 +309,7 @@ impl<'a, C, A> Licensing<C, A>
         Licensing {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -316,7 +318,7 @@ impl<'a, C, A> Licensing<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -554,10 +556,10 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku for which license would be revoked
     /// * `userId` - email id or unique Id of the user
-    pub fn update(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
+    pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C, A> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _product_id: product_id.to_string(),
             _sku_id: sku_id.to_string(),
             _user_id: user_id.to_string(),
@@ -577,10 +579,10 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku for which license would be revoked
     /// * `userId` - email id or unique Id of the user
-    pub fn patch(&self, request: &LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
+    pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C, A> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _product_id: product_id.to_string(),
             _sku_id: sku_id.to_string(),
             _user_id: user_id.to_string(),
@@ -599,10 +601,10 @@ impl<'a, C, A> LicenseAssignmentMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `productId` - Name for product
     /// * `skuId` - Name for sku
-    pub fn insert(&self, request: &LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
+    pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C, A> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _product_id: product_id.to_string(),
             _sku_id: sku_id.to_string(),
             _delegate: Default::default(),
@@ -768,12 +770,17 @@ impl<'a, C, A> LicenseAssignmentDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -1024,12 +1031,17 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1038,7 +1050,7 @@ impl<'a, C, A> LicenseAssignmentListForProductCall<'a, C, A> where C: BorrowMut<
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1286,12 +1298,17 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1300,7 +1317,7 @@ impl<'a, C, A> LicenseAssignmentGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1554,12 +1571,17 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1568,7 +1590,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1709,7 +1731,7 @@ impl<'a, C, A> LicenseAssignmentListForProductAndSkuCall<'a, C, A> where C: Borr
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.license_assignments().update(&req, "productId", "skuId", "userId")
+/// let result = hub.license_assignments().update(req, "productId", "skuId", "userId")
 ///              .doit();
 /// # }
 /// ```
@@ -1841,12 +1863,17 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1855,7 +1882,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1873,8 +1900,8 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Name for product
@@ -1991,7 +2018,7 @@ impl<'a, C, A> LicenseAssignmentUpdateCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.license_assignments().patch(&req, "productId", "skuId", "userId")
+/// let result = hub.license_assignments().patch(req, "productId", "skuId", "userId")
 ///              .doit();
 /// # }
 /// ```
@@ -2123,12 +2150,17 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2137,7 +2169,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2155,8 +2187,8 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Name for product
@@ -2273,7 +2305,7 @@ impl<'a, C, A> LicenseAssignmentPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.license_assignments().insert(&req, "productId", "skuId")
+/// let result = hub.license_assignments().insert(req, "productId", "skuId")
 ///              .doit();
 /// # }
 /// ```
@@ -2403,12 +2435,17 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2417,7 +2454,7 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2435,8 +2472,8 @@ impl<'a, C, A> LicenseAssignmentInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Name for product

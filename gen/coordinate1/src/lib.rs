@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *coordinate* crate version *0.1.5+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *coordinate* crate version *0.1.6+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! 
 //! Everything else about the *coordinate* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/coordinate/).
@@ -113,7 +113,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.jobs().update(&req, "teamId", "jobId")
+//! let result = hub.jobs().update(req, "teamId", "jobId")
 //!              .title("nonumy")
 //!              .progress("dolores")
 //!              .note("gubergren")
@@ -130,14 +130,15 @@
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -225,7 +226,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -302,7 +303,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().update(&req, "teamId", "jobId")
+/// let result = hub.jobs().update(req, "teamId", "jobId")
 ///              .title("ipsum")
 ///              .progress("Lorem")
 ///              .note("et")
@@ -319,14 +320,15 @@ impl Default for Scope {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -347,7 +349,7 @@ impl<'a, C, A> Coordinate<C, A>
         Coordinate {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -371,7 +373,7 @@ impl<'a, C, A> Coordinate<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -849,10 +851,10 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: &Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, C, A> {
+    pub fn update(&self, request: Job, team_id: &str, job_id: &str) -> JobUpdateCall<'a, C, A> {
         JobUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _team_id: team_id.to_string(),
             _job_id: job_id.to_string(),
             _title: Default::default(),
@@ -880,10 +882,10 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: &Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, C, A> {
+    pub fn patch(&self, request: Job, team_id: &str, job_id: &str) -> JobPatchCall<'a, C, A> {
         JobPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _team_id: team_id.to_string(),
             _job_id: job_id.to_string(),
             _title: Default::default(),
@@ -934,10 +936,10 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     /// * `lat` - The latitude coordinate of this job's location.
     /// * `lng` - The longitude coordinate of this job's location.
     /// * `title` - Job title
-    pub fn insert(&self, request: &Job, team_id: &str, address: &str, lat: f64, lng: f64, title: &str) -> JobInsertCall<'a, C, A> {
+    pub fn insert(&self, request: Job, team_id: &str, address: &str, lat: f64, lng: f64, title: &str) -> JobInsertCall<'a, C, A> {
         JobInsertCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _team_id: team_id.to_string(),
             _address: address.to_string(),
             _lat: lat,
@@ -1004,10 +1006,10 @@ impl<'a, C, A> ScheduleMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn update(&self, request: &Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, C, A> {
+    pub fn update(&self, request: Schedule, team_id: &str, job_id: &str) -> ScheduleUpdateCall<'a, C, A> {
         ScheduleUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _team_id: team_id.to_string(),
             _job_id: job_id.to_string(),
             _start_time: Default::default(),
@@ -1029,10 +1031,10 @@ impl<'a, C, A> ScheduleMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `teamId` - Team ID
     /// * `jobId` - Job number
-    pub fn patch(&self, request: &Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, C, A> {
+    pub fn patch(&self, request: Schedule, team_id: &str, job_id: &str) -> SchedulePatchCall<'a, C, A> {
         SchedulePatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _team_id: team_id.to_string(),
             _job_id: job_id.to_string(),
             _start_time: Default::default(),
@@ -1456,12 +1458,17 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1470,7 +1477,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1587,7 +1594,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().update(&req, "teamId", "jobId")
+/// let result = hub.jobs().update(req, "teamId", "jobId")
 ///              .title("no")
 ///              .progress("labore")
 ///              .note("eirmod")
@@ -1771,12 +1778,17 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1785,7 +1797,7 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1803,8 +1815,8 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Job) -> JobUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Job) -> JobUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Team ID
@@ -1982,7 +1994,7 @@ impl<'a, C, A> JobUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().patch(&req, "teamId", "jobId")
+/// let result = hub.jobs().patch(req, "teamId", "jobId")
 ///              .title("eirmod")
 ///              .progress("sanctus")
 ///              .note("et")
@@ -2166,12 +2178,17 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2180,7 +2197,7 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2198,8 +2215,8 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Job) -> JobPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Job) -> JobPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Team ID
@@ -2505,12 +2522,17 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2519,7 +2541,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2647,7 +2669,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().insert(&req, "teamId", "address", 0.455185502569, 0.898789428358, "title")
+/// let result = hub.jobs().insert(req, "teamId", "address", 0.455185502569, 0.898789428358, "title")
 ///              .note("sit")
 ///              .customer_phone_number("vero")
 ///              .customer_name("diam")
@@ -2812,12 +2834,17 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2826,7 +2853,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2844,8 +2871,8 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Job) -> JobInsertCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Job) -> JobInsertCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Team ID
@@ -3018,7 +3045,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().update(&req, "teamId", "jobId")
+/// let result = hub.schedule().update(req, "teamId", "jobId")
 ///              .start_time("sadipscing")
 ///              .end_time("invidunt")
 ///              .duration("consetetur")
@@ -3168,12 +3195,17 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3182,7 +3214,7 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3200,8 +3232,8 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Schedule) -> ScheduleUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Schedule) -> ScheduleUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Team ID
@@ -3336,7 +3368,7 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.schedule().patch(&req, "teamId", "jobId")
+/// let result = hub.schedule().patch(req, "teamId", "jobId")
 ///              .start_time("Lorem")
 ///              .end_time("et")
 ///              .duration("clita")
@@ -3486,12 +3518,17 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3500,7 +3537,7 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3518,8 +3555,8 @@ impl<'a, C, A> SchedulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Schedule) -> SchedulePatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Schedule) -> SchedulePatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Team ID
@@ -3769,12 +3806,17 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3783,7 +3825,7 @@ impl<'a, C, A> ScheduleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4013,12 +4055,17 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4027,7 +4074,7 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4261,12 +4308,17 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4275,7 +4327,7 @@ impl<'a, C, A> LocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4518,12 +4570,17 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4532,7 +4589,7 @@ impl<'a, C, A> TeamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4763,12 +4820,17 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4777,7 +4839,7 @@ impl<'a, C, A> CustomFieldDefListCall<'a, C, A> where C: BorrowMut<hyper::Client
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };

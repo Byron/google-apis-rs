@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-prediction1d6` library allows access to all features of the *Google prediction* service.
 
-This documentation was generated from *prediction* crate version *0.1.5+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *prediction* crate version *0.1.6+20140522*, where *20140522* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 
 Everything else about the *prediction* *v1d6* API can be found at the
 [official documentation site](https://developers.google.com/prediction/docs/developer-guide).
@@ -102,21 +102,22 @@ let mut req = Update::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.trainedmodels().update(&req, "project", "id")
+let result = hub.trainedmodels().update(req, "project", "id")
              .doit();
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }

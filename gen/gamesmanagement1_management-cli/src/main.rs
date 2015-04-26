@@ -19,52 +19,53 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  gamesmanagement1-management [options] achievements reset <achievement-id> [-p <v>]... [-o <out>]
-  gamesmanagement1-management [options] achievements reset-all [-p <v>]... [-o <out>]
-  gamesmanagement1-management [options] achievements reset-all-for-all-players [-p <v>]...
-  gamesmanagement1-management [options] achievements reset-for-all-players <achievement-id> [-p <v>]...
-  gamesmanagement1-management [options] achievements reset-multiple-for-all-players -r <kv>... [-p <v>]...
-  gamesmanagement1-management [options] applications list-hidden <application-id> [-p <v>]... [-o <out>]
-  gamesmanagement1-management [options] events reset <event-id> [-p <v>]...
-  gamesmanagement1-management [options] events reset-all [-p <v>]...
-  gamesmanagement1-management [options] events reset-all-for-all-players [-p <v>]...
-  gamesmanagement1-management [options] events reset-for-all-players <event-id> [-p <v>]...
-  gamesmanagement1-management [options] events reset-multiple-for-all-players -r <kv>... [-p <v>]...
-  gamesmanagement1-management [options] players hide <application-id> <player-id> [-p <v>]...
-  gamesmanagement1-management [options] players unhide <application-id> <player-id> [-p <v>]...
-  gamesmanagement1-management [options] quests reset <quest-id> [-p <v>]...
-  gamesmanagement1-management [options] quests reset-all [-p <v>]...
-  gamesmanagement1-management [options] quests reset-all-for-all-players [-p <v>]...
-  gamesmanagement1-management [options] quests reset-for-all-players <quest-id> [-p <v>]...
-  gamesmanagement1-management [options] quests reset-multiple-for-all-players -r <kv>... [-p <v>]...
-  gamesmanagement1-management [options] rooms reset [-p <v>]...
-  gamesmanagement1-management [options] rooms reset-for-all-players [-p <v>]...
-  gamesmanagement1-management [options] scores reset <leaderboard-id> [-p <v>]... [-o <out>]
-  gamesmanagement1-management [options] scores reset-all [-p <v>]... [-o <out>]
-  gamesmanagement1-management [options] scores reset-all-for-all-players [-p <v>]...
-  gamesmanagement1-management [options] scores reset-for-all-players <leaderboard-id> [-p <v>]...
-  gamesmanagement1-management [options] scores reset-multiple-for-all-players -r <kv>... [-p <v>]...
-  gamesmanagement1-management [options] turn-based-matches reset [-p <v>]...
-  gamesmanagement1-management [options] turn-based-matches reset-for-all-players [-p <v>]...
+  gamesmanagement1-management [options] achievements reset <achievement-id> [-p <v>...] [-o <out>]
+  gamesmanagement1-management [options] achievements reset-all [-p <v>...] [-o <out>]
+  gamesmanagement1-management [options] achievements reset-all-for-all-players [-p <v>...]
+  gamesmanagement1-management [options] achievements reset-for-all-players <achievement-id> [-p <v>...]
+  gamesmanagement1-management [options] achievements reset-multiple-for-all-players -r <kv>... [-p <v>...]
+  gamesmanagement1-management [options] applications list-hidden <application-id> [-p <v>...] [-o <out>]
+  gamesmanagement1-management [options] events reset <event-id> [-p <v>...]
+  gamesmanagement1-management [options] events reset-all [-p <v>...]
+  gamesmanagement1-management [options] events reset-all-for-all-players [-p <v>...]
+  gamesmanagement1-management [options] events reset-for-all-players <event-id> [-p <v>...]
+  gamesmanagement1-management [options] events reset-multiple-for-all-players -r <kv>... [-p <v>...]
+  gamesmanagement1-management [options] players hide <application-id> <player-id> [-p <v>...]
+  gamesmanagement1-management [options] players unhide <application-id> <player-id> [-p <v>...]
+  gamesmanagement1-management [options] quests reset <quest-id> [-p <v>...]
+  gamesmanagement1-management [options] quests reset-all [-p <v>...]
+  gamesmanagement1-management [options] quests reset-all-for-all-players [-p <v>...]
+  gamesmanagement1-management [options] quests reset-for-all-players <quest-id> [-p <v>...]
+  gamesmanagement1-management [options] quests reset-multiple-for-all-players -r <kv>... [-p <v>...]
+  gamesmanagement1-management [options] rooms reset [-p <v>...]
+  gamesmanagement1-management [options] rooms reset-for-all-players [-p <v>...]
+  gamesmanagement1-management [options] scores reset <leaderboard-id> [-p <v>...] [-o <out>]
+  gamesmanagement1-management [options] scores reset-all [-p <v>...] [-o <out>]
+  gamesmanagement1-management [options] scores reset-all-for-all-players [-p <v>...]
+  gamesmanagement1-management [options] scores reset-for-all-players <leaderboard-id> [-p <v>...]
+  gamesmanagement1-management [options] scores reset-multiple-for-all-players -r <kv>... [-p <v>...]
+  gamesmanagement1-management [options] turn-based-matches reset [-p <v>...]
+  gamesmanagement1-management [options] turn-based-matches reset-for-all-players [-p <v>...]
   gamesmanagement1-management --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -113,6 +114,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -156,6 +160,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -199,6 +206,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -240,6 +250,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -254,8 +267,39 @@ impl Engine {
 
     fn _achievements_reset_multiple_for_all_players(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::AchievementResetMultipleForAllRequest::default();
-        let mut call = self.hub.achievements().reset_multiple_for_all_players(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "achievement-ids" => {
+                        if request.achievement_ids.is_none() {
+                           request.achievement_ids = Some(Default::default());
+                        }
+                                        request.achievement_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.achievements().reset_multiple_for_all_players(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -277,33 +321,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "achievement-ids" => {
-                        if request.achievement_ids.is_none() {
-                           request.achievement_ids = Some(Default::default());
-                        }
-                                        request.achievement_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -351,6 +376,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -394,6 +422,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -435,6 +466,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -476,6 +510,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -517,6 +554,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -531,8 +571,39 @@ impl Engine {
 
     fn _events_reset_multiple_for_all_players(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::EventsResetMultipleForAllRequest::default();
-        let mut call = self.hub.events().reset_multiple_for_all_players(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "event-ids" => {
+                        if request.event_ids.is_none() {
+                           request.event_ids = Some(Default::default());
+                        }
+                                        request.event_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.events().reset_multiple_for_all_players(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -554,33 +625,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "event-ids" => {
-                        if request.event_ids.is_none() {
-                           request.event_ids = Some(Default::default());
-                        }
-                                        request.event_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -622,6 +674,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -663,6 +718,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -704,6 +762,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -745,6 +806,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -786,6 +850,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -827,6 +894,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -841,8 +911,39 @@ impl Engine {
 
     fn _quests_reset_multiple_for_all_players(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::QuestsResetMultipleForAllRequest::default();
-        let mut call = self.hub.quests().reset_multiple_for_all_players(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "quest-ids" => {
+                        if request.quest_ids.is_none() {
+                           request.quest_ids = Some(Default::default());
+                        }
+                                        request.quest_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.quests().reset_multiple_for_all_players(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -864,33 +965,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "quest-ids" => {
-                        if request.quest_ids.is_none() {
-                           request.quest_ids = Some(Default::default());
-                        }
-                                        request.quest_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -932,6 +1014,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -973,6 +1058,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1014,6 +1102,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1057,6 +1148,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1100,6 +1194,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1141,6 +1238,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1155,8 +1255,39 @@ impl Engine {
 
     fn _scores_reset_multiple_for_all_players(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ScoresResetMultipleForAllRequest::default();
-        let mut call = self.hub.scores().reset_multiple_for_all_players(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "leaderboard-ids" => {
+                        if request.leaderboard_ids.is_none() {
+                           request.leaderboard_ids = Some(Default::default());
+                        }
+                                        request.leaderboard_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.scores().reset_multiple_for_all_players(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1178,33 +1309,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "leaderboard-ids" => {
-                        if request.leaderboard_ids.is_none() {
-                           request.leaderboard_ids = Some(Default::default());
-                        }
-                                        request.leaderboard_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1246,6 +1358,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1287,6 +1402,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1465,6 +1583,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -1472,8 +1591,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

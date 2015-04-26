@@ -19,69 +19,70 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  androidenterprise1 [options] collections delete <enterprise-id> <collection-id> [-p <v>]...
-  androidenterprise1 [options] collections get <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collections insert <enterprise-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collections list <enterprise-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collections patch <enterprise-id> <collection-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collections update <enterprise-id> <collection-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collectionviewers delete <enterprise-id> <collection-id> <user-id> [-p <v>]...
-  androidenterprise1 [options] collectionviewers get <enterprise-id> <collection-id> <user-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collectionviewers list <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collectionviewers patch <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] collectionviewers update <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] devices get <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] devices get-state <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] devices list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] devices set-state <enterprise-id> <user-id> <device-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises delete <enterprise-id> [-p <v>]...
-  androidenterprise1 [options] enterprises enroll <token> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises get <enterprise-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises insert <token> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises list <domain> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises set-account <enterprise-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] enterprises unenroll <enterprise-id> [-p <v>]...
-  androidenterprise1 [options] entitlements delete <enterprise-id> <user-id> <entitlement-id> [-p <v>]...
-  androidenterprise1 [options] entitlements get <enterprise-id> <user-id> <entitlement-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] entitlements list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] entitlements patch <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] entitlements update <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] grouplicenses get <enterprise-id> <group-license-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] grouplicenses list <enterprise-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] grouplicenseusers list <enterprise-id> <group-license-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] installs delete <enterprise-id> <user-id> <device-id> <install-id> [-p <v>]...
-  androidenterprise1 [options] installs get <enterprise-id> <user-id> <device-id> <install-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] installs list <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] installs patch <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] installs update <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] permissions get <permission-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] products get <enterprise-id> <product-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] products get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] products get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] products update-permissions <enterprise-id> <product-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidenterprise1 [options] users generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] users get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] users list <enterprise-id> <email> [-p <v>]... [-o <out>]
-  androidenterprise1 [options] users revoke-token <enterprise-id> <user-id> [-p <v>]...
+  androidenterprise1 [options] collections delete <enterprise-id> <collection-id> [-p <v>...]
+  androidenterprise1 [options] collections get <enterprise-id> <collection-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collections insert <enterprise-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collections list <enterprise-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collections patch <enterprise-id> <collection-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collections update <enterprise-id> <collection-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collectionviewers delete <enterprise-id> <collection-id> <user-id> [-p <v>...]
+  androidenterprise1 [options] collectionviewers get <enterprise-id> <collection-id> <user-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collectionviewers list <enterprise-id> <collection-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collectionviewers patch <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] collectionviewers update <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] devices get <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] devices get-state <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] devices list <enterprise-id> <user-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] devices set-state <enterprise-id> <user-id> <device-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises delete <enterprise-id> [-p <v>...]
+  androidenterprise1 [options] enterprises enroll <token> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises get <enterprise-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises insert <token> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises list <domain> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises set-account <enterprise-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] enterprises unenroll <enterprise-id> [-p <v>...]
+  androidenterprise1 [options] entitlements delete <enterprise-id> <user-id> <entitlement-id> [-p <v>...]
+  androidenterprise1 [options] entitlements get <enterprise-id> <user-id> <entitlement-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] entitlements list <enterprise-id> <user-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] entitlements patch <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] entitlements update <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] grouplicenses get <enterprise-id> <group-license-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] grouplicenses list <enterprise-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] grouplicenseusers list <enterprise-id> <group-license-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] installs delete <enterprise-id> <user-id> <device-id> <install-id> [-p <v>...]
+  androidenterprise1 [options] installs get <enterprise-id> <user-id> <device-id> <install-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] installs list <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] installs patch <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] installs update <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] permissions get <permission-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] products get <enterprise-id> <product-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] products get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] products get-permissions <enterprise-id> <product-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] products update-permissions <enterprise-id> <product-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidenterprise1 [options] users generate-token <enterprise-id> <user-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] users get <enterprise-id> <user-id> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] users list <enterprise-id> <email> [-p <v>...] [-o <out>]
+  androidenterprise1 [options] users revoke-token <enterprise-id> <user-id> [-p <v>...]
   androidenterprise1 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -130,6 +131,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -171,6 +175,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -187,8 +194,48 @@ impl Engine {
 
     fn _collections_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Collection::default();
-        let mut call = self.hub.collections().insert(&request, &self.opt.arg_enterprise_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        if request.product_id.is_none() {
+                           request.product_id = Some(Default::default());
+                        }
+                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "visibility" => {
+                        request.visibility = Some(value.unwrap_or("").to_string());
+                    },
+                "collection-id" => {
+                        request.collection_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.collections().insert(request, &self.opt.arg_enterprise_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -210,42 +257,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        if request.product_id.is_none() {
-                           request.product_id = Some(Default::default());
-                        }
-                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "visibility" => {
-                        request.visibility = Some(value.unwrap_or("").to_string());
-                    },
-                "collection-id" => {
-                        request.collection_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -289,6 +308,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -305,8 +327,48 @@ impl Engine {
 
     fn _collections_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Collection::default();
-        let mut call = self.hub.collections().patch(&request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        if request.product_id.is_none() {
+                           request.product_id = Some(Default::default());
+                        }
+                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "visibility" => {
+                        request.visibility = Some(value.unwrap_or("").to_string());
+                    },
+                "collection-id" => {
+                        request.collection_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.collections().patch(request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -328,42 +390,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        if request.product_id.is_none() {
-                           request.product_id = Some(Default::default());
-                        }
-                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "visibility" => {
-                        request.visibility = Some(value.unwrap_or("").to_string());
-                    },
-                "collection-id" => {
-                        request.collection_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -380,8 +414,48 @@ impl Engine {
 
     fn _collections_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Collection::default();
-        let mut call = self.hub.collections().update(&request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        if request.product_id.is_none() {
+                           request.product_id = Some(Default::default());
+                        }
+                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "visibility" => {
+                        request.visibility = Some(value.unwrap_or("").to_string());
+                    },
+                "collection-id" => {
+                        request.collection_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.collections().update(request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -403,42 +477,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        if request.product_id.is_none() {
-                           request.product_id = Some(Default::default());
-                        }
-                                        request.product_id.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "visibility" => {
-                        request.visibility = Some(value.unwrap_or("").to_string());
-                    },
-                "collection-id" => {
-                        request.collection_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -482,6 +528,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -523,6 +572,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -566,6 +618,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -582,8 +637,39 @@ impl Engine {
 
     fn _collectionviewers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::User::default();
-        let mut call = self.hub.collectionviewers().patch(&request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id, &self.opt.arg_user_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "primary-email" => {
+                        request.primary_email = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.collectionviewers().patch(request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id, &self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -605,33 +691,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-email" => {
-                        request.primary_email = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -648,8 +715,39 @@ impl Engine {
 
     fn _collectionviewers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::User::default();
-        let mut call = self.hub.collectionviewers().update(&request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id, &self.opt.arg_user_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "primary-email" => {
+                        request.primary_email = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.collectionviewers().update(request, &self.opt.arg_enterprise_id, &self.opt.arg_collection_id, &self.opt.arg_user_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -671,33 +769,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-email" => {
-                        request.primary_email = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -741,6 +820,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -784,6 +866,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -827,6 +912,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -843,8 +931,36 @@ impl Engine {
 
     fn _devices_set_state(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::DeviceState::default();
-        let mut call = self.hub.devices().set_state(&request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "account-state" => {
+                        request.account_state = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.devices().set_state(request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -866,30 +982,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-state" => {
-                        request.account_state = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -933,6 +1033,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -947,8 +1050,42 @@ impl Engine {
 
     fn _enterprises_enroll(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Enterprise::default();
-        let mut call = self.hub.enterprises().enroll(&request, &self.opt.arg_token);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "primary-domain" => {
+                        request.primary_domain = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.enterprises().enroll(request, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -970,36 +1107,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-domain" => {
-                        request.primary_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1043,6 +1158,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1059,8 +1177,42 @@ impl Engine {
 
     fn _enterprises_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Enterprise::default();
-        let mut call = self.hub.enterprises().insert(&request, &self.opt.arg_token);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "primary-domain" => {
+                        request.primary_domain = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.enterprises().insert(request, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1082,36 +1234,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-domain" => {
-                        request.primary_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1155,6 +1285,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1171,8 +1304,36 @@ impl Engine {
 
     fn _enterprises_set_account(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::EnterpriseAccount::default();
-        let mut call = self.hub.enterprises().set_account(&request, &self.opt.arg_enterprise_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "account-email" => {
+                        request.account_email = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.enterprises().set_account(request, &self.opt.arg_enterprise_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1194,30 +1355,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-email" => {
-                        request.account_email = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1261,6 +1406,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1302,6 +1450,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1343,6 +1494,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1386,6 +1540,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1402,8 +1559,39 @@ impl Engine {
 
     fn _entitlements_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Entitlement::default();
-        let mut call = self.hub.entitlements().patch(&request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_entitlement_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "reason" => {
+                        request.reason = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        request.product_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.entitlements().patch(request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_entitlement_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1428,33 +1616,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "reason" => {
-                        request.reason = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        request.product_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1471,8 +1640,39 @@ impl Engine {
 
     fn _entitlements_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Entitlement::default();
-        let mut call = self.hub.entitlements().update(&request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_entitlement_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "reason" => {
+                        request.reason = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        request.product_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.entitlements().update(request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_entitlement_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1497,33 +1697,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "reason" => {
-                        request.reason = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        request.product_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1567,6 +1748,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1610,6 +1794,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1653,6 +1840,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1696,6 +1886,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1737,6 +1930,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1780,6 +1976,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1796,8 +1995,42 @@ impl Engine {
 
     fn _installs_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Install::default();
-        let mut call = self.hub.installs().patch(&request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id, &self.opt.arg_install_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "install-state" => {
+                        request.install_state = Some(value.unwrap_or("").to_string());
+                    },
+                "version-code" => {
+                        request.version_code = Some(arg_from_str(value.unwrap_or("-0"), err, "version-code", "integer"));
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        request.product_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.installs().patch(request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id, &self.opt.arg_install_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1819,36 +2052,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "install-state" => {
-                        request.install_state = Some(value.unwrap_or("").to_string());
-                    },
-                "version-code" => {
-                        request.version_code = Some(arg_from_str(value.unwrap_or("-0"), err, "version-code", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        request.product_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1865,8 +2076,42 @@ impl Engine {
 
     fn _installs_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Install::default();
-        let mut call = self.hub.installs().update(&request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id, &self.opt.arg_install_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "install-state" => {
+                        request.install_state = Some(value.unwrap_or("").to_string());
+                    },
+                "version-code" => {
+                        request.version_code = Some(arg_from_str(value.unwrap_or("-0"), err, "version-code", "integer"));
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        request.product_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.installs().update(request, &self.opt.arg_enterprise_id, &self.opt.arg_user_id, &self.opt.arg_device_id, &self.opt.arg_install_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1888,36 +2133,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "install-state" => {
-                        request.install_state = Some(value.unwrap_or("").to_string());
-                    },
-                "version-code" => {
-                        request.version_code = Some(arg_from_str(value.unwrap_or("-0"), err, "version-code", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        request.product_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1964,6 +2187,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2010,6 +2236,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2056,6 +2285,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2099,6 +2331,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2115,8 +2350,36 @@ impl Engine {
 
     fn _products_update_permissions(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ProductPermissions::default();
-        let mut call = self.hub.products().update_permissions(&request, &self.opt.arg_enterprise_id, &self.opt.arg_product_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "product-id" => {
+                        request.product_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.products().update_permissions(request, &self.opt.arg_enterprise_id, &self.opt.arg_product_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2138,30 +2401,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "product-id" => {
-                        request.product_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2205,6 +2452,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2248,6 +2498,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2291,6 +2544,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2334,6 +2590,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2561,6 +2820,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -2568,8 +2828,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

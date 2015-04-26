@@ -4,7 +4,7 @@
 [package]
 
 name = "google-pagespeedonline2-cli"
-version = "0.0.1+20150317"
+version = "0.1.0+20150317"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline2-cli"

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *logging* crate version *0.1.6+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3).
 //! # Features
 //! 
@@ -101,21 +101,22 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().log_services_sinks_update(&req, "projectsId", "logServicesId", "sinksId")
+//! let result = hub.projects().log_services_sinks_update(req, "projectsId", "logServicesId", "sinksId")
 //!              .doit();
 //! 
 //! match result {
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -203,7 +204,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -276,21 +277,22 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().log_services_sinks_update(&req, "projectsId", "logServicesId", "sinksId")
+/// let result = hub.projects().log_services_sinks_update(req, "projectsId", "logServicesId", "sinksId")
 ///              .doit();
 /// 
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -311,7 +313,7 @@ impl<'a, C, A> Logging<C, A>
         Logging {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -320,7 +322,7 @@ impl<'a, C, A> Logging<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -758,10 +760,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to update.
     /// * `logServicesId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_update(&self, request: &LogSink, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
+    pub fn log_services_sinks_update(&self, request: LogSink, projects_id: &str, log_services_id: &str, sinks_id: &str) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
         ProjectLogServiceSinkUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _projects_id: projects_id.to_string(),
             _log_services_id: log_services_id.to_string(),
             _sinks_id: sinks_id.to_string(),
@@ -780,10 +782,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `logName`. The name of the log resource into which to insert the log entries.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_entries_write(&self, request: &WriteLogEntriesRequest, projects_id: &str, logs_id: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
+    pub fn logs_entries_write(&self, request: WriteLogEntriesRequest, projects_id: &str, logs_id: &str) -> ProjectLogEntryWriteCall<'a, C, A> {
         ProjectLogEntryWriteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _projects_id: projects_id.to_string(),
             _logs_id: logs_id.to_string(),
             _delegate: Default::default(),
@@ -866,10 +868,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `projectsId` - Part of `sinkName`. The name of the sink to update.
     /// * `logsId` - Part of `sinkName`. See documentation of `projectsId`.
     /// * `sinksId` - Part of `sinkName`. See documentation of `projectsId`.
-    pub fn logs_sinks_update(&self, request: &LogSink, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
+    pub fn logs_sinks_update(&self, request: LogSink, projects_id: &str, logs_id: &str, sinks_id: &str) -> ProjectLogSinkUpdateCall<'a, C, A> {
         ProjectLogSinkUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _projects_id: projects_id.to_string(),
             _logs_id: logs_id.to_string(),
             _sinks_id: sinks_id.to_string(),
@@ -888,10 +890,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `serviceName`. The name of the service in which to create a sink.
     /// * `logServicesId` - Part of `serviceName`. See documentation of `projectsId`.
-    pub fn log_services_sinks_create(&self, request: &LogSink, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
+    pub fn log_services_sinks_create(&self, request: LogSink, projects_id: &str, log_services_id: &str) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
         ProjectLogServiceSinkCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _projects_id: projects_id.to_string(),
             _log_services_id: log_services_id.to_string(),
             _delegate: Default::default(),
@@ -930,10 +932,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `projectsId` - Part of `logName`. The log in which to create a sink resource.
     /// * `logsId` - Part of `logName`. See documentation of `projectsId`.
-    pub fn logs_sinks_create(&self, request: &LogSink, projects_id: &str, logs_id: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
+    pub fn logs_sinks_create(&self, request: LogSink, projects_id: &str, logs_id: &str) -> ProjectLogSinkCreateCall<'a, C, A> {
         ProjectLogSinkCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _projects_id: projects_id.to_string(),
             _logs_id: logs_id.to_string(),
             _delegate: Default::default(),
@@ -1170,12 +1172,17 @@ impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1184,7 +1191,7 @@ impl<'a, C, A> ProjectLogServiceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1449,12 +1456,17 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1463,7 +1475,7 @@ impl<'a, C, A> ProjectLogListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1719,12 +1731,17 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -1733,7 +1750,7 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -1864,7 +1881,7 @@ impl<'a, C, A> ProjectLogSinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().log_services_sinks_update(&req, "projectsId", "logServicesId", "sinksId")
+/// let result = hub.projects().log_services_sinks_update(req, "projectsId", "logServicesId", "sinksId")
 ///              .doit();
 /// # }
 /// ```
@@ -1996,12 +2013,17 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2010,7 +2032,7 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2028,8 +2050,8 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LogSink) -> ProjectLogServiceSinkUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Part of `sinkName`. The name of the sink to update.
@@ -2150,7 +2172,7 @@ impl<'a, C, A> ProjectLogServiceSinkUpdateCall<'a, C, A> where C: BorrowMut<hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().logs_entries_write(&req, "projectsId", "logsId")
+/// let result = hub.projects().logs_entries_write(req, "projectsId", "logsId")
 ///              .doit();
 /// # }
 /// ```
@@ -2280,12 +2302,17 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2294,7 +2321,7 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2312,8 +2339,8 @@ impl<'a, C, A> ProjectLogEntryWriteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &WriteLogEntriesRequest) -> ProjectLogEntryWriteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: WriteLogEntriesRequest) -> ProjectLogEntryWriteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Part of `logName`. The name of the log resource into which to insert the log entries.
@@ -2541,12 +2568,17 @@ impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2555,7 +2587,7 @@ impl<'a, C, A> ProjectLogServiceSinkDeleteCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -2826,12 +2858,17 @@ impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -2840,7 +2877,7 @@ impl<'a, C, A> ProjectLogServiceIndexeListCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3111,12 +3148,17 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3125,7 +3167,7 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3246,7 +3288,7 @@ impl<'a, C, A> ProjectLogSinkListCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().logs_sinks_update(&req, "projectsId", "logsId", "sinksId")
+/// let result = hub.projects().logs_sinks_update(req, "projectsId", "logsId", "sinksId")
 ///              .doit();
 /// # }
 /// ```
@@ -3378,12 +3420,17 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3392,7 +3439,7 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3410,8 +3457,8 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LogSink) -> ProjectLogSinkUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Part of `sinkName`. The name of the sink to update.
@@ -3532,7 +3579,7 @@ impl<'a, C, A> ProjectLogSinkUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().log_services_sinks_create(&req, "projectsId", "logServicesId")
+/// let result = hub.projects().log_services_sinks_create(req, "projectsId", "logServicesId")
 ///              .doit();
 /// # }
 /// ```
@@ -3662,12 +3709,17 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3676,7 +3728,7 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -3694,8 +3746,8 @@ impl<'a, C, A> ProjectLogServiceSinkCreateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LogSink) -> ProjectLogServiceSinkCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Part of `serviceName`. The name of the service in which to create a sink.
@@ -3923,12 +3975,17 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -3937,7 +3994,7 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4068,7 +4125,7 @@ impl<'a, C, A> ProjectLogSinkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().logs_sinks_create(&req, "projectsId", "logsId")
+/// let result = hub.projects().logs_sinks_create(req, "projectsId", "logsId")
 ///              .doit();
 /// # }
 /// ```
@@ -4198,12 +4255,17 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4212,7 +4274,7 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4230,8 +4292,8 @@ impl<'a, C, A> ProjectLogSinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &LogSink) -> ProjectLogSinkCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: LogSink) -> ProjectLogSinkCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Part of `logName`. The log in which to create a sink resource.
@@ -4459,12 +4521,17 @@ impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4473,7 +4540,7 @@ impl<'a, C, A> ProjectLogServiceSinkGetCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4719,12 +4786,17 @@ impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper:
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4733,7 +4805,7 @@ impl<'a, C, A> ProjectLogServiceSinkListCall<'a, C, A> where C: BorrowMut<hyper:
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4969,12 +5041,17 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4983,7 +5060,7 @@ impl<'a, C, A> ProjectLogDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };

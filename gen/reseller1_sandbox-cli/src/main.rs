@@ -19,39 +19,40 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  reseller1-sandbox [options] customers get <customer-id> [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] customers insert -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] customers patch <customer-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] customers update <customer-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions activate <customer-id> <subscription-id> [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions change-plan <customer-id> <subscription-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions change-renewal-settings <customer-id> <subscription-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions change-seats <customer-id> <subscription-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions delete <customer-id> <subscription-id> <deletion-type> [-p <v>]...
-  reseller1-sandbox [options] subscriptions get <customer-id> <subscription-id> [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions insert <customer-id> -r <kv>... [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions list [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions start-paid-service <customer-id> <subscription-id> [-p <v>]... [-o <out>]
-  reseller1-sandbox [options] subscriptions suspend <customer-id> <subscription-id> [-p <v>]... [-o <out>]
+  reseller1-sandbox [options] customers get <customer-id> [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] customers insert -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] customers patch <customer-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] customers update <customer-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions activate <customer-id> <subscription-id> [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions change-plan <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions change-renewal-settings <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions change-seats <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions delete <customer-id> <subscription-id> <deletion-type> [-p <v>...]
+  reseller1-sandbox [options] subscriptions get <customer-id> <subscription-id> [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions insert <customer-id> -r <kv>... [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions list [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions start-paid-service <customer-id> <subscription-id> [-p <v>...] [-o <out>]
+  reseller1-sandbox [options] subscriptions suspend <customer-id> <subscription-id> [-p <v>...] [-o <out>]
   reseller1-sandbox --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -100,6 +101,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -116,8 +120,95 @@ impl Engine {
 
     fn _customers_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Customer::default();
-        let mut call = self.hub.customers().insert(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_postal_address_init(request: &mut api::Customer) {
+                if request.postal_address.is_none() {
+                    request.postal_address = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "customer-domain" => {
+                        request.customer_domain = Some(value.unwrap_or("").to_string());
+                    },
+                "alternate-email" => {
+                        request.alternate_email = Some(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "resource-ui-url" => {
+                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
+                    },
+                "phone-number" => {
+                        request.phone_number = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.kind" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.organization-name" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().organization_name = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.country-code" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().country_code = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.locality" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.region" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.address-line2" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().address_line2 = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.address-line3" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().address_line3 = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.contact-name" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().contact_name = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.address-line1" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().address_line1 = Some(value.unwrap_or("").to_string());
+                    },
+                "postal-address.postal-code" => {
+                        request_postal_address_init(&mut request);
+                        request.postal_address.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
+                    },
+                "customer-id" => {
+                        request_postal_address_init(&mut request);
+                        request.customer_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.customers().insert(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -142,89 +233,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            fn request_postal_address_init(request: &mut api::Customer) {
-                if request.postal_address.is_none() {
-                    request.postal_address = Some(Default::default());
-                }
-            }
-            
-            match &field_name.to_string()[..] {
-                "customer-domain" => {
-                        request.customer_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "alternate-email" => {
-                        request.alternate_email = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-ui-url" => {
-                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
-                    },
-                "phone-number" => {
-                        request.phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.kind" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.organization-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().organization_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.country-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().country_code = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.locality" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.region" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line2" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line2 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line3" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line3 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.contact-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().contact_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line1" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line1 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.postal-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "customer-id" => {
-                        request_postal_address_init(&mut request);
-                        request.customer_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -241,35 +257,22 @@ impl Engine {
 
     fn _customers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Customer::default();
-        let mut call = self.hub.customers().patch(&request, &self.opt.arg_customer_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Customer::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_postal_address_init(request: &mut api::Customer) {
                 if request.postal_address.is_none() {
@@ -277,7 +280,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "customer-domain" => {
                         request.customer_domain = Some(value.unwrap_or("").to_string());
                     },
@@ -338,8 +341,30 @@ impl Engine {
                         request.customer_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.customers().patch(request, &self.opt.arg_customer_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -347,6 +372,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -363,35 +391,22 @@ impl Engine {
 
     fn _customers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Customer::default();
-        let mut call = self.hub.customers().update(&request, &self.opt.arg_customer_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Customer::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_postal_address_init(request: &mut api::Customer) {
                 if request.postal_address.is_none() {
@@ -399,7 +414,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "customer-domain" => {
                         request.customer_domain = Some(value.unwrap_or("").to_string());
                     },
@@ -460,8 +475,30 @@ impl Engine {
                         request.customer_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.customers().update(request, &self.opt.arg_customer_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -469,6 +506,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -512,6 +552,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -528,35 +571,22 @@ impl Engine {
 
     fn _subscriptions_change_plan(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::ChangePlanRequest::default();
-        let mut call = self.hub.subscriptions().change_plan(&request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::ChangePlanRequest::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_seats_init(request: &mut api::ChangePlanRequest) {
                 if request.seats.is_none() {
@@ -564,7 +594,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "plan-name" => {
                         request.plan_name = Some(value.unwrap_or("").to_string());
                     },
@@ -592,8 +622,30 @@ impl Engine {
                         request.purchase_order_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.subscriptions().change_plan(request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -601,6 +653,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -617,8 +672,36 @@ impl Engine {
 
     fn _subscriptions_change_renewal_settings(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::RenewalSettings::default();
-        let mut call = self.hub.subscriptions().change_renewal_settings(&request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "renewal-type" => {
+                        request.renewal_type = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.subscriptions().change_renewal_settings(request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -640,30 +723,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "renewal-type" => {
-                        request.renewal_type = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -680,8 +747,42 @@ impl Engine {
 
     fn _subscriptions_change_seats(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Seats::default();
-        let mut call = self.hub.subscriptions().change_seats(&request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "number-of-seats" => {
+                        request.number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "number-of-seats", "integer"));
+                    },
+                "maximum-number-of-seats" => {
+                        request.maximum_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "maximum-number-of-seats", "integer"));
+                    },
+                "licensed-number-of-seats" => {
+                        request.licensed_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "licensed-number-of-seats", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.subscriptions().change_seats(request, &self.opt.arg_customer_id, &self.opt.arg_subscription_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -703,36 +804,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "number-of-seats" => {
-                        request.number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "number-of-seats", "integer"));
-                    },
-                "maximum-number-of-seats" => {
-                        request.maximum_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "maximum-number-of-seats", "integer"));
-                    },
-                "licensed-number-of-seats" => {
-                        request.licensed_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "licensed-number-of-seats", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -776,6 +855,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -817,6 +899,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -833,38 +918,22 @@ impl Engine {
 
     fn _subscriptions_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Subscription::default();
-        let mut call = self.hub.subscriptions().insert(&request, &self.opt.arg_customer_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "customer-auth-token" => {
-                    call = call.customer_auth_token(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Subscription::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_plan_commitment_interval_init(request: &mut api::Subscription) {
                 request_plan_init(request);
@@ -903,7 +972,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "renewal-settings.kind" => {
                         request_renewal_settings_init(&mut request);
                         request.renewal_settings.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
@@ -997,8 +1066,33 @@ impl Engine {
                         request.customer_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.subscriptions().insert(request, &self.opt.arg_customer_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "customer-auth-token" => {
+                    call = call.customer_auth_token(value.unwrap_or(""));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1006,6 +1100,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1064,6 +1161,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1107,6 +1207,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1150,6 +1253,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1274,6 +1380,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -1281,8 +1388,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

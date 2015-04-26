@@ -4,7 +4,7 @@
 [package]
 
 name = "google-resourceviews1_beta2-cli"
-version = "0.0.1+20150302"
+version = "0.1.0+20150302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with resourceviews (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/resourceviews1_beta2-cli"

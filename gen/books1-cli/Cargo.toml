@@ -4,7 +4,7 @@
 [package]
 
 name = "google-books1-cli"
-version = "0.0.1+20150401"
+version = "0.1.0+20150401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with books (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/books1-cli"

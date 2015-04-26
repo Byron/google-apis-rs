@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Maps Engine* crate version *0.1.5+20150414*, where *20150414* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+//! This documentation was generated from *Maps Engine* crate version *0.1.6+20150414*, where *20150414* is the exact revision of the *mapsengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 //! 
 //! Everything else about the *Maps Engine* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/maps-engine/).
@@ -151,14 +151,15 @@
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
 //!         // You can also just use its `Debug`, `Display` or `Error` traits
-//!         Error::HttpError(_)
+//!          Error::HttpError(_)
 //!         |Error::MissingAPIKey
-//!         |Error::MissingToken
+//!         |Error::MissingToken(_)
 //!         |Error::Cancelled
 //!         |Error::UploadSizeLimitExceeded(_, _)
 //!         |Error::Failure(_)
+//!         |Error::BadRequest(_)
 //!         |Error::FieldClash(_)
-//!         |Error::JsonDecodeError(_) => println!("{}", e),
+//!         |Error::JsonDecodeError(_, _) => println!("{}", e),
 //!     },
 //!     Ok(res) => println!("Success: {:?}", res),
 //! }
@@ -246,7 +247,7 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, JsonServerError};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -337,14 +338,15 @@ impl Default for Scope {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
 ///         // You can also just use its `Debug`, `Display` or `Error` traits
-///         Error::HttpError(_)
+///          Error::HttpError(_)
 ///         |Error::MissingAPIKey
-///         |Error::MissingToken
+///         |Error::MissingToken(_)
 ///         |Error::Cancelled
 ///         |Error::UploadSizeLimitExceeded(_, _)
 ///         |Error::Failure(_)
+///         |Error::BadRequest(_)
 ///         |Error::FieldClash(_)
-///         |Error::JsonDecodeError(_) => println!("{}", e),
+///         |Error::JsonDecodeError(_, _) => println!("{}", e),
 ///     },
 ///     Ok(res) => println!("Success: {:?}", res),
 /// }
@@ -365,7 +367,7 @@ impl<'a, C, A> MapsEngine<C, A>
         MapsEngine {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.5".to_string(),
+            _user_agent: "google-api-rust-client/0.1.6".to_string(),
         }
     }
 
@@ -392,7 +394,7 @@ impl<'a, C, A> MapsEngine<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.5`.
+    /// It defaults to `google-api-rust-client/0.1.6`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2413,10 +2415,10 @@ impl<'a, C, A> LayerMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Layer) -> LayerCreateCall<'a, C, A> {
+    pub fn create(&self, request: Layer) -> LayerCreateCall<'a, C, A> {
         LayerCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _process: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2484,10 +2486,10 @@ impl<'a, C, A> LayerMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> LayerPermissionBatchDeleteCall<'a, C, A> {
+    pub fn permissions_batch_delete(&self, request: PermissionsBatchDeleteRequest, id: &str) -> LayerPermissionBatchDeleteCall<'a, C, A> {
         LayerPermissionBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2505,10 +2507,10 @@ impl<'a, C, A> LayerMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> LayerPermissionBatchUpdateCall<'a, C, A> {
+    pub fn permissions_batch_update(&self, request: PermissionsBatchUpdateRequest, id: &str) -> LayerPermissionBatchUpdateCall<'a, C, A> {
         LayerPermissionBatchUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2585,10 +2587,10 @@ impl<'a, C, A> LayerMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the layer.
-    pub fn patch(&self, request: &Layer, id: &str) -> LayerPatchCall<'a, C, A> {
+    pub fn patch(&self, request: Layer, id: &str) -> LayerPatchCall<'a, C, A> {
         LayerPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2681,10 +2683,10 @@ impl<'a, C, A> RasterMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterPermissionBatchUpdateCall<'a, C, A> {
+    pub fn permissions_batch_update(&self, request: PermissionsBatchUpdateRequest, id: &str) -> RasterPermissionBatchUpdateCall<'a, C, A> {
         RasterPermissionBatchUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2700,10 +2702,10 @@ impl<'a, C, A> RasterMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster.
-    pub fn patch(&self, request: &Raster, id: &str) -> RasterPatchCall<'a, C, A> {
+    pub fn patch(&self, request: Raster, id: &str) -> RasterPatchCall<'a, C, A> {
         RasterPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2753,10 +2755,10 @@ impl<'a, C, A> RasterMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterPermissionBatchDeleteCall<'a, C, A> {
+    pub fn permissions_batch_delete(&self, request: PermissionsBatchDeleteRequest, id: &str) -> RasterPermissionBatchDeleteCall<'a, C, A> {
         RasterPermissionBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2853,10 +2855,10 @@ impl<'a, C, A> RasterMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload(&self, request: &Raster) -> RasterUploadCall<'a, C, A> {
+    pub fn upload(&self, request: Raster) -> RasterUploadCall<'a, C, A> {
         RasterUploadCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3095,10 +3097,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table to append the features to.
-    pub fn features_batch_insert(&self, request: &FeaturesBatchInsertRequest, id: &str) -> TableFeatureBatchInsertCall<'a, C, A> {
+    pub fn features_batch_insert(&self, request: FeaturesBatchInsertRequest, id: &str) -> TableFeatureBatchInsertCall<'a, C, A> {
         TableFeatureBatchInsertCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3157,10 +3159,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table that contains the features to be deleted.
-    pub fn features_batch_delete(&self, request: &FeaturesBatchDeleteRequest, id: &str) -> TableFeatureBatchDeleteCall<'a, C, A> {
+    pub fn features_batch_delete(&self, request: FeaturesBatchDeleteRequest, id: &str) -> TableFeatureBatchDeleteCall<'a, C, A> {
         TableFeatureBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3240,10 +3242,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> TablePermissionBatchUpdateCall<'a, C, A> {
+    pub fn permissions_batch_update(&self, request: PermissionsBatchUpdateRequest, id: &str) -> TablePermissionBatchUpdateCall<'a, C, A> {
         TablePermissionBatchUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3260,10 +3262,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn upload(&self, request: &Table) -> TableUploadCall<'a, C, A> {
+    pub fn upload(&self, request: Table) -> TableUploadCall<'a, C, A> {
         TableUploadCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3292,10 +3294,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table containing the features to be patched.
-    pub fn features_batch_patch(&self, request: &FeaturesBatchPatchRequest, id: &str) -> TableFeatureBatchPatchCall<'a, C, A> {
+    pub fn features_batch_patch(&self, request: FeaturesBatchPatchRequest, id: &str) -> TableFeatureBatchPatchCall<'a, C, A> {
         TableFeatureBatchPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3311,10 +3313,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the table.
-    pub fn patch(&self, request: &Table, id: &str) -> TablePatchCall<'a, C, A> {
+    pub fn patch(&self, request: Table, id: &str) -> TablePatchCall<'a, C, A> {
         TablePatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3330,10 +3332,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> TablePermissionBatchDeleteCall<'a, C, A> {
+    pub fn permissions_batch_delete(&self, request: PermissionsBatchDeleteRequest, id: &str) -> TablePermissionBatchDeleteCall<'a, C, A> {
         TablePermissionBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3348,10 +3350,10 @@ impl<'a, C, A> TableMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Table) -> TableCreateCall<'a, C, A> {
+    pub fn create(&self, request: Table) -> TableCreateCall<'a, C, A> {
         TableCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3485,10 +3487,10 @@ impl<'a, C, A> MapMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the map.
-    pub fn patch(&self, request: &Map, id: &str) -> MapPatchCall<'a, C, A> {
+    pub fn patch(&self, request: Map, id: &str) -> MapPatchCall<'a, C, A> {
         MapPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3506,10 +3508,10 @@ impl<'a, C, A> MapMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> MapPermissionBatchUpdateCall<'a, C, A> {
+    pub fn permissions_batch_update(&self, request: PermissionsBatchUpdateRequest, id: &str) -> MapPermissionBatchUpdateCall<'a, C, A> {
         MapPermissionBatchUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3593,10 +3595,10 @@ impl<'a, C, A> MapMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &Map) -> MapCreateCall<'a, C, A> {
+    pub fn create(&self, request: Map) -> MapCreateCall<'a, C, A> {
         MapCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3646,10 +3648,10 @@ impl<'a, C, A> MapMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> MapPermissionBatchDeleteCall<'a, C, A> {
+    pub fn permissions_batch_delete(&self, request: PermissionsBatchDeleteRequest, id: &str) -> MapPermissionBatchDeleteCall<'a, C, A> {
         MapPermissionBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3705,10 +3707,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: &RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
+    pub fn create(&self, request: RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
         RasterCollectionCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3723,10 +3725,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset from which permissions will be removed.
-    pub fn permissions_batch_delete(&self, request: &PermissionsBatchDeleteRequest, id: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
+    pub fn permissions_batch_delete(&self, request: PermissionsBatchDeleteRequest, id: &str) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
         RasterCollectionPermissionBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3742,10 +3744,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection.
-    pub fn patch(&self, request: &RasterCollection, id: &str) -> RasterCollectionPatchCall<'a, C, A> {
+    pub fn patch(&self, request: RasterCollection, id: &str) -> RasterCollectionPatchCall<'a, C, A> {
         RasterCollectionPatchCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3797,10 +3799,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the asset to which permissions will be added.
-    pub fn permissions_batch_update(&self, request: &PermissionsBatchUpdateRequest, id: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
+    pub fn permissions_batch_update(&self, request: PermissionsBatchUpdateRequest, id: &str) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
         RasterCollectionPermissionBatchUpdateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3879,10 +3881,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection to which these rasters belong.
-    pub fn rasters_batch_insert(&self, request: &RasterCollectionsRastersBatchInsertRequest, id: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
+    pub fn rasters_batch_insert(&self, request: RasterCollectionsRastersBatchInsertRequest, id: &str) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
         RasterCollectionRasterBatchInsertCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3900,10 +3902,10 @@ impl<'a, C, A> RasterCollectionMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The ID of the raster collection to which these rasters belong.
-    pub fn rasters_batch_delete(&self, request: &RasterCollectionsRasterBatchDeleteRequest, id: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
+    pub fn rasters_batch_delete(&self, request: RasterCollectionsRasterBatchDeleteRequest, id: &str) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
         RasterCollectionRasterBatchDeleteCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _id: id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4041,10 +4043,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - The ID of the project.
-    pub fn icons_create(&self, request: &Icon, project_id: &str) -> ProjectIconCreateCall<'a, C, A> {
+    pub fn icons_create(&self, request: Icon, project_id: &str) -> ProjectIconCreateCall<'a, C, A> {
         ProjectIconCreateCall {
             hub: self.hub,
-            _request: request.clone(),
+            _request: request,
             _project_id: project_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -4237,12 +4239,17 @@ impl<'a, C, A> LayerUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4251,7 +4258,7 @@ impl<'a, C, A> LayerUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4476,12 +4483,17 @@ impl<'a, C, A> LayerPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4490,7 +4502,7 @@ impl<'a, C, A> LayerPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4706,12 +4718,17 @@ impl<'a, C, A> LayerListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4720,7 +4737,7 @@ impl<'a, C, A> LayerListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4838,7 +4855,7 @@ impl<'a, C, A> LayerListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.layers().create(&req)
+/// let result = hub.layers().create(req)
 ///              .process(false)
 ///              .doit();
 /// # }
@@ -4945,12 +4962,17 @@ impl<'a, C, A> LayerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -4959,7 +4981,7 @@ impl<'a, C, A> LayerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -4977,8 +4999,8 @@ impl<'a, C, A> LayerCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Layer) -> LayerCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Layer) -> LayerCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// Whether to queue the created layer for processing.
@@ -5185,12 +5207,17 @@ impl<'a, C, A> LayerGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5199,7 +5226,7 @@ impl<'a, C, A> LayerGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -5418,12 +5445,17 @@ impl<'a, C, A> LayerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -5647,12 +5679,17 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5661,7 +5698,7 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -5775,7 +5812,7 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.layers().permissions_batch_delete(&req, "id")
+/// let result = hub.layers().permissions_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -5903,12 +5940,17 @@ impl<'a, C, A> LayerPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -5917,7 +5959,7 @@ impl<'a, C, A> LayerPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -5935,8 +5977,8 @@ impl<'a, C, A> LayerPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> LayerPermissionBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchDeleteRequest) -> LayerPermissionBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset from which permissions will be removed.
@@ -6035,7 +6077,7 @@ impl<'a, C, A> LayerPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.layers().permissions_batch_update(&req, "id")
+/// let result = hub.layers().permissions_batch_update(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -6163,12 +6205,17 @@ impl<'a, C, A> LayerPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6177,7 +6224,7 @@ impl<'a, C, A> LayerPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6195,8 +6242,8 @@ impl<'a, C, A> LayerPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> LayerPermissionBatchUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchUpdateRequest) -> LayerPermissionBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset to which permissions will be added.
@@ -6445,12 +6492,17 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6459,7 +6511,7 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -6769,12 +6821,17 @@ impl<'a, C, A> LayerParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -6783,7 +6840,7 @@ impl<'a, C, A> LayerParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7017,12 +7074,17 @@ impl<'a, C, A> LayerCancelProcessingCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7031,7 +7093,7 @@ impl<'a, C, A> LayerCancelProcessingCall<'a, C, A> where C: BorrowMut<hyper::Cli
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7138,7 +7200,7 @@ impl<'a, C, A> LayerCancelProcessingCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.layers().patch(&req, "id")
+/// let result = hub.layers().patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -7265,12 +7327,17 @@ impl<'a, C, A> LayerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -7287,8 +7354,8 @@ impl<'a, C, A> LayerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Layer) -> LayerPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Layer) -> LayerPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the layer.
@@ -7498,12 +7565,17 @@ impl<'a, C, A> LayerPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7512,7 +7584,7 @@ impl<'a, C, A> LayerPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7732,12 +7804,17 @@ impl<'a, C, A> LayerProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7746,7 +7823,7 @@ impl<'a, C, A> LayerProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -7855,7 +7932,7 @@ impl<'a, C, A> LayerProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.rasters().permissions_batch_update(&req, "id")
+/// let result = hub.rasters().permissions_batch_update(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -7983,12 +8060,17 @@ impl<'a, C, A> RasterPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -7997,7 +8079,7 @@ impl<'a, C, A> RasterPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8015,8 +8097,8 @@ impl<'a, C, A> RasterPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterPermissionBatchUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchUpdateRequest) -> RasterPermissionBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset to which permissions will be added.
@@ -8113,7 +8195,7 @@ impl<'a, C, A> RasterPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.rasters().patch(&req, "id")
+/// let result = hub.rasters().patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -8240,12 +8322,17 @@ impl<'a, C, A> RasterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -8262,8 +8349,8 @@ impl<'a, C, A> RasterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Raster) -> RasterPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Raster) -> RasterPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the raster.
@@ -8473,12 +8560,17 @@ impl<'a, C, A> RasterPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8487,7 +8579,7 @@ impl<'a, C, A> RasterPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8706,12 +8798,17 @@ impl<'a, C, A> RasterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -8817,7 +8914,7 @@ impl<'a, C, A> RasterDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.rasters().permissions_batch_delete(&req, "id")
+/// let result = hub.rasters().permissions_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -8945,12 +9042,17 @@ impl<'a, C, A> RasterPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hype
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -8959,7 +9061,7 @@ impl<'a, C, A> RasterPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hype
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -8977,8 +9079,8 @@ impl<'a, C, A> RasterPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterPermissionBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchDeleteRequest) -> RasterPermissionBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset from which permissions will be removed.
@@ -9116,14 +9218,15 @@ impl<'a, C, A> RasterFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        let mut url = if protocol == "simple" {
-                "https://www.googleapis.com/upload/mapsengine/v1/rasters/{id}/files".to_string()
+        let (mut url, upload_type) = 
+            if protocol == "simple" {
+                ("https://www.googleapis.com/upload/mapsengine/v1/rasters/{id}/files".to_string(), "multipart")
             } else if protocol == "resumable" {
-                "https://www.googleapis.com/resumable/upload/mapsengine/v1/rasters/{id}/files".to_string()
+                ("https://www.googleapis.com/resumable/upload/mapsengine/v1/rasters/{id}/files".to_string(), "resumable")
             } else { 
                 unreachable!() 
-        };
-        params.push(("uploadType", protocol.to_string()));
+            };
+        params.push(("uploadType", upload_type.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -9229,12 +9332,17 @@ impl<'a, C, A> RasterFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
@@ -9244,9 +9352,9 @@ impl<'a, C, A> RasterFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
-                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url);
+                                dlg.store_upload_url(url_str);
                             }
 
                             cmn::ResumableUploadHelper {
@@ -9256,7 +9364,7 @@ impl<'a, C, A> RasterFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
-                                url: url,
+                                url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
                                 content_length: size
@@ -9533,12 +9641,17 @@ impl<'a, C, A> RasterProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9547,7 +9660,7 @@ impl<'a, C, A> RasterProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -9767,12 +9880,17 @@ impl<'a, C, A> RasterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -9781,7 +9899,7 @@ impl<'a, C, A> RasterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10037,12 +10155,17 @@ impl<'a, C, A> RasterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10051,7 +10174,7 @@ impl<'a, C, A> RasterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10241,7 +10364,7 @@ impl<'a, C, A> RasterListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.rasters().upload(&req)
+/// let result = hub.rasters().upload(req)
 ///              .doit();
 /// # }
 /// ```
@@ -10343,12 +10466,17 @@ impl<'a, C, A> RasterUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10357,7 +10485,7 @@ impl<'a, C, A> RasterUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10375,8 +10503,8 @@ impl<'a, C, A> RasterUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Raster) -> RasterUploadCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Raster) -> RasterUploadCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10586,12 +10714,17 @@ impl<'a, C, A> RasterParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10600,7 +10733,7 @@ impl<'a, C, A> RasterParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -10834,12 +10967,17 @@ impl<'a, C, A> AssetPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -10848,7 +10986,7 @@ impl<'a, C, A> AssetPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11107,12 +11245,17 @@ impl<'a, C, A> AssetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11121,7 +11264,7 @@ impl<'a, C, A> AssetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11422,12 +11565,17 @@ impl<'a, C, A> AssetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11436,7 +11584,7 @@ impl<'a, C, A> AssetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11666,12 +11814,17 @@ impl<'a, C, A> AssetParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -11680,7 +11833,7 @@ impl<'a, C, A> AssetParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -11913,12 +12066,17 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -12066,14 +12224,15 @@ impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        let mut url = if protocol == "simple" {
-                "https://www.googleapis.com/upload/mapsengine/v1/tables/{id}/files".to_string()
+        let (mut url, upload_type) = 
+            if protocol == "simple" {
+                ("https://www.googleapis.com/upload/mapsengine/v1/tables/{id}/files".to_string(), "multipart")
             } else if protocol == "resumable" {
-                "https://www.googleapis.com/resumable/upload/mapsengine/v1/tables/{id}/files".to_string()
+                ("https://www.googleapis.com/resumable/upload/mapsengine/v1/tables/{id}/files".to_string(), "resumable")
             } else { 
                 unreachable!() 
-        };
-        params.push(("uploadType", protocol.to_string()));
+            };
+        params.push(("uploadType", upload_type.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -12179,12 +12338,17 @@ impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
@@ -12194,9 +12358,9 @@ impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
-                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url);
+                                dlg.store_upload_url(url_str);
                             }
 
                             cmn::ResumableUploadHelper {
@@ -12206,7 +12370,7 @@ impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
-                                url: url,
+                                url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
                                 content_length: size
@@ -12378,7 +12542,7 @@ impl<'a, C, A> TableFileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().features_batch_insert(&req, "id")
+/// let result = hub.tables().features_batch_insert(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -12505,12 +12669,17 @@ impl<'a, C, A> TableFeatureBatchInsertCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -12527,8 +12696,8 @@ impl<'a, C, A> TableFeatureBatchInsertCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &FeaturesBatchInsertRequest) -> TableFeatureBatchInsertCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: FeaturesBatchInsertRequest) -> TableFeatureBatchInsertCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the table to append the features to.
@@ -12777,12 +12946,17 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -12791,7 +12965,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -13096,12 +13270,17 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13110,7 +13289,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -13223,7 +13402,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().features_batch_delete(&req, "id")
+/// let result = hub.tables().features_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -13350,12 +13529,17 @@ impl<'a, C, A> TableFeatureBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -13372,8 +13556,8 @@ impl<'a, C, A> TableFeatureBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &FeaturesBatchDeleteRequest) -> TableFeatureBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: FeaturesBatchDeleteRequest) -> TableFeatureBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the table that contains the features to be deleted.
@@ -13628,12 +13812,17 @@ impl<'a, C, A> TableFeatureListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13642,7 +13831,7 @@ impl<'a, C, A> TableFeatureListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -13925,12 +14114,17 @@ impl<'a, C, A> TableProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -13939,7 +14133,7 @@ impl<'a, C, A> TableProcesCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -14169,12 +14363,17 @@ impl<'a, C, A> TableParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14183,7 +14382,7 @@ impl<'a, C, A> TableParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -14306,7 +14505,7 @@ impl<'a, C, A> TableParentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().permissions_batch_update(&req, "id")
+/// let result = hub.tables().permissions_batch_update(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -14434,12 +14633,17 @@ impl<'a, C, A> TablePermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14448,7 +14652,7 @@ impl<'a, C, A> TablePermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -14466,8 +14670,8 @@ impl<'a, C, A> TablePermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> TablePermissionBatchUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchUpdateRequest) -> TablePermissionBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset to which permissions will be added.
@@ -14566,7 +14770,7 @@ impl<'a, C, A> TablePermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().upload(&req)
+/// let result = hub.tables().upload(req)
 ///              .doit();
 /// # }
 /// ```
@@ -14668,12 +14872,17 @@ impl<'a, C, A> TableUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -14682,7 +14891,7 @@ impl<'a, C, A> TableUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -14700,8 +14909,8 @@ impl<'a, C, A> TableUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Table) -> TableUploadCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Table) -> TableUploadCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -14802,7 +15011,7 @@ impl<'a, C, A> TableUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().features_batch_patch(&req, "id")
+/// let result = hub.tables().features_batch_patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -14929,12 +15138,17 @@ impl<'a, C, A> TableFeatureBatchPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -14951,8 +15165,8 @@ impl<'a, C, A> TableFeatureBatchPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &FeaturesBatchPatchRequest) -> TableFeatureBatchPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: FeaturesBatchPatchRequest) -> TableFeatureBatchPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the table containing the features to be patched.
@@ -15049,7 +15263,7 @@ impl<'a, C, A> TableFeatureBatchPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().patch(&req, "id")
+/// let result = hub.tables().patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -15176,12 +15390,17 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -15198,8 +15417,8 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Table) -> TablePatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Table) -> TablePatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the table.
@@ -15296,7 +15515,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().permissions_batch_delete(&req, "id")
+/// let result = hub.tables().permissions_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -15424,12 +15643,17 @@ impl<'a, C, A> TablePermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15438,7 +15662,7 @@ impl<'a, C, A> TablePermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -15456,8 +15680,8 @@ impl<'a, C, A> TablePermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> TablePermissionBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchDeleteRequest) -> TablePermissionBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset from which permissions will be removed.
@@ -15554,7 +15778,7 @@ impl<'a, C, A> TablePermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.tables().create(&req)
+/// let result = hub.tables().create(req)
 ///              .doit();
 /// # }
 /// ```
@@ -15656,12 +15880,17 @@ impl<'a, C, A> TableCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15670,7 +15899,7 @@ impl<'a, C, A> TableCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -15688,8 +15917,8 @@ impl<'a, C, A> TableCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Table) -> TableCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Table) -> TableCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -15889,12 +16118,17 @@ impl<'a, C, A> TablePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -15903,7 +16137,7 @@ impl<'a, C, A> TablePermissionListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -16135,12 +16369,17 @@ impl<'a, C, A> TableFeatureGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16149,7 +16388,7 @@ impl<'a, C, A> TableFeatureGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -16432,12 +16671,17 @@ impl<'a, C, A> MapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16446,7 +16690,7 @@ impl<'a, C, A> MapListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -16735,12 +16979,17 @@ impl<'a, C, A> MapListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -16749,7 +16998,7 @@ impl<'a, C, A> MapListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -16867,7 +17116,7 @@ impl<'a, C, A> MapListPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.maps().patch(&req, "id")
+/// let result = hub.maps().patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -16994,12 +17243,17 @@ impl<'a, C, A> MapPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -17016,8 +17270,8 @@ impl<'a, C, A> MapPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Map) -> MapPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Map) -> MapPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the map.
@@ -17116,7 +17370,7 @@ impl<'a, C, A> MapPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.maps().permissions_batch_update(&req, "id")
+/// let result = hub.maps().permissions_batch_update(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -17244,12 +17498,17 @@ impl<'a, C, A> MapPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17258,7 +17517,7 @@ impl<'a, C, A> MapPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -17276,8 +17535,8 @@ impl<'a, C, A> MapPermissionBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> MapPermissionBatchUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchUpdateRequest) -> MapPermissionBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset to which permissions will be added.
@@ -17486,12 +17745,17 @@ impl<'a, C, A> MapDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -17710,12 +17974,17 @@ impl<'a, C, A> MapUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17724,7 +17993,7 @@ impl<'a, C, A> MapUnpublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -17949,12 +18218,17 @@ impl<'a, C, A> MapPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -17963,7 +18237,7 @@ impl<'a, C, A> MapPublishCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -18190,12 +18464,17 @@ impl<'a, C, A> MapPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18204,7 +18483,7 @@ impl<'a, C, A> MapPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -18311,7 +18590,7 @@ impl<'a, C, A> MapPermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.maps().create(&req)
+/// let result = hub.maps().create(req)
 ///              .doit();
 /// # }
 /// ```
@@ -18413,12 +18692,17 @@ impl<'a, C, A> MapCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18427,7 +18711,7 @@ impl<'a, C, A> MapCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -18445,8 +18729,8 @@ impl<'a, C, A> MapCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Map) -> MapCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Map) -> MapCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -18646,12 +18930,17 @@ impl<'a, C, A> MapGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18660,7 +18949,7 @@ impl<'a, C, A> MapGetPublishedCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -18885,12 +19174,17 @@ impl<'a, C, A> MapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -18899,7 +19193,7 @@ impl<'a, C, A> MapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -19013,7 +19307,7 @@ impl<'a, C, A> MapGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.maps().permissions_batch_delete(&req, "id")
+/// let result = hub.maps().permissions_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -19141,12 +19435,17 @@ impl<'a, C, A> MapPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19155,7 +19454,7 @@ impl<'a, C, A> MapPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -19173,8 +19472,8 @@ impl<'a, C, A> MapPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> MapPermissionBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchDeleteRequest) -> MapPermissionBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset from which permissions will be removed.
@@ -19271,7 +19570,7 @@ impl<'a, C, A> MapPermissionBatchDeleteCall<'a, C, A> where C: BorrowMut<hyper::
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().create(&req)
+/// let result = hub.raster_collections().create(req)
 ///              .doit();
 /// # }
 /// ```
@@ -19373,12 +19672,17 @@ impl<'a, C, A> RasterCollectionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19387,7 +19691,7 @@ impl<'a, C, A> RasterCollectionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -19405,8 +19709,8 @@ impl<'a, C, A> RasterCollectionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: RasterCollection) -> RasterCollectionCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19493,7 +19797,7 @@ impl<'a, C, A> RasterCollectionCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().permissions_batch_delete(&req, "id")
+/// let result = hub.raster_collections().permissions_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -19621,12 +19925,17 @@ impl<'a, C, A> RasterCollectionPermissionBatchDeleteCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -19635,7 +19944,7 @@ impl<'a, C, A> RasterCollectionPermissionBatchDeleteCall<'a, C, A> where C: Borr
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -19653,8 +19962,8 @@ impl<'a, C, A> RasterCollectionPermissionBatchDeleteCall<'a, C, A> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchDeleteRequest) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchDeleteRequest) -> RasterCollectionPermissionBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset from which permissions will be removed.
@@ -19751,7 +20060,7 @@ impl<'a, C, A> RasterCollectionPermissionBatchDeleteCall<'a, C, A> where C: Borr
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().patch(&req, "id")
+/// let result = hub.raster_collections().patch(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -19878,12 +20187,17 @@ impl<'a, C, A> RasterCollectionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -19900,8 +20214,8 @@ impl<'a, C, A> RasterCollectionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &RasterCollection) -> RasterCollectionPatchCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: RasterCollection) -> RasterCollectionPatchCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the raster collection.
@@ -20111,12 +20425,17 @@ impl<'a, C, A> RasterCollectionCancelProcessingCall<'a, C, A> where C: BorrowMut
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20125,7 +20444,7 @@ impl<'a, C, A> RasterCollectionCancelProcessingCall<'a, C, A> where C: BorrowMut
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -20345,12 +20664,17 @@ impl<'a, C, A> RasterCollectionProcesCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20359,7 +20683,7 @@ impl<'a, C, A> RasterCollectionProcesCall<'a, C, A> where C: BorrowMut<hyper::Cl
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -20468,7 +20792,7 @@ impl<'a, C, A> RasterCollectionProcesCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().permissions_batch_update(&req, "id")
+/// let result = hub.raster_collections().permissions_batch_update(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -20596,12 +20920,17 @@ impl<'a, C, A> RasterCollectionPermissionBatchUpdateCall<'a, C, A> where C: Borr
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -20610,7 +20939,7 @@ impl<'a, C, A> RasterCollectionPermissionBatchUpdateCall<'a, C, A> where C: Borr
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -20628,8 +20957,8 @@ impl<'a, C, A> RasterCollectionPermissionBatchUpdateCall<'a, C, A> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &PermissionsBatchUpdateRequest) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: PermissionsBatchUpdateRequest) -> RasterCollectionPermissionBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the asset to which permissions will be added.
@@ -20838,12 +21167,17 @@ impl<'a, C, A> RasterCollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = res;
 
@@ -21072,12 +21406,17 @@ impl<'a, C, A> RasterCollectionParentListCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21086,7 +21425,7 @@ impl<'a, C, A> RasterCollectionParentListCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -21359,12 +21698,17 @@ impl<'a, C, A> RasterCollectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21373,7 +21717,7 @@ impl<'a, C, A> RasterCollectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -21562,7 +21906,7 @@ impl<'a, C, A> RasterCollectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().rasters_batch_insert(&req, "id")
+/// let result = hub.raster_collections().rasters_batch_insert(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -21690,12 +22034,17 @@ impl<'a, C, A> RasterCollectionRasterBatchInsertCall<'a, C, A> where C: BorrowMu
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21704,7 +22053,7 @@ impl<'a, C, A> RasterCollectionRasterBatchInsertCall<'a, C, A> where C: BorrowMu
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -21722,8 +22071,8 @@ impl<'a, C, A> RasterCollectionRasterBatchInsertCall<'a, C, A> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &RasterCollectionsRastersBatchInsertRequest) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: RasterCollectionsRastersBatchInsertRequest) -> RasterCollectionRasterBatchInsertCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the raster collection to which these rasters belong.
@@ -21822,7 +22171,7 @@ impl<'a, C, A> RasterCollectionRasterBatchInsertCall<'a, C, A> where C: BorrowMu
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.raster_collections().rasters_batch_delete(&req, "id")
+/// let result = hub.raster_collections().rasters_batch_delete(req, "id")
 ///              .doit();
 /// # }
 /// ```
@@ -21950,12 +22299,17 @@ impl<'a, C, A> RasterCollectionRasterBatchDeleteCall<'a, C, A> where C: BorrowMu
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -21964,7 +22318,7 @@ impl<'a, C, A> RasterCollectionRasterBatchDeleteCall<'a, C, A> where C: BorrowMu
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -21982,8 +22336,8 @@ impl<'a, C, A> RasterCollectionRasterBatchDeleteCall<'a, C, A> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &RasterCollectionsRasterBatchDeleteRequest) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: RasterCollectionsRasterBatchDeleteRequest) -> RasterCollectionRasterBatchDeleteCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the raster collection to which these rasters belong.
@@ -22193,12 +22547,17 @@ impl<'a, C, A> RasterCollectionPermissionListCall<'a, C, A> where C: BorrowMut<h
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22207,7 +22566,7 @@ impl<'a, C, A> RasterCollectionPermissionListCall<'a, C, A> where C: BorrowMut<h
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -22427,12 +22786,17 @@ impl<'a, C, A> RasterCollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22441,7 +22805,7 @@ impl<'a, C, A> RasterCollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -22716,12 +23080,17 @@ impl<'a, C, A> RasterCollectionRasterListCall<'a, C, A> where C: BorrowMut<hyper
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -22730,7 +23099,7 @@ impl<'a, C, A> RasterCollectionRasterListCall<'a, C, A> where C: BorrowMut<hyper
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -23050,12 +23419,17 @@ impl<'a, C, A> ProjectIconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = if enable_resource_parsing {
                         let mut json_response = String::new();
@@ -23064,7 +23438,7 @@ impl<'a, C, A> ProjectIconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     } else { (res, Default::default()) };
@@ -23182,7 +23556,7 @@ impl<'a, C, A> ProjectIconGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().icons_create(&req, "projectId")
+/// let result = hub.projects().icons_create(req, "projectId")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -23228,14 +23602,15 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = if protocol == "simple" {
-                "https://www.googleapis.com/upload/mapsengine/v1/projects/{projectId}/icons".to_string()
+        let (mut url, upload_type) = 
+            if protocol == "simple" {
+                ("https://www.googleapis.com/upload/mapsengine/v1/projects/{projectId}/icons".to_string(), "multipart")
             } else if protocol == "resumable" {
-                "https://www.googleapis.com/resumable/upload/mapsengine/v1/projects/{projectId}/icons".to_string()
+                ("https://www.googleapis.com/resumable/upload/mapsengine/v1/projects/{projectId}/icons".to_string(), "resumable")
             } else { 
                 unreachable!() 
-        };
-        params.push(("uploadType", protocol.to_string()));
+            };
+        params.push(("uploadType", upload_type.to_string()));
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -23354,12 +23729,17 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
@@ -23369,9 +23749,9 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                         }
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
-                            let url = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url);
+                                dlg.store_upload_url(url_str);
                             }
 
                             cmn::ResumableUploadHelper {
@@ -23381,7 +23761,7 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                                 auth: &mut *self.hub.auth.borrow_mut(),
                                 user_agent: &self.hub._user_agent,
                                 auth_header: auth_header.clone(),
-                                url: url,
+                                url: url_str,
                                 reader: &mut reader,
                                 media_type: reader_mime_type.clone(),
                                 content_length: size
@@ -23412,7 +23792,7 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -23456,8 +23836,8 @@ impl<'a, C, A> ProjectIconCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: &Icon) -> ProjectIconCreateCall<'a, C, A> {
-        self._request = new_value.clone();
+    pub fn request(mut self, new_value: Icon) -> ProjectIconCreateCall<'a, C, A> {
+        self._request = new_value;
         self
     }
     /// The ID of the project.
@@ -23641,12 +24021,17 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23655,7 +24040,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };
@@ -23875,12 +24260,17 @@ impl<'a, C, A> ProjectIconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, json::from_str(&json_err).ok()) {
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
                         dlg.finished(false);
-                        return Err(Error::Failure(res))
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
                     }
                     let result_value = {
                         let mut json_response = String::new();
@@ -23889,7 +24279,7 @@ impl<'a, C, A> ProjectIconListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
                                 dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(err));
+                                return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
                     };

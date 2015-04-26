@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-sqladmin1_beta4` library allows access to all features of the *Google SQL Admin* service.
 
-This documentation was generated from *SQL Admin* crate version *0.1.5+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *SQL Admin* crate version *0.1.6+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 
 Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 [official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
@@ -134,21 +134,22 @@ let mut req = User::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.users().update(&req, "project", "instance", "host", "name")
+let result = hub.users().update(req, "project", "instance", "host", "name")
              .doit();
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }

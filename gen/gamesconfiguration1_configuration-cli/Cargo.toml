@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration-cli"
-version = "0.0.1+20150413"
+version = "0.1.0+20150413"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration-cli"

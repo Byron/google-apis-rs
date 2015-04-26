@@ -1,4 +1,4 @@
-site_name: deploymentmanager v0.0.1+20150415
+site_name: deploymentmanager v0.1.0+20150415
 site_url: http://byron.github.io/google-apis-rs/google-deploymentmanager2_beta1-cli
 site_description: Write integrating applications with bcore
 

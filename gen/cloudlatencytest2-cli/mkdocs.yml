@@ -1,4 +1,4 @@
-site_name: cloudlatencytest v0.0.1+20150206
+site_name: cloudlatencytest v0.1.0+20150206
 site_url: http://byron.github.io/google-apis-rs/google-cloudlatencytest2-cli
 site_description: Write integrating applications with bcore
 

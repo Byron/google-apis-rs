@@ -1,4 +1,162 @@
-# HELLO YOUTUBE:V3
+<!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/cli/README.md.mako'
+DO NOT EDIT !
+-->
+The `youtube3` command-line interface *(CLI)* allows to use most features of the *Google YouTube* service from the comfort of your terminal.
+
+By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
+
+If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
+
+# Usage
+
+This documentation was generated from the *YouTube* API at revision *20150414*. The CLI is at version *0.1.0*.
+
+```bash
+  youtube3 [options] activities insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] activities list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] captions delete <id> [-p <v>...]
+  youtube3 [options] captions download <id> [-p <v>...] [-o <out>]
+  youtube3 [options] captions insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  youtube3 [options] captions list <part> <video-id> [-p <v>...] [-o <out>]
+  youtube3 [options] captions update -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  youtube3 [options] channel-banners insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  youtube3 [options] channel-sections delete <id> [-p <v>...]
+  youtube3 [options] channel-sections insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] channel-sections list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] channel-sections update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] channels list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] channels update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] comment-threads insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] comment-threads list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] comment-threads update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] comments delete <id> [-p <v>...]
+  youtube3 [options] comments insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] comments list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] comments mark-as-spam <id> [-p <v>...]
+  youtube3 [options] comments set-moderation-status <id> <moderation-status> [-p <v>...]
+  youtube3 [options] comments update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] guide-categories list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] i18n-languages list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] i18n-regions list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts bind <id> <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts control <id> <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts delete <id> [-p <v>...]
+  youtube3 [options] live-broadcasts insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts transition <broadcast-status> <id> <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-broadcasts update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] live-streams delete <id> [-p <v>...]
+  youtube3 [options] live-streams insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] live-streams list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] live-streams update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] playlist-items delete <id> [-p <v>...]
+  youtube3 [options] playlist-items insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] playlist-items list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] playlist-items update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] playlists delete <id> [-p <v>...]
+  youtube3 [options] playlists insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] playlists list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] playlists update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] search list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] subscriptions delete <id> [-p <v>...]
+  youtube3 [options] subscriptions insert -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] subscriptions list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] thumbnails set <video-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  youtube3 [options] video-abuse-report-reasons list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] video-categories list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] videos delete <id> [-p <v>...]
+  youtube3 [options] videos get-rating <id> [-p <v>...] [-o <out>]
+  youtube3 [options] videos insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  youtube3 [options] videos list <part> [-p <v>...] [-o <out>]
+  youtube3 [options] videos rate <id> <rating> [-p <v>...]
+  youtube3 [options] videos report-abuse -r <kv>... [-p <v>...]
+  youtube3 [options] videos update -r <kv>... [-p <v>...] [-o <out>]
+  youtube3 [options] watermarks set <channel-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...]
+  youtube3 [options] watermarks unset <channel-id> [-p <v>...]
+  youtube3 --help
+
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_youtube3_cli/index.html
+
+Configuration:
+  --scope <url>  
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir <folder>
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
+
+```
+
+# Configuration
+
+The program will store all persistent data in the `~/.google-service-cli` directory in *JSON* files prefixed with `youtube3-`.  You can change the directory used to store configuration with the `--config-dir` flag on a per-invocation basis.
+
+More information about the various kinds of persistent data are given in the following paragraphs.
+
+# Authentication
+
+Most APIs require a user to authenticate any request. If this is the case, the [scope][scopes] determines the 
+set of permissions granted. The granularity of these is usually no more than *read-only* or *full-access*.
+
+If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the `--scope` flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.
+
+The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.
+
+If a scope was authenticated by the user, the respective information will be stored as *JSON* in the configuration
+directory, e.g. `~/.google-service-cli/youtube3-token-<scope-hash>.json`. No manual management of these tokens
+is necessary.
+
+To revoke granted authentication, please refer to the [official documentation][revoke-access].
+
+# Application Secrets
+
+In order to allow any application to use Google services, it will need to be registered using the 
+[Google Developer Console][google-dev-console]. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.
+
+To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.
+
+You can workaround this limitation by putting your own secrets file at this location: 
+`~/.google-service-cli/youtube3-secret.json`, assuming that the required *youtube* API 
+was enabled for it. Such a secret file can be downloaded in the *Google Developer Console* at 
+*APIs & auth -> Credentials -> Download JSON* and used as is.
+
+Learn more about how to setup Google projects and enable APIs using the [official documentation][google-project-new].
 
 
-Include information about application secret files, and how we automatically write a default one.
+# Debugging
+
+Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error *as-is*.
+
+The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
+will cause all communication related to authentication to standard error.
+If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
+issue at hand.
+
+You may consider redirecting standard error into a file for ease of use, e.g. `youtube3 --debug <resource> <method> [options] 2>debug.txt`.
+
+
+[scopes]: https://developers.google.com/+/api/oauth#scopes
+[revoke-access]: http://webapps.stackexchange.com/a/30849
+[google-dev-console]: https://console.developers.google.com/
+[google-project-new]: https://developers.google.com/console/help/new/

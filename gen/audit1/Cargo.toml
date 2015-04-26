@@ -4,7 +4,7 @@
 [package]
 
 name = "google-audit1"
-version = "0.1.5+20150419"
+version = "0.1.6+20150419"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with audit (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/audit1"

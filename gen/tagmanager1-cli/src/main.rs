@@ -19,71 +19,72 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  tagmanager1 [options] accounts containers-create <account-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-delete <account-id> <container-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-get <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-list <account-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-macros-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-macros-delete <account-id> <container-id> <macro-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-macros-get <account-id> <container-id> <macro-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-macros-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-macros-update <account-id> <container-id> <macro-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-rules-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-rules-delete <account-id> <container-id> <rule-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-rules-get <account-id> <container-id> <rule-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-rules-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-rules-update <account-id> <container-id> <rule-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-tags-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-tags-get <account-id> <container-id> <tag-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-tags-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-tags-update <account-id> <container-id> <tag-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-delete <account-id> <container-id> <trigger-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-triggers-get <account-id> <container-id> <trigger-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-update <account-id> <container-id> <trigger-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-update <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-variables-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-variables-delete <account-id> <container-id> <variable-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-variables-get <account-id> <container-id> <variable-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-variables-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-variables-update <account-id> <container-id> <variable-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-create <account-id> <container-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-delete <account-id> <container-id> <container-version-id> [-p <v>]...
-  tagmanager1 [options] accounts containers-versions-get <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-list <account-id> <container-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-publish <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-restore <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-undelete <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts containers-versions-update <account-id> <container-id> <container-version-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts get <account-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts list [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts permissions-create <account-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts permissions-delete <account-id> <permission-id> [-p <v>]...
-  tagmanager1 [options] accounts permissions-get <account-id> <permission-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts permissions-list <account-id> [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts permissions-update <account-id> <permission-id> -r <kv>... [-p <v>]... [-o <out>]
-  tagmanager1 [options] accounts update <account-id> -r <kv>... [-p <v>]... [-o <out>]
+  tagmanager1 [options] accounts containers-create <account-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-delete <account-id> <container-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-get <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-list <account-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-macros-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-macros-delete <account-id> <container-id> <macro-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-macros-get <account-id> <container-id> <macro-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-macros-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-macros-update <account-id> <container-id> <macro-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-rules-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-rules-delete <account-id> <container-id> <rule-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-rules-get <account-id> <container-id> <rule-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-rules-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-rules-update <account-id> <container-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-tags-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-tags-get <account-id> <container-id> <tag-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-tags-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-tags-update <account-id> <container-id> <tag-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-triggers-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-triggers-delete <account-id> <container-id> <trigger-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-triggers-get <account-id> <container-id> <trigger-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-triggers-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-triggers-update <account-id> <container-id> <trigger-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-update <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-variables-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-variables-delete <account-id> <container-id> <variable-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-variables-get <account-id> <container-id> <variable-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-variables-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-variables-update <account-id> <container-id> <variable-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-delete <account-id> <container-id> <container-version-id> [-p <v>...]
+  tagmanager1 [options] accounts containers-versions-get <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-list <account-id> <container-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-publish <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-restore <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-undelete <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts containers-versions-update <account-id> <container-id> <container-version-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts get <account-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts list [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts permissions-create <account-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts permissions-delete <account-id> <permission-id> [-p <v>...]
+  tagmanager1 [options] accounts permissions-get <account-id> <permission-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts permissions-list <account-id> [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts permissions-update <account-id> <permission-id> -r <kv>... [-p <v>...] [-o <out>]
+  tagmanager1 [options] accounts update <account-id> -r <kv>... [-p <v>...] [-o <out>]
   tagmanager1 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_tagmanager1_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -105,37 +106,24 @@ struct Engine {
 impl Engine {
     fn _accounts_containers_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Container::default();
-        let mut call = self.hub.accounts().containers_create(&request, &self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Container::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "time-zone-id" => {
                         request.time_zone_id = Some(value.unwrap_or("").to_string());
                     },
@@ -179,8 +167,30 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_create(request, &self.opt.arg_account_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -188,6 +198,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -231,6 +244,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -272,6 +288,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -315,6 +334,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -331,37 +353,24 @@ impl Engine {
 
     fn _accounts_containers_macros_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Macro::default();
-        let mut call = self.hub.accounts().containers_macros_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Macro::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -402,8 +411,30 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_macros_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -411,6 +442,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -454,6 +488,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -495,6 +532,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -538,6 +578,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -554,40 +597,24 @@ impl Engine {
 
     fn _accounts_containers_macros_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Macro::default();
-        let mut call = self.hub.accounts().containers_macros_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_macro_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Macro::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -628,8 +655,33 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_macros_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_macro_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -637,6 +689,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -653,8 +708,48 @@ impl Engine {
 
     fn _accounts_containers_rules_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Rule::default();
-        let mut call = self.hub.accounts().containers_rules_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "container-id" => {
+                        request.container_id = Some(value.unwrap_or("").to_string());
+                    },
+                "rule-id" => {
+                        request.rule_id = Some(value.unwrap_or("").to_string());
+                    },
+                "notes" => {
+                        request.notes = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                "account-id" => {
+                        request.account_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().containers_rules_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -676,42 +771,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "container-id" => {
-                        request.container_id = Some(value.unwrap_or("").to_string());
-                    },
-                "rule-id" => {
-                        request.rule_id = Some(value.unwrap_or("").to_string());
-                    },
-                "notes" => {
-                        request.notes = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -755,6 +822,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -796,6 +866,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -839,6 +912,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -855,8 +931,48 @@ impl Engine {
 
     fn _accounts_containers_rules_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Rule::default();
-        let mut call = self.hub.accounts().containers_rules_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_rule_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "container-id" => {
+                        request.container_id = Some(value.unwrap_or("").to_string());
+                    },
+                "rule-id" => {
+                        request.rule_id = Some(value.unwrap_or("").to_string());
+                    },
+                "notes" => {
+                        request.notes = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                "account-id" => {
+                        request.account_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().containers_rules_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -881,42 +997,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "container-id" => {
-                        request.container_id = Some(value.unwrap_or("").to_string());
-                    },
-                "rule-id" => {
-                        request.rule_id = Some(value.unwrap_or("").to_string());
-                    },
-                "notes" => {
-                        request.notes = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -933,35 +1021,22 @@ impl Engine {
 
     fn _accounts_containers_tags_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Tag::default();
-        let mut call = self.hub.accounts().containers_tags_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Tag::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_priority_init(request: &mut api::Tag) {
                 if request.priority.is_none() {
@@ -969,7 +1044,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -1045,8 +1120,30 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_tags_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1054,6 +1151,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1097,6 +1197,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1138,6 +1241,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1181,6 +1287,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1197,38 +1306,22 @@ impl Engine {
 
     fn _accounts_containers_tags_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Tag::default();
-        let mut call = self.hub.accounts().containers_tags_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_tag_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Tag::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_priority_init(request: &mut api::Tag) {
                 if request.priority.is_none() {
@@ -1236,7 +1329,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -1312,36 +1405,17 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _accounts_containers_triggers_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::Trigger::default();
-        let mut call = self.hub.accounts().containers_triggers_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        let mut call = self.hub.accounts().containers_tags_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_tag_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -1360,12 +1434,46 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_triggers_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Trigger::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_check_validation_init(request: &mut api::Trigger) {
                 if request.check_validation.is_none() {
@@ -1421,7 +1529,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "video-percentage-list.type" => {
                         request_video_percentage_list_init(&mut request);
                         request.video_percentage_list.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
@@ -1555,8 +1663,30 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_triggers_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1564,6 +1694,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1607,6 +1740,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1648,6 +1784,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1691,6 +1830,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1707,38 +1849,22 @@ impl Engine {
 
     fn _accounts_containers_triggers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Trigger::default();
-        let mut call = self.hub.accounts().containers_triggers_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_trigger_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Trigger::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_check_validation_init(request: &mut api::Trigger) {
                 if request.check_validation.is_none() {
@@ -1794,7 +1920,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "video-percentage-list.type" => {
                         request_video_percentage_list_init(&mut request);
                         request.video_percentage_list.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
@@ -1928,33 +2054,11 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _accounts_containers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::Container::default();
-        let mut call = self.hub.accounts().containers_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        let mut call = self.hub.accounts().containers_triggers_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_trigger_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1979,14 +2083,48 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Container::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "time-zone-id" => {
                         request.time_zone_id = Some(value.unwrap_or("").to_string());
                     },
@@ -2030,36 +2168,17 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _accounts_containers_variables_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::Variable::default();
-        let mut call = self.hub.accounts().containers_variables_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        let mut call = self.hub.accounts().containers_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
                 "alt"
                 |"fields"
                 |"key"
@@ -2078,14 +2197,48 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_variables_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Variable::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -2126,8 +2279,30 @@ impl Engine {
                         request.container_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_variables_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2135,6 +2310,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2178,6 +2356,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2219,6 +2400,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2262,6 +2446,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2278,40 +2465,24 @@ impl Engine {
 
     fn _accounts_containers_variables_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Variable::default();
-        let mut call = self.hub.accounts().containers_variables_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_variable_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Variable::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "schedule-start-ms" => {
                         request.schedule_start_ms = Some(value.unwrap_or("").to_string());
                     },
@@ -2352,8 +2523,33 @@ impl Engine {
                         request.container_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_variables_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_variable_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2361,6 +2557,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2377,8 +2576,39 @@ impl Engine {
 
     fn _accounts_containers_versions_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::CreateContainerVersionRequestVersionOptions::default();
-        let mut call = self.hub.accounts().containers_versions_create(&request, &self.opt.arg_account_id, &self.opt.arg_container_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "notes" => {
+                        request.notes = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "quick-preview" => {
+                        request.quick_preview = Some(arg_from_str(value.unwrap_or("false"), err, "quick-preview", "boolean"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().containers_versions_create(request, &self.opt.arg_account_id, &self.opt.arg_container_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2400,33 +2630,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "notes" => {
-                        request.notes = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "quick-preview" => {
-                        request.quick_preview = Some(arg_from_str(value.unwrap_or("false"), err, "quick-preview", "boolean"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2470,6 +2681,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2511,6 +2725,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2557,6 +2774,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2603,6 +2823,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2646,6 +2869,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2689,6 +2915,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2705,38 +2934,22 @@ impl Engine {
 
     fn _accounts_containers_versions_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::ContainerVersion::default();
-        let mut call = self.hub.accounts().containers_versions_update(&request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_container_version_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::ContainerVersion::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_container_init(request: &mut api::ContainerVersion) {
                 if request.container.is_none() {
@@ -2744,7 +2957,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "container.time-zone-id" => {
                         request_container_init(&mut request);
                         request.container.as_mut().unwrap().time_zone_id = Some(value.unwrap_or("").to_string());
@@ -2827,8 +3040,33 @@ impl Engine {
                         request.account_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.accounts().containers_versions_update(request, &self.opt.arg_account_id, &self.opt.arg_container_id, &self.opt.arg_container_version_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2836,6 +3074,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2879,6 +3120,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2922,6 +3166,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2938,8 +3185,55 @@ impl Engine {
 
     fn _accounts_permissions_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::UserAccess::default();
-        let mut call = self.hub.accounts().permissions_create(&request, &self.opt.arg_account_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_account_access_init(request: &mut api::UserAccess) {
+                if request.account_access.is_none() {
+                    request.account_access = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "account-access.permission" => {
+                        request_account_access_init(&mut request);
+                        if request.account_access.as_mut().unwrap().permission.is_none() {
+                           request.account_access.as_mut().unwrap().permission = Some(Default::default());
+                        }
+                                        request.account_access.as_mut().unwrap().permission.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "email-address" => {
+                        request_account_access_init(&mut request);
+                        request.email_address = Some(value.unwrap_or("").to_string());
+                    },
+                "permission-id" => {
+                        request_account_access_init(&mut request);
+                        request.permission_id = Some(value.unwrap_or("").to_string());
+                    },
+                "account-id" => {
+                        request_account_access_init(&mut request);
+                        request.account_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().permissions_create(request, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2961,49 +3255,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            fn request_account_access_init(request: &mut api::UserAccess) {
-                if request.account_access.is_none() {
-                    request.account_access = Some(Default::default());
-                }
-            }
-            
-            match &field_name.to_string()[..] {
-                "account-access.permission" => {
-                        request_account_access_init(&mut request);
-                        if request.account_access.as_mut().unwrap().permission.is_none() {
-                           request.account_access.as_mut().unwrap().permission = Some(Default::default());
-                        }
-                                        request.account_access.as_mut().unwrap().permission.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "email-address" => {
-                        request_account_access_init(&mut request);
-                        request.email_address = Some(value.unwrap_or("").to_string());
-                    },
-                "permission-id" => {
-                        request_account_access_init(&mut request);
-                        request.permission_id = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_account_access_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3047,6 +3306,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -3088,6 +3350,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3131,6 +3396,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3147,8 +3415,55 @@ impl Engine {
 
     fn _accounts_permissions_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::UserAccess::default();
-        let mut call = self.hub.accounts().permissions_update(&request, &self.opt.arg_account_id, &self.opt.arg_permission_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_account_access_init(request: &mut api::UserAccess) {
+                if request.account_access.is_none() {
+                    request.account_access = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "account-access.permission" => {
+                        request_account_access_init(&mut request);
+                        if request.account_access.as_mut().unwrap().permission.is_none() {
+                           request.account_access.as_mut().unwrap().permission = Some(Default::default());
+                        }
+                                        request.account_access.as_mut().unwrap().permission.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "email-address" => {
+                        request_account_access_init(&mut request);
+                        request.email_address = Some(value.unwrap_or("").to_string());
+                    },
+                "permission-id" => {
+                        request_account_access_init(&mut request);
+                        request.permission_id = Some(value.unwrap_or("").to_string());
+                    },
+                "account-id" => {
+                        request_account_access_init(&mut request);
+                        request.account_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().permissions_update(request, &self.opt.arg_account_id, &self.opt.arg_permission_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3170,49 +3485,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            fn request_account_access_init(request: &mut api::UserAccess) {
-                if request.account_access.is_none() {
-                    request.account_access = Some(Default::default());
-                }
-            }
-            
-            match &field_name.to_string()[..] {
-                "account-access.permission" => {
-                        request_account_access_init(&mut request);
-                        if request.account_access.as_mut().unwrap().permission.is_none() {
-                           request.account_access.as_mut().unwrap().permission = Some(Default::default());
-                        }
-                                        request.account_access.as_mut().unwrap().permission.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "email-address" => {
-                        request_account_access_init(&mut request);
-                        request.email_address = Some(value.unwrap_or("").to_string());
-                    },
-                "permission-id" => {
-                        request_account_access_init(&mut request);
-                        request.permission_id = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_account_access_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3229,8 +3509,42 @@ impl Engine {
 
     fn _accounts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Account::default();
-        let mut call = self.hub.accounts().update(&request, &self.opt.arg_account_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "share-data" => {
+                        request.share_data = Some(arg_from_str(value.unwrap_or("false"), err, "share-data", "boolean"));
+                    },
+                "fingerprint" => {
+                        request.fingerprint = Some(value.unwrap_or("").to_string());
+                    },
+                "name" => {
+                        request.name = Some(value.unwrap_or("").to_string());
+                    },
+                "account-id" => {
+                        request.account_id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.accounts().update(request, &self.opt.arg_account_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3255,36 +3569,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "share-data" => {
-                        request.share_data = Some(arg_from_str(value.unwrap_or("false"), err, "share-data", "boolean"));
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3468,6 +3760,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -3475,8 +3768,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

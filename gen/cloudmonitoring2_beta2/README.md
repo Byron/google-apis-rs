@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudmonitoring2_beta2` library allows access to all features of the *Google Cloud Monitoring* service.
 
-This documentation was generated from *Cloud Monitoring* crate version *0.1.5+20150401*, where *20150401* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *Cloud Monitoring* crate version *0.1.6+20150401*, where *20150401* is the exact revision of the *cloudmonitoring:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 
 Everything else about the *Cloud Monitoring* *v2_beta2* API can be found at the
 [official documentation site](https://cloud.google.com/monitoring/v2beta2/).
@@ -104,7 +104,7 @@ let mut req = ListMetricDescriptorsRequest::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.metric_descriptors().list(&req, "project")
+let result = hub.metric_descriptors().list(req, "project")
              .query("sit")
              .page_token("Stet")
              .count(-42)
@@ -114,14 +114,15 @@ match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-licensing1` library allows access to all features of the *Google licensing* service.
 
-This documentation was generated from *licensing* crate version *0.1.5+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *licensing* crate version *0.1.6+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 
 Everything else about the *licensing* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/licensing/).
@@ -107,14 +107,15 @@ match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }

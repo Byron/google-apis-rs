@@ -19,58 +19,59 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  blogger3 [options] blog-user-infos get <user-id> <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] blogs get <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] blogs get-by-url <url> [-p <v>]... [-o <out>]
-  blogger3 [options] blogs list-by-user <user-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments approve <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments delete <blog-id> <post-id> <comment-id> [-p <v>]...
-  blogger3 [options] comments get <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments list <blog-id> <post-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments list-by-blog <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments mark-as-spam <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
-  blogger3 [options] comments remove-content <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
-  blogger3 [options] page-views get <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] pages delete <blog-id> <page-id> [-p <v>]...
-  blogger3 [options] pages get <blog-id> <page-id> [-p <v>]... [-o <out>]
-  blogger3 [options] pages insert <blog-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] pages list <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] pages patch <blog-id> <page-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] pages publish <blog-id> <page-id> [-p <v>]... [-o <out>]
-  blogger3 [options] pages revert <blog-id> <page-id> [-p <v>]... [-o <out>]
-  blogger3 [options] pages update <blog-id> <page-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] post-user-infos get <user-id> <blog-id> <post-id> [-p <v>]... [-o <out>]
-  blogger3 [options] post-user-infos list <user-id> <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] posts delete <blog-id> <post-id> [-p <v>]...
-  blogger3 [options] posts get <blog-id> <post-id> [-p <v>]... [-o <out>]
-  blogger3 [options] posts get-by-path <blog-id> <path> [-p <v>]... [-o <out>]
-  blogger3 [options] posts insert <blog-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] posts list <blog-id> [-p <v>]... [-o <out>]
-  blogger3 [options] posts patch <blog-id> <post-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] posts publish <blog-id> <post-id> [-p <v>]... [-o <out>]
-  blogger3 [options] posts revert <blog-id> <post-id> [-p <v>]... [-o <out>]
-  blogger3 [options] posts search <blog-id> <q> [-p <v>]... [-o <out>]
-  blogger3 [options] posts update <blog-id> <post-id> -r <kv>... [-p <v>]... [-o <out>]
-  blogger3 [options] users get <user-id> [-p <v>]... [-o <out>]
+  blogger3 [options] blog-user-infos get <user-id> <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] blogs get <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] blogs get-by-url <url> [-p <v>...] [-o <out>]
+  blogger3 [options] blogs list-by-user <user-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments approve <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments delete <blog-id> <post-id> <comment-id> [-p <v>...]
+  blogger3 [options] comments get <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments list <blog-id> <post-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments list-by-blog <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments mark-as-spam <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
+  blogger3 [options] comments remove-content <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
+  blogger3 [options] page-views get <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] pages delete <blog-id> <page-id> [-p <v>...]
+  blogger3 [options] pages get <blog-id> <page-id> [-p <v>...] [-o <out>]
+  blogger3 [options] pages insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] pages list <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] pages patch <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] pages publish <blog-id> <page-id> [-p <v>...] [-o <out>]
+  blogger3 [options] pages revert <blog-id> <page-id> [-p <v>...] [-o <out>]
+  blogger3 [options] pages update <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] post-user-infos get <user-id> <blog-id> <post-id> [-p <v>...] [-o <out>]
+  blogger3 [options] post-user-infos list <user-id> <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] posts delete <blog-id> <post-id> [-p <v>...]
+  blogger3 [options] posts get <blog-id> <post-id> [-p <v>...] [-o <out>]
+  blogger3 [options] posts get-by-path <blog-id> <path> [-p <v>...] [-o <out>]
+  blogger3 [options] posts insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] posts list <blog-id> [-p <v>...] [-o <out>]
+  blogger3 [options] posts patch <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] posts publish <blog-id> <post-id> [-p <v>...] [-o <out>]
+  blogger3 [options] posts revert <blog-id> <post-id> [-p <v>...] [-o <out>]
+  blogger3 [options] posts search <blog-id> <q> [-p <v>...] [-o <out>]
+  blogger3 [options] posts update <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
+  blogger3 [options] users get <user-id> [-p <v>...] [-o <out>]
   blogger3 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_blogger3_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -122,6 +123,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -171,6 +175,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -217,6 +224,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -272,6 +282,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -315,6 +328,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -358,6 +374,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -402,6 +421,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -466,6 +488,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -527,6 +552,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -570,6 +598,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -613,6 +644,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -659,6 +693,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -702,6 +739,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -746,6 +786,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -762,38 +805,22 @@ impl Engine {
 
     fn _pages_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Page::default();
-        let mut call = self.hub.pages().insert(&request, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "is-draft" => {
-                    call = call.is_draft(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Page::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Page) {
                 request_author_init(request);
@@ -814,7 +841,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -873,8 +900,33 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.pages().insert(request, &self.opt.arg_blog_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "is-draft" => {
+                    call = call.is_draft(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -882,6 +934,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -940,6 +995,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -956,41 +1014,22 @@ impl Engine {
 
     fn _pages_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Page::default();
-        let mut call = self.hub.pages().patch(&request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "revert" => {
-                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
-                },
-                "publish" => {
-                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Page::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Page) {
                 request_author_init(request);
@@ -1011,7 +1050,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -1070,8 +1109,36 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.pages().patch(request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "revert" => {
+                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
+                },
+                "publish" => {
+                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1079,6 +1146,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1122,6 +1192,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1165,6 +1238,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1181,41 +1257,22 @@ impl Engine {
 
     fn _pages_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Page::default();
-        let mut call = self.hub.pages().update(&request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "revert" => {
-                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
-                },
-                "publish" => {
-                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Page::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Page) {
                 request_author_init(request);
@@ -1236,7 +1293,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -1295,8 +1352,36 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.pages().update(request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "revert" => {
+                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
+                },
+                "publish" => {
+                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1304,6 +1389,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1350,6 +1438,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1420,6 +1511,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1463,6 +1557,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1516,6 +1613,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1565,6 +1665,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1581,44 +1684,22 @@ impl Engine {
 
     fn _posts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Post::default();
-        let mut call = self.hub.posts().insert(&request, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "is-draft" => {
-                    call = call.is_draft(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
-                },
-                "fetch-images" => {
-                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
-                },
-                "fetch-body" => {
-                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Post::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Post) {
                 request_author_init(request);
@@ -1651,7 +1732,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -1752,8 +1833,39 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.posts().insert(request, &self.opt.arg_blog_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "is-draft" => {
+                    call = call.is_draft(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
+                },
+                "fetch-images" => {
+                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
+                },
+                "fetch-body" => {
+                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1761,6 +1873,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1834,6 +1949,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1850,50 +1968,22 @@ impl Engine {
 
     fn _posts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Post::default();
-        let mut call = self.hub.posts().patch(&request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "revert" => {
-                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
-                },
-                "publish" => {
-                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
-                },
-                "max-comments" => {
-                    call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
-                },
-                "fetch-images" => {
-                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
-                },
-                "fetch-body" => {
-                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Post::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Post) {
                 request_author_init(request);
@@ -1926,7 +2016,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -2027,8 +2117,45 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.posts().patch(request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "revert" => {
+                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
+                },
+                "publish" => {
+                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
+                },
+                "max-comments" => {
+                    call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
+                },
+                "fetch-images" => {
+                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
+                },
+                "fetch-body" => {
+                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2036,6 +2163,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2082,6 +2212,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2125,6 +2258,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2174,6 +2310,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2190,50 +2329,22 @@ impl Engine {
 
     fn _posts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Post::default();
-        let mut call = self.hub.posts().update(&request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "revert" => {
-                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
-                },
-                "publish" => {
-                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
-                },
-                "max-comments" => {
-                    call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
-                },
-                "fetch-images" => {
-                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
-                },
-                "fetch-body" => {
-                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Post::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_author_image_init(request: &mut api::Post) {
                 request_author_init(request);
@@ -2266,7 +2377,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "status" => {
                         request.status = Some(value.unwrap_or("").to_string());
                     },
@@ -2367,8 +2478,45 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.posts().update(request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "revert" => {
+                    call = call.revert(arg_from_str(value.unwrap_or("false"), err, "revert", "boolean"));
+                },
+                "publish" => {
+                    call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
+                },
+                "max-comments" => {
+                    call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
+                },
+                "fetch-images" => {
+                    call = call.fetch_images(arg_from_str(value.unwrap_or("false"), err, "fetch-images", "boolean"));
+                },
+                "fetch-body" => {
+                    call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2376,6 +2524,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2419,6 +2570,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2611,6 +2765,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -2618,8 +2773,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

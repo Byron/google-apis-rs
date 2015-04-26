@@ -19,76 +19,77 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  androidpublisher2 [options] edits apklistings-delete <package-name> <edit-id> <apk-version-code> <language> [-p <v>]...
-  androidpublisher2 [options] edits apklistings-deleteall <package-name> <edit-id> <apk-version-code> [-p <v>]...
-  androidpublisher2 [options] edits apklistings-get <package-name> <edit-id> <apk-version-code> <language> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apklistings-list <package-name> <edit-id> <apk-version-code> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apklistings-patch <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apklistings-update <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apks-addexternallyhosted <package-name> <edit-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits apks-upload <package-name> <edit-id> -u (simple|resumable) <file> <mime> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits commit <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits delete <package-name> <edit-id> [-p <v>]...
-  androidpublisher2 [options] edits details-get <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits details-patch <package-name> <edit-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits details-update <package-name> <edit-id> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-get <package-name> <edit-id> <apk-version-code> <expansion-file-type> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-patch <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-update <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> -u (simple|resumable) <file> <mime> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits get <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits images-delete <package-name> <edit-id> <language> <image-type> <image-id> [-p <v>]...
-  androidpublisher2 [options] edits images-deleteall <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits images-list <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits images-upload <package-name> <edit-id> <language> <image-type> -u (simple|resumable) <file> <mime> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits insert <package-name> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits listings-delete <package-name> <edit-id> <language> [-p <v>]...
-  androidpublisher2 [options] edits listings-deleteall <package-name> <edit-id> [-p <v>]...
-  androidpublisher2 [options] edits listings-get <package-name> <edit-id> <language> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits listings-list <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits listings-patch <package-name> <edit-id> <language> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits listings-update <package-name> <edit-id> <language> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits testers-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits testers-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits testers-update <package-name> <edit-id> <track> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits tracks-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits tracks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits tracks-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits tracks-update <package-name> <edit-id> <track> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] edits validate <package-name> <edit-id> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts batch -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts delete <package-name> <sku> [-p <v>]...
-  androidpublisher2 [options] inappproducts get <package-name> <sku> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts insert <package-name> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts list <package-name> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts patch <package-name> <sku> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] inappproducts update <package-name> <sku> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] purchases products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...
-  androidpublisher2 [options] purchases subscriptions-defer <package-name> <subscription-id> <token> -r <kv>... [-p <v>]... [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
-  androidpublisher2 [options] purchases subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
+  androidpublisher2 [options] edits apklistings-delete <package-name> <edit-id> <apk-version-code> <language> [-p <v>...]
+  androidpublisher2 [options] edits apklistings-deleteall <package-name> <edit-id> <apk-version-code> [-p <v>...]
+  androidpublisher2 [options] edits apklistings-get <package-name> <edit-id> <apk-version-code> <language> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apklistings-list <package-name> <edit-id> <apk-version-code> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apklistings-patch <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apklistings-update <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apks-addexternallyhosted <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apks-list <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits apks-upload <package-name> <edit-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits commit <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits delete <package-name> <edit-id> [-p <v>...]
+  androidpublisher2 [options] edits details-get <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits details-patch <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits details-update <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits expansionfiles-get <package-name> <edit-id> <apk-version-code> <expansion-file-type> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits expansionfiles-patch <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits expansionfiles-update <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits get <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits images-delete <package-name> <edit-id> <language> <image-type> <image-id> [-p <v>...]
+  androidpublisher2 [options] edits images-deleteall <package-name> <edit-id> <language> <image-type> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits images-list <package-name> <edit-id> <language> <image-type> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits images-upload <package-name> <edit-id> <language> <image-type> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits insert <package-name> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits listings-delete <package-name> <edit-id> <language> [-p <v>...]
+  androidpublisher2 [options] edits listings-deleteall <package-name> <edit-id> [-p <v>...]
+  androidpublisher2 [options] edits listings-get <package-name> <edit-id> <language> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits listings-list <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits listings-patch <package-name> <edit-id> <language> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits listings-update <package-name> <edit-id> <language> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits testers-get <package-name> <edit-id> <track> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits testers-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits testers-update <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits tracks-get <package-name> <edit-id> <track> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits tracks-list <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits tracks-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits tracks-update <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] edits validate <package-name> <edit-id> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts batch -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts delete <package-name> <sku> [-p <v>...]
+  androidpublisher2 [options] inappproducts get <package-name> <sku> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts insert <package-name> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts list <package-name> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts patch <package-name> <sku> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] inappproducts update <package-name> <sku> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] purchases products-get <package-name> <product-id> <token> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] purchases subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>...]
+  androidpublisher2 [options] purchases subscriptions-defer <package-name> <subscription-id> <token> -r <kv>... [-p <v>...] [-o <out>]
+  androidpublisher2 [options] purchases subscriptions-get <package-name> <subscription-id> <token> [-p <v>...] [-o <out>]
+  androidpublisher2 [options] purchases subscriptions-refund <package-name> <subscription-id> <token> [-p <v>...]
+  androidpublisher2 [options] purchases subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>...]
   androidpublisher2 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -138,6 +139,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -180,6 +184,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -222,6 +229,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -266,6 +276,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -282,9 +295,37 @@ impl Engine {
 
     fn _edits_apklistings_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ApkListing::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "recent-changes" => {
+                        request.recent_changes = Some(value.unwrap_or("").to_string());
+                    },
+                "language" => {
+                        request.language = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
-        let mut call = self.hub.edits().apklistings_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
+        let mut call = self.hub.edits().apklistings_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -306,30 +347,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "recent-changes" => {
-                        request.recent_changes = Some(value.unwrap_or("").to_string());
-                    },
-                "language" => {
-                        request.language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -346,9 +371,37 @@ impl Engine {
 
     fn _edits_apklistings_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ApkListing::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "recent-changes" => {
+                        request.recent_changes = Some(value.unwrap_or("").to_string());
+                    },
+                "language" => {
+                        request.language = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
-        let mut call = self.hub.edits().apklistings_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
+        let mut call = self.hub.edits().apklistings_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -370,30 +423,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "recent-changes" => {
-                        request.recent_changes = Some(value.unwrap_or("").to_string());
-                    },
-                "language" => {
-                        request.language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -410,35 +447,22 @@ impl Engine {
 
     fn _edits_apks_addexternallyhosted(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::ApksAddExternallyHostedRequest::default();
-        let mut call = self.hub.edits().apks_addexternallyhosted(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::ApksAddExternallyHostedRequest::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_externally_hosted_apk_init(request: &mut api::ApksAddExternallyHostedRequest) {
                 if request.externally_hosted_apk.is_none() {
@@ -446,7 +470,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "externally-hosted-apk.icon-base64" => {
                         request_externally_hosted_apk_init(&mut request);
                         request.externally_hosted_apk.as_mut().unwrap().icon_base64 = Some(value.unwrap_or("").to_string());
@@ -513,8 +537,30 @@ impl Engine {
                                         request.externally_hosted_apk.as_mut().unwrap().native_codes.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.edits().apks_addexternallyhosted(request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -522,6 +568,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -565,6 +614,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -617,6 +669,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
@@ -661,6 +716,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -704,6 +762,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -745,6 +806,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -761,8 +825,42 @@ impl Engine {
 
     fn _edits_details_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::AppDetails::default();
-        let mut call = self.hub.edits().details_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "contact-email" => {
+                        request.contact_email = Some(value.unwrap_or("").to_string());
+                    },
+                "contact-phone" => {
+                        request.contact_phone = Some(value.unwrap_or("").to_string());
+                    },
+                "contact-website" => {
+                        request.contact_website = Some(value.unwrap_or("").to_string());
+                    },
+                "default-language" => {
+                        request.default_language = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().details_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -784,36 +882,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "contact-email" => {
-                        request.contact_email = Some(value.unwrap_or("").to_string());
-                    },
-                "contact-phone" => {
-                        request.contact_phone = Some(value.unwrap_or("").to_string());
-                    },
-                "contact-website" => {
-                        request.contact_website = Some(value.unwrap_or("").to_string());
-                    },
-                "default-language" => {
-                        request.default_language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -830,8 +906,42 @@ impl Engine {
 
     fn _edits_details_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::AppDetails::default();
-        let mut call = self.hub.edits().details_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "contact-email" => {
+                        request.contact_email = Some(value.unwrap_or("").to_string());
+                    },
+                "contact-phone" => {
+                        request.contact_phone = Some(value.unwrap_or("").to_string());
+                    },
+                "contact-website" => {
+                        request.contact_website = Some(value.unwrap_or("").to_string());
+                    },
+                "default-language" => {
+                        request.default_language = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().details_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -853,36 +963,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "contact-email" => {
-                        request.contact_email = Some(value.unwrap_or("").to_string());
-                    },
-                "contact-phone" => {
-                        request.contact_phone = Some(value.unwrap_or("").to_string());
-                    },
-                "contact-website" => {
-                        request.contact_website = Some(value.unwrap_or("").to_string());
-                    },
-                "default-language" => {
-                        request.default_language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -927,6 +1015,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -943,9 +1034,37 @@ impl Engine {
 
     fn _edits_expansionfiles_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ExpansionFile::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "references-version" => {
+                        request.references_version = Some(arg_from_str(value.unwrap_or("-0"), err, "references-version", "integer"));
+                    },
+                "file-size" => {
+                        request.file_size = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
-        let mut call = self.hub.edits().expansionfiles_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
+        let mut call = self.hub.edits().expansionfiles_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -967,30 +1086,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "references-version" => {
-                        request.references_version = Some(arg_from_str(value.unwrap_or("-0"), err, "references-version", "integer"));
-                    },
-                "file-size" => {
-                        request.file_size = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1007,9 +1110,37 @@ impl Engine {
 
     fn _edits_expansionfiles_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::ExpansionFile::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "references-version" => {
+                        request.references_version = Some(arg_from_str(value.unwrap_or("-0"), err, "references-version", "integer"));
+                    },
+                "file-size" => {
+                        request.file_size = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
         let apk_version_code: i32 = arg_from_str(&self.opt.arg_apk_version_code, err, "<apk-version-code>", "integer");
-        let mut call = self.hub.edits().expansionfiles_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
+        let mut call = self.hub.edits().expansionfiles_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, apk_version_code, &self.opt.arg_expansion_file_type);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1031,30 +1162,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "references-version" => {
-                        request.references_version = Some(arg_from_str(value.unwrap_or("-0"), err, "references-version", "integer"));
-                    },
-                "file-size" => {
-                        request.file_size = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1108,6 +1223,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
@@ -1152,6 +1270,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1195,6 +1316,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1236,6 +1360,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1279,6 +1406,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1331,6 +1461,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
@@ -1348,8 +1481,36 @@ impl Engine {
 
     fn _edits_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::AppEdit::default();
-        let mut call = self.hub.edits().insert(&request, &self.opt.arg_package_name);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "expiry-time-seconds" => {
+                        request.expiry_time_seconds = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().insert(request, &self.opt.arg_package_name);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1371,30 +1532,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "expiry-time-seconds" => {
-                        request.expiry_time_seconds = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1438,6 +1583,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1479,6 +1627,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1520,6 +1671,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1563,6 +1717,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1579,8 +1736,45 @@ impl Engine {
 
     fn _edits_listings_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Listing::default();
-        let mut call = self.hub.edits().listings_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "short-description" => {
+                        request.short_description = Some(value.unwrap_or("").to_string());
+                    },
+                "video" => {
+                        request.video = Some(value.unwrap_or("").to_string());
+                    },
+                "full-description" => {
+                        request.full_description = Some(value.unwrap_or("").to_string());
+                    },
+                "language" => {
+                        request.language = Some(value.unwrap_or("").to_string());
+                    },
+                "title" => {
+                        request.title = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().listings_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1602,39 +1796,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "short-description" => {
-                        request.short_description = Some(value.unwrap_or("").to_string());
-                    },
-                "video" => {
-                        request.video = Some(value.unwrap_or("").to_string());
-                    },
-                "full-description" => {
-                        request.full_description = Some(value.unwrap_or("").to_string());
-                    },
-                "language" => {
-                        request.language = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1651,8 +1820,45 @@ impl Engine {
 
     fn _edits_listings_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Listing::default();
-        let mut call = self.hub.edits().listings_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "short-description" => {
+                        request.short_description = Some(value.unwrap_or("").to_string());
+                    },
+                "video" => {
+                        request.video = Some(value.unwrap_or("").to_string());
+                    },
+                "full-description" => {
+                        request.full_description = Some(value.unwrap_or("").to_string());
+                    },
+                "language" => {
+                        request.language = Some(value.unwrap_or("").to_string());
+                    },
+                "title" => {
+                        request.title = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().listings_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_language);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1674,39 +1880,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "short-description" => {
-                        request.short_description = Some(value.unwrap_or("").to_string());
-                    },
-                "video" => {
-                        request.video = Some(value.unwrap_or("").to_string());
-                    },
-                "full-description" => {
-                        request.full_description = Some(value.unwrap_or("").to_string());
-                    },
-                "language" => {
-                        request.language = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1750,6 +1931,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1766,8 +1950,42 @@ impl Engine {
 
     fn _edits_testers_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Testers::default();
-        let mut call = self.hub.edits().testers_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "google-groups" => {
+                        if request.google_groups.is_none() {
+                           request.google_groups = Some(Default::default());
+                        }
+                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "google-plus-communities" => {
+                        if request.google_plus_communities.is_none() {
+                           request.google_plus_communities = Some(Default::default());
+                        }
+                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().testers_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1789,36 +2007,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "google-groups" => {
-                        if request.google_groups.is_none() {
-                           request.google_groups = Some(Default::default());
-                        }
-                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "google-plus-communities" => {
-                        if request.google_plus_communities.is_none() {
-                           request.google_plus_communities = Some(Default::default());
-                        }
-                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1835,8 +2031,42 @@ impl Engine {
 
     fn _edits_testers_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Testers::default();
-        let mut call = self.hub.edits().testers_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "google-groups" => {
+                        if request.google_groups.is_none() {
+                           request.google_groups = Some(Default::default());
+                        }
+                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "google-plus-communities" => {
+                        if request.google_plus_communities.is_none() {
+                           request.google_plus_communities = Some(Default::default());
+                        }
+                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().testers_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1858,36 +2088,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "google-groups" => {
-                        if request.google_groups.is_none() {
-                           request.google_groups = Some(Default::default());
-                        }
-                                        request.google_groups.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "google-plus-communities" => {
-                        if request.google_plus_communities.is_none() {
-                           request.google_plus_communities = Some(Default::default());
-                        }
-                                        request.google_plus_communities.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1931,6 +2139,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1974,6 +2185,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1990,8 +2204,42 @@ impl Engine {
 
     fn _edits_tracks_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Track::default();
-        let mut call = self.hub.edits().tracks_patch(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "track" => {
+                        request.track = Some(value.unwrap_or("").to_string());
+                    },
+                "user-fraction" => {
+                        request.user_fraction = Some(arg_from_str(value.unwrap_or("0.0"), err, "user-fraction", "number"));
+                    },
+                "version-codes" => {
+                        if request.version_codes.is_none() {
+                           request.version_codes = Some(Default::default());
+                        }
+                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().tracks_patch(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2013,36 +2261,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "track" => {
-                        request.track = Some(value.unwrap_or("").to_string());
-                    },
-                "user-fraction" => {
-                        request.user_fraction = Some(arg_from_str(value.unwrap_or("0.0"), err, "user-fraction", "number"));
-                    },
-                "version-codes" => {
-                        if request.version_codes.is_none() {
-                           request.version_codes = Some(Default::default());
-                        }
-                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2059,8 +2285,42 @@ impl Engine {
 
     fn _edits_tracks_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Track::default();
-        let mut call = self.hub.edits().tracks_update(&request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "track" => {
+                        request.track = Some(value.unwrap_or("").to_string());
+                    },
+                "user-fraction" => {
+                        request.user_fraction = Some(arg_from_str(value.unwrap_or("0.0"), err, "user-fraction", "number"));
+                    },
+                "version-codes" => {
+                        if request.version_codes.is_none() {
+                           request.version_codes = Some(Default::default());
+                        }
+                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.edits().tracks_update(request, &self.opt.arg_package_name, &self.opt.arg_edit_id, &self.opt.arg_track);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2082,36 +2342,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "track" => {
-                        request.track = Some(value.unwrap_or("").to_string());
-                    },
-                "user-fraction" => {
-                        request.user_fraction = Some(arg_from_str(value.unwrap_or("0.0"), err, "user-fraction", "number"));
-                    },
-                "version-codes" => {
-                        if request.version_codes.is_none() {
-                           request.version_codes = Some(Default::default());
-                        }
-                                        request.version_codes.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "version-codes", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2155,6 +2393,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2171,8 +2412,30 @@ impl Engine {
 
     fn _inappproducts_batch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::InappproductsBatchRequest::default();
-        let mut call = self.hub.inappproducts().batch(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.inappproducts().batch(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2194,24 +2457,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2255,6 +2508,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2296,6 +2552,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2312,38 +2571,22 @@ impl Engine {
 
     fn _inappproducts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::InAppProduct::default();
-        let mut call = self.hub.inappproducts().insert(&request, &self.opt.arg_package_name);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::InAppProduct::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_default_price_init(request: &mut api::InAppProduct) {
                 if request.default_price.is_none() {
@@ -2371,7 +2614,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "sku" => {
                         request.sku = Some(value.unwrap_or("").to_string());
                     },
@@ -2422,8 +2665,33 @@ impl Engine {
                         request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.inappproducts().insert(request, &self.opt.arg_package_name);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "auto-convert-missing-prices" => {
+                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2431,6 +2699,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2483,6 +2754,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2499,38 +2773,22 @@ impl Engine {
 
     fn _inappproducts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::InAppProduct::default();
-        let mut call = self.hub.inappproducts().patch(&request, &self.opt.arg_package_name, &self.opt.arg_sku);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::InAppProduct::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_default_price_init(request: &mut api::InAppProduct) {
                 if request.default_price.is_none() {
@@ -2558,7 +2816,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "sku" => {
                         request.sku = Some(value.unwrap_or("").to_string());
                     },
@@ -2609,8 +2867,33 @@ impl Engine {
                         request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.inappproducts().patch(request, &self.opt.arg_package_name, &self.opt.arg_sku);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "auto-convert-missing-prices" => {
+                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2618,6 +2901,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2634,38 +2920,22 @@ impl Engine {
 
     fn _inappproducts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::InAppProduct::default();
-        let mut call = self.hub.inappproducts().update(&request, &self.opt.arg_package_name, &self.opt.arg_sku);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "auto-convert-missing-prices" => {
-                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::InAppProduct::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_default_price_init(request: &mut api::InAppProduct) {
                 if request.default_price.is_none() {
@@ -2693,7 +2963,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "sku" => {
                         request.sku = Some(value.unwrap_or("").to_string());
                     },
@@ -2744,8 +3014,33 @@ impl Engine {
                         request.default_price.as_mut().unwrap().price_micros = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.inappproducts().update(request, &self.opt.arg_package_name, &self.opt.arg_sku);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "auto-convert-missing-prices" => {
+                    call = call.auto_convert_missing_prices(arg_from_str(value.unwrap_or("false"), err, "auto-convert-missing-prices", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2753,6 +3048,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2796,6 +3094,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2839,6 +3140,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -2853,8 +3157,44 @@ impl Engine {
 
     fn _purchases_subscriptions_defer(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::SubscriptionPurchasesDeferRequest::default();
-        let mut call = self.hub.purchases().subscriptions_defer(&request, &self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_deferral_info_init(request: &mut api::SubscriptionPurchasesDeferRequest) {
+                if request.deferral_info.is_none() {
+                    request.deferral_info = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "deferral-info.expected-expiry-time-millis" => {
+                        request_deferral_info_init(&mut request);
+                        request.deferral_info.as_mut().unwrap().expected_expiry_time_millis = Some(value.unwrap_or("").to_string());
+                    },
+                "deferral-info.desired-expiry-time-millis" => {
+                        request_deferral_info_init(&mut request);
+                        request.deferral_info.as_mut().unwrap().desired_expiry_time_millis = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.purchases().subscriptions_defer(request, &self.opt.arg_package_name, &self.opt.arg_subscription_id, &self.opt.arg_token);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2876,38 +3216,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            fn request_deferral_info_init(request: &mut api::SubscriptionPurchasesDeferRequest) {
-                if request.deferral_info.is_none() {
-                    request.deferral_info = Some(Default::default());
-                }
-            }
-            
-            match &field_name.to_string()[..] {
-                "deferral-info.expected-expiry-time-millis" => {
-                        request_deferral_info_init(&mut request);
-                        request.deferral_info.as_mut().unwrap().expected_expiry_time_millis = Some(value.unwrap_or("").to_string());
-                    },
-                "deferral-info.desired-expiry-time-millis" => {
-                        request_deferral_info_init(&mut request);
-                        request.deferral_info.as_mut().unwrap().desired_expiry_time_millis = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2951,6 +3267,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2994,6 +3313,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -3035,6 +3357,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -3236,6 +3561,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -3243,8 +3569,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

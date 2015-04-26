@@ -4,7 +4,7 @@
 [package]
 
 name = "google-licensing1"
-version = "0.1.5+20140122"
+version = "0.1.6+20140122"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with licensing (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1"

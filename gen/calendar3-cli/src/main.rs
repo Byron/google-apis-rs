@@ -19,62 +19,63 @@ use std::io::{self, Write};
 
 docopt!(Options derive Debug, "
 Usage: 
-  calendar3 [options] acl delete <calendar-id> <rule-id> [-p <v>]...
-  calendar3 [options] acl get <calendar-id> <rule-id> [-p <v>]... [-o <out>]
-  calendar3 [options] acl insert <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] acl list <calendar-id> [-p <v>]... [-o <out>]
-  calendar3 [options] acl patch <calendar-id> <rule-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] acl update <calendar-id> <rule-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] acl watch <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list delete <calendar-id> [-p <v>]...
-  calendar3 [options] calendar-list get <calendar-id> [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list insert -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list list [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list patch <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list update <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendar-list watch -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendars clear <calendar-id> [-p <v>]...
-  calendar3 [options] calendars delete <calendar-id> [-p <v>]...
-  calendar3 [options] calendars get <calendar-id> [-p <v>]... [-o <out>]
-  calendar3 [options] calendars insert -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendars patch <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] calendars update <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] channels stop -r <kv>... [-p <v>]...
-  calendar3 [options] colors get [-p <v>]... [-o <out>]
-  calendar3 [options] events delete <calendar-id> <event-id> [-p <v>]...
-  calendar3 [options] events get <calendar-id> <event-id> [-p <v>]... [-o <out>]
-  calendar3 [options] events import <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] events insert <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] events instances <calendar-id> <event-id> [-p <v>]... [-o <out>]
-  calendar3 [options] events list <calendar-id> [-p <v>]... [-o <out>]
-  calendar3 [options] events move <calendar-id> <event-id> <destination> [-p <v>]... [-o <out>]
-  calendar3 [options] events patch <calendar-id> <event-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] events quick-add <calendar-id> <text> [-p <v>]... [-o <out>]
-  calendar3 [options] events update <calendar-id> <event-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] events watch <calendar-id> -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] freebusy query -r <kv>... [-p <v>]... [-o <out>]
-  calendar3 [options] settings get <setting> [-p <v>]... [-o <out>]
-  calendar3 [options] settings list [-p <v>]... [-o <out>]
-  calendar3 [options] settings watch -r <kv>... [-p <v>]... [-o <out>]
+  calendar3 [options] acl delete <calendar-id> <rule-id> [-p <v>...]
+  calendar3 [options] acl get <calendar-id> <rule-id> [-p <v>...] [-o <out>]
+  calendar3 [options] acl insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] acl list <calendar-id> [-p <v>...] [-o <out>]
+  calendar3 [options] acl patch <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] acl update <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] acl watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list delete <calendar-id> [-p <v>...]
+  calendar3 [options] calendar-list get <calendar-id> [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list insert -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list list [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendar-list watch -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendars clear <calendar-id> [-p <v>...]
+  calendar3 [options] calendars delete <calendar-id> [-p <v>...]
+  calendar3 [options] calendars get <calendar-id> [-p <v>...] [-o <out>]
+  calendar3 [options] calendars insert -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendars patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] calendars update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] channels stop -r <kv>... [-p <v>...]
+  calendar3 [options] colors get [-p <v>...] [-o <out>]
+  calendar3 [options] events delete <calendar-id> <event-id> [-p <v>...]
+  calendar3 [options] events get <calendar-id> <event-id> [-p <v>...] [-o <out>]
+  calendar3 [options] events import <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] events insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] events instances <calendar-id> <event-id> [-p <v>...] [-o <out>]
+  calendar3 [options] events list <calendar-id> [-p <v>...] [-o <out>]
+  calendar3 [options] events move <calendar-id> <event-id> <destination> [-p <v>...] [-o <out>]
+  calendar3 [options] events patch <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] events quick-add <calendar-id> <text> [-p <v>...] [-o <out>]
+  calendar3 [options] events update <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] events watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] freebusy query -r <kv>... [-p <v>...] [-o <out>]
+  calendar3 [options] settings get <setting> [-p <v>...] [-o <out>]
+  calendar3 [options] settings list [-p <v>...] [-o <out>]
+  calendar3 [options] settings watch -r <kv>... [-p <v>...] [-o <out>]
   calendar3 --help
 
-All documentation details can be found TODO: <URL to github.io docs here, see #51>
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_calendar3_cli/index.html
 
 Configuration:
   --scope <url>  
-            Specify the authentication a method should be executed in. Each scope requires
-            the user to grant this application permission to use it.
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to a user-writable
-            directory that we will create during the first invocation.
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
             [default: ~/.google-service-cli]
   --debug
-            Output all server communication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
   --debug-auth
-            Output all communication related to authentication to standard error. `tx` and `rx` are placed into 
-            the same stream.
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
 ");
 
 mod cmn;
@@ -123,6 +124,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -164,6 +168,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -180,35 +187,22 @@ impl Engine {
 
     fn _acl_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::AclRule::default();
-        let mut call = self.hub.acl().insert(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::AclRule::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_scope_init(request: &mut api::AclRule) {
                 if request.scope.is_none() {
@@ -216,7 +210,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
                         request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
@@ -242,8 +236,30 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.acl().insert(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -251,6 +267,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -306,6 +325,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -322,35 +344,22 @@ impl Engine {
 
     fn _acl_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::AclRule::default();
-        let mut call = self.hub.acl().patch(&request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::AclRule::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_scope_init(request: &mut api::AclRule) {
                 if request.scope.is_none() {
@@ -358,7 +367,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
                         request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
@@ -384,8 +393,30 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.acl().patch(request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -393,6 +424,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -409,35 +443,22 @@ impl Engine {
 
     fn _acl_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::AclRule::default();
-        let mut call = self.hub.acl().update(&request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::AclRule::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_scope_init(request: &mut api::AclRule) {
                 if request.scope.is_none() {
@@ -445,7 +466,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "scope.type" => {
                         request_scope_init(&mut request);
                         request.scope.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
@@ -471,48 +492,14 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _acl_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::Channel::default();
-        let mut call = self.hub.acl().watch(&request, &self.opt.arg_calendar_id);
+        let mut call = self.hub.acl().update(request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "sync-token" => {
-                    call = call.sync_token(value.unwrap_or(""));
-                },
-                "show-deleted" => {
-                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
                 "alt"
                 |"fields"
                 |"key"
@@ -531,14 +518,48 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _acl_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Channel::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "resource-uri" => {
                         request.resource_uri = Some(value.unwrap_or("").to_string());
                     },
@@ -574,8 +595,42 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.acl().watch(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sync-token" => {
+                    call = call.sync_token(value.unwrap_or(""));
+                },
+                "show-deleted" => {
+                    call = call.show_deleted(arg_from_str(value.unwrap_or("false"), err, "show-deleted", "boolean"));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -583,6 +638,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -626,6 +684,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -667,6 +728,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -683,40 +747,24 @@ impl Engine {
 
     fn _calendar_list_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::CalendarListEntry::default();
-        let mut call = self.hub.calendar_list().insert(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::CalendarListEntry::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -766,8 +814,33 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.calendar_list().insert(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "color-rgb-format" => {
+                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -775,6 +848,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -836,6 +912,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -852,40 +931,24 @@ impl Engine {
 
     fn _calendar_list_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::CalendarListEntry::default();
-        let mut call = self.hub.calendar_list().patch(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::CalendarListEntry::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -935,8 +998,33 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.calendar_list().patch(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "color-rgb-format" => {
+                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -944,6 +1032,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -960,40 +1051,24 @@ impl Engine {
 
     fn _calendar_list_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::CalendarListEntry::default();
-        let mut call = self.hub.calendar_list().update(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "color-rgb-format" => {
-                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::CalendarListEntry::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1043,8 +1118,33 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.calendar_list().update(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "color-rgb-format" => {
+                    call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1052,6 +1152,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1068,8 +1171,64 @@ impl Engine {
 
     fn _calendar_list_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Channel::default();
-        let mut call = self.hub.calendar_list().watch(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "resource-uri" => {
+                        request.resource_uri = Some(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "resource-id" => {
+                        request.resource_id = Some(value.unwrap_or("").to_string());
+                    },
+                "payload" => {
+                        request.payload = Some(arg_from_str(value.unwrap_or("false"), err, "payload", "boolean"));
+                    },
+                "token" => {
+                        request.token = Some(value.unwrap_or("").to_string());
+                    },
+                "params" => {
+                        if request.params.is_none() {
+                           request.params = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
+                    },
+                "expiration" => {
+                        request.expiration = Some(value.unwrap_or("").to_string());
+                    },
+                "address" => {
+                        request.address = Some(value.unwrap_or("").to_string());
+                    },
+                "type" => {
+                        request.type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.calendar_list().watch(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1109,58 +1268,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "resource-uri" => {
-                        request.resource_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-id" => {
-                        request.resource_id = Some(value.unwrap_or("").to_string());
-                    },
-                "payload" => {
-                        request.payload = Some(arg_from_str(value.unwrap_or("false"), err, "payload", "boolean"));
-                    },
-                "token" => {
-                        request.token = Some(value.unwrap_or("").to_string());
-                    },
-                "params" => {
-                        if request.params.is_none() {
-                           request.params = Some(Default::default());
-                        }
-                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
-                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
-                    },
-                "expiration" => {
-                        request.expiration = Some(value.unwrap_or("").to_string());
-                    },
-                "address" => {
-                        request.address = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1204,6 +1319,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1245,6 +1363,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1286,6 +1407,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1302,37 +1426,24 @@ impl Engine {
 
     fn _calendars_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Calendar::default();
-        let mut call = self.hub.calendars().insert(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Calendar::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1355,8 +1466,30 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.calendars().insert(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1364,6 +1497,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1380,37 +1516,24 @@ impl Engine {
 
     fn _calendars_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Calendar::default();
-        let mut call = self.hub.calendars().patch(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Calendar::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1433,8 +1556,30 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.calendars().patch(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1442,6 +1587,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1458,37 +1606,24 @@ impl Engine {
 
     fn _calendars_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Calendar::default();
-        let mut call = self.hub.calendars().update(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Calendar::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "kind" => {
                         request.kind = Some(value.unwrap_or("").to_string());
                     },
@@ -1511,33 +1646,11 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
             }
         }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _channels_stop(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut request = api::Channel::default();
-        let mut call = self.hub.channels().stop(&request);
+        let mut call = self.hub.calendars().update(request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1559,14 +1672,48 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
+        let protocol = "standard-request";
+        if dry_run {
+            None
+        } else {
+            assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
+            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            match match protocol {
+                "standard-request" => call.doit(),
+                _ => unreachable!(),
+            } {
+                Err(api_err) => Some(api_err),
+                Ok((mut response, output_schema)) => {
+                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    None
+                }
+            }
+        }
+    }
+
+    fn _channels_stop(&self, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Option<api::Error> {
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Channel::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "resource-uri" => {
                         request.resource_uri = Some(value.unwrap_or("").to_string());
                     },
@@ -1602,8 +1749,30 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.channels().stop(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -1611,6 +1780,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1652,6 +1824,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1698,6 +1873,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             match match protocol {
                 "standard-request" => call.doit(),
                 _ => unreachable!(),
@@ -1748,6 +1926,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -1764,35 +1945,22 @@ impl Engine {
 
     fn _events_import(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Event::default();
-        let mut call = self.hub.events().import(&request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Event::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_creator_init(request: &mut api::Event) {
                 if request.creator.is_none() {
@@ -1848,7 +2016,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
                         if request.extended_properties.as_mut().unwrap().shared.is_none() {
@@ -2089,8 +2257,30 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.events().import(request, &self.opt.arg_calendar_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -2098,6 +2288,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2114,8 +2307,323 @@ impl Engine {
 
     fn _events_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Event::default();
-        let mut call = self.hub.events().insert(&request, &self.opt.arg_calendar_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_creator_init(request: &mut api::Event) {
+                if request.creator.is_none() {
+                    request.creator = Some(Default::default());
+                }
+            }
+            
+            fn request_end_init(request: &mut api::Event) {
+                if request.end.is_none() {
+                    request.end = Some(Default::default());
+                }
+            }
+            
+            fn request_extended_properties_init(request: &mut api::Event) {
+                if request.extended_properties.is_none() {
+                    request.extended_properties = Some(Default::default());
+                }
+            }
+            
+            fn request_gadget_init(request: &mut api::Event) {
+                if request.gadget.is_none() {
+                    request.gadget = Some(Default::default());
+                }
+            }
+            
+            fn request_organizer_init(request: &mut api::Event) {
+                if request.organizer.is_none() {
+                    request.organizer = Some(Default::default());
+                }
+            }
+            
+            fn request_original_start_time_init(request: &mut api::Event) {
+                if request.original_start_time.is_none() {
+                    request.original_start_time = Some(Default::default());
+                }
+            }
+            
+            fn request_reminders_init(request: &mut api::Event) {
+                if request.reminders.is_none() {
+                    request.reminders = Some(Default::default());
+                }
+            }
+            
+            fn request_source_init(request: &mut api::Event) {
+                if request.source.is_none() {
+                    request.source = Some(Default::default());
+                }
+            }
+            
+            fn request_start_init(request: &mut api::Event) {
+                if request.start.is_none() {
+                    request.start = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "extended-properties.shared" => {
+                        request_extended_properties_init(&mut request);
+                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
+                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
+                    },
+                "extended-properties.private" => {
+                        request_extended_properties_init(&mut request);
+                        if request.extended_properties.as_mut().unwrap().private.is_none() {
+                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
+                    },
+                "creator.self" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
+                    },
+                "creator.display-name" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.email" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.id" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "organizer.self" => {
+                        request_organizer_init(&mut request);
+                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
+                    },
+                "organizer.display-name" => {
+                        request_organizer_init(&mut request);
+                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "organizer.email" => {
+                        request_organizer_init(&mut request);
+                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
+                    },
+                "organizer.id" => {
+                        request_organizer_init(&mut request);
+                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request_organizer_init(&mut request);
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                "hangout-link" => {
+                        request_organizer_init(&mut request);
+                        request.hangout_link = Some(value.unwrap_or("").to_string());
+                    },
+                "end.date" => {
+                        request_end_init(&mut request);
+                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
+                    },
+                "end.time-zone" => {
+                        request_end_init(&mut request);
+                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
+                    },
+                "end.date-time" => {
+                        request_end_init(&mut request);
+                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
+                    },
+                "source.url" => {
+                        request_source_init(&mut request);
+                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
+                    },
+                "source.title" => {
+                        request_source_init(&mut request);
+                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
+                    },
+                "html-link" => {
+                        request_source_init(&mut request);
+                        request.html_link = Some(value.unwrap_or("").to_string());
+                    },
+                "recurrence" => {
+                        request_source_init(&mut request);
+                        if request.recurrence.is_none() {
+                           request.recurrence = Some(Default::default());
+                        }
+                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "start.date" => {
+                        request_start_init(&mut request);
+                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
+                    },
+                "start.time-zone" => {
+                        request_start_init(&mut request);
+                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
+                    },
+                "start.date-time" => {
+                        request_start_init(&mut request);
+                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
+                    },
+                "etag" => {
+                        request_start_init(&mut request);
+                        request.etag = Some(value.unwrap_or("").to_string());
+                    },
+                "location" => {
+                        request_start_init(&mut request);
+                        request.location = Some(value.unwrap_or("").to_string());
+                    },
+                "recurring-event-id" => {
+                        request_start_init(&mut request);
+                        request.recurring_event_id = Some(value.unwrap_or("").to_string());
+                    },
+                "original-start-time.date" => {
+                        request_original_start_time_init(&mut request);
+                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
+                    },
+                "original-start-time.time-zone" => {
+                        request_original_start_time_init(&mut request);
+                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
+                    },
+                "original-start-time.date-time" => {
+                        request_original_start_time_init(&mut request);
+                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
+                    },
+                "status" => {
+                        request_original_start_time_init(&mut request);
+                        request.status = Some(value.unwrap_or("").to_string());
+                    },
+                "updated" => {
+                        request_original_start_time_init(&mut request);
+                        request.updated = Some(value.unwrap_or("").to_string());
+                    },
+                "description" => {
+                        request_original_start_time_init(&mut request);
+                        request.description = Some(value.unwrap_or("").to_string());
+                    },
+                "i-cal-uid" => {
+                        request_original_start_time_init(&mut request);
+                        request.i_cal_uid = Some(value.unwrap_or("").to_string());
+                    },
+                "gadget.preferences" => {
+                        request_gadget_init(&mut request);
+                        if request.gadget.as_mut().unwrap().preferences.is_none() {
+                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
+                    },
+                "gadget.title" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
+                    },
+                "gadget.height" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
+                    },
+                "gadget.width" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
+                    },
+                "gadget.link" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
+                    },
+                "gadget.type" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "gadget.display" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
+                    },
+                "gadget.icon-link" => {
+                        request_gadget_init(&mut request);
+                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
+                    },
+                "end-time-unspecified" => {
+                        request_gadget_init(&mut request);
+                        request.end_time_unspecified = Some(arg_from_str(value.unwrap_or("false"), err, "end-time-unspecified", "boolean"));
+                    },
+                "sequence" => {
+                        request_gadget_init(&mut request);
+                        request.sequence = Some(arg_from_str(value.unwrap_or("-0"), err, "sequence", "integer"));
+                    },
+                "visibility" => {
+                        request_gadget_init(&mut request);
+                        request.visibility = Some(value.unwrap_or("").to_string());
+                    },
+                "guests-can-modify" => {
+                        request_gadget_init(&mut request);
+                        request.guests_can_modify = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-modify", "boolean"));
+                    },
+                "attendees-omitted" => {
+                        request_gadget_init(&mut request);
+                        request.attendees_omitted = Some(arg_from_str(value.unwrap_or("false"), err, "attendees-omitted", "boolean"));
+                    },
+                "kind" => {
+                        request_gadget_init(&mut request);
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "locked" => {
+                        request_gadget_init(&mut request);
+                        request.locked = Some(arg_from_str(value.unwrap_or("false"), err, "locked", "boolean"));
+                    },
+                "created" => {
+                        request_gadget_init(&mut request);
+                        request.created = Some(value.unwrap_or("").to_string());
+                    },
+                "color-id" => {
+                        request_gadget_init(&mut request);
+                        request.color_id = Some(value.unwrap_or("").to_string());
+                    },
+                "anyone-can-add-self" => {
+                        request_gadget_init(&mut request);
+                        request.anyone_can_add_self = Some(arg_from_str(value.unwrap_or("false"), err, "anyone-can-add-self", "boolean"));
+                    },
+                "reminders.use-default" => {
+                        request_reminders_init(&mut request);
+                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
+                    },
+                "guests-can-see-other-guests" => {
+                        request_reminders_init(&mut request);
+                        request.guests_can_see_other_guests = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-see-other-guests", "boolean"));
+                    },
+                "summary" => {
+                        request_reminders_init(&mut request);
+                        request.summary = Some(value.unwrap_or("").to_string());
+                    },
+                "guests-can-invite-others" => {
+                        request_reminders_init(&mut request);
+                        request.guests_can_invite_others = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-invite-others", "boolean"));
+                    },
+                "transparency" => {
+                        request_reminders_init(&mut request);
+                        request.transparency = Some(value.unwrap_or("").to_string());
+                    },
+                "private-copy" => {
+                        request_reminders_init(&mut request);
+                        request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.events().insert(request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2143,317 +2651,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            fn request_creator_init(request: &mut api::Event) {
-                if request.creator.is_none() {
-                    request.creator = Some(Default::default());
-                }
-            }
-            
-            fn request_end_init(request: &mut api::Event) {
-                if request.end.is_none() {
-                    request.end = Some(Default::default());
-                }
-            }
-            
-            fn request_extended_properties_init(request: &mut api::Event) {
-                if request.extended_properties.is_none() {
-                    request.extended_properties = Some(Default::default());
-                }
-            }
-            
-            fn request_gadget_init(request: &mut api::Event) {
-                if request.gadget.is_none() {
-                    request.gadget = Some(Default::default());
-                }
-            }
-            
-            fn request_organizer_init(request: &mut api::Event) {
-                if request.organizer.is_none() {
-                    request.organizer = Some(Default::default());
-                }
-            }
-            
-            fn request_original_start_time_init(request: &mut api::Event) {
-                if request.original_start_time.is_none() {
-                    request.original_start_time = Some(Default::default());
-                }
-            }
-            
-            fn request_reminders_init(request: &mut api::Event) {
-                if request.reminders.is_none() {
-                    request.reminders = Some(Default::default());
-                }
-            }
-            
-            fn request_source_init(request: &mut api::Event) {
-                if request.source.is_none() {
-                    request.source = Some(Default::default());
-                }
-            }
-            
-            fn request_start_init(request: &mut api::Event) {
-                if request.start.is_none() {
-                    request.start = Some(Default::default());
-                }
-            }
-            
-            match &field_name.to_string()[..] {
-                "extended-properties.shared" => {
-                        request_extended_properties_init(&mut request);
-                        if request.extended_properties.as_mut().unwrap().shared.is_none() {
-                           request.extended_properties.as_mut().unwrap().shared = Some(Default::default());
-                        }
-                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
-                        request.extended_properties.as_mut().unwrap().shared.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
-                    },
-                "extended-properties.private" => {
-                        request_extended_properties_init(&mut request);
-                        if request.extended_properties.as_mut().unwrap().private.is_none() {
-                           request.extended_properties.as_mut().unwrap().private = Some(Default::default());
-                        }
-                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
-                        request.extended_properties.as_mut().unwrap().private.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
-                    },
-                "creator.self" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "creator.self", "boolean"));
-                    },
-                "creator.display-name" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.email" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.id" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "organizer.self" => {
-                        request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().self_ = Some(arg_from_str(value.unwrap_or("false"), err, "organizer.self", "boolean"));
-                    },
-                "organizer.display-name" => {
-                        request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "organizer.email" => {
-                        request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "organizer.id" => {
-                        request_organizer_init(&mut request);
-                        request.organizer.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_organizer_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "hangout-link" => {
-                        request_organizer_init(&mut request);
-                        request.hangout_link = Some(value.unwrap_or("").to_string());
-                    },
-                "end.date" => {
-                        request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
-                    },
-                "end.time-zone" => {
-                        request_end_init(&mut request);
-                        request.end.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "end.date-time" => {
-                        request_end_init(&mut request);
-                        request.end.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
-                    },
-                "source.url" => {
-                        request_source_init(&mut request);
-                        request.source.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "source.title" => {
-                        request_source_init(&mut request);
-                        request.source.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "html-link" => {
-                        request_source_init(&mut request);
-                        request.html_link = Some(value.unwrap_or("").to_string());
-                    },
-                "recurrence" => {
-                        request_source_init(&mut request);
-                        if request.recurrence.is_none() {
-                           request.recurrence = Some(Default::default());
-                        }
-                                        request.recurrence.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "start.date" => {
-                        request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
-                    },
-                "start.time-zone" => {
-                        request_start_init(&mut request);
-                        request.start.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "start.date-time" => {
-                        request_start_init(&mut request);
-                        request.start.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_start_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "location" => {
-                        request_start_init(&mut request);
-                        request.location = Some(value.unwrap_or("").to_string());
-                    },
-                "recurring-event-id" => {
-                        request_start_init(&mut request);
-                        request.recurring_event_id = Some(value.unwrap_or("").to_string());
-                    },
-                "original-start-time.date" => {
-                        request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date = Some(value.unwrap_or("").to_string());
-                    },
-                "original-start-time.time-zone" => {
-                        request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "original-start-time.date-time" => {
-                        request_original_start_time_init(&mut request);
-                        request.original_start_time.as_mut().unwrap().date_time = Some(value.unwrap_or("").to_string());
-                    },
-                "status" => {
-                        request_original_start_time_init(&mut request);
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_original_start_time_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request_original_start_time_init(&mut request);
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "i-cal-uid" => {
-                        request_original_start_time_init(&mut request);
-                        request.i_cal_uid = Some(value.unwrap_or("").to_string());
-                    },
-                "gadget.preferences" => {
-                        request_gadget_init(&mut request);
-                        if request.gadget.as_mut().unwrap().preferences.is_none() {
-                           request.gadget.as_mut().unwrap().preferences = Some(Default::default());
-                        }
-                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
-                        request.gadget.as_mut().unwrap().preferences.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
-                    },
-                "gadget.title" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "gadget.height" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.height", "integer"));
-                    },
-                "gadget.width" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "gadget.width", "integer"));
-                    },
-                "gadget.link" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().link = Some(value.unwrap_or("").to_string());
-                    },
-                "gadget.type" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "gadget.display" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().display = Some(value.unwrap_or("").to_string());
-                    },
-                "gadget.icon-link" => {
-                        request_gadget_init(&mut request);
-                        request.gadget.as_mut().unwrap().icon_link = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time-unspecified" => {
-                        request_gadget_init(&mut request);
-                        request.end_time_unspecified = Some(arg_from_str(value.unwrap_or("false"), err, "end-time-unspecified", "boolean"));
-                    },
-                "sequence" => {
-                        request_gadget_init(&mut request);
-                        request.sequence = Some(arg_from_str(value.unwrap_or("-0"), err, "sequence", "integer"));
-                    },
-                "visibility" => {
-                        request_gadget_init(&mut request);
-                        request.visibility = Some(value.unwrap_or("").to_string());
-                    },
-                "guests-can-modify" => {
-                        request_gadget_init(&mut request);
-                        request.guests_can_modify = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-modify", "boolean"));
-                    },
-                "attendees-omitted" => {
-                        request_gadget_init(&mut request);
-                        request.attendees_omitted = Some(arg_from_str(value.unwrap_or("false"), err, "attendees-omitted", "boolean"));
-                    },
-                "kind" => {
-                        request_gadget_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "locked" => {
-                        request_gadget_init(&mut request);
-                        request.locked = Some(arg_from_str(value.unwrap_or("false"), err, "locked", "boolean"));
-                    },
-                "created" => {
-                        request_gadget_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "color-id" => {
-                        request_gadget_init(&mut request);
-                        request.color_id = Some(value.unwrap_or("").to_string());
-                    },
-                "anyone-can-add-self" => {
-                        request_gadget_init(&mut request);
-                        request.anyone_can_add_self = Some(arg_from_str(value.unwrap_or("false"), err, "anyone-can-add-self", "boolean"));
-                    },
-                "reminders.use-default" => {
-                        request_reminders_init(&mut request);
-                        request.reminders.as_mut().unwrap().use_default = Some(arg_from_str(value.unwrap_or("false"), err, "reminders.use-default", "boolean"));
-                    },
-                "guests-can-see-other-guests" => {
-                        request_reminders_init(&mut request);
-                        request.guests_can_see_other_guests = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-see-other-guests", "boolean"));
-                    },
-                "summary" => {
-                        request_reminders_init(&mut request);
-                        request.summary = Some(value.unwrap_or("").to_string());
-                    },
-                "guests-can-invite-others" => {
-                        request_reminders_init(&mut request);
-                        request.guests_can_invite_others = Some(arg_from_str(value.unwrap_or("false"), err, "guests-can-invite-others", "boolean"));
-                    },
-                "transparency" => {
-                        request_reminders_init(&mut request);
-                        request.transparency = Some(value.unwrap_or("").to_string());
-                    },
-                "private-copy" => {
-                        request_reminders_init(&mut request);
-                        request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2524,6 +2729,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2618,6 +2826,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2664,6 +2875,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -2680,44 +2894,22 @@ impl Engine {
 
     fn _events_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Event::default();
-        let mut call = self.hub.events().patch(&request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
-                },
-                "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
-                },
-                "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Event::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_creator_init(request: &mut api::Event) {
                 if request.creator.is_none() {
@@ -2773,7 +2965,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
                         if request.extended_properties.as_mut().unwrap().shared.is_none() {
@@ -3014,8 +3206,39 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.events().patch(request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "send-notifications" => {
+                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                },
+                "max-attendees" => {
+                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                },
+                "always-include-email" => {
+                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3023,6 +3246,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3069,6 +3295,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3085,44 +3314,22 @@ impl Engine {
 
     fn _events_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Event::default();
-        let mut call = self.hub.events().update(&request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "send-notifications" => {
-                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
-                },
-                "max-attendees" => {
-                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
-                },
-                "always-include-email" => {
-                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Event::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
             }
             fn request_creator_init(request: &mut api::Event) {
                 if request.creator.is_none() {
@@ -3178,7 +3385,7 @@ impl Engine {
                 }
             }
             
-            match &field_name.to_string()[..] {
+            match &temp_cursor.to_string()[..] {
                 "extended-properties.shared" => {
                         request_extended_properties_init(&mut request);
                         if request.extended_properties.as_mut().unwrap().shared.is_none() {
@@ -3419,8 +3626,39 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.events().update(request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "send-notifications" => {
+                    call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
+                },
+                "max-attendees" => {
+                    call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                },
+                "always-include-email" => {
+                    call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3428,6 +3666,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3444,8 +3685,64 @@ impl Engine {
 
     fn _events_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::Channel::default();
-        let mut call = self.hub.events().watch(&request, &self.opt.arg_calendar_id);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "resource-uri" => {
+                        request.resource_uri = Some(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "resource-id" => {
+                        request.resource_id = Some(value.unwrap_or("").to_string());
+                    },
+                "payload" => {
+                        request.payload = Some(arg_from_str(value.unwrap_or("false"), err, "payload", "boolean"));
+                    },
+                "token" => {
+                        request.token = Some(value.unwrap_or("").to_string());
+                    },
+                "params" => {
+                        if request.params.is_none() {
+                           request.params = Some(Default::default());
+                        }
+                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
+                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
+                    },
+                "expiration" => {
+                        request.expiration = Some(value.unwrap_or("").to_string());
+                    },
+                "address" => {
+                        request.address = Some(value.unwrap_or("").to_string());
+                    },
+                "type" => {
+                        request.type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.events().watch(request, &self.opt.arg_calendar_id);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3518,58 +3815,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "resource-uri" => {
-                        request.resource_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-id" => {
-                        request.resource_id = Some(value.unwrap_or("").to_string());
-                    },
-                "payload" => {
-                        request.payload = Some(arg_from_str(value.unwrap_or("false"), err, "payload", "boolean"));
-                    },
-                "token" => {
-                        request.token = Some(value.unwrap_or("").to_string());
-                    },
-                "params" => {
-                        if request.params.is_none() {
-                           request.params = Some(Default::default());
-                        }
-                        let (key, value) = parse_kv_arg(value.unwrap_or(""), err, true);
-                        request.params.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
-                    },
-                "expiration" => {
-                        request.expiration = Some(value.unwrap_or("").to_string());
-                    },
-                "address" => {
-                        request.address = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3586,8 +3839,45 @@ impl Engine {
 
     fn _freebusy_query(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
+        
         let mut request = api::FreeBusyRequest::default();
-        let mut call = self.hub.freebusy().query(&request);
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
+                "time-max" => {
+                        request.time_max = Some(value.unwrap_or("").to_string());
+                    },
+                "calendar-expansion-max" => {
+                        request.calendar_expansion_max = Some(arg_from_str(value.unwrap_or("-0"), err, "calendar-expansion-max", "integer"));
+                    },
+                "time-zone" => {
+                        request.time_zone = Some(value.unwrap_or("").to_string());
+                    },
+                "time-min" => {
+                        request.time_min = Some(value.unwrap_or("").to_string());
+                    },
+                "group-expansion-max" => {
+                        request.group_expansion_max = Some(arg_from_str(value.unwrap_or("-0"), err, "group-expansion-max", "integer"));
+                    },
+                _ => {
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                }
+            }
+        }
+        let mut call = self.hub.freebusy().query(request);
         for parg in self.opt.arg_v.iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -3609,39 +3899,14 @@ impl Engine {
                 _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
-        
-        let mut field_name = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
-                err.issues.push(field_err);
-            }
-            match &field_name.to_string()[..] {
-                "time-max" => {
-                        request.time_max = Some(value.unwrap_or("").to_string());
-                    },
-                "calendar-expansion-max" => {
-                        request.calendar_expansion_max = Some(arg_from_str(value.unwrap_or("-0"), err, "calendar-expansion-max", "integer"));
-                    },
-                "time-zone" => {
-                        request.time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "time-min" => {
-                        request.time_min = Some(value.unwrap_or("").to_string());
-                    },
-                "group-expansion-max" => {
-                        request.group_expansion_max = Some(arg_from_str(value.unwrap_or("-0"), err, "group-expansion-max", "integer"));
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
-                }
-            }
-        }
         let protocol = "standard-request";
         if dry_run {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3685,6 +3950,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3737,6 +4005,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -3753,46 +4024,24 @@ impl Engine {
 
     fn _settings_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
-        let mut request = api::Channel::default();
-        let mut call = self.hub.settings().watch(&request);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "sync-token" => {
-                    call = call.sync_token(value.unwrap_or(""));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
         
-        let mut field_name = FieldCursor::default();
+        let mut request = api::Channel::default();
+        let mut field_cursor = FieldCursor::default();
         for kvarg in self.opt.arg_kv.iter() {
+            let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            if let Err(field_err) = field_name.set(&*key) {
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
                 err.issues.push(field_err);
             }
-            match &field_name.to_string()[..] {
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            match &temp_cursor.to_string()[..] {
                 "resource-uri" => {
                         request.resource_uri = Some(value.unwrap_or("").to_string());
                     },
@@ -3828,8 +4077,39 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
                 }
+            }
+        }
+        let mut call = self.hub.settings().watch(request);
+        for parg in self.opt.arg_v.iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "sync-token" => {
+                    call = call.sync_token(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "alt"
+                |"fields"
+                |"key"
+                |"oauth-token"
+                |"pretty-print"
+                |"quota-user"
+                |"user-ip" => {
+                    let map = [
+                        ("oauth-token", "oauth_token"),
+                        ("pretty-print", "prettyPrint"),
+                        ("quota-user", "quotaUser"),
+                        ("user-ip", "userIp"),
+                    ];
+                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
+                },
+                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
             }
         }
         let protocol = "standard-request";
@@ -3837,6 +4117,9 @@ impl Engine {
             None
         } else {
             assert!(err.issues.len() == 0);
+            if self.opt.flag_scope.len() > 0 {
+                call = call.add_scope(&self.opt.flag_scope);
+            }
             let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
                 "standard-request" => call.doit(),
@@ -4037,6 +4320,7 @@ impl Engine {
 
 fn main() {
     let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
+    let debug = opts.flag_debug;
     match Engine::new(opts) {
         Err(err) => {
             writeln!(io::stderr(), "{}", err).ok();
@@ -4044,8 +4328,11 @@ fn main() {
         },
         Ok(engine) => {
             if let Some(err) = engine.doit() {
-                writeln!(io::stderr(), "{:?}", err).ok();
-                writeln!(io::stderr(), "{}", err).ok();
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
                 env::set_exit_status(1);
             }
         }

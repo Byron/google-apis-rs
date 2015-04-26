@@ -1,4 +1,179 @@
-# HELLO ANALYTICS:V3
+<!---
+DO NOT EDIT !
+This file was generated automatically from 'src/mako/cli/README.md.mako'
+DO NOT EDIT !
+-->
+The `analytics3` command-line interface *(CLI)* allows to use most features of the *Google analytics* service from the comfort of your terminal.
+
+By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
+
+If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
+
+# Usage
+
+This documentation was generated from the *analytics* API at revision *20150305*. The CLI is at version *0.1.0*.
+
+```bash
+  analytics3 [options] data ga-get <ids> <start-date> <end-date> <metrics> [-p <v>...] [-o <out>]
+  analytics3 [options] data mcf-get <ids> <start-date> <end-date> <metrics> [-p <v>...] [-o <out>]
+  analytics3 [options] data realtime-get <ids> <metrics> [-p <v>...] [-o <out>]
+  analytics3 [options] management account-summaries-list [-p <v>...] [-o <out>]
+  analytics3 [options] management account-user-links-delete <account-id> <link-id> [-p <v>...]
+  analytics3 [options] management account-user-links-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management account-user-links-list <account-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management account-user-links-update <account-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management accounts-list [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-data-sources-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-dimensions-get <account-id> <web-property-id> <custom-dimension-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-dimensions-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-dimensions-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-dimensions-patch <account-id> <web-property-id> <custom-dimension-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-dimensions-update <account-id> <web-property-id> <custom-dimension-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-metrics-get <account-id> <web-property-id> <custom-metric-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-metrics-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-metrics-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-metrics-patch <account-id> <web-property-id> <custom-metric-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management custom-metrics-update <account-id> <web-property-id> <custom-metric-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management experiments-delete <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>...]
+  analytics3 [options] management experiments-get <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management experiments-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management experiments-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management experiments-patch <account-id> <web-property-id> <profile-id> <experiment-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management experiments-update <account-id> <web-property-id> <profile-id> <experiment-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-delete <account-id> <filter-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-get <account-id> <filter-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-list <account-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-patch <account-id> <filter-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management filters-update <account-id> <filter-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management goals-get <account-id> <web-property-id> <profile-id> <goal-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management goals-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management goals-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management goals-patch <account-id> <web-property-id> <profile-id> <goal-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management goals-update <account-id> <web-property-id> <profile-id> <goal-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-filter-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...]
+  analytics3 [options] management profile-filter-links-get <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-filter-links-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-filter-links-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-filter-links-patch <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-filter-links-update <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-user-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...]
+  analytics3 [options] management profile-user-links-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-user-links-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management profile-user-links-update <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profiles-delete <account-id> <web-property-id> <profile-id> [-p <v>...]
+  analytics3 [options] management profiles-get <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management profiles-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profiles-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management profiles-patch <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management profiles-update <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management segments-list [-p <v>...] [-o <out>]
+  analytics3 [options] management unsampled-reports-get <account-id> <web-property-id> <profile-id> <unsampled-report-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management unsampled-reports-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management unsampled-reports-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management uploads-delete-upload-data <account-id> <web-property-id> <custom-data-source-id> -r <kv>... [-p <v>...]
+  analytics3 [options] management uploads-get <account-id> <web-property-id> <custom-data-source-id> <upload-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management uploads-list <account-id> <web-property-id> <custom-data-source-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management uploads-upload-data <account-id> <web-property-id> <custom-data-source-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+  analytics3 [options] management web-property-ad-words-links-delete <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>...]
+  analytics3 [options] management web-property-ad-words-links-get <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management web-property-ad-words-links-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management web-property-ad-words-links-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management web-property-ad-words-links-patch <account-id> <web-property-id> <web-property-ad-words-link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management web-property-ad-words-links-update <account-id> <web-property-id> <web-property-ad-words-link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperties-get <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperties-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperties-list <account-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperties-patch <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperties-update <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperty-user-links-delete <account-id> <web-property-id> <link-id> [-p <v>...]
+  analytics3 [options] management webproperty-user-links-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperty-user-links-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
+  analytics3 [options] management webproperty-user-links-update <account-id> <web-property-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 [options] metadata columns-list <report-type> [-p <v>...] [-o <out>]
+  analytics3 [options] provisioning create-account-ticket -r <kv>... [-p <v>...] [-o <out>]
+  analytics3 --help
+
+All documentation details can be found at
+http://byron.github.io/google-apis-rs/google_analytics3_cli/index.html
+
+Configuration:
+  --scope <url>  
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir <folder>
+            A directory into which we will store our persistent data. Defaults to 
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+  --debug
+            Output all server communication to standard error. `tx` and `rx` are placed 
+            into the same stream.
+  --debug-auth
+            Output all communication related to authentication to standard error. `tx` 
+            and `rx` are placed into the same stream.
+
+```
+
+# Configuration
+
+The program will store all persistent data in the `~/.google-service-cli` directory in *JSON* files prefixed with `analytics3-`.  You can change the directory used to store configuration with the `--config-dir` flag on a per-invocation basis.
+
+More information about the various kinds of persistent data are given in the following paragraphs.
+
+# Authentication
+
+Most APIs require a user to authenticate any request. If this is the case, the [scope][scopes] determines the 
+set of permissions granted. The granularity of these is usually no more than *read-only* or *full-access*.
+
+If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the `--scope` flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.
+
+The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.
+
+If a scope was authenticated by the user, the respective information will be stored as *JSON* in the configuration
+directory, e.g. `~/.google-service-cli/analytics3-token-<scope-hash>.json`. No manual management of these tokens
+is necessary.
+
+To revoke granted authentication, please refer to the [official documentation][revoke-access].
+
+# Application Secrets
+
+In order to allow any application to use Google services, it will need to be registered using the 
+[Google Developer Console][google-dev-console]. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.
+
+To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.
+
+You can workaround this limitation by putting your own secrets file at this location: 
+`~/.google-service-cli/analytics3-secret.json`, assuming that the required *analytics* API 
+was enabled for it. Such a secret file can be downloaded in the *Google Developer Console* at 
+*APIs & auth -> Credentials -> Download JSON* and used as is.
+
+Learn more about how to setup Google projects and enable APIs using the [official documentation][google-project-new].
 
 
-Include information about application secret files, and how we automatically write a default one.
+# Debugging
+
+Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error *as-is*.
+
+The `--debug` flag will print all client-server communication to standard error, whereas the `--debug-auth` flag
+will cause all communication related to authentication to standard error.
+If the `--debug` flag is set, error-results will be debug-printed, possibly yielding more information about the 
+issue at hand.
+
+You may consider redirecting standard error into a file for ease of use, e.g. `analytics3 --debug <resource> <method> [options] 2>debug.txt`.
+
+
+[scopes]: https://developers.google.com/+/api/oauth#scopes
+[revoke-access]: http://webapps.stackexchange.com/a/30849
+[google-dev-console]: https://console.developers.google.com/
+[google-project-new]: https://developers.google.com/console/help/new/

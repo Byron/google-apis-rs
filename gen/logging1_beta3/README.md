@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-logging1_beta3` library allows access to all features of the *Google logging* service.
 
-This documentation was generated from *logging* crate version *0.1.5+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *logging* crate version *0.1.6+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.Logging.html) ... 
@@ -100,21 +100,22 @@ let mut req = LogSink::default();
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().log_services_sinks_update(&req, "projectsId", "logServicesId", "sinksId")
+let result = hub.projects().log_services_sinks_update(req, "projectsId", "logServicesId", "sinksId")
              .doit();
 
 match result {
     Err(e) => match e {
         // The Error enum provides details about what exactly happened.
         // You can also just use its `Debug`, `Display` or `Error` traits
-        Error::HttpError(_)
+         Error::HttpError(_)
         |Error::MissingAPIKey
-        |Error::MissingToken
+        |Error::MissingToken(_)
         |Error::Cancelled
         |Error::UploadSizeLimitExceeded(_, _)
         |Error::Failure(_)
+        |Error::BadRequest(_)
         |Error::FieldClash(_)
-        |Error::JsonDecodeError(_) => println!("{}", e),
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
     },
     Ok(res) => println!("Success: {:?}", res),
 }

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudsearch1` library allows access to all features of the *Google cloudsearch* service.
 
-This documentation was generated from *cloudsearch* crate version *0.1.5+20150416*, where *20150416* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.5*.
+This documentation was generated from *cloudsearch* crate version *0.1.6+20150416*, where *20150416* is the exact revision of the *cloudsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
 # Features
 
 It seems there is nothing you can do here ... .
