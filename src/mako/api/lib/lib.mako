@@ -227,7 +227,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* ${link('request values', request_trait_url)} are borrowed
+* ${link('request values', request_trait_url)} are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
