@@ -95,6 +95,9 @@ impl${rb_params} ${ThisType} {
     % endfor
     % endif
     pub fn ${mangle_ident(a)}${type_params}(&self${method_args}) -> ${RType}${mb_tparams} {
+        % if part_prop and request_value:
+        let parts = ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts();
+        % endif
         ${RType} {
             hub: self.hub,
             % for p in required_props:
@@ -102,7 +105,7 @@ impl${rb_params} ${ThisType} {
             % endfor
             ## auto-generate parts from request resources
             % if part_prop and request_value:
-            ${property(part_prop.name)}: ${mangle_ident(REQUEST_VALUE_PROPERTY_NAME)}.to_parts(),
+            ${property(part_prop.name)}: parts,
             % endif
             % for p in optional_props:
             ${property(p.name)}: Default::default(),

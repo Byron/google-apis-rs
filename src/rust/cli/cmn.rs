@@ -103,7 +103,7 @@ pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap:
             let key = &kv[..pos];
             if kv.len() <= pos + 1 {
                 add_err();
-                return (key, None)
+                return (key, Some(""))
             }
             (key, Some(&kv[pos+1..]))
         }

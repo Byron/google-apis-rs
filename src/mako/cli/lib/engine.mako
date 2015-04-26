@@ -382,16 +382,25 @@ if dry_run {
     flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map)
 %>\
 let mut ${request_prop_name} = api::${request_prop_type}::default();
-let mut field_name = FieldCursor::default();
+let mut field_cursor = FieldCursor::default();
 for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
+    let last_errc = err.issues.len();
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
-    if let Err(field_err) = field_name.set(&*key) {
+    let mut temp_cursor = field_cursor.clone();
+    if let Err(field_err) = temp_cursor.set(&*key) {
         err.issues.push(field_err);
+    }
+    if value.is_none() {
+        field_cursor = temp_cursor.clone();
+        if err.issues.len() > last_errc {
+            err.issues.remove(last_errc);
+        }
+        continue;
     }
     % for name in sorted(init_fn_map.keys()):
 ${init_fn_map[name] | indent_by(4)}
     % endfor
-    match &field_name.to_string()[..] {
+    match &temp_cursor.to_string()[..] {
     % for init_call, schema, fe, f in schema_fields:
 <%
     ptype = actual_json_type(f[-1][1], fe.actual_property.type)
@@ -439,7 +448,7 @@ ${opt_suffix}\
             },
         % endfor # each nested field
         _ => {
-            err.issues.push(CLIError::Field(FieldError::Unknown(field_name.to_string())));
+            err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
         }
     }
 }
