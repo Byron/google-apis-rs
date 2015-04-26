@@ -481,7 +481,7 @@ match result {
     /// Perform the operation you have build so far.
     ${action_fn} {
         % if URL_ENCODE in special_cases:
-        use url::{percent_encode, FORM_URLENCODED_ENCODE_SET};
+        use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
