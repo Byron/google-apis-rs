@@ -15,6 +15,11 @@ By default all output is printed to standard out, but flags can be set to direct
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
+% if documentationLink:
+
+Everything else about the *${util.canonical_name()}* API can be found at the
+[official documentation site](${documentationLink}).
+% endif
 
 # Usage
 
