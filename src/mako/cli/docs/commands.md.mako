@@ -177,7 +177,7 @@ ${SPLIT_END}
             if v != FIELD_SEP:
                 break
         res = ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:])
-        res += ' '
+        res += '     '
         return res
 
     def cursor_arg(field):
@@ -194,7 +194,7 @@ ${SPLIT_END}
         first_flag = ''
 %>\
 % if isinstance(f, SchemaEntry):
-* **${first_flag}${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}**
+* `${first_flag}${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}`
     - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
 % if f.container_type == CTYPE_ARRAY:
     - Each invocation of this argument appends the given value to the array.
