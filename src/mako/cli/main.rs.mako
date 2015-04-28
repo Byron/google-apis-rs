@@ -25,7 +25,7 @@ extern crate ${to_extern_crate_name(library_to_crate_name(library_name(name, ver
 
 use std::env;
 use std::io::{self, Write};
-use clap::{App, SubCommand};
+use clap::{App, SubCommand, Arg};
 
 ## ${engine.new(c)}\
 
