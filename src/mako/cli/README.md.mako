@@ -5,7 +5,7 @@
     c = new_context(schemas, resources, context.get('methods'))
 %>\
 <%namespace name="util" file="../lib/util.mako"/>\
-<%namespace name="docopt" file="lib/docopt.mako"/>\
+<%namespace name="argparse" file="lib/argparse.mako"/>\
 <%block filter="markdown_comment">\
 <%util:gen_info source="${self.uri}" />\
 </%block>
@@ -26,7 +26,7 @@ Everything else about the *${util.canonical_name()}* API can be found at the
 This documentation was generated from the *${util.canonical_name()}* API at revision *${revision is UNDEFINED and '00000000' or revision}*. The CLI is at version *${cargo.build_version}*.
 
 ```bash
-${docopt.new(c, usage_only=True)}
+${argparse.grammar(c)}
 ```
 
 # Configuration
