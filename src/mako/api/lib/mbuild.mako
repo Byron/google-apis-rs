@@ -726,7 +726,7 @@ else {
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.as_ref())
+                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))\
                     % if default_scope:
 
