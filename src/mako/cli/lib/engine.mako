@@ -5,9 +5,9 @@
                       ADD_SCOPE_FN, TREF)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     call_method_ident, arg_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
+                     call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
-                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG)
+                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -172,7 +172,7 @@ ${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}
     % elif p.type != 'string':
     % if p.get('repeated', False): 
 let ${prop_name}: Vec<${prop_type} = Vec::new();
-for (arg_id, arg) in opt.values_of().unwrap_or(Vec::new()).iter().enumerate() {
+for (arg_id, arg) in opt.values_of("${mangle_subcommand(p.name)}").unwrap_or(Vec::new()).iter().enumerate() {
     ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
 }
     % else:
@@ -197,7 +197,7 @@ let mut download_mode = false;
 % endif
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
-for parg in opt.values_of("${ident(VALUE_ARG)}").unwrap_or(Vec::new()).iter() {
+for parg in opt.values_of("${VALUE_ARG}").unwrap_or(Vec::new()).iter() {
     let (key, value) = parse_kv_arg(&*parg, err, false);
     match key {
 % for p in optional_props:
@@ -253,21 +253,9 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let protocol = 
-% for p in mc.media_params:
-    % if loop.first:
-    if \
-    % else:
-    } else if \
-    % endif
-${opt_value(p.protocol)} {
-        "${p.protocol}"
-% endfor # each media param
-    } else { 
-        unreachable!() 
-    };
-let mut input_file = input_file_from_opts(&${opt_value(FILE_ARG)}, err);
-let mime_type = input_mime_from_opts(&${opt_value(MIME_ARG)}, err);
+let protocol = ${req_value(MODE_ARG)};
+let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
+let mime_type = input_mime_from_opts(${req_value(MIME_ARG)}, err);
 % else:
 let protocol = "${STANDARD}";
 % endif # support upload
@@ -376,7 +364,7 @@ if dry_run {
 %>\
 let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_cursor = FieldCursor::default();
-for kvarg in ${opt_value(KEY_VALUE_ARG)}.iter() {
+for kvarg in opt.values_of("${KEY_VALUE_ARG}").unwrap_or(Vec::new()).iter() {
     let last_errc = err.issues.len();
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
     let mut temp_cursor = field_cursor.clone();

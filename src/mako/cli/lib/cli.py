@@ -20,6 +20,7 @@ CONFIG_DIR_FLAG = 'config-dir'
 DEBUG_FLAG = 'debug'
 DEBUG_AUTH_FLAG = 'debug-auth'
 
+MODE_ARG = 'mode'
 FILE_ARG = 'file'
 MIME_ARG = 'mime'
 OUT_ARG = 'out'
@@ -91,12 +92,12 @@ def mangle_subcommand(name):
 def ident(name):
     return mangle_subcommand(name).replace('-', '_')
 
-# Similar to cmd_ident, but for arguments
-def arg_ident(name):
-    return opt_value(name)
+# Return a required value in Rust, using unwrap()
+def req_value(name):
+    return 'opt.value_of("' + mangle_subcommand(name) + '").unwrap()'
 
-def opt_value(name, opt='opt'):
-    return opt + '.value_of("' + mangle_subcommand(name) + '").unwrap_or("")'
+def opt_value(name, opt='opt', default=''):
+    return opt + '.value_of("' + mangle_subcommand(name) + ('").unwrap_or("%s")' % default)
 
 def application_secret_path(program_name):
     return program_name + '-secret.json'

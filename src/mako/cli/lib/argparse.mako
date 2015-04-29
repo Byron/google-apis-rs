@@ -5,7 +5,7 @@
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG)
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG)
 
     def rust_boolean(v):
         return v and 'true' or 'false'
@@ -64,7 +64,7 @@ Configuration:
 % if supports_scopes(auth):
   --${SCOPE_FLAG} <url>  
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
 % endif scopes
   --${CONFIG_DIR_FLAG} <folder>
@@ -187,12 +187,11 @@ let arg_data = [
         args.append((
                 UPLOAD_FLAG,
                 "Specify which file to upload",
-                "mode",
-                False,
+                MODE_ARG,
+                True,
                 False,
                 upload_protocols
             ))
-        ## args.append('-%s %s %s %s' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
@@ -284,12 +283,12 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
 
                 scmd = scmd.arg(Arg::with_name("file")
                                     .short("f")
-                                    .required(false)
+                                    .required(true)
                                     .help("The file to upload")
                                     .takes_value(true));
                 scmd = scmd.arg(Arg::with_name("mime")
                                     .short("m")
-                                    .required(false)
+                                    .required(true)
                                     .help("The file's mime time, like 'application/octet-stream'")
                                     .takes_value(true));
             }
@@ -299,6 +298,5 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
     }
     app = app.subcommand(mcmd);
 }
-let matches = app.get_matches();
 </%block>
 </%def>

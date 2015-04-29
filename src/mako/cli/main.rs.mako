@@ -34,6 +34,7 @@ ${engine.new(c)}\
 
 fn main() {
     ${argparse.new(c) | indent_all_but_first_by(1)}\
+    let matches = app.get_matches();
 
     let debug = matches.is_present("${DEBUG_FLAG}");
     match Engine::new(matches) {
