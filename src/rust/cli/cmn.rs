@@ -351,7 +351,7 @@ impl fmt::Display for CLIError {
                 writeln!(f, "'{}' does not match {}pattern <key>=<value>", kv, hashmap_info)
             },
             CLIError::MissingCommandError => writeln!(f, "Please specify the main sub-command"),
-            CLIError::MissingMethodError(ref cmd) => writeln!(f, "Please specify the method to call on the {} command", cmd),
+            CLIError::MissingMethodError(ref cmd) => writeln!(f, "Please specify the method to call on the '{}' command", cmd),
         }
     }
 }

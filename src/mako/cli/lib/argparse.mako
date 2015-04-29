@@ -104,7 +104,7 @@ Configuration:
         CONFIG_DIR_FLAG,
         "A directory into which we will store our persistent data. Defaults to "
         "a user-writable directory that we will create during the first invocation."
-        "[default: ${CONFIG_DIR}]",
+        "[default: %s" % CONFIG_DIR,
         'folder',
     ))
 

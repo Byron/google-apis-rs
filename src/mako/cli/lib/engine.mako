@@ -69,12 +69,14 @@ impl<'n, 'a> Engine<'n, 'a> {
                     % endfor # each method
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("${mangle_subcommand(resource)}".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
             },
 % endfor # each resource
             _ => {
                 err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", ${SOPT}.usage()).ok();
             }
         }
 
