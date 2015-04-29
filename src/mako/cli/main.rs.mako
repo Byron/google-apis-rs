@@ -27,6 +27,8 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
+mod cmn;
+
 ## ${engine.new(c)}\
 
 fn main() {

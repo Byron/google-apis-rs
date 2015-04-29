@@ -15,6 +15,8 @@
             v = v and 'true' or 'false'
         elif isinstance(v, basestring):
             v = '"%s"' % v
+        elif isinstance(v, list):
+            v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
         return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
@@ -118,6 +120,8 @@ Configuration:
         None
     ))
 %>\
+use cmn::UploadProtocol;
+
 let mut app = App::new("${util.program_name()}")
 <%block filter="indent_by(7)">\
 .author("${', '.join(cargo.authors)}")
@@ -161,6 +165,7 @@ let arg_data = [
             mangle_subcommand(p.name),
             True,
             False,
+            None,
         ))
     # end for each required property
 
@@ -171,6 +176,7 @@ let arg_data = [
                 KEY_VALUE_ARG,
                 True,
                 True,
+                None
             ))
     # end request_value
 
@@ -183,7 +189,8 @@ let arg_data = [
                 "Specify which file to upload",
                 "mode",
                 True,
-                True,
+                False,
+                upload_protocols
             ))
         ## args.append('-%s %s %s %s' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
     # end upload handling
@@ -195,6 +202,7 @@ let arg_data = [
                 VALUE_ARG,
                 False,
                 True,
+                None
             ))
     # end paramters
     
@@ -205,17 +213,19 @@ let arg_data = [
                 OUT_ARG,
                 False,
                 False,
+                None
             ))
     # handle output
 %>\
     ("${mangle_subcommand(method)}",  ${rust_optional(mc.m.get('description'))}, 
           vec![
-            % for flag, desc, arg_name, required, multi in args:
+            % for flag, desc, arg_name, required, multi, upload_protocols in args:
             (${rust_optional(arg_name)},
              ${rust_optional(flag)},
              ${rust_optional(desc)},
              ${rust_optional(required)},
-             ${rust_optional(multi)}),
+             ${rust_optional(multi)},
+             ${rust_optional(upload_protocols)}),
             % if not loop.last:
 
             % endif
@@ -234,7 +244,7 @@ for &(main_command_name, ref subcommands) in &arg_data {
         if let &Some(desc) = desc {
             scmd = scmd.about(desc);
         }
-        for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+        for &(ref arg_name, ref flag, ref desc, ref required, ref multi, ref protocols) in args {
             let mut arg = Arg::with_name(match (arg_name, flag) {
                                                 (&Some(an), _) => an,
                                                 (_, &Some(f)) => f,
@@ -254,6 +264,9 @@ for &(main_command_name, ref subcommands) in &arg_data {
             }
             if let &Some(multi) = multi {
                 arg = arg.multiple(multi);
+            }
+            if let &Some(ref protocols) = protocols {
+                
             }
             scmd = scmd.arg(arg);
         }
