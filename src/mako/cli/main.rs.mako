@@ -30,7 +30,6 @@ use clap::{App, SubCommand, Arg};
 ## ${engine.new(c)}\
 
 fn main() {
-    let matches = 
     ${argparse.new(c) | indent_all_but_first_by(1)}\
 
     ## let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());

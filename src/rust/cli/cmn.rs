@@ -1,6 +1,7 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use rustc_serialize::json;
 use mime::Mime;
+use clap::{App, SubCommand};
 
 use std::fs;
 use std::env;
@@ -14,6 +15,22 @@ use std::io::{Write, Read, stdout};
 use std::default::Default;
 
 const FIELD_SEP: char = '.';
+
+
+fn make_subcommand(command_name: &str, desc: Option<&str>,
+                                       args: &Vec<(Option<&str>, Option<&str>, Option<&str>, 
+                                                   Option<bool>, Option<bool>)>)
+                                                   -> App<'a, 'v, 'ab, 'u, 'h, 'ar> {
+   // arg_name: Option<&str>,
+   // short_name: Option<&str>,
+   // help: Option<&str>,
+   // % if flag is not None:
+   //                      .takes_value(${rust_boolean(arg_name)})
+   // required: Option<bool>,
+   // multiple: Option<bool>
+    SubCommand::new(command_name)
+}
+
 
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);

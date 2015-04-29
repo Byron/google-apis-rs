@@ -7,6 +7,15 @@
 
     def rust_boolean(v):
         return v and 'true' or 'false'
+
+    def rust_optional(v):
+        if v is None:
+            return 'None'
+        if isinstance(v, bool):
+            v = v and 'true' or 'false'
+        elif isinstance(v, basestring):
+            v = '"%s"' % v
+        return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
 % for resource in sorted(c.rta_map.keys()):
@@ -109,7 +118,7 @@ Configuration:
         None
     ))
 %>\
-App::new("${util.program_name()}")
+let mut app = App::new("${util.program_name()}")
 <%block filter="indent_by(7)">\
 .author("${', '.join(cargo.authors)}")
 .version("${cargo.build_version}")
@@ -121,11 +130,17 @@ App::new("${util.program_name()}")
 .arg(Arg::with_name("${arg_name or flag}")
         .long("${flag}")
         .help("${desc}")
-        .takes_value(${rust_boolean(arg_name)}))
+        .takes_value(${rust_boolean(arg_name)}))\
+% if loop.last:
+;
+% else:
+
+% endif
 % endfor
+let arg_data = [
 % for resource in sorted(c.rta_map.keys()):
-.subcommand(
-    SubCommand::new("${mangle_subcommand(resource)}")
+<%block filter="indent_by(4)">\
+("${mangle_subcommand(resource)}", vec![
     % for method in sorted(c.rta_map[resource]):
 <%
     mc = new_method_context(resource, method, c)
@@ -193,30 +208,23 @@ App::new("${util.program_name()}")
             ))
     # handle output
 %>\
-    .subcommand(
-        SubCommand::new("${mangle_subcommand(method)}")
-            % if mc.m.get('description') is not None:
-            .about("${mc.m.description}")
-            % endif
+    ("${mangle_subcommand(method)}",  ${rust_optional(mc.m.get('description'))}, 
+          vec![
             % for flag, desc, arg_name, required, multi in args:
-            .arg(
-                Arg::with_name("${arg_name or flag}")
-                    % if flag:
-                        .short("${flag}")
-                    % endif
-                    % if desc:
-                        .help("${desc}")
-                    % endif
-                    % if flag is not None:
-                        .takes_value(${rust_boolean(arg_name)})
-                    % endif
-                        .required(${rust_boolean(required)})
-                        .multiple(${rust_boolean(multi)}))
+            (${rust_optional(arg_name)},
+             ${rust_optional(flag)},
+             ${rust_optional(desc)},
+             ${rust_optional(required)},
+             ${rust_optional(multi)}),
+            % if not loop.last:
+
+            % endif
             % endfor
-        )
+          ]),
     % endfor # each method
-    )
+    ]),
+</%block>
 % endfor # end for each resource
-.get_matches();
+];
 </%block>
 </%def>

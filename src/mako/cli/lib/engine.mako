@@ -29,7 +29,7 @@
 %>\
 mod cmn;
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, make_subcommand};
 
 use std::default::Default;
 use std::str::FromStr;
