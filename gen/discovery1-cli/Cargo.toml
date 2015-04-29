@@ -4,7 +4,7 @@
 [package]
 
 name = "google-discovery1-cli"
-version = "0.1.0+00000000"
+version = "0.2.0+00000000"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1-cli"
@@ -20,8 +20,7 @@ name = "discovery1"
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
+clap = "*"
 rustc-serialize = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"

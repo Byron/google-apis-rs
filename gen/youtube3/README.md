@@ -230,7 +230,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_youtube3/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_youtube3/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

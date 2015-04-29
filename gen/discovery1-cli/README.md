@@ -10,9 +10,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *discovery* API can be found at the
+[official documentation site](https://developers.google.com/discovery/).
+
 # Usage
 
-This documentation was generated from the *discovery* API at revision *00000000*. The CLI is at version *0.1.0*.
+This documentation was generated from the *discovery* API at revision *00000000*. The CLI is at version *0.2.0*.
 
 ```bash
   discovery1 [options] apis get-rest <api> <version> [-p <v>...] [-o <out>]
