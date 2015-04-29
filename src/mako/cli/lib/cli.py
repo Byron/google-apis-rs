@@ -20,9 +20,9 @@ CONFIG_DIR_FLAG = 'config-dir'
 DEBUG_FLAG = 'debug'
 DEBUG_AUTH_FLAG = 'debug-auth'
 
-FILE_ARG = '<file>'
-MIME_ARG = '<mime>'
-OUT_ARG = '<out>'
+FILE_ARG = 'file'
+MIME_ARG = 'mime'
+OUT_ARG = 'out'
 
 FIELD_SEP = '.'
 

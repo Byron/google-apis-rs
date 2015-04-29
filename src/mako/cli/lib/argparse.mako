@@ -37,7 +37,7 @@
     if mc.media_params:
         upload_protocols = [mp.protocol for mp in mc.media_params]
         mode = docopt_mode(upload_protocols)
-        args.append('-%s %s %s %s' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
+        args.append('-%s %s <%s> <%s>' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
@@ -45,7 +45,7 @@
     # end paramters
     
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
-        args.append('[-%s %s]' % (OUTPUT_FLAG, OUT_ARG))
+        args.append('[-%s <%s>]' % (OUTPUT_FLAG, OUT_ARG))
     # handle output
 %>\
   ${util.program_name()} [options] ${mangle_subcommand(resource)} ${mangle_subcommand(method)} ${' '.join(args)}
@@ -226,5 +226,41 @@ let arg_data = [
 </%block>
 % endfor # end for each resource
 ];
+
+for &(main_command_name, ref subcommands) in &arg_data {
+    let mut mcmd = SubCommand::new(main_command_name);
+    for &(sub_command_name, ref desc, ref args) in subcommands {
+        let mut scmd = SubCommand::new(sub_command_name);
+        if let &Some(desc) = desc {
+            scmd = scmd.about(desc);
+        }
+        for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+            let mut arg = Arg::with_name(match (arg_name, flag) {
+                                                (&Some(an), _) => an,
+                                                (_, &Some(f)) => f,
+                                                _ => unreachable!(),
+                                            });
+            if let &Some(short_flag) = flag {
+                arg = arg.short(short_flag);
+            }
+            if let &Some(desc) = desc {
+                arg = arg.help(desc);
+            }
+            if arg_name.is_some() && flag.is_some() {
+                arg = arg.takes_value(true);
+            }
+            if let &Some(required) = required {
+                arg = arg.required(required);
+            }
+            if let &Some(multi) = multi {
+                arg = arg.multiple(multi);
+            }
+            scmd = scmd.arg(arg);
+        }
+        mcmd = mcmd.subcommand(scmd);
+    }
+    app = app.subcommand(mcmd);
+}
+let matches = app.get_matches();
 </%block>
 </%def>
