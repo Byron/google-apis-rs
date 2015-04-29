@@ -16,7 +16,7 @@
         elif isinstance(v, basestring):
             v = '"%s"' % v
         elif isinstance(v, list):
-            v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
+            v = 'vec![%s]' % ','.join('"%s"' % p for p in v)
         return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
@@ -182,13 +182,11 @@ let arg_data = [
 
     if mc.media_params:
         upload_protocols = [mp.protocol for mp in mc.media_params]
-        # TODO: figure out how to have a group of arguments
-        # NOTE: use possible_values() to specify 'mode'
         args.append((
                 UPLOAD_FLAG,
                 "Specify which file to upload",
                 "mode",
-                True,
+                False,
                 False,
                 upload_protocols
             ))
@@ -266,7 +264,20 @@ for &(main_command_name, ref subcommands) in &arg_data {
                 arg = arg.multiple(multi);
             }
             if let &Some(ref protocols) = protocols {
-                
+                arg = arg.possible_values(protocols.clone());
+                arg = arg.requires("file");
+                arg = arg.requires("mime");
+
+                scmd = scmd.arg(Arg::with_name("file")
+                                    .short("f")
+                                    .required(false)
+                                    .help("The file to upload")
+                                    .takes_value(true));
+                scmd = scmd.arg(Arg::with_name("mime")
+                                    .short("m")
+                                    .required(false)
+                                    .help("The file's mime time, like 'application/octet-stream'")
+                                    .takes_value(true));
             }
             scmd = scmd.arg(arg);
         }
