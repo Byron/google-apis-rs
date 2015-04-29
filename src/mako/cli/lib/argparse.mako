@@ -1,5 +1,7 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
+    import os
+    
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
@@ -56,7 +58,7 @@
   ${util.program_name()} --help
 
 All documentation details can be found at
-${cargo.doc_base_url + '/' + api_index(cargo.doc_base_url, name, version, make, check_exists=False)}
+${cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, version, make, check_exists=False))}
 
 Configuration:
 % if supports_scopes(auth):
@@ -81,8 +83,8 @@ Configuration:
 
 <%def name="new(c)" buffered="True">\
 <%
-    url_info = "All documentation details can be found at" + \
-                cargo.doc_base_url + '/' + api_index(cargo.doc_base_url, name, version, make, check_exists=False)
+    url_info = "All documentation details can be found at " + \
+                cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, version, make, check_exists=False))
 
     # list of tuples
     # (0) = long name
@@ -235,7 +237,7 @@ let arg_data = [
 % endfor # end for each resource
 ];
 
-for &(main_command_name, ref subcommands) in &arg_data {
+for &(main_command_name, ref subcommands) in arg_data.iter() {
     let mut mcmd = SubCommand::new(main_command_name);
     for &(sub_command_name, ref desc, ref args) in subcommands {
         let mut scmd = SubCommand::new(sub_command_name);

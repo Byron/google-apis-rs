@@ -214,7 +214,7 @@ This documentation was generated from the *dfareporting* API at revision *201503
   dfareporting2d1 --help
 
 All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli/index.html
+http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli
 
 Configuration:
   --scope <url>  

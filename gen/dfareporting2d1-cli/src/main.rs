@@ -17,13 +17,16 @@ use std::env;
 use std::io::{self, Write};
 use clap::{App, SubCommand, Arg};
 
+mod cmn;
+
 fn main() {
-    let matches = 
-    App::new("dfareporting2d1")
+    use cmn::UploadProtocol;
+    
+    let mut app = App::new("dfareporting2d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
            .version("0.2.0")
            .about("Manage your DoubleClick Campaign Manager ad campaigns and reports.")
-           .after_help("All documentation details can be found athttp://byron.github.io/google-apis-rs/google_dfareporting2d1_cli/index.html")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
                    .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
@@ -39,5648 +42,5925 @@ fn main() {
            .arg(Arg::with_name("debug-auth")
                    .long("debug-auth")
                    .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
-                   .takes_value(false))
-           .subcommand(
-               SubCommand::new("account-active-ad-summaries")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets the account's active ad summary by account ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("summary-account-id")
-                                   .help("Account ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("account-permission-groups")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one account permission group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Account permission group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves the list of account permission groups.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("account-permissions")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one account permission by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Account permission ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves the list of account permissions.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("account-user-profiles")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one account user profile by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new account user profile.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of account user profiles, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing account user profile. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing account user profile.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("accounts")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one account by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Account ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves the list of accounts, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing account. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Account ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing account.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("ads")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one ad by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Ad ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new ad.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of ads, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing ad. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Ad ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing ad.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("advertiser-groups")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing advertiser group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Advertiser group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one advertiser group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Advertiser group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new advertiser group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of advertiser groups, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing advertiser group. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Advertiser group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing advertiser group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("advertisers")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one advertiser by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Advertiser ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new advertiser.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of advertisers, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing advertiser. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Advertiser ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing advertiser.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("browsers")
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of browsers.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("campaign-creative-associations")
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Associates a creative with the specified campaign. This method creates a default ad with dimensions matching the creative in the campaign if such a default ad does not exist already.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Campaign ID in this association.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves the list of creative IDs associated with the specified campaign.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Campaign ID in this association.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("campaigns")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one campaign by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new campaign.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("default-landing-page-name")
-                                   .help("Default landing page name for this new campaign. Must be less than 256 characters long.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("default-landing-page-url")
-                                   .help("Default landing page URL for this new campaign.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of campaigns, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing campaign. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing campaign.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("change-logs")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one change log by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Change log ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of change logs.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("cities")
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of cities, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("connection-types")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one connection type by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Connection type ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of connection types.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("content-categories")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing content category.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Content category ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one content category by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Content category ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new content category.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of content categories, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing content category. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Content category ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing content category.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("countries")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one country by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("dart-id")
-                                   .help("Country DART ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of countries.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("creative-assets")
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new creative asset.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("advertiser-id")
-                                   .help("Advertiser ID of this creative. This is a required field.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("mode")
-                                   .short("u")
-                                   .help("Specify which file to upload")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("creative-field-values")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing creative field value.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field Value ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one creative field value by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field Value ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new creative field value.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of creative field values, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing creative field value. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field Value ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing creative field value.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("creative-field-id")
-                                   .help("Creative field ID for this creative field value.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("creative-fields")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing creative field.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one creative field by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new creative field.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of creative fields, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing creative field. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative Field ID")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing creative field.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("creative-groups")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one creative group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new creative group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of creative groups, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing creative group. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing creative group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("creatives")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one creative by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new creative.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of creatives, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing creative. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Creative ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing creative.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("dimension-values")
-               .subcommand(
-                   SubCommand::new("query")
-                       .about("Retrieves list of report dimension values for a list of filters.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("directory-site-contacts")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one directory site contact by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Directory site contact ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of directory site contacts, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("directory-sites")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one directory site by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Directory site ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new directory site.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of directory sites, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("event-tags")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing event tag.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Event tag ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one event tag by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Event tag ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new event tag.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of event tags, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing event tag. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Event tag ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing event tag.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("files")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Retrieves a report file by its report ID and file ID.")
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("file-id")
-                                   .help("The ID of the report file.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Lists files for a user profile.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("floodlight-activities")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing floodlight activity.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("generatetag")
-                       .about("Generates a tag for a floodlight activity.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one floodlight activity by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new floodlight activity.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of floodlight activities, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing floodlight activity. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing floodlight activity.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("floodlight-activity-groups")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing floodlight activity group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity Group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one floodlight activity group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity Group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new floodlight activity group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of floodlight activity groups, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing floodlight activity group. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight activity Group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing floodlight activity group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("floodlight-configurations")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one floodlight configuration by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight configuration ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of floodlight configurations, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing floodlight configuration. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Floodlight configuration ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing floodlight configuration.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("inventory-items")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one inventory item by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for order documents.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Inventory item ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of inventory items, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for order documents.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("landing-pages")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing campaign landing page.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Landing page ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one campaign landing page by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Landing page ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new landing page for the specified campaign.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves the list of landing pages for the specified campaign.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing campaign landing page. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Landing page ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing campaign landing page.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("campaign-id")
-                                   .help("Landing page campaign ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("metros")
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of metros.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("mobile-carriers")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one mobile carrier by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Mobile carrier ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of mobile carriers.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("operating-system-versions")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one operating system version by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Operating system version ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of operating system versions.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("operating-systems")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one operating system by DART ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("dart-id")
-                                   .help("Operating system DART ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of operating systems.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("order-documents")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one order document by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for order documents.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Order document ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of order documents, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for order documents.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("orders")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one order by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for orders.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Order ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of orders, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("project-id")
-                                   .help("Project ID for orders.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("placement-groups")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one placement group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new placement group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of placement groups, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing placement group. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing placement group.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("placement-strategies")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing placement strategy.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement strategy ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one placement strategy by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement strategy ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new placement strategy.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of placement strategies, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing placement strategy. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement strategy ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing placement strategy.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("placements")
-               .subcommand(
-                   SubCommand::new("generatetags")
-                       .about("Generates tags for a placement.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one placement by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new placement.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of placements, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing placement. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Placement ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing placement.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("platform-types")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one platform type by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Platform type ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of platform types.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("postal-codes")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one postal code by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("code")
-                                   .help("Postal code ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of postal codes.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("projects")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one project by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Project ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of projects, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("regions")
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of regions.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("remarketing-list-shares")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one remarketing list share by remarketing list ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("remarketing-list-id")
-                                   .help("Remarketing list ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing remarketing list share. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("remarketing-list-id")
-                                   .help("Remarketing list ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing remarketing list share.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("remarketing-lists")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one remarketing list by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Remarketing list ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new remarketing list.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of remarketing lists, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("advertiser-id")
-                                   .help("Select only remarketing lists owned by this advertiser.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing remarketing list. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Remarketing list ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing remarketing list.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("reports")
-               .subcommand(
-                   SubCommand::new("compatible-fields-query")
-                       .about("Returns the fields that are compatible to be selected in the respective sections of a report criteria, given the fields already selected in the input report and user permissions.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes a report by its ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("files-get")
-                       .about("Retrieves a report file.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("file-id")
-                                   .help("The ID of the report file.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("files-list")
-                       .about("Lists files for a report.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the parent report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Retrieves a report by its ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Creates a report.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves list of reports.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates a report. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("run")
-                       .about("Runs a report.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates a report.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The DFA user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("report-id")
-                                   .help("The ID of the report.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("sites")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one site by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Site ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new site.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of sites, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing site. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Site ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing site.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("sizes")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one size by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Size ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new size.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of sizes, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("subaccounts")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one subaccount by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Subaccount ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new subaccount.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Gets a list of subaccounts, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing subaccount. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Subaccount ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing subaccount.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("targetable-remarketing-lists")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one remarketing list by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("Remarketing list ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of targetable remarketing lists, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("advertiser-id")
-                                   .help("Select only targetable remarketing lists targetable by these advertisers.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("user-profiles")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one user profile by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("The user profile ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves list of user profiles for a user.")
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("user-role-permission-groups")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one user role permission group by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User role permission group ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Gets a list of all supported user role permission groups.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("user-role-permissions")
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one user role permission by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User role permission ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Gets a list of user role permissions, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .subcommand(
-               SubCommand::new("user-roles")
-               .subcommand(
-                   SubCommand::new("delete")
-                       .about("Deletes an existing user role.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User role ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                   )
-               .subcommand(
-                   SubCommand::new("get")
-                       .about("Gets one user role by ID.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User role ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("insert")
-                       .about("Inserts a new user role.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("list")
-                       .about("Retrieves a list of user roles, possibly filtered.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("patch")
-                       .about("Updates an existing user role. This method supports patch semantics.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("id")
-                                   .help("User role ID.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               .subcommand(
-                   SubCommand::new("update")
-                       .about("Updates an existing user role.")
-                       .arg(
-                           Arg::with_name("profile-id")
-                                   .help("User profile ID associated with this request.")
-                                   .required(true)
-                                   .multiple(false))
-                       .arg(
-                           Arg::with_name("kv")
-                                   .short("r")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(true)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("v")
-                                   .short("p")
-                                   .help("Set various fields of the request structure")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(true))
-                       .arg(
-                           Arg::with_name("<out>")
-                                   .short("o")
-                                   .help("Specify the file into which to write the programs output")
-                                   .takes_value(true)
-                                   .required(false)
-                                   .multiple(false))
-                   )
-               )
-           .get_matches();
+                   .takes_value(false));
+           let arg_data = [
+               ("account-active-ad-summaries", vec![
+                   ("get",  Some("Gets the account's active ad summary by account ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("summary-account-id"),
+                            None,
+                            Some("Account ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("account-permission-groups", vec![
+                   ("get",  Some("Gets one account permission group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Account permission group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves the list of account permission groups."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("account-permissions", vec![
+                   ("get",  Some("Gets one account permission by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Account permission ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves the list of account permissions."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("account-user-profiles", vec![
+                   ("get",  Some("Gets one account user profile by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new account user profile."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of account user profiles, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing account user profile. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing account user profile."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("accounts", vec![
+                   ("get",  Some("Gets one account by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Account ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves the list of accounts, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing account. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Account ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing account."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("ads", vec![
+                   ("get",  Some("Gets one ad by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Ad ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new ad."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of ads, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing ad. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Ad ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing ad."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("advertiser-groups", vec![
+                   ("delete",  Some("Deletes an existing advertiser group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Advertiser group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one advertiser group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Advertiser group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new advertiser group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of advertiser groups, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing advertiser group. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Advertiser group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing advertiser group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("advertisers", vec![
+                   ("get",  Some("Gets one advertiser by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Advertiser ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new advertiser."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of advertisers, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing advertiser. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Advertiser ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing advertiser."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("browsers", vec![
+                   ("list",  Some("Retrieves a list of browsers."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("campaign-creative-associations", vec![
+                   ("insert",  Some("Associates a creative with the specified campaign. This method creates a default ad with dimensions matching the creative in the campaign if such a default ad does not exist already."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Campaign ID in this association."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves the list of creative IDs associated with the specified campaign."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Campaign ID in this association."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("campaigns", vec![
+                   ("get",  Some("Gets one campaign by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new campaign."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("default-landing-page-name"),
+                            None,
+                            Some("Default landing page name for this new campaign. Must be less than 256 characters long."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("default-landing-page-url"),
+                            None,
+                            Some("Default landing page URL for this new campaign."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of campaigns, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing campaign. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing campaign."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("change-logs", vec![
+                   ("get",  Some("Gets one change log by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Change log ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of change logs."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("cities", vec![
+                   ("list",  Some("Retrieves a list of cities, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("connection-types", vec![
+                   ("get",  Some("Gets one connection type by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Connection type ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of connection types."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("content-categories", vec![
+                   ("delete",  Some("Deletes an existing content category."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Content category ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one content category by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Content category ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new content category."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of content categories, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing content category. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Content category ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing content category."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("countries", vec![
+                   ("get",  Some("Gets one country by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("dart-id"),
+                            None,
+                            Some("Country DART ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of countries."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("creative-assets", vec![
+                   ("insert",  Some("Inserts a new creative asset."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("advertiser-id"),
+                            None,
+                            Some("Advertiser ID of this creative. This is a required field."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("mode"),
+                            Some("u"),
+                            Some("Specify which file to upload"),
+                            Some(false),
+                            Some(false),
+                            Some(vec!["simple","resumable"])),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("creative-field-values", vec![
+                   ("delete",  Some("Deletes an existing creative field value."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field Value ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one creative field value by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field Value ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new creative field value."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of creative field values, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing creative field value. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field Value ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing creative field value."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("creative-field-id"),
+                            None,
+                            Some("Creative field ID for this creative field value."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("creative-fields", vec![
+                   ("delete",  Some("Deletes an existing creative field."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one creative field by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new creative field."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of creative fields, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing creative field. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative Field ID"),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing creative field."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("creative-groups", vec![
+                   ("get",  Some("Gets one creative group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new creative group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of creative groups, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing creative group. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing creative group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("creatives", vec![
+                   ("get",  Some("Gets one creative by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new creative."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of creatives, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing creative. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Creative ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing creative."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("dimension-values", vec![
+                   ("query",  Some("Retrieves list of report dimension values for a list of filters."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("directory-site-contacts", vec![
+                   ("get",  Some("Gets one directory site contact by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Directory site contact ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of directory site contacts, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("directory-sites", vec![
+                   ("get",  Some("Gets one directory site by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Directory site ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new directory site."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of directory sites, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("event-tags", vec![
+                   ("delete",  Some("Deletes an existing event tag."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Event tag ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one event tag by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Event tag ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new event tag."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of event tags, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing event tag. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Event tag ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing event tag."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("files", vec![
+                   ("get",  Some("Retrieves a report file by its report ID and file ID."), 
+                         vec![
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("file-id"),
+                            None,
+                            Some("The ID of the report file."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Lists files for a user profile."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("floodlight-activities", vec![
+                   ("delete",  Some("Deletes an existing floodlight activity."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("generatetag",  Some("Generates a tag for a floodlight activity."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one floodlight activity by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new floodlight activity."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of floodlight activities, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing floodlight activity. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing floodlight activity."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("floodlight-activity-groups", vec![
+                   ("delete",  Some("Deletes an existing floodlight activity group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity Group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one floodlight activity group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity Group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new floodlight activity group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of floodlight activity groups, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing floodlight activity group. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight activity Group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing floodlight activity group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("floodlight-configurations", vec![
+                   ("get",  Some("Gets one floodlight configuration by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight configuration ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of floodlight configurations, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing floodlight configuration. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Floodlight configuration ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing floodlight configuration."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("inventory-items", vec![
+                   ("get",  Some("Gets one inventory item by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for order documents."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Inventory item ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of inventory items, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for order documents."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("landing-pages", vec![
+                   ("delete",  Some("Deletes an existing campaign landing page."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Landing page ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one campaign landing page by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Landing page ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new landing page for the specified campaign."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves the list of landing pages for the specified campaign."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing campaign landing page. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Landing page ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing campaign landing page."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("campaign-id"),
+                            None,
+                            Some("Landing page campaign ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("metros", vec![
+                   ("list",  Some("Retrieves a list of metros."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("mobile-carriers", vec![
+                   ("get",  Some("Gets one mobile carrier by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Mobile carrier ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of mobile carriers."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("operating-system-versions", vec![
+                   ("get",  Some("Gets one operating system version by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Operating system version ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of operating system versions."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("operating-systems", vec![
+                   ("get",  Some("Gets one operating system by DART ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("dart-id"),
+                            None,
+                            Some("Operating system DART ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of operating systems."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("order-documents", vec![
+                   ("get",  Some("Gets one order document by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for order documents."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Order document ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of order documents, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for order documents."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("orders", vec![
+                   ("get",  Some("Gets one order by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for orders."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Order ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of orders, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("project-id"),
+                            None,
+                            Some("Project ID for orders."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("placement-groups", vec![
+                   ("get",  Some("Gets one placement group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new placement group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of placement groups, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing placement group. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing placement group."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("placement-strategies", vec![
+                   ("delete",  Some("Deletes an existing placement strategy."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement strategy ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one placement strategy by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement strategy ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new placement strategy."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of placement strategies, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing placement strategy. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement strategy ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing placement strategy."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("placements", vec![
+                   ("generatetags",  Some("Generates tags for a placement."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one placement by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new placement."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of placements, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing placement. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Placement ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing placement."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("platform-types", vec![
+                   ("get",  Some("Gets one platform type by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Platform type ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of platform types."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("postal-codes", vec![
+                   ("get",  Some("Gets one postal code by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("code"),
+                            None,
+                            Some("Postal code ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of postal codes."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("projects", vec![
+                   ("get",  Some("Gets one project by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Project ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of projects, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("regions", vec![
+                   ("list",  Some("Retrieves a list of regions."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("remarketing-list-shares", vec![
+                   ("get",  Some("Gets one remarketing list share by remarketing list ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("remarketing-list-id"),
+                            None,
+                            Some("Remarketing list ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing remarketing list share. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("remarketing-list-id"),
+                            None,
+                            Some("Remarketing list ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing remarketing list share."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("remarketing-lists", vec![
+                   ("get",  Some("Gets one remarketing list by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Remarketing list ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new remarketing list."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of remarketing lists, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("advertiser-id"),
+                            None,
+                            Some("Select only remarketing lists owned by this advertiser."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing remarketing list. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Remarketing list ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing remarketing list."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("reports", vec![
+                   ("compatible-fields-query",  Some("Returns the fields that are compatible to be selected in the respective sections of a report criteria, given the fields already selected in the input report and user permissions."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("delete",  Some("Deletes a report by its ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("files-get",  Some("Retrieves a report file."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("file-id"),
+                            None,
+                            Some("The ID of the report file."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("files-list",  Some("Lists files for a report."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the parent report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("get",  Some("Retrieves a report by its ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Creates a report."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves list of reports."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates a report. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("run",  Some("Runs a report."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates a report."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The DFA user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("report-id"),
+                            None,
+                            Some("The ID of the report."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("sites", vec![
+                   ("get",  Some("Gets one site by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Site ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new site."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of sites, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing site. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Site ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing site."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("sizes", vec![
+                   ("get",  Some("Gets one size by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Size ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new size."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of sizes, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("subaccounts", vec![
+                   ("get",  Some("Gets one subaccount by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Subaccount ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new subaccount."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Gets a list of subaccounts, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing subaccount. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Subaccount ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing subaccount."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("targetable-remarketing-lists", vec![
+                   ("get",  Some("Gets one remarketing list by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("Remarketing list ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of targetable remarketing lists, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("advertiser-id"),
+                            None,
+                            Some("Select only targetable remarketing lists targetable by these advertisers."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("user-profiles", vec![
+                   ("get",  Some("Gets one user profile by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("The user profile ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves list of user profiles for a user."), 
+                         vec![
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("user-role-permission-groups", vec![
+                   ("get",  Some("Gets one user role permission group by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User role permission group ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Gets a list of all supported user role permission groups."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("user-role-permissions", vec![
+                   ("get",  Some("Gets one user role permission by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User role permission ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Gets a list of user role permissions, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+               ("user-roles", vec![
+                   ("delete",  Some("Deletes an existing user role."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User role ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+                         ]),
+                   ("get",  Some("Gets one user role by ID."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User role ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("insert",  Some("Inserts a new user role."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("list",  Some("Retrieves a list of user roles, possibly filtered."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("patch",  Some("Updates an existing user role. This method supports patch semantics."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("id"),
+                            None,
+                            Some("User role ID."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ("update",  Some("Updates an existing user role."), 
+                         vec![
+                           (Some("profile-id"),
+                            None,
+                            Some("User profile ID associated with this request."),
+                            Some(true),
+                            Some(false),
+                            None),
+               
+                           (Some("kv"),
+                            Some("r"),
+                            Some("Set various fields of the request structure"),
+                            Some(true),
+                            Some(true),
+                            None),
+               
+                           (Some("v"),
+                            Some("p"),
+                            Some("Set various fields of the request structure"),
+                            Some(false),
+                            Some(true),
+                            None),
+               
+                           (Some("out"),
+                            Some("o"),
+                            Some("Specify the file into which to write the programs output"),
+                            Some(false),
+                            Some(false),
+                            None),
+                         ]),
+                   ]),
+               
+           ];
+           
+           for &(main_command_name, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name);
+               for &(sub_command_name, ref desc, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi, ref protocols) in args {
+                       let mut arg = Arg::with_name(match (arg_name, flag) {
+                                                           (&Some(an), _) => an,
+                                                           (_, &Some(f)) => f,
+                                                           _ => unreachable!(),
+                                                       });
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       if let &Some(ref protocols) = protocols {
+                           arg = arg.possible_values(protocols.clone());
+                           arg = arg.requires("file");
+                           arg = arg.requires("mime");
+           
+                           scmd = scmd.arg(Arg::with_name("file")
+                                               .short("f")
+                                               .required(false)
+                                               .help("The file to upload")
+                                               .takes_value(true));
+                           scmd = scmd.arg(Arg::with_name("mime")
+                                               .short("m")
+                                               .required(false)
+                                               .help("The file's mime time, like 'application/octet-stream'")
+                                               .takes_value(true));
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           let matches = app.get_matches();
            
     
 }
