@@ -1,7 +1,7 @@
 <%namespace name="util" file="../../lib/util.mako"/>\
 <%!
     import os
-    
+
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
@@ -225,7 +225,17 @@ let arg_data = [
              ${rust_optional(desc)},
              ${rust_optional(required)},
              ${rust_optional(multi)},
-             ${rust_optional(upload_protocols)}),
+             % if not mc.media_params:
+             ## Make sure the type is set, even though we don't have any protocol information
+             % if loop.first:
+             None::${'<Vec<&str>>'}\
+             % else:
+             None\
+             % endif
+             % else:
+             ${rust_optional(upload_protocols)}\
+             % endif
+),
             % if not loop.last:
 
             % endif
@@ -239,17 +249,19 @@ let arg_data = [
 
 for &(main_command_name, ref subcommands) in arg_data.iter() {
     let mut mcmd = SubCommand::new(main_command_name);
+
     for &(sub_command_name, ref desc, ref args) in subcommands {
         let mut scmd = SubCommand::new(sub_command_name);
         if let &Some(desc) = desc {
             scmd = scmd.about(desc);
         }
+
         for &(ref arg_name, ref flag, ref desc, ref required, ref multi, ref protocols) in args {
             let mut arg = Arg::with_name(match (arg_name, flag) {
-                                                (&Some(an), _) => an,
-                                                (_, &Some(f)) => f,
-                                                _ => unreachable!(),
-                                            });
+                                                (&Some(an), _       ) => an,
+                                                (_        , &Some(f)) => f,
+                                                 _                    => unreachable!(),
+                                         });
             if let &Some(short_flag) = flag {
                 arg = arg.short(short_flag);
             }
