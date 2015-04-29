@@ -4,6 +4,7 @@
 <%  
     from util import (new_context, rust_comment, to_extern_crate_name, library_to_crate_name, library_name,
                       indent_all_but_first_by)
+    from cli import DEBUG_FLAG    
 
     c = new_context(schemas, resources, context.get('methods'))
     default_user_agent = "google-cli-rust-client/" + cargo.build_version
@@ -29,27 +30,26 @@ use clap::{App, SubCommand, Arg};
 
 mod cmn;
 
-## ${engine.new(c)}\
+${engine.new(c)}\
 
 fn main() {
     ${argparse.new(c) | indent_all_but_first_by(1)}\
 
-    ## let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    ## let debug = opts.flag_debug;
-    ## match Engine::new(opts) {
-    ##     Err(err) => {
-    ##         writeln!(io::stderr(), "{}", err).ok();
-    ##         env::set_exit_status(err.exit_code);
-    ##     },
-    ##     Ok(engine) => {
-    ##         if let Some(err) = engine.doit() {
-    ##             if debug {
-    ##                 writeln!(io::stderr(), "{:?}", err).ok();
-    ##             } else {
-    ##                 writeln!(io::stderr(), "{}", err).ok();
-    ##             }
-    ##             env::set_exit_status(1);
-    ##         }
-    ##     }
-    ## }
+    let debug = matches.is_present("${DEBUG_FLAG}");
+    match Engine::new(matches) {
+        Err(err) => {
+            writeln!(io::stderr(), "{}", err).ok();
+            env::set_exit_status(err.exit_code);
+        },
+        Ok(engine) => {
+            if let Some(err) = engine.doit() {
+                if debug {
+                    writeln!(io::stderr(), "{:?}", err).ok();
+                } else {
+                    writeln!(io::stderr(), "{}", err).ok();
+                }
+                env::set_exit_status(1);
+            }
+        }
+    }
 }

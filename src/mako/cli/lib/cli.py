@@ -91,16 +91,12 @@ def mangle_subcommand(name):
 def ident(name):
     return mangle_subcommand(name).replace('-', '_')
 
-# return the identifier of a command for the given name, suitable to address the command field in the docopt structure
-def cmd_ident(name):
-    return 'cmd_' + ident(name)
-
 # Similar to cmd_ident, but for arguments
 def arg_ident(name):
-    return 'arg_' + ident(name)
+    return opt_value(name)
 
-def flag_ident(name):
-    return 'flag_' + ident(name)
+def opt_value(name, opt='opt'):
+    return opt + '.value_of("' + mangle_subcommand(name) + '").unwrap_or("")'
 
 def application_secret_path(program_name):
     return program_name + '-secret.json'
