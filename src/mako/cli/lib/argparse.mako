@@ -2,7 +2,7 @@
 <%!
     import os
 
-    from util import (put_and, supports_scopes, api_index, indent_by, enclose_in)
+    from util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG, 
@@ -132,9 +132,12 @@ Configuration:
 %>\
 let arg_data = [
 % for resource in sorted(c.rta_map.keys()):
+<% 
+    methods = sorted(c.rta_map[resource])
+%>\
 <%block filter="indent_by(4)">\
-("${mangle_subcommand(resource)}", vec![
-    % for method in sorted(c.rta_map[resource]):
+("${mangle_subcommand(resource)}", "supported subcommands: ${put_and(["'%s'" % mangle_subcommand(m) for m in methods])}", vec![
+    % for method in methods:
 <%
     mc = new_method_context(resource, method, c)
 
@@ -254,8 +257,8 @@ let mut app = App::new("${util.program_name()}")
 % endif
 % endfor
 
-for &(main_command_name, ref subcommands) in arg_data.iter() {
-    let mut mcmd = SubCommand::new(main_command_name);
+for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+    let mut mcmd = SubCommand::new(main_command_name).about(about);
 
     for &(sub_command_name, ref desc, ref args) in subcommands {
         let mut scmd = SubCommand::new(sub_command_name);
