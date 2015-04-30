@@ -17,7 +17,7 @@
         if isinstance(v, bool):
             v = v and 'true' or 'false'
         elif isinstance(v, basestring):
-            v = '"%s"' % v
+            v = '"%s"' % v.replace('"', r'\"')
         elif isinstance(v, list):
             v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
         return 'Some(%s)' % v
