@@ -1,5 +1,5 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
-use rustc_serialize::json;
+use serde::json;
 use mime::Mime;
 use clap::{App, SubCommand};
 
@@ -208,49 +208,47 @@ impl JsonTokenStorage {
 }
 
 impl TokenStorage for JsonTokenStorage {
-    type Error = io::Error;
+    type Error = json::Error;
 
     // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<io::Error> {
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<json::Error> {
         match token {
             None => {
                 match fs::remove_file(self.path(scope_hash)) {
                     Err(err) => 
                         match err.kind() {
                             io::ErrorKind::NotFound => None,
-                            _ => Some(err)
+                            _ => Some(json::Error::IoError(err))
                         },
                     Ok(_) => None
                 }
             }
             Some(token) => {
-                let json_token = json::encode(&token).unwrap();
                 match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
                     Ok(mut f) => {
-                        match f.write(json_token.as_bytes()) {
+                        match json::to_writer_pretty(&mut f, &token) {
                             Ok(_) => None,
-                            Err(io_err) => Some(io_err),
+                            Err(io_err) => Some(json::Error::IoError(io_err)),
                         }
                     },
-                    Err(io_err) => Some(io_err)
+                    Err(io_err) => Some(json::Error::IoError(io_err))
                 }
             }
         }
     }
 
-    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, io::Error> {
+    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, json::Error> {
         match fs::File::open(&self.path(scope_hash)) {
             Ok(mut f) => {
-                let mut json_string = String::new();
-                match f.read_to_string(&mut json_string) {
-                    Ok(_) => Ok(Some(json::decode::<Token>(&json_string).unwrap())),
-                    Err(io_err) => Err(io_err),
+                match json::de::from_reader(f) {
+                    Ok(token) => Ok(Some(token)),
+                    Err(err)  => Err(err),
                 }
             },
             Err(io_err) => {
                 match io_err.kind() {
                     io::ErrorKind::NotFound => Ok(None),
-                    _ => Err(io_err)
+                    _ => Err(json::Error::IoError(io_err))
                 }
             }
         }
@@ -260,7 +258,7 @@ impl TokenStorage for JsonTokenStorage {
 
 #[derive(Debug)]
 pub enum ApplicationSecretError {
-    DecoderError((String, json::DecoderError)),
+    DecoderError((String, json::Error)),
     FormatError(String),    
 }
 
@@ -440,7 +438,7 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
 
 pub fn application_secret_from_directory(dir: &str, 
                                          secret_basename: &str, 
-                                         json_app_secret: &str)
+                                         json_console_secret: &str)
                                                         -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
@@ -459,7 +457,10 @@ pub fn application_secret_from_directory(dir: &str,
                     err = match fs::OpenOptions::new().create(true).write(true).open(&secret_path) {
                         Err(cfe) => cfe,
                         Ok(mut f) => {
-                            match f.write(json_app_secret.as_bytes()) {
+                            // Assure we convert 'ugly' json string into pretty one
+                            let console_secret: ConsoleApplicationSecret 
+                                            = json::from_str(json_console_secret).unwrap();
+                            match json::to_writer_pretty(&mut f, &console_secret) {
                                 Err(io_err) => io_err,
                                 Ok(_) => continue,
                             }
@@ -470,23 +471,24 @@ pub fn application_secret_from_directory(dir: &str,
                 return secret_io_error(err)
             },
             Ok(mut f) => {
-                let mut json_encoded_secret = String::new();
-                if let Err(io_err) = f.read_to_string(&mut json_encoded_secret) {
-                    return secret_io_error(io_err)
-                }
-                match json::decode::<ConsoleApplicationSecret>(&json_encoded_secret) {
-                    Err(json_decode_error) => return Err(CLIError::Configuration(
-                        ConfigurationError::Secret(ApplicationSecretError::DecoderError(
-                                                (secret_str(), json_decode_error)
+                match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
+                    Err(json::Error::IoError(err)) => 
+                        return secret_io_error(err),
+                    Err(json_err) => 
+                        return Err(CLIError::Configuration(
+                            ConfigurationError::Secret(
+                                ApplicationSecretError::DecoderError(
+                                                (secret_str(), json_err)
                                               )))),
-                    Ok(console_secret) => match console_secret.installed {
-                        Some(secret) => return Ok(secret),
-                        None => return Err(
-                                    CLIError::Configuration(
-                                    ConfigurationError::Secret(
-                                    ApplicationSecretError::FormatError(secret_str())
-                                    )))
-                    },
+                    Ok(console_secret) => 
+                        match console_secret.installed {
+                            Some(secret) => return Ok(secret),
+                            None => return Err(
+                                        CLIError::Configuration(
+                                        ConfigurationError::Secret(
+                                        ApplicationSecretError::FormatError(secret_str())
+                                        )))
+                        },
                 }
             }
         }

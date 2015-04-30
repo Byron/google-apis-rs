@@ -3,8 +3,6 @@
                       IO_TYPES, activity_split, enclose_in, REQUEST_MARKER_TRAIT, mb_type, indent_all_but_first_by,
                       NESTED_TYPE_SUFFIX, RESPONSE_MARKER_TRAIT, split_camelcase_s, METHODS_RESOURCE, unique_type_name, 
                       PART_MARKER_TRAIT, canonical_type_name, TO_PARTS_MARKER, UNUSED_TYPE_MARKER, is_schema_with_optionals)
-
-    default_traits = ('RustcEncodable', 'Clone', 'Default')
 %>\
 ## Build a schema which must be an object
 ###################################################################################################################

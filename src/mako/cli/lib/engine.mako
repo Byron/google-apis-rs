@@ -33,7 +33,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
 use clap::ArgMatches;
 
 struct Engine<'n, 'a> {
