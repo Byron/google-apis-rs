@@ -1,6 +1,7 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use rustc_serialize::json;
 use mime::Mime;
+use clap::{App, SubCommand};
 
 use std::fs;
 use std::env;
@@ -14,6 +15,44 @@ use std::io::{Write, Read, stdout};
 use std::default::Default;
 
 const FIELD_SEP: char = '.';
+
+pub enum CallType {
+    Upload(UploadProtocol),
+    Standard,
+}
+
+pub enum UploadProtocol {
+    Simple,
+    Resumable,
+}
+
+impl AsRef<str> for UploadProtocol {
+    fn as_ref(&self) -> &str {
+        match *self {
+            UploadProtocol::Simple => "simple",
+            UploadProtocol::Resumable => "resumable"
+        }
+    }
+}
+
+impl AsRef<str> for CallType {
+    fn as_ref(&self) -> &str {
+        match *self {
+            CallType::Upload(ref proto) => proto.as_ref(),
+            CallType::Standard => "standard-request"
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UploadProtocol {
+    fn from(this: &'a str) -> UploadProtocol {
+        match this {
+            "simple" => UploadProtocol::Simple,
+            "resumable" => UploadProtocol::Resumable,
+            _ => panic!("We don't expect to see anything else here, the CLI parser takes care")
+        }
+    }
+}
 
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);
@@ -132,11 +171,11 @@ pub fn input_mime_from_opts(mime: &str, err: &mut InvalidOptionsError) -> Option
 
 // May panic if we can't open the file - this is anticipated, we can't currently communicate this 
 // kind of error: TODO: fix this architecture :)
-pub fn writer_from_opts(flag: bool, arg: &str) -> Box<Write> {
-    if !flag || arg == "-" {
-        Box::new(stdout())
-    } else {
-        Box::new(fs::OpenOptions::new().create(true).write(true).open(arg).unwrap())
+pub fn writer_from_opts(arg: Option<&str>) -> Box<Write> {
+    let f = arg.unwrap_or("-");
+    match f {
+        "-" => Box::new(stdout()),
+        _ => Box::new(fs::OpenOptions::new().create(true).write(true).open(f).unwrap())
     }
 }
 
@@ -314,6 +353,8 @@ pub enum CLIError {
     InvalidKeyValueSyntax(String, bool),
     Input(InputError),
     Field(FieldError),
+    MissingCommandError,
+    MissingMethodError(String),
 }
 
 impl fmt::Display for CLIError {
@@ -331,6 +372,8 @@ impl fmt::Display for CLIError {
                 let hashmap_info = if is_hashmap { "hashmap " } else { "" };
                 writeln!(f, "'{}' does not match {}pattern <key>=<value>", kv, hashmap_info)
             },
+            CLIError::MissingCommandError => writeln!(f, "Please specify the main sub-command"),
+            CLIError::MissingMethodError(ref cmd) => writeln!(f, "Please specify the method to call on the '{}' command", cmd),
         }
     }
 }

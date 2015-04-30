@@ -20,9 +20,15 @@ CONFIG_DIR_FLAG = 'config-dir'
 DEBUG_FLAG = 'debug'
 DEBUG_AUTH_FLAG = 'debug-auth'
 
-FILE_ARG = '<file>'
-MIME_ARG = '<mime>'
-OUT_ARG = '<out>'
+MODE_ARG = 'mode'
+FILE_ARG = 'file'
+FILE_FLAG = 'f'
+MIME_ARG = 'mime'
+MIME_FLAG = 'm'
+OUT_ARG = 'out'
+
+SCOPE_ARG = 'url'
+CONFIG_DIR_ARG = 'folder'
 
 FIELD_SEP = '.'
 
@@ -91,16 +97,15 @@ def mangle_subcommand(name):
 def ident(name):
     return mangle_subcommand(name).replace('-', '_')
 
-# return the identifier of a command for the given name, suitable to address the command field in the docopt structure
-def cmd_ident(name):
-    return 'cmd_' + ident(name)
+# Return a required value in Rust, using unwrap()
+def req_value(name):
+    return 'opt.value_of("' + mangle_subcommand(name) + '").unwrap()'
 
-# Similar to cmd_ident, but for arguments
-def arg_ident(name):
-    return 'arg_' + ident(name)
+def opt_value(name, opt='opt', default=''):
+    return opt + '.value_of("' + mangle_subcommand(name) + ('").unwrap_or("%s")' % default)
 
-def flag_ident(name):
-    return 'flag_' + ident(name)
+def opt_values(name, opt='opt'):
+    return opt + '.values_of("' + mangle_subcommand(name) + '").unwrap_or(Vec::new()).iter()'
 
 def application_secret_path(program_name):
     return program_name + '-secret.json'

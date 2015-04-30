@@ -10,9 +10,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *YouTube* API can be found at the
+[official documentation site](https://developers.google.com/youtube/v3).
+
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20150414*. The CLI is at version *0.1.0*.
+This documentation was generated from the *YouTube* API at revision *20150414*. The CLI is at version *0.2.0*.
 
 ```bash
   youtube3 [options] activities insert -r <kv>... [-p <v>...] [-o <out>]

@@ -10,9 +10,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *dfareporting* API can be found at the
+[official documentation site](https://developers.google.com/doubleclick-advertisers/reporting/).
+
 # Usage
 
-This documentation was generated from the *dfareporting* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *dfareporting* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
   dfareporting2d1 [options] account-active-ad-summaries get <profile-id> <summary-account-id> [-p <v>...] [-o <out>]
@@ -211,7 +214,7 @@ This documentation was generated from the *dfareporting* API at revision *201503
   dfareporting2d1 --help
 
 All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli/index.html
+http://byron.github.io/google-apis-rs/google_dfareporting2d1_cli
 
 Configuration:
   --scope <url>  

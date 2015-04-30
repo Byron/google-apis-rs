@@ -3,6 +3,7 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use rustc_serialize::json;
 use mime::Mime;
+use clap::{App, SubCommand};
 
 use std::fs;
 use std::env;
@@ -16,6 +17,22 @@ use std::io::{Write, Read, stdout};
 use std::default::Default;
 
 const FIELD_SEP: char = '.';
+
+/// Unused for now, can be used once https://github.com/kbknapp/clap-rs/issues/87
+/// is available
+pub enum UploadProtocol {
+    Simple,
+    Resumable,
+}
+
+impl AsRef<str> for UploadProtocol {
+    fn as_ref(&self) -> &str {
+        match *self {
+            UploadProtocol::Simple => "simple",
+            UploadProtocol::Resumable => "resumable",
+        }
+    }
+}
 
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);

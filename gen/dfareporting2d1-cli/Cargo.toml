@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d1-cli"
-version = "0.1.0+20150326"
+version = "0.2.0+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting2d1-cli"
@@ -20,8 +20,7 @@ name = "dfareporting2d1"
 hyper = "*"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
+clap = "*"
 rustc-serialize = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"

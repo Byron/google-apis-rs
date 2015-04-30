@@ -22,12 +22,11 @@ make:
     - source: main.rs
       output_dir: src
 cargo:
-  build_version: "0.1.0"
+  build_version: "0.2.0"
   keywords: [cli]
   is_executable: YES
   dependencies:
-    - docopt = "*"
-    - docopt_macros = "*"
+    - clap = "*"
     - rustc-serialize = "*"
     - yup-hyper-mock = "*"
     - serde = ">= 0.3.0"

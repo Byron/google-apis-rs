@@ -5,48 +5,47 @@
                       ADD_SCOPE_FN, TREF)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     cmd_ident, call_method_ident, arg_ident, POD_TYPES, flag_ident, ident, JSON_TYPE_VALUE_MAP,
+                     call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
-                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG)
+                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG)
 
     v_arg = '<%s>' % VALUE_ARG
-    SOPT = 'self.opt.'
+    SOPT = 'self.opt'
     def to_opt_arg_ident(p):
-        return SOPT + arg_ident(p.name)
+        return opt_value(p.name)
 
     def borrow_prefix(p):
         ptype = p.get('type', None)
         borrow = ''
-        if (ptype not in POD_TYPES or ptype in ('string', None) or p.get('repeated', False)) and ptype is not None:
+        if (ptype not in POD_TYPES or ptype is None or p.get('repeated', False)) and ptype is not None:
             borrow = '&'
         return borrow
-
-    STANDARD = 'standard-request'
 %>\
 <%def name="new(c)">\
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-mod cmn;
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
 use rustc_serialize::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
 }
 
 
-impl Engine {
+impl<'n, 'a> Engine<'n, 'a> {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
-    fn ${call_method_ident(resource, method)}(&self, dry_run: bool, err: &mut InvalidOptionsError)
+    fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Option<api::Error> {
         ${self._method_call_impl(c, resource, method) | indent_all_but_first_by(2)}
     }
@@ -55,35 +54,29 @@ impl Engine {
 % endfor 
     fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
+        let mut call_result: Option<api::Error> = None;
         let mut err_opt: Option<InvalidOptionsError> = None;
 ## RESOURCE LOOP: check for set primary subcommand
+        match ${SOPT + '.subcommand()'} {
 % for resource in sorted(c.rta_map.keys()):
-
-        % if loop.first:
-        if \
-        % else:
- else if \
-        % endif
-self.opt.${cmd_ident(resource)} {
-        ## METHOD LOOP: Check for method subcommand
-        % for method in sorted(c.rta_map[resource]):
-            % if loop.first:
-            if \
-            % else:
- else if \
-            % endif
-self.opt.${cmd_ident(method)} {
-                call_result = self.${call_method_ident(resource, method)}(dry_run, &mut err);
-            }\
-        % endfor # each method
- else {
-                unreachable!();
-            }
-        }\
+            ("${mangle_subcommand(resource)}", Some(opt)) => {
+                match opt.subcommand() {
+                    % for method in sorted(c.rta_map[resource]):
+                    ("${mangle_subcommand(method)}", Some(opt)) => {
+                        call_result = self.${call_method_ident(resource, method)}(opt, dry_run, &mut err);
+                    },
+                    % endfor # each method
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("${mangle_subcommand(resource)}".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
 % endfor # each resource
- else {
-            unreachable!();
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", ${SOPT}.usage()).ok();
+            }
         }
 
         if dry_run {
@@ -95,9 +88,9 @@ self.opt.${cmd_ident(method)} {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -138,7 +131,7 @@ self.opt.${cmd_ident(method)} {
 </%def>
 
 <%def name="_debug_client(flag_name)" buffered="True">\
-if opt.flag_${mangle_ident(flag_name)} {
+if opt.is_present("${flag_name}") {
     hyper::Client::with_connector(mock::TeeConnector {
             connector: hyper::net::HttpConnector(None) 
         })
@@ -180,7 +173,7 @@ ${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}
     % elif p.type != 'string':
     % if p.get('repeated', False): 
 let ${prop_name}: Vec<${prop_type} = Vec::new();
-for (arg_id, arg) in ${opt_ident}.iter().enumerate() {
+for (arg_id, arg) in ${opt_values(mangle_subcommand(p.name))}.enumerate() {
     ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
 }
     % else:
@@ -205,7 +198,7 @@ let mut download_mode = false;
 % endif
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
-for parg in ${SOPT + arg_ident(VALUE_ARG)}.iter() {
+for parg in ${opt_values(VALUE_ARG)} {
     let (key, value) = parse_kv_arg(&*parg, err, false);
     match key {
 % for p in optional_props:
@@ -261,48 +254,36 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let protocol = 
-% for p in mc.media_params:
-    % if loop.first:
-    if \
-    % else:
-    } else if \
-    % endif
-${SOPT + cmd_ident(p.protocol)} {
-        "${p.protocol}"
-% endfor # each media param
-    } else { 
-        unreachable!() 
-    };
-let mut input_file = input_file_from_opts(&${SOPT + arg_ident(FILE_ARG[1:-1])}, err);
-let mime_type = input_mime_from_opts(&${SOPT + arg_ident(MIME_ARG[1:-1])}, err);
+let protocol = CallType::Upload(UploadProtocol::from(${req_value(MODE_ARG)}));
+let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
+let mime_type = input_mime_from_opts(${req_value(MIME_ARG)}, err);
 % else:
-let protocol = "${STANDARD}";
+let protocol = CallType::Standard;
 % endif # support upload
 if dry_run {
     None
 } else {
     assert!(err.issues.len() == 0);
     % if method_default_scope(mc.m):
-<% scope_opt = SOPT + flag_ident('scope') %>\
-    if ${scope_opt}.len() > 0 {
-        call = call.${ADD_SCOPE_FN}(&${scope_opt});
+    for scope in ${opt_values(SCOPE_ARG, opt=SOPT)} {
+        call = call.${ADD_SCOPE_FN}(scope);
     }
     % endif
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
     ## TODO: unify error handling
     % if handle_output:
-    let mut ostream = writer_from_opts(${SOPT + flag_ident(OUTPUT_FLAG)}, &${SOPT + arg_ident(OUT_ARG[1:-1])});
+    let mut ostream = writer_from_opts(opt.value_of("${(OUT_ARG)}"));
     % endif # handle output
     match match protocol {
         % if mc.media_params:
         % for p in mc.media_params:
-        "${p.protocol}" => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        CallType::Upload(UploadProtocol::${p.protocol.capitalize()}) => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
         % endfor
+        CallType::Standard => unreachable!()
         % else:
-        "${STANDARD}" => call.${api.terms.action}(),
+        CallType::Standard => call.${api.terms.action}(),
+        _ => unreachable!()
         % endif
-        _ => unreachable!(),
     } {
         Err(api_err) => Some(api_err),
         % if mc.response_schema:
@@ -384,7 +365,7 @@ if dry_run {
 %>\
 let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_cursor = FieldCursor::default();
-for kvarg in ${SOPT + arg_ident(KEY_VALUE_ARG)}.iter() {
+for kvarg in ${opt_values(KEY_VALUE_ARG)} {
     let last_errc = err.issues.len();
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
     let mut temp_cursor = field_cursor.clone();
