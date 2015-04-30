@@ -457,6 +457,16 @@ impl<'a> Read for MultiPartReader<'a> {
 header!{
     #[doc="The `X-Upload-Content-Type` header."]
     (XUploadContentType, "X-Upload-Content-Type") => [Mime]
+
+    xupload_content_type {
+        test_header!(
+            test1,
+            vec![b"text/plain"],
+            Some(HeaderField(
+                vec![Mime(TopLevel::Text, SubLevel::Plain, Vec::new())]
+                )));
+
+    }
 }
 
 #[derive(Clone, PartialEq, Debug)]
