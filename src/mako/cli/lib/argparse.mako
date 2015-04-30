@@ -5,7 +5,8 @@
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG)
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG, 
+                     CONFIG_DIR_ARG)
 
     def rust_boolean(v):
         return v and 'true' or 'false'
@@ -18,7 +19,7 @@
         elif isinstance(v, basestring):
             v = '"%s"' % v
         elif isinstance(v, list):
-            v = 'vec![%s]' % ','.join('"%s"' % p for p in v)
+            v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
         return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
@@ -62,12 +63,12 @@ ${cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
 
 Configuration:
 % if supports_scopes(auth):
-  --${SCOPE_FLAG} <url>  
+  --${SCOPE_FLAG} <${SCOPE_ARG}>...
             Specify the authentication a method should be executed in. Each scope 
             requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
 % endif scopes
-  --${CONFIG_DIR_FLAG} <folder>
+  --${CONFIG_DIR_FLAG} <${CONFIG_DIR_ARG}>
             A directory into which we will store our persistent data. Defaults to 
             a user-writable directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
@@ -90,6 +91,7 @@ Configuration:
     # (0) = long name
     # (1) = description
     # (2) = argument name, no argument if no argument
+    # (3) = multiple
     global_args = list()
     if supports_scopes(auth):
         global_args.append((
@@ -97,7 +99,8 @@ Configuration:
             "Specify the authentication a method should be executed in. Each scope "
             "requires the user to grant this application permission to use it."
             "If unset, it defaults to the shortest scope url for a particular method.",
-            'url'
+            SCOPE_ARG,
+            True
         ))
     # end add scope arg
     global_args.append((
@@ -105,44 +108,26 @@ Configuration:
         "A directory into which we will store our persistent data. Defaults to "
         "a user-writable directory that we will create during the first invocation."
         "[default: %s" % CONFIG_DIR,
-        'folder',
+        CONFIG_DIR_ARG,
+        False,
     ))
 
     global_args.append((
         DEBUG_FLAG,  
         "Output all server communication to standard error. `tx` and `rx` are placed "
         "into the same stream.",
-        None
+        None,
+        False,
     ))
 
     global_args.append((
         DEBUG_AUTH_FLAG,
         "Output all communication related to authentication to standard error. `tx` "
         "and `rx` are placed into the same stream.",
-        None
+        None,
+        False,
     ))
 %>\
-use cmn::UploadProtocol;
-
-let mut app = App::new("${util.program_name()}")
-<%block filter="indent_by(7)">\
-.author("${', '.join(cargo.authors)}")
-.version("${cargo.build_version}")
-% if description is not UNDEFINED:
-.about("${description}")
-% endif
-.after_help("${url_info}")
-% for flag, desc, arg_name in global_args:
-.arg(Arg::with_name("${arg_name or flag}")
-        .long("${flag}")
-        .help("${desc}")
-        .takes_value(${rust_boolean(arg_name)}))\
-% if loop.last:
-;
-% else:
-
-% endif
-% endfor
 let arg_data = [
 % for resource in sorted(c.rta_map.keys()):
 <%block filter="indent_by(4)">\
@@ -246,6 +231,27 @@ let arg_data = [
 % endfor # end for each resource
 ];
 
+let mut app = App::new("${util.program_name()}")
+<%block filter="indent_by(7)">\
+.author("${', '.join(cargo.authors)}")
+.version("${util.crate_version()}")
+% if description is not UNDEFINED:
+.about("${description}")
+% endif
+.after_help("${url_info}")
+% for flag, desc, arg_name, multiple in global_args:
+.arg(Arg::with_name("${arg_name or flag}")
+        .long("${flag}")
+        .help("${desc}")
+        .multiple(${rust_boolean(multiple)})
+        .takes_value(${rust_boolean(arg_name)}))\
+% if loop.last:
+;
+% else:
+
+% endif
+% endfor
+
 for &(main_command_name, ref subcommands) in arg_data.iter() {
     let mut mcmd = SubCommand::new(main_command_name);
 
@@ -277,7 +283,7 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
                 arg = arg.multiple(multi);
             }
             if let &Some(ref protocols) = protocols {
-                arg = arg.possible_values(protocols.clone());
+                arg = arg.possible_values(protocols);
                 arg = arg.requires("file");
                 arg = arg.requires("mime");
 

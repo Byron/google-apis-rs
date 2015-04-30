@@ -7,7 +7,8 @@
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
-                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG)
+                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -28,7 +29,7 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, UploadProtocol};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -91,7 +92,7 @@ impl<'n, 'a> Engine<'n, 'a> {
     // Please note that this call will fail if any part of the opt can't be handled
     fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_FLAG}").unwrap_or("${CONFIG_DIR}")) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -174,7 +175,7 @@ ${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}
     % elif p.type != 'string':
     % if p.get('repeated', False): 
 let ${prop_name}: Vec<${prop_type} = Vec::new();
-for (arg_id, arg) in opt.values_of("${mangle_subcommand(p.name)}").unwrap_or(Vec::new()).iter().enumerate() {
+for (arg_id, arg) in ${opt_values(mangle_subcommand(p.name))}.enumerate() {
     ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
 }
     % else:
@@ -199,7 +200,7 @@ let mut download_mode = false;
 % endif
 let mut call = self.hub.${mangle_ident(resource)}().${mangle_ident(method)}(${', '.join(call_args)});
 % if handle_props:
-for parg in opt.values_of("${VALUE_ARG}").unwrap_or(Vec::new()).iter() {
+for parg in ${opt_values(VALUE_ARG)} {
     let (key, value) = parse_kv_arg(&*parg, err, false);
     match key {
 % for p in optional_props:
@@ -266,9 +267,8 @@ if dry_run {
 } else {
     assert!(err.issues.len() == 0);
     % if method_default_scope(mc.m):
-<% scope_opt = opt_value('scope', SOPT) %>\
-    if ${scope_opt}.len() > 0 {
-        call = call.${ADD_SCOPE_FN}(&${scope_opt});
+    for scope in ${opt_values(SCOPE_ARG, opt=SOPT)} {
+        call = call.${ADD_SCOPE_FN}(scope);
     }
     % endif
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
@@ -276,15 +276,14 @@ if dry_run {
     % if handle_output:
     let mut ostream = writer_from_opts(opt.value_of("${(OUT_ARG)}"));
     % endif # handle output
-    match match protocol {
+    match match UploadProtocol::from(protocol) {
         % if mc.media_params:
         % for p in mc.media_params:
-        "${p.protocol}" => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        UploadProtocol::${p.protocol.capitalize()} => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
         % endfor
         % else:
         "${STANDARD}" => call.${api.terms.action}(),
         % endif
-        _ => unreachable!(),
     } {
         Err(api_err) => Some(api_err),
         % if mc.response_schema:
@@ -366,7 +365,7 @@ if dry_run {
 %>\
 let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_cursor = FieldCursor::default();
-for kvarg in opt.values_of("${KEY_VALUE_ARG}").unwrap_or(Vec::new()).iter() {
+for kvarg in ${opt_values(KEY_VALUE_ARG)} {
     let last_errc = err.issues.len();
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
     let mut temp_cursor = field_cursor.clone();

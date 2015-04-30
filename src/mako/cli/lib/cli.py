@@ -25,6 +25,9 @@ FILE_ARG = 'file'
 MIME_ARG = 'mime'
 OUT_ARG = 'out'
 
+SCOPE_ARG = 'url'
+CONFIG_DIR_ARG = 'folder'
+
 FIELD_SEP = '.'
 
 CONFIG_DIR = '~/.google-service-cli'
@@ -98,6 +101,9 @@ def req_value(name):
 
 def opt_value(name, opt='opt', default=''):
     return opt + '.value_of("' + mangle_subcommand(name) + ('").unwrap_or("%s")' % default)
+
+def opt_values(name, opt='opt'):
+    return opt + '.values_of("' + mangle_subcommand(name) + '").unwrap_or(Vec::new()).iter()'
 
 def application_secret_path(program_name):
     return program_name + '-secret.json'

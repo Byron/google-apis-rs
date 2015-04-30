@@ -16,8 +16,6 @@ use std::default::Default;
 
 const FIELD_SEP: char = '.';
 
-/// Unused for now, can be used once https://github.com/kbknapp/clap-rs/issues/87
-/// is available
 pub enum UploadProtocol {
     Simple,
     Resumable,
@@ -28,6 +26,16 @@ impl AsRef<str> for UploadProtocol {
         match *self {
             UploadProtocol::Simple => "simple",
             UploadProtocol::Resumable => "resumable",
+        }
+    }
+}
+
+impl<'a> From<&'a str> for UploadProtocol {
+    fn from(this: &'a str) -> UploadProtocol {
+        match this {
+            "simple" => UploadProtocol::Simple,
+            "resumable" => UploadProtocol::Resumable,
+            _ => unreachable!(),
         }
     }
 }
