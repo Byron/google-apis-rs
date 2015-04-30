@@ -169,13 +169,14 @@ pub fn input_mime_from_opts(mime: &str, err: &mut InvalidOptionsError) -> Option
     }
 }
 
-// May panic if we can't open the file - this is anticipated, we can't currently communicate this 
-// kind of error: TODO: fix this architecture :)
-pub fn writer_from_opts(arg: Option<&str>) -> Box<Write> {
+pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
     let f = arg.unwrap_or("-");
     match f {
-        "-" => Box::new(stdout()),
-        _ => Box::new(fs::OpenOptions::new().create(true).write(true).open(f).unwrap())
+        "-" => Ok(Box::new(stdout())),
+        _ => match fs::OpenOptions::new().create(true).write(true).open(f) {
+            Ok(f) => Ok(Box::new(f)),
+            Err(io_err) => Err(io_err),
+        }
     }
 }
 

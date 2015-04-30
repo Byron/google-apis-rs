@@ -36,6 +36,11 @@ use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
 use serde::json;
 use clap::ArgMatches;
 
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
 struct Engine<'n, 'a> {
     opt: ArgMatches<'n, 'a>,
     hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
@@ -46,15 +51,15 @@ impl<'n, 'a> Engine<'n, 'a> {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
     fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+                                                    -> Result<(), DoitError> {
         ${self._method_call_impl(c, resource, method) | indent_all_but_first_by(2)}
     }
 
     % endfor # each method
 % endfor 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error> = None;
+        let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
 ## RESOURCE LOOP: check for set primary subcommand
         match ${SOPT + '.subcommand()'} {
@@ -83,8 +88,10 @@ impl<'n, 'a> Engine<'n, 'a> {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
@@ -117,15 +124,17 @@ impl<'n, 'a> Engine<'n, 'a> {
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 </%def>
@@ -261,7 +270,7 @@ let mime_type = input_mime_from_opts(${opt_value(MIME_ARG, default=DEFAULT_MIME)
 let protocol = CallType::Standard;
 % endif # support upload
 if dry_run {
-    None
+    Ok(())
 } else {
     assert!(err.issues.len() == 0);
     % if method_default_scope(mc.m):
@@ -270,9 +279,11 @@ if dry_run {
     }
     % endif
     ## Make the call, handle uploads, handle downloads (also media downloads|json decoding)
-    ## TODO: unify error handling
     % if handle_output:
-    let mut ostream = writer_from_opts(opt.value_of("${(OUT_ARG)}"));
+    let mut ostream = match writer_from_opts(opt.value_of("${(OUT_ARG)}")) {
+        Ok(mut f) => f,
+        Err(io_err) => return Err(DoitError::IoError(${opt_value(OUT_ARG, default='-')}.to_string(), io_err)),
+    };
     % endif # handle output
     match match protocol {
         % if mc.media_params:
@@ -285,7 +296,7 @@ if dry_run {
         _ => unreachable!()
         % endif
     } {
-        Err(api_err) => Some(api_err),
+        Err(api_err) => Err(DoitError::ApiError(api_err)),
         % if mc.response_schema:
         Ok((mut response, output_schema)) => {
         % else:
@@ -310,7 +321,7 @@ if dry_run {
             % if track_download_flag:
             }
             % endif
-            None
+            Ok(())
         }
     }
 }\

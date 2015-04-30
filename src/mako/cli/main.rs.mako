@@ -4,7 +4,7 @@
 <%  
     from util import (new_context, rust_comment, to_extern_crate_name, library_to_crate_name, library_name,
                       indent_all_but_first_by)
-    from cli import DEBUG_FLAG    
+    from cli import OUT_ARG, DEBUG_FLAG, opt_value
 
     c = new_context(schemas, resources, context.get('methods'))
     default_user_agent = "google-cli-rust-client/" + cargo.build_version
@@ -38,17 +38,24 @@ fn main() {
     let debug = matches.is_present("${DEBUG_FLAG}");
     match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }
