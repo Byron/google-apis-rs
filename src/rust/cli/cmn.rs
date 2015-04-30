@@ -212,27 +212,27 @@ impl TokenStorage for JsonTokenStorage {
     type Error = json::Error;
 
     // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<json::Error> {
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Result<(), json::Error> {
         match token {
             None => {
                 match fs::remove_file(self.path(scope_hash)) {
                     Err(err) => 
                         match err.kind() {
-                            io::ErrorKind::NotFound => None,
-                            _ => Some(json::Error::IoError(err))
+                            io::ErrorKind::NotFound => Ok(()),
+                            _ => Err(json::Error::IoError(err))
                         },
-                    Ok(_) => None
+                    Ok(_) => Ok(()),
                 }
             }
             Some(token) => {
                 match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
                     Ok(mut f) => {
                         match json::to_writer_pretty(&mut f, &token) {
-                            Ok(_) => None,
-                            Err(io_err) => Some(json::Error::IoError(io_err)),
+                            Ok(_) => Ok(()),
+                            Err(io_err) => Err(json::Error::IoError(io_err)),
                         }
                     },
-                    Err(io_err) => Some(json::Error::IoError(io_err))
+                    Err(io_err) => Err(json::Error::IoError(io_err))
                 }
             }
         }
