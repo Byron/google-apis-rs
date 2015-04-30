@@ -6,7 +6,7 @@
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG, 
-                     CONFIG_DIR_ARG)
+                     CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG)
 
     def rust_boolean(v):
         return v and 'true' or 'false'
@@ -19,11 +19,13 @@
         elif isinstance(v, basestring):
             v = '"%s"' % v
         elif isinstance(v, list):
-            v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
+            v = 'vec![%s]' % ','.join('CallType::Upload%s' % p.capitalize() for p in v)
         return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
+${util.program_name()} [options]
 % for resource in sorted(c.rta_map.keys()):
+        ${mangle_subcommand(resource)}
     % for method in sorted(c.rta_map[resource]):
 <%
     mc = new_method_context(resource, method, c)
@@ -36,24 +38,24 @@
     # end for each required property
 
     if mc.request_value:
-        args.append('-%s %s...' % (STRUCT_FLAG, '<%s>' % KEY_VALUE_ARG))
+        args.append('(-%s %s)...' % (STRUCT_FLAG, '<%s>' % KEY_VALUE_ARG))
     # end request_value
 
     if mc.media_params:
         upload_protocols = [mp.protocol for mp in mc.media_params]
         mode = docopt_mode(upload_protocols)
-        args.append('-%s %s <%s> <%s>' % (UPLOAD_FLAG, mode, FILE_ARG, MIME_ARG))
+        args.append('(-%s %s -%s <%s> -%s <%s>)' % (UPLOAD_FLAG, mode, FILE_FLAG, FILE_ARG, MIME_FLAG, MIME_ARG))
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
-        args.append('[-%s %s...]' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
+        args.append('[-%s %s]...' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
     # end paramters
     
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append('[-%s <%s>]' % (OUTPUT_FLAG, OUT_ARG))
     # handle output
 %>\
-  ${util.program_name()} [options] ${mangle_subcommand(resource)} ${mangle_subcommand(method)} ${' '.join(args)}
+                ${mangle_subcommand(method)} ${' '.join(args)}
     % endfor # each method
 % endfor # end for each resource
   ${util.program_name()} --help
@@ -63,7 +65,7 @@ ${cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
 
 Configuration:
 % if supports_scopes(auth):
-  --${SCOPE_FLAG} <${SCOPE_ARG}>...
+  [--${SCOPE_FLAG} <${SCOPE_ARG}>]...
             Specify the authentication a method should be executed in. Each scope 
             requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
@@ -212,7 +214,7 @@ let arg_data = [
              % if not mc.media_params:
              ## Make sure the type is set, even though we don't have any protocol information
              % if loop.first:
-             None::${'<Vec<&str>>'}\
+             None::${'<Vec<CallType>>'}\
              % else:
              None\
              % endif
@@ -284,16 +286,18 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
             }
             if let &Some(ref protocols) = protocols {
                 arg = arg.possible_values(protocols);
-                arg = arg.requires("file");
-                arg = arg.requires("mime");
+                arg = arg.requires("${FILE_ARG}");
+                arg = arg.requires("${MIME_ARG}");
 
-                scmd = scmd.arg(Arg::with_name("file")
-                                    .short("f")
+                scmd = scmd.arg(Arg::with_name("${FILE_ARG}")
+                                    .short("${FILE_FLAG}")
                                     .required(true)
+                                    .requires("${MODE_ARG}")
                                     .help("The file to upload")
                                     .takes_value(true));
-                scmd = scmd.arg(Arg::with_name("mime")
-                                    .short("m")
+                scmd = scmd.arg(Arg::with_name("${MIME_ARG}")
+                                    .short("${MIME_FLAG}")
+                                    .requires("${MODE_ARG}")
                                     .required(true)
                                     .help("The file's mime time, like 'application/octet-stream'")
                                     .takes_value(true));

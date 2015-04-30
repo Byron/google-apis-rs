@@ -16,25 +16,27 @@ use std::default::Default;
 
 const FIELD_SEP: char = '.';
 
-pub enum UploadProtocol {
-    Simple,
-    Resumable,
+pub enum CallType {
+    UploadSimple,
+    UploadResumable,
+    Standard,
 }
 
-impl AsRef<str> for UploadProtocol {
+impl AsRef<str> for CallType {
     fn as_ref(&self) -> &str {
         match *self {
-            UploadProtocol::Simple => "simple",
-            UploadProtocol::Resumable => "resumable",
+            CallType::UploadSimple => "simple",
+            CallType::UploadResumable => "resumable",
+            CallType::Standard => "standard-request"
         }
     }
 }
 
-impl<'a> From<&'a str> for UploadProtocol {
-    fn from(this: &'a str) -> UploadProtocol {
+impl<'a> From<&'a str> for CallType {
+    fn from(this: &'a str) -> CallType {
         match this {
-            "simple" => UploadProtocol::Simple,
-            "resumable" => UploadProtocol::Resumable,
+            "simple" => CallType::UploadSimple,
+            "resumable" => CallType::UploadResumable,
             _ => unreachable!(),
         }
     }

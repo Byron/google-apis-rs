@@ -29,7 +29,7 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, UploadProtocol};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -256,11 +256,11 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let protocol = ${req_value(MODE_ARG)};
+let protocol = CallType::from(${req_value(MODE_ARG)});
 let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
 let mime_type = input_mime_from_opts(${req_value(MIME_ARG)}, err);
 % else:
-let protocol = "${STANDARD}";
+let protocol = CallType::Standard;
 % endif # support upload
 if dry_run {
     None
@@ -276,13 +276,15 @@ if dry_run {
     % if handle_output:
     let mut ostream = writer_from_opts(opt.value_of("${(OUT_ARG)}"));
     % endif # handle output
-    match match UploadProtocol::from(protocol) {
+    match match protocol {
         % if mc.media_params:
         % for p in mc.media_params:
-        UploadProtocol::${p.protocol.capitalize()} => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        CallType::Upload${p.protocol.capitalize()} => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
         % endfor
+        CallType::Standard => unreachable!()
         % else:
-        "${STANDARD}" => call.${api.terms.action}(),
+        CallType::Standard => call.${api.terms.action}(),
+        _ => unreachable!()
         % endif
     } {
         Err(api_err) => Some(api_err),

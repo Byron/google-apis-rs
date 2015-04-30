@@ -22,7 +22,9 @@ DEBUG_AUTH_FLAG = 'debug-auth'
 
 MODE_ARG = 'mode'
 FILE_ARG = 'file'
+FILE_FLAG = 'f'
 MIME_ARG = 'mime'
+MIME_FLAG = 'm'
 OUT_ARG = 'out'
 
 SCOPE_ARG = 'url'
