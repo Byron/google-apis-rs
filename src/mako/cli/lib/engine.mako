@@ -21,15 +21,13 @@
         if (ptype not in POD_TYPES or ptype is None or p.get('repeated', False)) and ptype is not None:
             borrow = '&'
         return borrow
-
-    STANDARD = 'standard-request'
 %>\
 <%def name="new(c)">\
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -256,7 +254,7 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let protocol = CallType::from(${req_value(MODE_ARG)});
+let protocol = CallType::Upload(UploadProtocol::from(${req_value(MODE_ARG)}));
 let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
 let mime_type = input_mime_from_opts(${req_value(MIME_ARG)}, err);
 % else:
@@ -279,7 +277,7 @@ if dry_run {
     match match protocol {
         % if mc.media_params:
         % for p in mc.media_params:
-        CallType::Upload${p.protocol.capitalize()} => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
+        CallType::Upload(UploadProtocol::${p.protocol.capitalize()}) => call.${upload_action_fn(api.terms.upload_action, p.type.suffix)}(input_file.unwrap(), mime_type.unwrap()),
         % endfor
         CallType::Standard => unreachable!()
         % else:

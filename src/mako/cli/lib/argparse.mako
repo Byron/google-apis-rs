@@ -19,7 +19,7 @@
         elif isinstance(v, basestring):
             v = '"%s"' % v
         elif isinstance(v, list):
-            v = 'vec![%s]' % ','.join('CallType::Upload%s' % p.capitalize() for p in v)
+            v = 'vec![%s]' % ','.join('UploadProtocol::%s' % p.capitalize() for p in v)
         return 'Some(%s)' % v
 %>\
 <%def name="grammar(c)">\
@@ -214,7 +214,7 @@ let arg_data = [
              % if not mc.media_params:
              ## Make sure the type is set, even though we don't have any protocol information
              % if loop.first:
-             None::${'<Vec<CallType>>'}\
+             None::${'<Vec<UploadProtocol>>'}\
              % else:
              None\
              % endif
