@@ -44,7 +44,7 @@ ${util.program_name()} [options]
     if mc.media_params:
         upload_protocols = [mp.protocol for mp in mc.media_params]
         mode = docopt_mode(upload_protocols)
-        args.append('(-%s %s -%s <%s> -%s <%s>)' % (UPLOAD_FLAG, mode, FILE_FLAG, FILE_ARG, MIME_FLAG, MIME_ARG))
+        args.append('(-%s %s -%s <%s> [-%s <%s>])' % (UPLOAD_FLAG, mode, FILE_FLAG, FILE_ARG, MIME_FLAG, MIME_ARG))
     # end upload handling
 
     if mc.optional_props or parameters is not UNDEFINED:
@@ -287,7 +287,6 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
             if let &Some(ref protocols) = protocols {
                 arg = arg.possible_values(protocols);
                 arg = arg.requires("${FILE_ARG}");
-                arg = arg.requires("${MIME_ARG}");
 
                 scmd = scmd.arg(Arg::with_name("${FILE_ARG}")
                                     .short("${FILE_FLAG}")
@@ -298,7 +297,8 @@ for &(main_command_name, ref subcommands) in arg_data.iter() {
                 scmd = scmd.arg(Arg::with_name("${MIME_ARG}")
                                     .short("${MIME_FLAG}")
                                     .requires("${MODE_ARG}")
-                                    .required(true)
+                                    .requires("${FILE_ARG}")
+                                    .required(false)
                                     .help("The file's mime time, like 'application/octet-stream'")
                                     .takes_value(true));
             }

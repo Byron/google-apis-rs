@@ -5,7 +5,8 @@
     from cli import (subcommand_md_filename, new_method_context, SPLIT_START, SPLIT_END, pretty, SCOPE_FLAG,
                      mangle_subcommand, is_request_value_property, FIELD_SEP, PARAM_FLAG, UPLOAD_FLAG, docopt_mode,
                      FILE_ARG, MIME_ARG, OUT_ARG, OUTPUT_FLAG, to_cli_schema, cli_schema_to_yaml, SchemaEntry,
-                     STRUCT_FLAG, field_to_value, CTYPE_ARRAY, CTYPE_MAP, to_docopt_arg)
+                     STRUCT_FLAG, field_to_value, CTYPE_ARRAY, CTYPE_MAP, to_docopt_arg, FILE_FLAG, MIME_FLAG, 
+                     DEFAULT_MIME)
 
     from copy import deepcopy
 
@@ -92,16 +93,20 @@ The cursor position is key to comfortably set complex nested structures. The fol
 %>\
 # Required Upload Flags
 
-This method supports the upload of data, using the following protocol${len(mc.media_params) > 1 and 's' or ''}:
+This method supports the upload of data, which *requires* all of the following flags to be set:
 
-* **-${UPLOAD_FLAG} ${docopt_mode(protocols)} ${escape_html(FILE_ARG)} ${escape_html(MIME_ARG)}**
+* **-${UPLOAD_FLAG} ${docopt_mode(protocols)}**
 % for mp in mc.media_params:
     - **${mp.protocol}** - ${mp.get('description', NO_DESC).split('\n')[0] | xml_escape}
 % endfor # each media param
-    - **${escape_html(FILE_ARG)}**
-        + Path to file to upload. It must be seekable.
-    - **${escape_html(MIME_ARG)}**
-        + the mime type, like 'application/octet-stream', which is the default
+* **-${FILE_FLAG} ${escape_html(FILE_ARG)}**
+    - Path to file to upload. It must be seekable.
+
+The following flag *may* be set: 
+
+* **-${MIME_FLAG} ${escape_html(MIME_ARG)}**
+    - the mime type, like '${DEFAULT_MIME}', which is the default
+
 % endif # have upload capabilities
 % if mc.response_schema or smd:
 
@@ -164,20 +169,19 @@ ${SPLIT_END}
     - ${p.get('description') or NO_DESC | xml_escape ,indent_all_but_first_by(2)}
 </%def>
 
-<%def name="_list_schem_args(schema, cursor_tokens=list(), first_flag=None)">\
+<%def name="_list_schem_args(schema, cursor_tokens=list())">\
 <%
     if len(cursor_tokens) == 0:
         cursor_tokens = [FIELD_SEP]
-    if first_flag is None:
-        first_flag = '-%s ' % STRUCT_FLAG
 
     def cursor_fmt(cursor):
+        flag = '-%s ' % STRUCT_FLAG
         fndfi = 0 # first non-dot field index
         for (fndfi, v) in enumerate(cursor):
             if v != FIELD_SEP:
                 break
         res = ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:])
-        res += '     '
+        res += '    ' + flag
         return res
 
     def cursor_arg(field):
@@ -185,16 +189,14 @@ ${SPLIT_END}
         if cursor_tokens:
             prefix = cursor_fmt(cursor_tokens)
             del cursor_tokens[:]
-        return prefix + field
+        return  prefix + field
 %>\
 % for fni, fn in enumerate(sorted(schema.fields.keys())):
 <% 
     f = schema.fields[fn]
-    if fni > 0:
-        first_flag = ''
 %>\
 % if isinstance(f, SchemaEntry):
-* `${first_flag}${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}`
+* `-${STRUCT_FLAG} ${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}`
     - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
 % if f.container_type == CTYPE_ARRAY:
     - Each invocation of this argument appends the given value to the array.
@@ -205,7 +207,7 @@ ${SPLIT_END}
 <%
     cursor_tokens.append(mangle_subcommand(fn))
 %>\
-${self._list_schem_args(f, cursor_tokens, first_flag)}
+${self._list_schem_args(f, cursor_tokens)}
 <%
     assert not cursor_tokens or cursor_tokens[-1] == FIELD_SEP
     if not cursor_tokens:

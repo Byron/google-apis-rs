@@ -8,7 +8,7 @@
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
-                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG)
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -256,7 +256,7 @@ ${value_unwrap}\
 % if mc.media_params:
 let protocol = CallType::Upload(UploadProtocol::from(${req_value(MODE_ARG)}));
 let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
-let mime_type = input_mime_from_opts(${req_value(MIME_ARG)}, err);
+let mime_type = input_mime_from_opts(${opt_value(MIME_ARG, default=DEFAULT_MIME)}, err);
 % else:
 let protocol = CallType::Standard;
 % endif # support upload
