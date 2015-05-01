@@ -2,8 +2,8 @@
 <%!
     from util import (hub_type, mangle_ident, indent_all_but_first_by, activity_rust_type, setter_fn_name, ADD_PARAM_FN,
                       upload_action_fn, is_schema_with_optionals, schema_markers, indent_by, method_default_scope,
-                      ADD_SCOPE_FN, TREF)
-    from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
+                      ADD_SCOPE_FN, TREF, enclose_in)
+    from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
@@ -25,7 +25,8 @@
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          protocol_from_str};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -263,8 +264,9 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let protocol = CallType::Upload(UploadProtocol::from(${req_value(MODE_ARG)}));
-let mut input_file = input_file_from_opts(${req_value(FILE_ARG)}, err);
+let vals = opt.values_of("${MODE_ARG}").unwrap();
+let protocol = protocol_from_str(vals[0], [${', '.join('"%s"' % mp.protocol for mp in mc.media_params)}].iter().map(|&v| v.to_string()).collect(), err);
+let mut input_file = input_file_from_opts(vals[1], err);
 let mime_type = input_mime_from_opts(${opt_value(MIME_ARG, default=DEFAULT_MIME)}, err);
 % else:
 let protocol = CallType::Standard;

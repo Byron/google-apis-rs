@@ -44,13 +44,15 @@ impl AsRef<str> for CallType {
     }
 }
 
-impl<'a> From<&'a str> for UploadProtocol {
-    fn from(this: &'a str) -> UploadProtocol {
-        match this {
-            "simple" => UploadProtocol::Simple,
-            "resumable" => UploadProtocol::Resumable,
-            _ => panic!("We don't expect to see anything else here, the CLI parser takes care")
-        }
+impl FromStr for UploadProtocol {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<UploadProtocol, String> {
+        match s {
+            "simple" => Ok(UploadProtocol::Simple),
+            "resumable" => Ok(UploadProtocol::Resumable),
+            _ => Err(format!("Protocol '{}' is unknown", s)),
+        }        
     }
 }
 
@@ -149,6 +151,17 @@ pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap:
     }
 }
 
+pub fn protocol_from_str(name: &str, valid_protocols: Vec<String>, err: &mut InvalidOptionsError) -> CallType {
+    CallType::Upload(
+        match UploadProtocol::from_str(name) {
+            Ok(up) => up,
+            Err(msg) => {
+                err.issues.push(CLIError::InvalidUploadProtocol(name.to_string(), valid_protocols)); 
+                UploadProtocol::Simple
+            }
+        })
+}
+
 pub fn input_file_from_opts(file_path: &str, err: &mut InvalidOptionsError) -> Option<fs::File> {
     match fs::File::open(file_path) {
         Ok(f) => Some(f),
@@ -189,7 +202,7 @@ pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError,
     match FromStr::from_str(arg) {
         Err(perr) => {
             err.issues.push(
-                CLIError::ParseError((arg_name, arg_type, arg.to_string(), format!("{}", perr)))
+                CLIError::ParseError(arg_name, arg_type, arg.to_string(), format!("{}", perr))
             );
             Default::default()
         },
@@ -347,8 +360,9 @@ impl fmt::Display for FieldError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
-    ParseError((&'static str, &'static str, String, String)),
+    ParseError(&'static str, &'static str, String, String),
     UnknownParameter(String),
+    InvalidUploadProtocol(String, Vec<String>),
     InvalidKeyValueSyntax(String, bool),
     Input(InputError),
     Field(FieldError),
@@ -362,7 +376,9 @@ impl fmt::Display for CLIError {
             CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
             CLIError::Input(ref err) => write!(f, "Input -> {}", err),
             CLIError::Field(ref err) => write!(f, "Field -> {}", err),
-            CLIError::ParseError((arg_name, type_name, ref value, ref err_desc)) 
+            CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names) 
+                => writeln!(f, "'{}' is not a valid upload protocol. Choose from one of {}", proto_name, valid_names.connect(", ")),
+            CLIError::ParseError(arg_name, type_name, ref value, ref err_desc) 
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}",
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name) 

@@ -169,19 +169,21 @@ ${SPLIT_END}
     - ${p.get('description') or NO_DESC | xml_escape ,indent_all_but_first_by(2)}
 </%def>
 
-<%def name="_list_schem_args(schema, cursor_tokens=list())">\
+<%def name="_list_schem_args(schema, cursor_tokens=list(), first_flag=None)">\
 <%
     if len(cursor_tokens) == 0:
         cursor_tokens = [FIELD_SEP]
 
+    if first_flag is None:
+        first_flag = '-%s ' % STRUCT_FLAG
+
     def cursor_fmt(cursor):
-        flag = '-%s ' % STRUCT_FLAG
         fndfi = 0 # first non-dot field index
         for (fndfi, v) in enumerate(cursor):
             if v != FIELD_SEP:
                 break
         res = ''.join(cursor[:fndfi]) + FIELD_SEP.join(cursor[fndfi:])
-        res += '    ' + flag
+        res += '    '
         return res
 
     def cursor_arg(field):
@@ -194,9 +196,11 @@ ${SPLIT_END}
 % for fni, fn in enumerate(sorted(schema.fields.keys())):
 <% 
     f = schema.fields[fn]
+    if fni > 0:
+        first_flag = ''
 %>\
 % if isinstance(f, SchemaEntry):
-* `-${STRUCT_FLAG} ${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}`
+* `${first_flag}${cursor_arg(mangle_subcommand(fn))}=${field_to_value(f)}`
     - ${f.property.get('description', NO_DESC) | xml_escape, indent_all_but_first_by(2)}
 % if f.container_type == CTYPE_ARRAY:
     - Each invocation of this argument appends the given value to the array.
@@ -207,7 +211,7 @@ ${SPLIT_END}
 <%
     cursor_tokens.append(mangle_subcommand(fn))
 %>\
-${self._list_schem_args(f, cursor_tokens)}
+${self._list_schem_args(f, cursor_tokens, first_flag)}
 <%
     assert not cursor_tokens or cursor_tokens[-1] == FIELD_SEP
     if not cursor_tokens:

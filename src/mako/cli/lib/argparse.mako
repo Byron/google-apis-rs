@@ -130,6 +130,21 @@ Configuration:
         False,
     ))
 %>\
+<%
+    have_media_params = False
+    for resource in sorted(c.rta_map.keys()):
+        methods = sorted(c.rta_map[resource])
+        for method in methods:
+            mc = new_method_context(resource, method, c)
+            if mc.media_params:
+                have_media_params = True
+                break
+        # end for each method
+    # end for each resource
+%>\
+% if have_media_params:
+let upload_value_names = ["${MODE_ARG}", "${FILE_ARG}"];
+% endif
 let arg_data = [
 % for resource in sorted(c.rta_map.keys()):
 <% 
@@ -157,7 +172,6 @@ let arg_data = [
             mangle_subcommand(p.name),
             True,
             False,
-            None,
         ))
     # end for each required property
 
@@ -168,19 +182,16 @@ let arg_data = [
                 KEY_VALUE_ARG,
                 True,
                 True,
-                None
             ))
     # end request_value
 
     if mc.media_params:
-        upload_protocols = [mp.protocol for mp in mc.media_params]
         args.append((
                 UPLOAD_FLAG,
-                "Specify which file to upload",
+                "Specify the upload protocol (%s) and the file to upload" % '|'.join(mp.protocol for mp in mc.media_params),
                 MODE_ARG,
                 True,
-                False,
-                upload_protocols
+                True,
             ))
     # end upload handling
 
@@ -191,7 +202,6 @@ let arg_data = [
                 VALUE_ARG,
                 False,
                 True,
-                None
             ))
     # end paramters
     
@@ -202,29 +212,17 @@ let arg_data = [
                 OUT_ARG,
                 False,
                 False,
-                None
             ))
     # handle output
 %>\
     ("${mangle_subcommand(method)}",  ${rust_optional(mc.m.get('description'))}, 
           vec![
-            % for flag, desc, arg_name, required, multi, upload_protocols in args:
+            % for flag, desc, arg_name, required, multi in args:
             (${rust_optional(arg_name)},
              ${rust_optional(flag)},
              ${rust_optional(desc)},
              ${rust_optional(required)},
-             ${rust_optional(multi)},
-             % if not mc.media_params:
-             ## Make sure the type is set, even though we don't have any protocol information
-             % if loop.first:
-             None::${'<Vec<UploadProtocol>>'}\
-             % else:
-             None\
-             % endif
-             % else:
-             ${rust_optional(upload_protocols)}\
-             % endif
-),
+             ${rust_optional(multi)}),
             % if not loop.last:
 
             % endif
@@ -266,12 +264,14 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
             scmd = scmd.about(desc);
         }
 
-        for &(ref arg_name, ref flag, ref desc, ref required, ref multi, ref protocols) in args {
-            let mut arg = Arg::with_name(match (arg_name, flag) {
-                                                (&Some(an), _       ) => an,
-                                                (_        , &Some(f)) => f,
-                                                 _                    => unreachable!(),
-                                         });
+        for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+            let arg_name_str = 
+                match (arg_name, flag) {
+                        (&Some(an), _       ) => an,
+                        (_        , &Some(f)) => f,
+                         _                    => unreachable!(),
+                 };
+            let mut arg = Arg::with_name(arg_name_str);
             if let &Some(short_flag) = flag {
                 arg = arg.short(short_flag);
             }
@@ -287,20 +287,13 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
             if let &Some(multi) = multi {
                 arg = arg.multiple(multi);
             }
-            if let &Some(ref protocols) = protocols {
-                arg = arg.possible_values(protocols);
-                arg = arg.requires("${FILE_ARG}");
+            if arg_name_str == "${MODE_ARG}" {
+                arg = arg.number_of_values(2);
+                arg = arg.value_names(&upload_value_names);
 
-                scmd = scmd.arg(Arg::with_name("${FILE_ARG}")
-                                    .short("${FILE_FLAG}")
-                                    .required(true)
-                                    .requires("${MODE_ARG}")
-                                    .help("The file to upload")
-                                    .takes_value(true));
                 scmd = scmd.arg(Arg::with_name("${MIME_ARG}")
                                     .short("${MIME_FLAG}")
                                     .requires("${MODE_ARG}")
-                                    .requires("${FILE_ARG}")
                                     .required(false)
                                     .help("The file's mime time, like 'application/octet-stream'")
                                     .takes_value(true));
