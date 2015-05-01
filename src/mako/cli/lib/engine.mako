@@ -12,8 +12,6 @@
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
-    def to_opt_arg_ident(p):
-        return opt_value(p.name)
 
     def borrow_prefix(p):
         ptype = p.get('type', None)
@@ -174,7 +172,6 @@ if opt.is_present("${flag_name}") {
 <% 
     prop_name = mangle_ident(p.name)
     prop_type = activity_rust_type(c.schemas, p, allow_optionals=False)
-    opt_ident = to_opt_arg_ident(p)
 %>\
     % if is_request_value_property(mc, p):
 <% request_prop_type = prop_type %>\
@@ -186,7 +183,7 @@ for (arg_id, arg) in ${opt_values(mangle_subcommand(p.name))}.enumerate() {
     ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
 }
     % else:
-let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
+let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${mangle_subcommand(p.name)}>", "${p.type}");
     % endif # handle repeated values
     % endif # handle request value
 % endfor # each required parameter
@@ -198,7 +195,10 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_ident}, err, "<${mangle_sub
         borrow = borrow_prefix(p)
         arg_name = mangle_ident(p.name)
         if p.get('type', '') == 'string':
-            arg_name = to_opt_arg_ident(p)
+            if p.get('repeated', False):
+                arg_name = opt_values(p.name) + '.map(|&v| v.to_string()).collect::<Vec<String>>()'
+            else:
+                arg_name = opt_value(p.name)
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\

@@ -136,7 +136,7 @@ let arg_data = [
     methods = sorted(c.rta_map[resource])
 %>\
 <%block filter="indent_by(4)">\
-("${mangle_subcommand(resource)}", "supported subcommands: ${put_and(["'%s'" % mangle_subcommand(m) for m in methods])}", vec![
+("${mangle_subcommand(resource)}", "methods: ${put_and(["'%s'" % mangle_subcommand(m) for m in methods])}", vec![
     % for method in methods:
 <%
     mc = new_method_context(resource, method, c)
