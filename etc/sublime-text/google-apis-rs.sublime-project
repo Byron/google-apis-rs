@@ -14,5 +14,19 @@
 				"gen/doc"
 			],
 		},
-	]
+	],
+	 "SublimeLinter":
+    {
+        "linters":
+        {
+			"rust": {
+                "@disable": true,
+                "args": [],
+                "crate-root": null,
+                "excludes": [],
+                "use-cargo": true,
+                "use-crate-root": true
+            },
+        }
+    }
 }
