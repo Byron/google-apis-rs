@@ -800,7 +800,7 @@ else {
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url_str);
+                                dlg.store_upload_url(Some(url_str));
                             }
 
                             cmn::ResumableUploadHelper {
@@ -832,6 +832,7 @@ else {
                                 res = upload_result;
                                 if !res.status.is_success() {
                                     ## delegate was called in upload() already - don't tell him again
+                                    dlg.store_upload_url(None);
                                     ${delegate_finish}(false);
                                     return Err(Error::Failure(res))
                                 }

@@ -171,7 +171,10 @@ pub trait Delegate {
     /// Called after we have retrieved a new upload URL for a resumable upload to store it
     /// in case we fail or cancel. That way, we can attempt to resume the upload later, 
     /// see `upload_url()`.
-    fn store_upload_url(&mut self, url: &str) {
+    /// It will also be called with None after a successful upload, which allows the delegate
+    /// to forget the URL. That way, we will not attempt to resume an upload that has already
+    /// finished.
+    fn store_upload_url(&mut self, url: Option<&str>) {
         let _ = url;
     }
 
