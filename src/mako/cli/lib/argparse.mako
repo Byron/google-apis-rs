@@ -287,6 +287,7 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
             if let &Some(multi) = multi {
                 arg = arg.multiple(multi);
             }
+            % if have_media_params:
             if arg_name_str == "${MODE_ARG}" {
                 arg = arg.number_of_values(2);
                 arg = arg.value_names(&upload_value_names);
@@ -298,6 +299,7 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
                                     .help("The file's mime time, like 'application/octet-stream'")
                                     .takes_value(true));
             }
+            % endif
             scmd = scmd.arg(arg);
         }
         mcmd = mcmd.subcommand(scmd);
