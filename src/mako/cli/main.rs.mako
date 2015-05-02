@@ -21,6 +21,7 @@ extern crate yup_hyper_mock as mock;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate ${to_extern_crate_name(library_to_crate_name(library_name(name, version), make.depends_on_suffix))} as api;
 
 use std::env;

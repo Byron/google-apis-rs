@@ -27,6 +27,7 @@ cargo:
   is_executable: YES
   dependencies:
     - clap = "*"
+    - strsim = "*"
     - yup-hyper-mock = "*"
     - serde = ">= 0.3.0"
     - serde_macros = "*"

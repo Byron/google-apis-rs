@@ -8,7 +8,7 @@
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
-                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME)
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -259,7 +259,7 @@ ${value_unwrap}\
             call = call.${ADD_PARAM_FN}(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap})
         },
     % endif # handle global parameters
-        _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+        _ => err.issues.push(CLIError::UnknownParameter(key.to_string(), ${field_vec(global_parameter_names)})),
     }
 }
 % endif # handle call parameters
@@ -333,7 +333,7 @@ if dry_run {
 <%
     allow_optionals_fn = lambda s: is_schema_with_optionals(schema_markers(s, c, transitive=False))
 
-    def flatten_schema_fields(schema, res, init_fn_map, cur=list(), init_call=None):
+    def flatten_schema_fields(schema, res, init_fn_map, fields, cur=list(), init_call=None):
         if len(cur) == 0:
             init_call = ''
             cur = list()
@@ -345,6 +345,7 @@ if dry_run {
             opt_access = ''
         for fn, f in schema.fields.iteritems():
             cur.append(['%s%s' % (mangle_ident(fn), opt_access), fn])
+            fields.add(fn)
             if isinstance(f, SchemaEntry):
                 cur[-1][0] = mangle_ident(fn)
                 res.append((init_call, schema, f, list(cur)))
@@ -367,14 +368,15 @@ if dry_run {
                                
                     init_fn_map[init_fn_name] = init_fn
                 # end handle init
-                flatten_schema_fields(f, res, init_fn_map, cur, init_call)
+                flatten_schema_fields(f, res, init_fn_map, fields, cur, init_call)
             cur.pop()
         # endfor
     # end utility
 
     schema_fields = list()
     init_fn_map = dict()
-    flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map)
+    fields = set()
+    flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map, fields)
 %>\
 let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_cursor = FieldCursor::default();
@@ -443,7 +445,8 @@ ${opt_suffix}\
             },
         % endfor # each nested field
         _ => {
-            err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+            let suggestion = FieldCursor::did_you_mean(key, &${field_vec(sorted(fields))});
+            err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
         }
     }
 }

@@ -82,6 +82,10 @@ def new_method_context(resource, method, c):
     return MethodContext(m, response_schema, params, request_value, media_params, 
                          required_props, optional_props, part_prop)
 
+# Returns a string representing a string-vector of mangled names
+# fields is an iterator
+def field_vec(fields):
+    return "vec![%s]" % ', '.join('"%s"' % mangle_subcommand(f) for f in fields)
 
 def pretty(n):
     return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))

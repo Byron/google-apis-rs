@@ -178,7 +178,7 @@ let arg_data = [
     if mc.request_value:
         args.append((
                 STRUCT_FLAG,
-                "Set various fields of the request structure",
+                "Set various fields of the request structure, matching the key=value form",
                 KEY_VALUE_ARG,
                 True,
                 True,
@@ -198,7 +198,7 @@ let arg_data = [
     if mc.optional_props or parameters is not UNDEFINED:
         args.append((
                 PARAM_FLAG,
-                "Set various fields of the request structure",
+                "Set various optional parameters, matching the key=value form",
                 VALUE_ARG,
                 False,
                 True,
