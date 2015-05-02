@@ -10,21 +10,26 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Groups Migration* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/groups-migration/).
+
 # Usage
 
-This documentation was generated from the *Groups Migration* API at revision *20140416*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Groups Migration* API at revision *20140416*. The CLI is at version *0.2.0*.
 
 ```bash
-  groupsmigration1 [options] archive insert <group-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+groupsmigration1 [options]
+        archive
+                insert <group-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   groupsmigration1 --help
 
 All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_groupsmigration1_cli/index.html
+http://byron.github.io/google-apis-rs/google_groupsmigration1_cli
 
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

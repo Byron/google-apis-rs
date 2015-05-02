@@ -2,31 +2,31 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Groups Migration* crate version *0.1.6+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
-//! 
+//! This documentation was generated from *Groups Migration* crate version *0.1.7+20140416*, where *20140416* is the exact revision of the *groupsmigration:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
+//!
 //! Everything else about the *Groups Migration* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-migration/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1).
 //! # Features
-//! 
-//! Handle the following *Resources* with ease from the central [hub](struct.GroupsMigration.html) ... 
-//! 
+//!
+//! Handle the following *Resources* with ease from the central [hub](struct.GroupsMigration.html) ...
+//!
 //! * archive
 //!  * [*insert*](struct.ArchiveInsertCall.html)
-//! 
-//! 
+//!
+//!
 //! Upload supported by ...
-//! 
+//!
 //! * [*insert archive*](struct.ArchiveInsertCall.html)
-//! 
-//! 
-//! 
+//!
+//!
+//!
 //! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](../index.html).
-//! 
+//!
 //! # Structure of this Library
-//! 
+//!
 //! The API is structured into the following primary items:
-//! 
+//!
 //! * **[Hub](struct.GroupsMigration.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
@@ -39,39 +39,39 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
-//! 
+//!
 //! All *structures* are marked with applicable traits to further categorize them and ease browsing.
-//! 
+//!
 //! Generally speaking, you can invoke *Activities* like this:
-//! 
+//!
 //! ```Rust,ignore
 //! let r = hub.resource().activity(...).doit()
 //! ```
-//! 
+//!
 //! Or specifically ...
-//! 
+//!
 //! ```ignore
 //! let r = hub.archive().insert(...).doit()
 //! ```
-//! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//!
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
-//! 
+//!
 //! # Usage
-//! 
+//!
 //! ## Setting up your Project
-//! 
+//!
 //! To use this library, you would put the following lines into your `Cargo.toml` file:
-//! 
+//!
 //! ```toml
 //! [dependencies]
 //! google-groupsmigration1 = "*"
 //! ```
-//! 
+//!
 //! ## A complete example
-//! 
+//!
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
@@ -82,13 +82,13 @@
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 //! use groupsmigration1::GroupsMigration;
-//! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//!
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -100,7 +100,7 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.archive().insert("groupId")
 //!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
-//! 
+//!
 //! match result {
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
@@ -120,62 +120,61 @@
 //! # }
 //! ```
 //! ## Handling Errors
-//! 
-//! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of 
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//!
+//! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](trait.Delegate.html), or the [Authenticator Delegate](../yup-oauth2/trait.AuthenticatorDelegate.html).
-//! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//!
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
-//! 
+//!
 //! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
-//! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//!
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
-//! 
+//!
 //! ## Customization and Callbacks
-//! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](trait.Delegate.html) to the 
-//! [Method Builder](trait.CallBuilder.html) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//!
+//! You may alter the way an `doit()` method is called by providing a [delegate](trait.Delegate.html) to the
+//! [Method Builder](trait.CallBuilder.html) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
-//! 
+//!
 //! The [delegate trait](trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
-//! 
+//!
 //! ## Optional Parts in Server-Requests
-//! 
-//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//!
+//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
-//! 
+//!
 //! ## Builder Arguments
-//! 
+//!
 //! Using [method builders](trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 //! These will always take a single argument, for which the following statements are true.
-//! 
+//!
 //! * [PODs][wiki-pod] are handed by copy
 //! * strings are passed as `&str`
-//! * [request values](trait.RequestValue.html) are borrowed
-//! 
+//! * [request values](trait.RequestValue.html) are moved
+//!
 //! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
-//! 
+//!
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
-//! 
-//! 
-#![feature(std_misc)]
+//!
+//!
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
-// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
+// Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
 // Required for serde annotations
@@ -201,7 +200,10 @@ use std::io;
 use std::fs;
 use std::thread::sleep_ms;
 
-pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part, ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, Resource, ErrorResponse};
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error,
+              CallBuilder, Hub, ReadSeek, Part, ResponseResult,
+              RequestValue, NestedType, Delegate, DefaultDelegate,
+              MethodsBuilder, Resource, ErrorResponse};
 
 
 // ##############
@@ -305,7 +307,7 @@ impl<'a, C, A> GroupsMigration<C, A>
         GroupsMigration {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.6".to_string(),
+            _user_agent: "google-api-rust-client/0.1.7".to_string(),
         }
     }
 
@@ -314,7 +316,7 @@ impl<'a, C, A> GroupsMigration<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.6`.
+    /// It defaults to `google-api-rust-client/0.1.7`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -391,7 +393,7 @@ pub struct ArchiveMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ArchiveMethods<'a, C, A> {}
 
 impl<'a, C, A> ArchiveMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Inserts a new mail into the archive of the Google group.
@@ -465,10 +467,16 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Groups)>
-		where RS: ReadSeek {
+    fn doit<RS>(mut self,
+                mut reader: RS,
+                reader_mime_type: mime::Mime,
+                protocol: &'static str)
+                -> Result<(hyper::client::Response, Groups)>
+        where RS: ReadSeek
+    {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        use hyper::header::{ContentType, ContentLength, Authorization,
+                            UserAgent, Location};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
@@ -490,7 +498,7 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let (mut url, upload_type) = 
+        let (mut url, upload_type) =
             if protocol == "simple" {
                 ("https://www.googleapis.com/upload/groups/v1/groups/{groupId}/archive".to_string(), "multipart")
             } else if protocol == "resumable" {
@@ -527,7 +535,7 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 params.remove(index);
             }
         }
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
@@ -568,7 +576,7 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -626,7 +634,7 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url_str);
+                                dlg.store_upload_url(Some(url_str));
                             }
 
                             cmn::ResumableUploadHelper {
@@ -654,6 +662,7 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
                                     dlg.finished(false);
                                     return Err(Error::Failure(res))
                                 }
@@ -685,8 +694,12 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *max size*: 16MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'message/rfc822'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
-                where RS: ReadSeek {
+    pub fn upload<RS>(self,
+                      stream: RS,
+                      mime_type: mime::Mime)
+                      -> Result<(hyper::client::Response, Groups)>
+        where RS: ReadSeek
+    {
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
@@ -701,8 +714,12 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *max size*: 16MB
     /// * *multipart*: yes
     /// * *valid mime types*: 'message/rfc822'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Groups)>
-                where RS: ReadSeek {
+    pub fn upload_resumable<RS>(self,
+                                resumeable_stream: RS,
+                                mime_type: mime::Mime)
+                                -> Result<(hyper::client::Response, Groups)>
+        where RS: ReadSeek
+    {
         self.doit(resumeable_stream, mime_type, "resumable")
     }
 
@@ -744,7 +761,8 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C, A>
-                                                        where T: AsRef<str> {
+        where T: AsRef<str>
+    {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
@@ -760,11 +778,10 @@ impl<'a, C, A> ArchiveInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ArchiveInsertCall<'a, C, A> 
-                                                        where T: AsRef<str> {
+    pub fn add_scope<T>(mut self, scope: T) -> ArchiveInsertCall<'a, C, A>
+        where T: AsRef<str>
+    {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
     }
 }
-
-

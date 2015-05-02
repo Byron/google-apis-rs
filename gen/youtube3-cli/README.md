@@ -18,76 +18,98 @@ Everything else about the *YouTube* API can be found at the
 This documentation was generated from the *YouTube* API at revision *20150414*. The CLI is at version *0.2.0*.
 
 ```bash
-  youtube3 [options] activities insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] activities list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] captions delete <id> [-p <v>...]
-  youtube3 [options] captions download <id> [-p <v>...] [-o <out>]
-  youtube3 [options] captions insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  youtube3 [options] captions list <part> <video-id> [-p <v>...] [-o <out>]
-  youtube3 [options] captions update -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  youtube3 [options] channel-banners insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  youtube3 [options] channel-sections delete <id> [-p <v>...]
-  youtube3 [options] channel-sections insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] channel-sections list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] channel-sections update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] channels list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] channels update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] comment-threads insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] comment-threads list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] comment-threads update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] comments delete <id> [-p <v>...]
-  youtube3 [options] comments insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] comments list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] comments mark-as-spam <id> [-p <v>...]
-  youtube3 [options] comments set-moderation-status <id> <moderation-status> [-p <v>...]
-  youtube3 [options] comments update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] guide-categories list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] i18n-languages list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] i18n-regions list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts bind <id> <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts control <id> <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts delete <id> [-p <v>...]
-  youtube3 [options] live-broadcasts insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts transition <broadcast-status> <id> <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-broadcasts update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] live-streams delete <id> [-p <v>...]
-  youtube3 [options] live-streams insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] live-streams list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] live-streams update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] playlist-items delete <id> [-p <v>...]
-  youtube3 [options] playlist-items insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] playlist-items list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] playlist-items update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] playlists delete <id> [-p <v>...]
-  youtube3 [options] playlists insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] playlists list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] playlists update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] search list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] subscriptions delete <id> [-p <v>...]
-  youtube3 [options] subscriptions insert -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] subscriptions list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] thumbnails set <video-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  youtube3 [options] video-abuse-report-reasons list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] video-categories list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] videos delete <id> [-p <v>...]
-  youtube3 [options] videos get-rating <id> [-p <v>...] [-o <out>]
-  youtube3 [options] videos insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  youtube3 [options] videos list <part> [-p <v>...] [-o <out>]
-  youtube3 [options] videos rate <id> <rating> [-p <v>...]
-  youtube3 [options] videos report-abuse -r <kv>... [-p <v>...]
-  youtube3 [options] videos update -r <kv>... [-p <v>...] [-o <out>]
-  youtube3 [options] watermarks set <channel-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...]
-  youtube3 [options] watermarks unset <channel-id> [-p <v>...]
+youtube3 [options]
+        activities
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+        captions
+                delete <id> [-p <v>]...
+                download <id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <part> <video-id> [-p <v>]... [-o <out>]
+                update (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        channel-banners
+                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        channel-sections
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        channels
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        comment-threads
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        comments
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                mark-as-spam <id> [-p <v>]...
+                set-moderation-status <id> <moderation-status> [-p <v>]...
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        guide-categories
+                list <part> [-p <v>]... [-o <out>]
+        i18n-languages
+                list <part> [-p <v>]... [-o <out>]
+        i18n-regions
+                list <part> [-p <v>]... [-o <out>]
+        live-broadcasts
+                bind <id> <part> [-p <v>]... [-o <out>]
+                control <id> <part> [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                transition <broadcast-status> <id> <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        live-streams
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        playlist-items
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        playlists
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        search
+                list <part> [-p <v>]... [-o <out>]
+        subscriptions
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+        thumbnails
+                set <video-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        video-abuse-report-reasons
+                list <part> [-p <v>]... [-o <out>]
+        video-categories
+                list <part> [-p <v>]... [-o <out>]
+        videos
+                delete <id> [-p <v>]...
+                get-rating <id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <part> [-p <v>]... [-o <out>]
+                rate <id> <rating> [-p <v>]...
+                report-abuse (-r <kv>)... [-p <v>]...
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        watermarks
+                set <channel-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]...
+                unset <channel-id> [-p <v>]...
   youtube3 --help
 
 All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_youtube3_cli/index.html
+http://byron.github.io/google-apis-rs/google_youtube3_cli
 
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

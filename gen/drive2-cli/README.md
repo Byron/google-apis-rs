@@ -10,79 +10,96 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *drive* API can be found at the
+[official documentation site](https://developers.google.com/drive/).
+
 # Usage
 
-This documentation was generated from the *drive* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *drive* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  drive2 [options] about get [-p <v>...] [-o <out>]
-  drive2 [options] apps get <app-id> [-p <v>...] [-o <out>]
-  drive2 [options] apps list [-p <v>...] [-o <out>]
-  drive2 [options] changes get <change-id> [-p <v>...] [-o <out>]
-  drive2 [options] changes list [-p <v>...] [-o <out>]
-  drive2 [options] changes watch -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] channels stop -r <kv>... [-p <v>...]
-  drive2 [options] children delete <folder-id> <child-id> [-p <v>...]
-  drive2 [options] children get <folder-id> <child-id> [-p <v>...] [-o <out>]
-  drive2 [options] children insert <folder-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] children list <folder-id> [-p <v>...] [-o <out>]
-  drive2 [options] comments delete <file-id> <comment-id> [-p <v>...]
-  drive2 [options] comments get <file-id> <comment-id> [-p <v>...] [-o <out>]
-  drive2 [options] comments insert <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] comments list <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] comments patch <file-id> <comment-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] comments update <file-id> <comment-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] files copy <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] files delete <file-id> [-p <v>...]
-  drive2 [options] files empty-trash [-p <v>...]
-  drive2 [options] files get <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] files insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  drive2 [options] files list [-p <v>...] [-o <out>]
-  drive2 [options] files patch <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] files touch <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] files trash <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] files untrash <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] files update <file-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  drive2 [options] files watch <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] parents delete <file-id> <parent-id> [-p <v>...]
-  drive2 [options] parents get <file-id> <parent-id> [-p <v>...] [-o <out>]
-  drive2 [options] parents insert <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] parents list <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] permissions delete <file-id> <permission-id> [-p <v>...]
-  drive2 [options] permissions get <file-id> <permission-id> [-p <v>...] [-o <out>]
-  drive2 [options] permissions get-id-for-email <email> [-p <v>...] [-o <out>]
-  drive2 [options] permissions insert <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] permissions list <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] permissions patch <file-id> <permission-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] permissions update <file-id> <permission-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] properties delete <file-id> <property-key> [-p <v>...]
-  drive2 [options] properties get <file-id> <property-key> [-p <v>...] [-o <out>]
-  drive2 [options] properties insert <file-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] properties list <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] properties patch <file-id> <property-key> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] properties update <file-id> <property-key> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] realtime get <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] realtime update <file-id> -u (simple|resumable) <file> <mime> [-p <v>...]
-  drive2 [options] replies delete <file-id> <comment-id> <reply-id> [-p <v>...]
-  drive2 [options] replies get <file-id> <comment-id> <reply-id> [-p <v>...] [-o <out>]
-  drive2 [options] replies insert <file-id> <comment-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] replies list <file-id> <comment-id> [-p <v>...] [-o <out>]
-  drive2 [options] replies patch <file-id> <comment-id> <reply-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] replies update <file-id> <comment-id> <reply-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] revisions delete <file-id> <revision-id> [-p <v>...]
-  drive2 [options] revisions get <file-id> <revision-id> [-p <v>...] [-o <out>]
-  drive2 [options] revisions list <file-id> [-p <v>...] [-o <out>]
-  drive2 [options] revisions patch <file-id> <revision-id> -r <kv>... [-p <v>...] [-o <out>]
-  drive2 [options] revisions update <file-id> <revision-id> -r <kv>... [-p <v>...] [-o <out>]
+drive2 [options]
+        about
+                get [-p <v>]... [-o <out>]
+        apps
+                get <app-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        changes
+                get <change-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                watch (-r <kv>)... [-p <v>]... [-o <out>]
+        channels
+                stop (-r <kv>)... [-p <v>]...
+        children
+                delete <folder-id> <child-id> [-p <v>]...
+                get <folder-id> <child-id> [-p <v>]... [-o <out>]
+                insert <folder-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <folder-id> [-p <v>]... [-o <out>]
+        comments
+                delete <file-id> <comment-id> [-p <v>]...
+                get <file-id> <comment-id> [-p <v>]... [-o <out>]
+                insert <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+                patch <file-id> <comment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <file-id> <comment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        files
+                copy <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <file-id> [-p <v>]...
+                empty-trash [-p <v>]...
+                get <file-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                touch <file-id> [-p <v>]... [-o <out>]
+                trash <file-id> [-p <v>]... [-o <out>]
+                untrash <file-id> [-p <v>]... [-o <out>]
+                update <file-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                watch <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        parents
+                delete <file-id> <parent-id> [-p <v>]...
+                get <file-id> <parent-id> [-p <v>]... [-o <out>]
+                insert <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+        permissions
+                delete <file-id> <permission-id> [-p <v>]...
+                get <file-id> <permission-id> [-p <v>]... [-o <out>]
+                get-id-for-email <email> [-p <v>]... [-o <out>]
+                insert <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+                patch <file-id> <permission-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <file-id> <permission-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        properties
+                delete <file-id> <property-key> [-p <v>]...
+                get <file-id> <property-key> [-p <v>]... [-o <out>]
+                insert <file-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+                patch <file-id> <property-key> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <file-id> <property-key> (-r <kv>)... [-p <v>]... [-o <out>]
+        realtime
+                get <file-id> [-p <v>]... [-o <out>]
+                update <file-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]...
+        replies
+                delete <file-id> <comment-id> <reply-id> [-p <v>]...
+                get <file-id> <comment-id> <reply-id> [-p <v>]... [-o <out>]
+                insert <file-id> <comment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <file-id> <comment-id> [-p <v>]... [-o <out>]
+                patch <file-id> <comment-id> <reply-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <file-id> <comment-id> <reply-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        revisions
+                delete <file-id> <revision-id> [-p <v>]...
+                get <file-id> <revision-id> [-p <v>]... [-o <out>]
+                list <file-id> [-p <v>]... [-o <out>]
+                patch <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
   drive2 --help
 
 All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_drive2_cli/index.html
+http://byron.github.io/google-apis-rs/google_drive2_cli
 
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 
