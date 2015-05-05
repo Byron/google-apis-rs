@@ -259,7 +259,7 @@ ${value_unwrap}\
             call = call.${ADD_PARAM_FN}(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap})
         },
     % endif # handle global parameters
-        _ => err.issues.push(CLIError::UnknownParameter(key.to_string(), ${field_vec(global_parameter_names)})),
+        _ => err.issues.push(CLIError::UnknownParameter(key.to_string(), ${field_vec(global_parameter_names + [p.name for p in optional_props])})),
     }
 }
 % endif # handle call parameters
