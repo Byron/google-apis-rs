@@ -47,6 +47,8 @@ Must be one of the following:
 * **test**: Adding missing tests
 * **chore**: Changes to the build process or auxiliary tools and libraries such as documentation
   generation
+* **imp**: An improvement to an existing feature, which faces the user. For internal improvements,
+  use the *refactor* type
 
 ### Scope
 The scope could be anything specifying place of the commit change. For example `$location`,
