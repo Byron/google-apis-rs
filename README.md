@@ -31,6 +31,7 @@ Click the image below to see the playlist with all project related content:
 Each episode sums up one major step in project development:
 
 * [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
+* [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
 
 # Build Instructions
 
