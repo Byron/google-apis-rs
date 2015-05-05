@@ -1,2 +1,5 @@
 [clog]
 repository = "https://github.com/Byron/google-apis-rs"
+
+[sections]
+Improvements = ["imp"]
