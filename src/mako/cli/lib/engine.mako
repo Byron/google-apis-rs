@@ -19,6 +19,12 @@
         if (ptype not in POD_TYPES or ptype is None or p.get('repeated', False)) and ptype is not None:
             borrow = '&'
         return borrow
+
+    def gen_global_parameter_names(parameters):
+        if parameters is not UNDEFINED:
+            return [pn for pn in sorted(parameters.keys())]
+        else:
+            return list()
 %>\
 <%def name="new(c)">\
 <%
@@ -43,6 +49,8 @@ enum DoitError {
 struct Engine<'n, 'a> {
     opt: ArgMatches<'n, 'a>,
     hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: ${"Vec<&'static str>"},
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
@@ -117,9 +125,16 @@ impl<'n, 'a> Engine<'n, 'a> {
 
         let client = 
             ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
+<% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
             opt: opt,
             hub: ${hub_type_name}::new(client, auth),
+            gp: ${field_vec(gpm)},
+            gpm: vec![
+                % for pn in list(pn for pn in gpm if mangle_subcommand(pn) != pn):
+                    ("${mangle_subcommand(pn)}", "${pn}"),
+                % endfor # each global parameter
+                ]
         };
 
         match engine._doit(true) {
@@ -156,17 +171,15 @@ if opt.is_present("${flag_name}") {
     optional_props = [p for p in mc.optional_props if not p.get('skip_example', False)]
     optional_prop_names = set(p.name for p in optional_props)
 
-    global_parameter_names = set()
     track_download_flag = (not mc.media_params and
                            supports_media_download and 
                           (parameters is not UNDEFINED and 'alt' in parameters) or ('alt' in optional_prop_names))
-    if parameters is not UNDEFINED:
-        global_parameter_names = list(pn for pn in sorted(parameters.keys()) if pn not in optional_prop_names)
     handle_props = optional_props or parameters is not UNDEFINED
     if mc.request_value:
         request_cli_schema = to_cli_schema(c, mc.request_value)
 
     request_prop_type = None
+    global_parameter_names = gen_global_parameter_names(parameters)
 %>\
     ## REQUIRED PARAMETERS
 % for p in mc.required_props:
@@ -231,35 +244,31 @@ ${value_unwrap}\
 );
         },
 % endfor # each property
-    % if parameters is not UNDEFINED:
-    % for pn in global_parameter_names:
-        \
-    % if not loop.first:
-|\
-    % endif
-"${mangle_subcommand(pn)}"\
-    % if not loop.last:
-
-    % endif
-    % endfor # each global parameter
- => {
+        _ => {
 <%
     value_unwrap = 'value.unwrap_or("unset")'
 %>\
-    % if track_download_flag and 'alt' in global_parameter_names:
-            if key == "alt" && ${value_unwrap} == "media" {
-                download_mode = true;
+            let mut found = false;
+            for param in &self.gp {
+                if key == *param {
+                    % if track_download_flag and 'alt' in global_parameter_names:
+                    if key == "alt" && ${value_unwrap} == "media" {
+                        download_mode = true;
+                    }
+                    % endif
+                    found = true;
+                    call = call.${ADD_PARAM_FN}(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap});
+                    break;
+                }
             }
-    % endif
-            let map = [
-            % for pn in list(pn for pn in global_parameter_names if mangle_subcommand(pn) != pn):
-                ("${mangle_subcommand(pn)}", "${pn}"),
-            % endfor # each global parameter
-            ];
-            call = call.${ADD_PARAM_FN}(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, ${value_unwrap})
-        },
-    % endif # handle global parameters
-        _ => err.issues.push(CLIError::UnknownParameter(key.to_string(), ${field_vec(global_parameter_names + [p.name for p in optional_props])})),
+            if !found {
+                err.issues.push(CLIError::UnknownParameter(key.to_string(), {   
+                                                    let mut v = Vec::new();
+                                                    v.extend(self.gp.iter().cloned()); 
+                                                    v.extend(${field_vec(optional_prop_names)}.iter().cloned()); 
+                                                    v }));
+            }
+        }
     }
 }
 % endif # handle call parameters
