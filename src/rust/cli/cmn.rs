@@ -37,9 +37,11 @@ pub enum CallType {
     Standard,
 }
 
-pub enum UploadProtocol {
-    Simple,
-    Resumable,
+arg_enum!{
+    pub enum UploadProtocol {
+        Simple,
+        Resumable
+    }
 }
 
 impl AsRef<str> for UploadProtocol {
@@ -57,18 +59,6 @@ impl AsRef<str> for CallType {
             CallType::Upload(ref proto) => proto.as_ref(),
             CallType::Standard => "standard-request"
         }
-    }
-}
-
-impl FromStr for UploadProtocol {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<UploadProtocol, String> {
-        match s {
-            "simple" => Ok(UploadProtocol::Simple),
-            "resumable" => Ok(UploadProtocol::Resumable),
-            _ => Err(format!("Protocol '{}' is unknown", s)),
-        }        
     }
 }
 
@@ -210,7 +200,7 @@ pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap:
     }
 }
 
-pub fn protocol_from_str(name: &str, valid_protocols: Vec<String>, err: &mut InvalidOptionsError) -> CallType {
+pub fn calltype_from_str(name: &str, valid_protocols: Vec<String>, err: &mut InvalidOptionsError) -> CallType {
     CallType::Upload(
         match UploadProtocol::from_str(name) {
             Ok(up) => up,

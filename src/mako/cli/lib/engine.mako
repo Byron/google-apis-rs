@@ -32,7 +32,7 @@
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          protocol_from_str};
+          calltype_from_str};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -272,7 +272,7 @@ ${value_unwrap}\
 % endif # handle call parameters
 % if mc.media_params:
 let vals = opt.values_of("${MODE_ARG}").unwrap();
-let protocol = protocol_from_str(vals[0], [${', '.join('"%s"' % mp.protocol for mp in mc.media_params)}].iter().map(|&v| v.to_string()).collect(), err);
+let protocol = calltype_from_str(vals[0], [${', '.join('"%s"' % mp.protocol for mp in mc.media_params)}].iter().map(|&v| v.to_string()).collect(), err);
 let mut input_file = input_file_from_opts(vals[1], err);
 let mime_type = input_mime_from_opts(${opt_value(MIME_ARG, default=DEFAULT_MIME)}, err);
 % else:
