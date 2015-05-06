@@ -8,7 +8,7 @@
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
-                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec)
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -262,11 +262,9 @@ ${value_unwrap}\
                 }
             }
             if !found {
-                err.issues.push(CLIError::UnknownParameter(key.to_string(), {   
-                                                    let mut v = Vec::new();
-                                                    v.extend(self.gp.iter().cloned()); 
-                                                    v.extend(${field_vec(optional_prop_names)}.iter().cloned()); 
-                                                    v }));
+                err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                        Vec::new() + &self.gp + &[${comma_sep_fields(optional_prop_names)}]
+                                                    ));
             }
         }
     }
