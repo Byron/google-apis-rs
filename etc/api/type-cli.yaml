@@ -26,8 +26,12 @@ cargo:
   keywords: [cli]
   is_executable: YES
   dependencies:
-    - clap = "*"
     - strsim = "*"
     - yup-hyper-mock = "*"
     - serde = ">= 0.3.0"
     - serde_macros = "*"
+    - |
+      [dependencies.clap]
+      version = "*"
+      features = ["suggestions"]
+      default-features = false
