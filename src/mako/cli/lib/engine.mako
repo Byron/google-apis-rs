@@ -32,7 +32,7 @@
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str};
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -318,7 +318,9 @@ if dry_run {
             if !download_mode {
             % endif
             % if mc.response_schema:
-            serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+            let mut value = json::value::to_value(&output_schema);
+            remove_json_null_values(&mut value);
+            serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
             % endif
             % if track_download_flag:
             } else {

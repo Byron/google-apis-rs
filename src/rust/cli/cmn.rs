@@ -17,6 +17,29 @@ use std::default::Default;
 
 const FIELD_SEP: char = '.';
 
+// Based on @erickt user comment. Thanks for the idea !
+// Remove all keys whose values are null from given value (changed in place)
+pub fn remove_json_null_values(value: &mut json::value::Value) {
+    match *value {
+        json::value::Value::Object(ref mut map) => {
+            let mut for_removal = Vec::new();
+
+            for (key, mut value) in map.iter_mut() {
+                if value.is_null() {
+                    for_removal.push(key.clone());
+                } else {
+                    remove_json_null_values(&mut value);
+                }
+            }
+
+            for key in &for_removal {
+                map.remove(key);
+            }
+        }
+        _ => {}
+    }
+}
+
 fn did_you_mean<'a>(v: &str, possible_values: &[&'a str]) -> Option<&'a str> {
 
     let mut candidate: Option<(f64, &str)> = None;
