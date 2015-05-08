@@ -663,7 +663,18 @@ else {
 
         % if request_value:
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
+                io::Cursor::new(json_tools::TokenReader::new(
+                                    json_tools::FilterTypedKeyValuePairs::new(
+                                        json_tools::Lexer::new(
+                                                json_cache.bytes(), 
+                                                json_tools::BufferType::Span),
+                                        json_tools::TokenType::Null),
+                                        Some(&json_cache)).bytes().filter_map(|v|v.ok()).collect::${'<Vec<u8>>'}()
+                                )
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
         % endif

@@ -27,3 +27,4 @@ cargo:
     - url = "*"
     - serde = ">= 0.3.0"
     - serde_macros = "*"
+    - json-tools = "*"

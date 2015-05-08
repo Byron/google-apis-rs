@@ -31,4 +31,3 @@ cargo:
     - serde = ">= 0.3.0"
     - serde_macros = "*"
     - clap = "*"
-    - json-tools = "*"
