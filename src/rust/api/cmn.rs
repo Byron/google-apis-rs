@@ -136,7 +136,7 @@ pub trait Delegate {
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
     ///
     /// Return retry information.
-    fn http_error(&mut self, &hyper::HttpError) -> Retry {
+    fn http_error(&mut self, &hyper::Error) -> Retry {
         Retry::Abort
     }
 
@@ -248,7 +248,7 @@ impl Delegate for DefaultDelegate {}
 #[derive(Debug)]
 pub enum Error {
     /// The http connection failed
-    HttpError(hyper::HttpError),
+    HttpError(hyper::Error),
 
     /// An attempt was made to upload a resource with size stored in field `.0`
     /// even though the maximum upload size is what is stored in field `.1`.
@@ -587,7 +587,7 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
 impl<'a, A> ResumableUploadHelper<'a, A>
     where A: oauth2::GetToken {
 
-    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::HttpResult<hyper::client::Response>> {
+    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::Result<hyper::client::Response>> {
         loop {
             match self.client.post(self.url)
                 .header(UserAgent(self.user_agent.to_string()))
@@ -623,7 +623,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
     /// returns None if operation was cancelled by delegate, or the HttpResult.
     /// It can be that we return the result just because we didn't understand the status code -
     /// caller should check for status himself before assuming it's OK to use
-    pub fn upload(&mut self) -> Option<hyper::HttpResult<hyper::client::Response>> {
+    pub fn upload(&mut self) -> Option<hyper::Result<hyper::client::Response>> {
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status() {
