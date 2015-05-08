@@ -483,6 +483,9 @@ match result {
         % if URL_ENCODE in special_cases:
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
+        % if request_value:
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs};
+        % endif
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -666,14 +669,16 @@ else {
         let mut request_value_reader = 
             {
                 let json_cache = json::to_string(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
-                io::Cursor::new(json_tools::TokenReader::new(
-                                    json_tools::FilterTypedKeyValuePairs::new(
-                                        json_tools::Lexer::new(
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut TokenReader::new(
+                                    FilterTypedKeyValuePairs::new(
+                                        Lexer::new(
                                                 json_cache.bytes(), 
-                                                json_tools::BufferType::Span),
-                                        json_tools::TokenType::Null),
-                                        Some(&json_cache)).bytes().filter_map(|v|v.ok()).collect::${'<Vec<u8>>'}()
-                                )
+                                                BufferType::Span),
+                                        TokenType::Null),
+                                        Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
             };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
