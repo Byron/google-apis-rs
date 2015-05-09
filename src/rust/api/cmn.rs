@@ -291,8 +291,20 @@ impl Display for Error {
                 writeln!(f, "The application's API key was not found in the configuration").ok();
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
-            Error::BadRequest(ref err) 
-                => writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message),
+            Error::BadRequest(ref err) => {
+                try!(writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message));
+                for err in err.error.errors.iter() {
+                    try!(writeln!(f, "    {}: {}, {}{}", 
+                                            err.domain, 
+                                            err.message, 
+                                            err.reason,
+                                            match &err.location {
+                                                &Some(ref loc) => format!("@{}", loc),
+                                                &None => String::new(),
+                                            }));
+                }
+                Ok(())
+            },
             Error::MissingToken(ref err) =>
                 writeln!(f, "Token retrieval failed with error: {}", err),
             Error::Cancelled => 
