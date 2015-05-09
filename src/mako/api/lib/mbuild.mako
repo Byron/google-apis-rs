@@ -484,7 +484,7 @@ match result {
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
         % if request_value:
-        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs};
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         % endif
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
@@ -670,13 +670,9 @@ else {
             {
                 let json_cache = json::to_string(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
                 let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
-                io::copy(&mut TokenReader::new(
-                                    FilterTypedKeyValuePairs::new(
-                                        Lexer::new(
-                                                json_cache.bytes(), 
-                                                BufferType::Span),
-                                        TokenType::Null),
-                                        Some(&json_cache)), &mut mem_dst).unwrap();
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
                 mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
                 mem_dst
             };
