@@ -6,7 +6,7 @@
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
                      CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG, 
-                     CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG)
+                     CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG, subcommand_md_filename)
 
     def rust_boolean(v):
         return v and 'true' or 'false'
@@ -60,9 +60,6 @@ ${util.program_name()} [options]
 % endfor # end for each resource
   ${util.program_name()} --help
 
-All documentation details can be found at
-${cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, version, make, check_exists=False))}
-
 Configuration:
 % if supports_scopes(auth):
   [--${SCOPE_FLAG} <${SCOPE_ARG}>]...
@@ -86,8 +83,9 @@ Configuration:
 
 <%def name="new(c)" buffered="True">\
 <%
-    url_info = "All documentation details can be found at " + \
-                cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, version, make, check_exists=False))
+    doc_url_base = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, 
+                                                                        version, make, check_exists=False))
+    url_info = "All documentation details can be found at " + doc_url_base
 
     # list of tuples
     # (0) = long name
@@ -208,14 +206,16 @@ let arg_data = [
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append((
                 OUTPUT_FLAG,
-                "Specify the file into which to write the programs output",
+                "Specify the file into which to write the program's output",
                 OUT_ARG,
                 False,
                 False,
             ))
     # handle output
 %>\
-    ("${mangle_subcommand(method)}",  ${rust_optional(mc.m.get('description'))}, 
+    ("${mangle_subcommand(method)}",  
+            ${rust_optional(mc.m.get('description'))},
+            "Details at ${doc_url_base}/${os.path.splitext(subcommand_md_filename(resource, method))[0]}",
           vec![
             % for flag, desc, arg_name, required, multi in args:
             (${rust_optional(arg_name)},
@@ -258,11 +258,12 @@ let mut app = App::new("${util.program_name()}")
 for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
     let mut mcmd = SubCommand::new(main_command_name).about(about);
 
-    for &(sub_command_name, ref desc, ref args) in subcommands {
+    for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
         let mut scmd = SubCommand::new(sub_command_name);
         if let &Some(desc) = desc {
             scmd = scmd.about(desc);
         }
+        scmd = scmd.after_help(url_info);
 
         for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
             let arg_name_str = 
