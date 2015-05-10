@@ -1,7 +1,7 @@
 <%
     import os
     import yaml
-    from util import (gen_crate_dir, api_index, crates_io_url, program_name)
+    from util import (gen_crate_dir, api_index, crates_io_url, program_name, program_download_url)
 
     title = 'Google Service Documentation for Rust'
 
@@ -55,24 +55,24 @@ DO NOT EDIT !
         <% 
             has_any_index = False
             type_names = list()
-            for api_name, ad in tc.iteritems():
+            for program_type, ad in tc.iteritems():
                 if api_index(DOC_ROOT, an, v, ad.make):
                     has_any_index = True
-                    type_names.append(api_name)
+                    type_names.append(program_type)
             # end for each type
         %>\
         % if not has_any_index:
             <% continue %>\
         % endif
         <span class="text">${an} ${v} (
-        % for api_name in type_names:
-            <% ad = tc[api_name] %>
+        % for program_type in type_names:
+            <% ad = tc[program_type] %>
             <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
-            % if api_name == 'api':
+            % if program_type == 'api':
             <a href="${crates_io_url(an, v)}"><img src="${html_index.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
             % else:
             % for os_name in ('ubuntu', 'osx'):
-            <a href="${html_index.download_base_url + '/google.rs/%s/%s/%s/%s' % (api_name, ad.cargo.build_version, os_name, program_name(an, v))}"><img src="${html_index.asset_urls.get('%s_img' % os_name)}" title="Download the pre-compiled 64bit program for ${os_name}" height="16" width="16"/></a>
+            <a href="${program_download_url(html_index.download_base_url, program_type, ad.cargo.build_version, os_name, an, v)}"><img src="${html_index.asset_urls.get('%s_img' % os_name)}" title="Download the pre-compiled 64bit program for ${os_name}" height="16" width="16"/></a>
             % endfor ## each os
             % endif
             % if not loop.last:
