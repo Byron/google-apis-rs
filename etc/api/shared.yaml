@@ -17,6 +17,9 @@ make:
   types:
     - api
     - cli
+html_index:
+  asset_urls:
+    crates_img: https://raw.githubusercontent.com/rust-lang/crates.io/master/public/favicon.ico
 directories:
   # directory under which all generated sources should reside
   output: gen

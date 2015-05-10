@@ -1,7 +1,7 @@
 <%
     import os
     import yaml
-    from util import (gen_crate_dir, api_index)
+    from util import (gen_crate_dir, api_index, crates_io_url)
 
     title = 'Google Service Documentation for Rust'
 
@@ -68,6 +68,9 @@ DO NOT EDIT !
         % for api_name in type_names:
             <% ad = tc[api_name] %>
             <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
+            % if api_name == 'api':
+            <a href="${crates_io_url(an, v)}"><img src="${html_index.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
+            % endif
             % if not loop.last:
 , 
             % endif

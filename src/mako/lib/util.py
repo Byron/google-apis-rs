@@ -832,6 +832,9 @@ def to_extern_crate_name(crate_name):
 def gen_crate_dir(name, version, ti):
     return to_extern_crate_name(library_to_crate_name(library_name(name, version), ti.target_suffix))
 
+def crates_io_url(name, version):
+    return "https://crates.io/crates/%s" % library_to_crate_name(library_name(name, version))
+
 def api_index(DOC_ROOT, name, version, ti, check_exists=True):
     crate_dir = gen_crate_dir(name, version, ti)
     if ti.documentation_engine == 'rustdoc':
