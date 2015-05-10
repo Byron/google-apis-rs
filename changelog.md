@@ -1,5 +1,71 @@
-<a name="v0.1.6"></a>
-## v0.1.6 (2015-05-02)
+<a name="api-v0.1.7"></a>
+## api-v0.1.7 (2015-05-10)
+
+
+#### Improvements
+
+* **CLI**  remove null in pretty-printed json ([5894c816](https://github.com/Byron/google-apis-rs/commit/5894c8163afa9f9d9bed592e7e41912c77cf993d), closes [#102](https://github.com/Byron/google-apis-rs/issues/102))
+* **index.html**  DL title contains os-name ([69b12104](https://github.com/Byron/google-apis-rs/commit/69b12104a9f9579773553825f63c321e7d1a6899))
+* **API**
+  *  improved display of BadRequest ([e86e55ca](https://github.com/Byron/google-apis-rs/commit/e86e55cae788506a2280816009b8620bad091477), closes [#103](https://github.com/Byron/google-apis-rs/issues/103))
+  *  faster null-value removal ([26314e74](https://github.com/Byron/google-apis-rs/commit/26314e743e2c4f38eb6c5824bf51209099000f9f))
+
+#### Features
+
+* **clap**
+  *  implement -u as good as possible ([656fcae2](https://github.com/Byron/google-apis-rs/commit/656fcae2b481ac90254bf5e3081d2bbd659d5232))
+  *  parse structure and build App ([db4624b4](https://github.com/Byron/google-apis-rs/commit/db4624b46728379393372be40b1ce731fe8f28b4), closes [#87](https://github.com/Byron/google-apis-rs/issues/87))
+  *  initial version of command generation ([b39bc3a9](https://github.com/Byron/google-apis-rs/commit/b39bc3a9cd165db8f9ea3fa536697ca80d36628e))
+  *  setup infrastructure ([988d37f0](https://github.com/Byron/google-apis-rs/commit/988d37f0dfaf8a1725bf92364e965c1f32e6802f))
+* **CLI**
+  *  did you mean for struct values ([96415d17](https://github.com/Byron/google-apis-rs/commit/96415d17ca383ba0653fb4df23df1ebe27d57f55), closes [#67](https://github.com/Byron/google-apis-rs/issues/67))
+  *  `-u <mode> <file>` parsing ([75b80de3](https://github.com/Byron/google-apis-rs/commit/75b80de3c644a1487358561810c7c56bad8cca1d), closes [#92](https://github.com/Byron/google-apis-rs/issues/92))
+  *  adjust to serde usage in `yup-oauth` ([894b5b5e](https://github.com/Byron/google-apis-rs/commit/894b5b5ec7bf7cb027ba31bf83c40f27e0ab51bd), closes [#93](https://github.com/Byron/google-apis-rs/issues/93))
+* **index.html**
+  * added download links (osx,ubuntu) ([52027c6d](https://github.com/Byron/google-apis-rs/commit/52027c6db59c2952f61ee03204fd947277d0cc62), closes [#106](https://github.com/Byron/google-apis-rs/issues/106))
+  *  added back-link to crates.io ([0e6605d7](https://github.com/Byron/google-apis-rs/commit/0e6605d7a4ee59e16d52fd93e037b5608fd5f61f), closes [#105](https://github.com/Byron/google-apis-rs/issues/105))
+* **deploy**
+  *  simple linux deployment script ([36513f10](https://github.com/Byron/google-apis-rs/commit/36513f101e0c3299513fe1bf542c7fc7c492e771))
+  *  simple osx deploy script ([c2483019](https://github.com/Byron/google-apis-rs/commit/c248301951cc1266136e2ab7b6c6f5cc54d86164))
+
+#### Bug Fixes
+
+* **CLI**
+  *  completed list of parameter names ([9274938f](https://github.com/Byron/google-apis-rs/commit/9274938f9f69ecab2e8cb975467860f41466ad1d))
+  *  added latest reference CLI code ([d2a4e2ff](https://github.com/Byron/google-apis-rs/commit/d2a4e2ff8b16cb848869cc07b6c5a9107fb0a929))
+  *  gate usage of `upload_media_params` ([89432cc6](https://github.com/Byron/google-apis-rs/commit/89432cc64600ba0711e412c6cf6b1e06e2f11102))
+  *  handle repeated required strings ([bf6a2ba6](https://github.com/Byron/google-apis-rs/commit/bf6a2ba60c364e7c30de198d335e481c0b3206f0), closes [#96](https://github.com/Byron/google-apis-rs/issues/96))
+  *  'about()' text for main commands ([153324eb](https://github.com/Byron/google-apis-rs/commit/153324ebccf8a7846d9669f16c8f3ea52f0ec810), closes [#95](https://github.com/Byron/google-apis-rs/issues/95))
+  *  adjust `JsonTokenStorage` to yup-oauth ([94c821e0](https://github.com/Byron/google-apis-rs/commit/94c821e09d2b75756dd3dfa2d5f508b079413cf1))
+  *  unified error handling ([2f200217](https://github.com/Byron/google-apis-rs/commit/2f200217f942aa0317186811dbbe95d675a17ab0), closes [#66](https://github.com/Byron/google-apis-rs/issues/66))
+  *  escape subcommand descriptions ([fac50418](https://github.com/Byron/google-apis-rs/commit/fac50418a7156b1b2fa958008691dbb2f6cbb756))
+* **API**
+  *  filter null values of requrest structs ([3efa4f2b](https://github.com/Byron/google-apis-rs/commit/3efa4f2b12219412cdabf8535e03974b94f71af5))
+  *  simplified call to form_urlencode ([b27c990d](https://github.com/Byron/google-apis-rs/commit/b27c990db8a8701e2814e77136a34689be56c623))
+  *  let delegate forget uploaded urls ([c346645f](https://github.com/Byron/google-apis-rs/commit/c346645fc96abf9831ce723bb56e26f95e3c5b45), closes [#85](https://github.com/Byron/google-apis-rs/issues/85))
+  *  remove unused std_misc feature ([d46c0839](https://github.com/Byron/google-apis-rs/commit/d46c083975201a6a4804fde9d4cec6ae0fc29479))
+  *  adjust to latest hyper header macros ([4115d50c](https://github.com/Byron/google-apis-rs/commit/4115d50ca795ec2a2958f5f75b7681cb9f84720b))
+  *  exclude cloudsearch from build ([de85fb43](https://github.com/Byron/google-apis-rs/commit/de85fb43e53723d1d38d0b6e8746acc962035233))
+* **compat**
+  *  upgrade to hyper v0.4.0 ([3fe2732a](https://github.com/Byron/google-apis-rs/commit/3fe2732a01371ededca2c35fe7499a4bbe63c318))
+  *  make it work with latest hyper ([57808cf9](https://github.com/Byron/google-apis-rs/commit/57808cf92adf7ff4dd65664a4a4ed3a361b60c6e))
+* **clap**
+  * re-introduce UploadProtocol,fix CallType ([d0ce221b](https://github.com/Byron/google-apis-rs/commit/d0ce221ba39db621b969b8c1faad358c775502a5), closes [#81](https://github.com/Byron/google-apis-rs/issues/81))
+  *  update docs and fix calltype handling ([b039b382](https://github.com/Byron/google-apis-rs/commit/b039b382446f450a58c12d2d881dbcd00b96928a))
+  *  various fixes and improvements ([7a38f7e4](https://github.com/Byron/google-apis-rs/commit/7a38f7e4d5dea97b5bd2cbe6b10e4619b3b45b12))
+  *  print usage if command is missing ([63e23dd4](https://github.com/Byron/google-apis-rs/commit/63e23dd48f7fb80268eb3bc95380b77b233de62a))
+  *  tweaks to make youtube3 work ([5320a48e](https://github.com/Byron/google-apis-rs/commit/5320a48e68c0ee4457455c5caa5c01f322fc6c7e))
+  *  adjust option usage to changed API ([bac4e1a8](https://github.com/Byron/google-apis-rs/commit/bac4e1a82fa331370c20a7c4843989f11974600c))
+  *  handle apis without media upload ([feaa3a06](https://github.com/Byron/google-apis-rs/commit/feaa3a06ed53ae039750e2d420817116b1140984))
+  *  call `iter()` directly ([02a41296](https://github.com/Byron/google-apis-rs/commit/02a41296628eb0cbc0c8b7b2e86b06678e8db084))
+  *  commit before un-using UploadProtocol ([1aff3135](https://github.com/Byron/google-apis-rs/commit/1aff3135d97435632599bf39cf5e8c5de9d773a8))
+  *  generate command data structure ([8ac8d3b1](https://github.com/Byron/google-apis-rs/commit/8ac8d3b1cb59249d492a657fa8cd39fbe3fd99a7))
+  *  upload some code to help debugging ([9a8ae4b7](https://github.com/Byron/google-apis-rs/commit/9a8ae4b7d66ec1b6a74316fceeccbf04a2f77469))
+
+
+
+<a name="api-v0.1.6"></a>
+## api-v0.1.6 (2015-05-02)
 
 
 #### Bug Fixes
@@ -90,8 +156,8 @@
 
 
 
-<a name="v0.1.4"></a>
-## v0.1.4 (2015-05-02)
+<a name="api-v0.1.4"></a>
+## api-v0.1.4 (2015-05-02)
 
 
 #### Bug Fixes
@@ -102,8 +168,8 @@
 
 
 
-<a name="v0.1.3"></a>
-## v0.1.3 (2015-05-02)
+<a name="api-v0.1.3"></a>
+## api-v0.1.3 (2015-05-02)
 
 
 #### Bug Fixes
@@ -115,8 +181,8 @@
 
 
 
-<a name="v0.1.2"></a>
-## v0.1.2 (2015-05-02)
+<a name="api-v0.1.2"></a>
+## api-v0.1.2 (2015-05-02)
 
 
 #### Bug Fixes
@@ -139,8 +205,8 @@
 
 
 
-<a name="v0.1.1"></a>
-## v0.1.1 (2015-05-02)
+<a name="api-v0.1.1"></a>
+## api-v0.1.1 (2015-05-02)
 
 
 #### Bug Fixes
@@ -149,8 +215,8 @@
 
 
 
-<a name="v0.1.0"></a>
-## v0.1.0 (2015-05-02)
+<a name="api-v0.1.0"></a>
+## api-v0.1.0 (2015-05-02)
 
 
 #### Bug Fixes
