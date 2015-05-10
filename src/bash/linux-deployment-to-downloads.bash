@@ -11,7 +11,7 @@ base_dir=${5:?Is the root path of the download directory, e.g. /var/www/download
 dest_dir=${base_dir}/google.rs/${program_type}/${version}/${os_name}
 mkdir -p ${dest_dir} || exit $?
 cd ${dest_dir} && tar -xzvf ${tar_file} || exit $?
-for file in *; do 
+for file in `find . -executable -type f`; do 
 	program_tar_file=${file}.tar.gz
 	tar -czf ${program_tar_file} $file && rm $file && echo "Created ${program_tar_file}"
 done
