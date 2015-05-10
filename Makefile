@@ -82,7 +82,7 @@ license: LICENSE.md
 wheezy-build:
 	@-rm -Rf WHEEZY_BUILD_OUTPUT
 	@mkdir -p $(WHEEZY_BUILD_OUTPUT)
-	docker run -v $(PWD):/source -v $(PWD)/$(WHEEZY_BUILD_OUTPUT):/build-result $(WHEEZY_IMAGE) /source/.docker-build-cli.sh
+	docker run -v $(PWD):/source -v $(PWD)/$(WHEEZY_BUILD_OUTPUT):/build-result $(WHEEZY_IMAGE) /source/src/bash/docker-build-cli.bash
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
