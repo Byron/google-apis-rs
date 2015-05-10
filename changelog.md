@@ -1,3 +1,36 @@
+<a name="cli-v0.2.0"></a>
+
+## cli-v0.2.0 (2015-05-10)
+
+I proudly present, the first release [you can actually use][youtube-workflow]!
+
+#### Features
+
+* **[Clap][clap] - The Argument Parser Users will *Love* !**
+  * Thanks to [clap][clap], using the command-line interface is so much more comfortable and helpful.
+    In addition to that, it will provide wonderful usage information and help texts to get
+    you going fast without stying the online-manual all the time.
+  * Special thanks to [@kbknapp][kbknapp] for all the great support. It was my pleasure evolving my CLIs alongside [clap][clap].
+
+#### Improvements
+  * **Usage-to-Manual Backlinks**
+    * Sometimes even the extended usage, e.g. `youtube3 videos insert --help`, is not enough. Now a 
+      URL to the exact method manual is provided as well to help filling in [complex information][youtube3-example].
+  * ***(More)* Human JSON Output**
+    * Previously obtained JSON information would contain `null` values, adding unwanted noise. These are now 
+      filtered out. Thanks to [@erickt][erickt] [for the hint][json-value-null-filtering].
+    * *Did you know ...* that you can use [JQ][jq-homepage] to filter the JSON output and extract data ?
+
+#### Bug Fixes
+  * **Out-of-memory during Uploads**
+    * When uploading anything over SSL (the default for Google Services), due to an [issue in rust-openssl][openssl-blocker-bug]
+      all data would first be cached in-memory before sending it with ulta-high CPU usage. Now that the aforementioned 
+      bug is fixed, you can easily saturate a 1Gb link for encrypted uploads.
+  * **YouTube uploads didn't work**
+    * Any YouTube upload was rejected as the server didn't want to see `null` values within the request structure. Thanks
+      to [additional filtering][json-tools] an optimized JSON stream is produced, much to the joy of said server.
+
+
 <a name="api-v0.1.7"></a>
 ## api-v0.1.7 (2015-05-10)
 
@@ -458,3 +491,13 @@
 * **methods**  intermed. support for 'methods' ([60d953a3](https://github.com/Byron/google-apis-rs/commit/60d953a3428d11591954e7488bc46078d4765b1f))
 * **pyratemp**  successfully generating make deps ([c0bfeabb](https://github.com/Byron/google-apis-rs/commit/c0bfeabbc39cd7449f59c8e1fd1fe9e5abba315a))
 
+
+[clap]: https://github.com/kbknapp/clap-rs
+[youtube3-example]: https://github.com/Byron/depot/blob/master/src/bash/upload-session_google-rs.bash#L22
+[jq-homepage]: http://stedolan.github.io/jq/
+[openssl-blocker-bug]: https://github.com/sfackler/rust-openssl/issues/208
+[json-value-null-filtering]: https://github.com/serde-rs/serde/issues/65#issuecomment-100244937
+[json-tools]: https://github.com/Byron/json-tools
+[kbknapp]: https://github.com/kbknapp
+[erickt]: https://github.com/erickt
+[youtube-workflow]: https://youtu.be/2HiJUiHdQvw
