@@ -10,98 +10,103 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *analytics* API can be found at the
+[official documentation site](https://developers.google.com/analytics/).
+
 # Usage
 
-This documentation was generated from the *analytics* API at revision *20150305*. The CLI is at version *0.1.0*.
+This documentation was generated from the *analytics* API at revision *20150305*. The CLI is at version *0.2.0*.
 
 ```bash
-  analytics3 [options] data ga-get <ids> <start-date> <end-date> <metrics> [-p <v>...] [-o <out>]
-  analytics3 [options] data mcf-get <ids> <start-date> <end-date> <metrics> [-p <v>...] [-o <out>]
-  analytics3 [options] data realtime-get <ids> <metrics> [-p <v>...] [-o <out>]
-  analytics3 [options] management account-summaries-list [-p <v>...] [-o <out>]
-  analytics3 [options] management account-user-links-delete <account-id> <link-id> [-p <v>...]
-  analytics3 [options] management account-user-links-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management account-user-links-list <account-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management account-user-links-update <account-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management accounts-list [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-data-sources-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-dimensions-get <account-id> <web-property-id> <custom-dimension-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-dimensions-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-dimensions-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-dimensions-patch <account-id> <web-property-id> <custom-dimension-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-dimensions-update <account-id> <web-property-id> <custom-dimension-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-metrics-get <account-id> <web-property-id> <custom-metric-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-metrics-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-metrics-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-metrics-patch <account-id> <web-property-id> <custom-metric-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management custom-metrics-update <account-id> <web-property-id> <custom-metric-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management experiments-delete <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>...]
-  analytics3 [options] management experiments-get <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management experiments-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management experiments-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management experiments-patch <account-id> <web-property-id> <profile-id> <experiment-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management experiments-update <account-id> <web-property-id> <profile-id> <experiment-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-delete <account-id> <filter-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-get <account-id> <filter-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-list <account-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-patch <account-id> <filter-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management filters-update <account-id> <filter-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management goals-get <account-id> <web-property-id> <profile-id> <goal-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management goals-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management goals-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management goals-patch <account-id> <web-property-id> <profile-id> <goal-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management goals-update <account-id> <web-property-id> <profile-id> <goal-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-filter-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...]
-  analytics3 [options] management profile-filter-links-get <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-filter-links-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-filter-links-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-filter-links-patch <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-filter-links-update <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-user-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>...]
-  analytics3 [options] management profile-user-links-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-user-links-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management profile-user-links-update <account-id> <web-property-id> <profile-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profiles-delete <account-id> <web-property-id> <profile-id> [-p <v>...]
-  analytics3 [options] management profiles-get <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management profiles-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profiles-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management profiles-patch <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management profiles-update <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management segments-list [-p <v>...] [-o <out>]
-  analytics3 [options] management unsampled-reports-get <account-id> <web-property-id> <profile-id> <unsampled-report-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management unsampled-reports-insert <account-id> <web-property-id> <profile-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management unsampled-reports-list <account-id> <web-property-id> <profile-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management uploads-delete-upload-data <account-id> <web-property-id> <custom-data-source-id> -r <kv>... [-p <v>...]
-  analytics3 [options] management uploads-get <account-id> <web-property-id> <custom-data-source-id> <upload-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management uploads-list <account-id> <web-property-id> <custom-data-source-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management uploads-upload-data <account-id> <web-property-id> <custom-data-source-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  analytics3 [options] management web-property-ad-words-links-delete <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>...]
-  analytics3 [options] management web-property-ad-words-links-get <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management web-property-ad-words-links-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management web-property-ad-words-links-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management web-property-ad-words-links-patch <account-id> <web-property-id> <web-property-ad-words-link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management web-property-ad-words-links-update <account-id> <web-property-id> <web-property-ad-words-link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperties-get <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperties-insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperties-list <account-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperties-patch <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperties-update <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperty-user-links-delete <account-id> <web-property-id> <link-id> [-p <v>...]
-  analytics3 [options] management webproperty-user-links-insert <account-id> <web-property-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperty-user-links-list <account-id> <web-property-id> [-p <v>...] [-o <out>]
-  analytics3 [options] management webproperty-user-links-update <account-id> <web-property-id> <link-id> -r <kv>... [-p <v>...] [-o <out>]
-  analytics3 [options] metadata columns-list <report-type> [-p <v>...] [-o <out>]
-  analytics3 [options] provisioning create-account-ticket -r <kv>... [-p <v>...] [-o <out>]
+analytics3 [options]
+        data
+                ga-get <ids> <start-date> <end-date> <metrics> [-p <v>]... [-o <out>]
+                mcf-get <ids> <start-date> <end-date> <metrics> [-p <v>]... [-o <out>]
+                realtime-get <ids> <metrics> [-p <v>]... [-o <out>]
+        management
+                account-summaries-list [-p <v>]... [-o <out>]
+                account-user-links-delete <account-id> <link-id> [-p <v>]...
+                account-user-links-insert <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                account-user-links-list <account-id> [-p <v>]... [-o <out>]
+                account-user-links-update <account-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                accounts-list [-p <v>]... [-o <out>]
+                custom-data-sources-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                custom-dimensions-get <account-id> <web-property-id> <custom-dimension-id> [-p <v>]... [-o <out>]
+                custom-dimensions-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-dimensions-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                custom-dimensions-patch <account-id> <web-property-id> <custom-dimension-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-dimensions-update <account-id> <web-property-id> <custom-dimension-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-metrics-get <account-id> <web-property-id> <custom-metric-id> [-p <v>]... [-o <out>]
+                custom-metrics-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-metrics-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                custom-metrics-patch <account-id> <web-property-id> <custom-metric-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custom-metrics-update <account-id> <web-property-id> <custom-metric-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                experiments-delete <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>]...
+                experiments-get <account-id> <web-property-id> <profile-id> <experiment-id> [-p <v>]... [-o <out>]
+                experiments-insert <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                experiments-list <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                experiments-patch <account-id> <web-property-id> <profile-id> <experiment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                experiments-update <account-id> <web-property-id> <profile-id> <experiment-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                filters-delete <account-id> <filter-id> [-p <v>]... [-o <out>]
+                filters-get <account-id> <filter-id> [-p <v>]... [-o <out>]
+                filters-insert <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                filters-list <account-id> [-p <v>]... [-o <out>]
+                filters-patch <account-id> <filter-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                filters-update <account-id> <filter-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                goals-get <account-id> <web-property-id> <profile-id> <goal-id> [-p <v>]... [-o <out>]
+                goals-insert <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                goals-list <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                goals-patch <account-id> <web-property-id> <profile-id> <goal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                goals-update <account-id> <web-property-id> <profile-id> <goal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profile-filter-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>]...
+                profile-filter-links-get <account-id> <web-property-id> <profile-id> <link-id> [-p <v>]... [-o <out>]
+                profile-filter-links-insert <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profile-filter-links-list <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                profile-filter-links-patch <account-id> <web-property-id> <profile-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profile-filter-links-update <account-id> <web-property-id> <profile-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profile-user-links-delete <account-id> <web-property-id> <profile-id> <link-id> [-p <v>]...
+                profile-user-links-insert <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profile-user-links-list <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                profile-user-links-update <account-id> <web-property-id> <profile-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-delete <account-id> <web-property-id> <profile-id> [-p <v>]...
+                profiles-get <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                profiles-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                profiles-patch <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                profiles-update <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                segments-list [-p <v>]... [-o <out>]
+                unsampled-reports-get <account-id> <web-property-id> <profile-id> <unsampled-report-id> [-p <v>]... [-o <out>]
+                unsampled-reports-insert <account-id> <web-property-id> <profile-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                unsampled-reports-list <account-id> <web-property-id> <profile-id> [-p <v>]... [-o <out>]
+                uploads-delete-upload-data <account-id> <web-property-id> <custom-data-source-id> (-r <kv>)... [-p <v>]...
+                uploads-get <account-id> <web-property-id> <custom-data-source-id> <upload-id> [-p <v>]... [-o <out>]
+                uploads-list <account-id> <web-property-id> <custom-data-source-id> [-p <v>]... [-o <out>]
+                uploads-upload-data <account-id> <web-property-id> <custom-data-source-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                web-property-ad-words-links-delete <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>]...
+                web-property-ad-words-links-get <account-id> <web-property-id> <web-property-ad-words-link-id> [-p <v>]... [-o <out>]
+                web-property-ad-words-links-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                web-property-ad-words-links-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                web-property-ad-words-links-patch <account-id> <web-property-id> <web-property-ad-words-link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                web-property-ad-words-links-update <account-id> <web-property-id> <web-property-ad-words-link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                webproperties-get <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                webproperties-insert <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                webproperties-list <account-id> [-p <v>]... [-o <out>]
+                webproperties-patch <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                webproperties-update <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                webproperty-user-links-delete <account-id> <web-property-id> <link-id> [-p <v>]...
+                webproperty-user-links-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                webproperty-user-links-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
+                webproperty-user-links-update <account-id> <web-property-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        metadata
+                columns-list <report-type> [-p <v>]... [-o <out>]
+        provisioning
+                create-account-ticket (-r <kv>)... [-p <v>]... [-o <out>]
   analytics3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_analytics3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

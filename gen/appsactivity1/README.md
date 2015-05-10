@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-appsactivity1` library allows access to all features of the *Google appsactivity* service.
 
-This documentation was generated from *appsactivity* crate version *0.1.6+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *appsactivity* crate version *0.1.7+20140828*, where *20140828* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *appsactivity* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/activity/).
@@ -164,7 +164,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_appsactivity1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_appsactivity1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

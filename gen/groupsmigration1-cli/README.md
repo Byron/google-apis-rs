@@ -23,9 +23,6 @@ groupsmigration1 [options]
                 insert <group-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   groupsmigration1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_groupsmigration1_cli
-
 Configuration:
   [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 

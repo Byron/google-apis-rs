@@ -10,33 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Games Configuration* API can be found at the
+[official documentation site](https://developers.google.com/games/services).
+
 # Usage
 
-This documentation was generated from the *Games Configuration* API at revision *20150413*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Games Configuration* API at revision *20150413*. The CLI is at version *0.2.0*.
 
 ```bash
-  gamesconfiguration1-configuration [options] achievement-configurations delete <achievement-id> [-p <v>...]
-  gamesconfiguration1-configuration [options] achievement-configurations get <achievement-id> [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] achievement-configurations insert <application-id> -r <kv>... [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] achievement-configurations list <application-id> [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] achievement-configurations patch <achievement-id> -r <kv>... [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] achievement-configurations update <achievement-id> -r <kv>... [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] image-configurations upload <resource-id> <image-type> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] leaderboard-configurations delete <leaderboard-id> [-p <v>...]
-  gamesconfiguration1-configuration [options] leaderboard-configurations get <leaderboard-id> [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] leaderboard-configurations insert <application-id> -r <kv>... [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] leaderboard-configurations list <application-id> [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] leaderboard-configurations patch <leaderboard-id> -r <kv>... [-p <v>...] [-o <out>]
-  gamesconfiguration1-configuration [options] leaderboard-configurations update <leaderboard-id> -r <kv>... [-p <v>...] [-o <out>]
+gamesconfiguration1-configuration [options]
+        achievement-configurations
+                delete <achievement-id> [-p <v>]...
+                get <achievement-id> [-p <v>]... [-o <out>]
+                insert <application-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <application-id> [-p <v>]... [-o <out>]
+                patch <achievement-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <achievement-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        image-configurations
+                upload <resource-id> <image-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        leaderboard-configurations
+                delete <leaderboard-id> [-p <v>]...
+                get <leaderboard-id> [-p <v>]... [-o <out>]
+                insert <application-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <application-id> [-p <v>]... [-o <out>]
+                patch <leaderboard-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <leaderboard-id> (-r <kv>)... [-p <v>]... [-o <out>]
   gamesconfiguration1-configuration --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_gamesconfiguration1_configuration_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

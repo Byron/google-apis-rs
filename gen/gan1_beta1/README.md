@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gan1_beta1` library allows access to all features of the *Google gan* service.
 
-This documentation was generated from *gan* crate version *0.1.6+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *gan* crate version *0.1.7+20130205*, where *20130205* is the exact revision of the *gan:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *gan* *v1_beta1* API can be found at the
 [official documentation site](https://developers.google.com/affiliate-network/).
@@ -182,7 +182,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_gan1_beta1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_gan1_beta1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

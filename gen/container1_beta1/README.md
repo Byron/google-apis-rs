@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-container1_beta1` library allows access to all features of the *Google container* service.
 
-This documentation was generated from *container* crate version *0.1.6+20150420*, where *20150420* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *container* crate version *0.1.7+20150420*, where *20150420* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *container* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -159,7 +159,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_container1_beta1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_container1_beta1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

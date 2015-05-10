@@ -10,71 +10,75 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Android Publisher* API can be found at the
+[official documentation site](https://developers.google.com/android-publisher).
+
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20150323*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Android Publisher* API at revision *20150323*. The CLI is at version *0.2.0*.
 
 ```bash
-  androidpublisher2 [options] edits apklistings-delete <package-name> <edit-id> <apk-version-code> <language> [-p <v>...]
-  androidpublisher2 [options] edits apklistings-deleteall <package-name> <edit-id> <apk-version-code> [-p <v>...]
-  androidpublisher2 [options] edits apklistings-get <package-name> <edit-id> <apk-version-code> <language> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apklistings-list <package-name> <edit-id> <apk-version-code> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apklistings-patch <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apklistings-update <package-name> <edit-id> <apk-version-code> <language> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apks-addexternallyhosted <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apks-list <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits apks-upload <package-name> <edit-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits commit <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits delete <package-name> <edit-id> [-p <v>...]
-  androidpublisher2 [options] edits details-get <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits details-patch <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits details-update <package-name> <edit-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-get <package-name> <edit-id> <apk-version-code> <expansion-file-type> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-patch <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-update <package-name> <edit-id> <apk-version-code> <expansion-file-type> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits get <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits images-delete <package-name> <edit-id> <language> <image-type> <image-id> [-p <v>...]
-  androidpublisher2 [options] edits images-deleteall <package-name> <edit-id> <language> <image-type> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits images-list <package-name> <edit-id> <language> <image-type> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits images-upload <package-name> <edit-id> <language> <image-type> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits insert <package-name> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits listings-delete <package-name> <edit-id> <language> [-p <v>...]
-  androidpublisher2 [options] edits listings-deleteall <package-name> <edit-id> [-p <v>...]
-  androidpublisher2 [options] edits listings-get <package-name> <edit-id> <language> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits listings-list <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits listings-patch <package-name> <edit-id> <language> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits listings-update <package-name> <edit-id> <language> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits testers-get <package-name> <edit-id> <track> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits testers-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits testers-update <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits tracks-get <package-name> <edit-id> <track> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits tracks-list <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits tracks-patch <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits tracks-update <package-name> <edit-id> <track> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] edits validate <package-name> <edit-id> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts batch -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts delete <package-name> <sku> [-p <v>...]
-  androidpublisher2 [options] inappproducts get <package-name> <sku> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts insert <package-name> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts list <package-name> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts patch <package-name> <sku> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] inappproducts update <package-name> <sku> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] purchases products-get <package-name> <product-id> <token> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>...]
-  androidpublisher2 [options] purchases subscriptions-defer <package-name> <subscription-id> <token> -r <kv>... [-p <v>...] [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-get <package-name> <subscription-id> <token> [-p <v>...] [-o <out>]
-  androidpublisher2 [options] purchases subscriptions-refund <package-name> <subscription-id> <token> [-p <v>...]
-  androidpublisher2 [options] purchases subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>...]
+androidpublisher2 [options]
+        edits
+                apklistings-delete <package-name> <edit-id> <apk-version-code> <language> [-p <v>]...
+                apklistings-deleteall <package-name> <edit-id> <apk-version-code> [-p <v>]...
+                apklistings-get <package-name> <edit-id> <apk-version-code> <language> [-p <v>]... [-o <out>]
+                apklistings-list <package-name> <edit-id> <apk-version-code> [-p <v>]... [-o <out>]
+                apklistings-patch <package-name> <edit-id> <apk-version-code> <language> (-r <kv>)... [-p <v>]... [-o <out>]
+                apklistings-update <package-name> <edit-id> <apk-version-code> <language> (-r <kv>)... [-p <v>]... [-o <out>]
+                apks-addexternallyhosted <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
+                apks-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                commit <package-name> <edit-id> [-p <v>]... [-o <out>]
+                delete <package-name> <edit-id> [-p <v>]...
+                details-get <package-name> <edit-id> [-p <v>]... [-o <out>]
+                details-patch <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                details-update <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                expansionfiles-get <package-name> <edit-id> <apk-version-code> <expansion-file-type> [-p <v>]... [-o <out>]
+                expansionfiles-patch <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-r <kv>)... [-p <v>]... [-o <out>]
+                expansionfiles-update <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-r <kv>)... [-p <v>]... [-o <out>]
+                expansionfiles-upload <package-name> <edit-id> <apk-version-code> <expansion-file-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                get <package-name> <edit-id> [-p <v>]... [-o <out>]
+                images-delete <package-name> <edit-id> <language> <image-type> <image-id> [-p <v>]...
+                images-deleteall <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
+                images-list <package-name> <edit-id> <language> <image-type> [-p <v>]... [-o <out>]
+                images-upload <package-name> <edit-id> <language> <image-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                listings-delete <package-name> <edit-id> <language> [-p <v>]...
+                listings-deleteall <package-name> <edit-id> [-p <v>]...
+                listings-get <package-name> <edit-id> <language> [-p <v>]... [-o <out>]
+                listings-list <package-name> <edit-id> [-p <v>]... [-o <out>]
+                listings-patch <package-name> <edit-id> <language> (-r <kv>)... [-p <v>]... [-o <out>]
+                listings-update <package-name> <edit-id> <language> (-r <kv>)... [-p <v>]... [-o <out>]
+                testers-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
+                testers-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
+                testers-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
+                tracks-get <package-name> <edit-id> <track> [-p <v>]... [-o <out>]
+                tracks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
+                tracks-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
+                tracks-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
+                validate <package-name> <edit-id> [-p <v>]... [-o <out>]
+        inappproducts
+                batch (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <package-name> <sku> [-p <v>]...
+                get <package-name> <sku> [-p <v>]... [-o <out>]
+                insert <package-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <package-name> [-p <v>]... [-o <out>]
+                patch <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
+        purchases
+                products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
+                subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...
+                subscriptions-defer <package-name> <subscription-id> <token> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-get <package-name> <subscription-id> <token> [-p <v>]... [-o <out>]
+                subscriptions-refund <package-name> <subscription-id> <token> [-p <v>]...
+                subscriptions-revoke <package-name> <subscription-id> <token> [-p <v>]...
   androidpublisher2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

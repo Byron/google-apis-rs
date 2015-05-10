@@ -10,27 +10,29 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *siteVerification* API can be found at the
+[official documentation site](https://developers.google.com/site-verification/).
+
 # Usage
 
-This documentation was generated from the *siteVerification* API at revision *20131007*. The CLI is at version *0.1.0*.
+This documentation was generated from the *siteVerification* API at revision *20131007*. The CLI is at version *0.2.0*.
 
 ```bash
-  siteverification1 [options] web-resource delete <id> [-p <v>...]
-  siteverification1 [options] web-resource get <id> [-p <v>...] [-o <out>]
-  siteverification1 [options] web-resource get-token -r <kv>... [-p <v>...] [-o <out>]
-  siteverification1 [options] web-resource insert <verification-method> -r <kv>... [-p <v>...] [-o <out>]
-  siteverification1 [options] web-resource list [-p <v>...] [-o <out>]
-  siteverification1 [options] web-resource patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  siteverification1 [options] web-resource update <id> -r <kv>... [-p <v>...] [-o <out>]
+siteverification1 [options]
+        web-resource
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                get-token (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <verification-method> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... [-p <v>]... [-o <out>]
   siteverification1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_siteverification1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

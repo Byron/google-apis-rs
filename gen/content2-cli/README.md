@@ -10,61 +10,71 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Shopping Content* API can be found at the
+[official documentation site](https://developers.google.com/shopping-content/v2/).
+
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20150421*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Shopping Content* API at revision *20150421*. The CLI is at version *0.2.0*.
 
 ```bash
-  content2 [options] accounts authinfo [-p <v>...] [-o <out>]
-  content2 [options] accounts custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accounts delete <merchant-id> <account-id> [-p <v>...]
-  content2 [options] accounts get <merchant-id> <account-id> [-p <v>...] [-o <out>]
-  content2 [options] accounts insert <merchant-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accounts list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] accounts patch <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accounts update <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accountshipping custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accountshipping get <merchant-id> <account-id> [-p <v>...] [-o <out>]
-  content2 [options] accountshipping list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] accountshipping patch <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accountshipping update <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accountstatuses custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accountstatuses get <merchant-id> <account-id> [-p <v>...] [-o <out>]
-  content2 [options] accountstatuses list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] accounttax custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accounttax get <merchant-id> <account-id> [-p <v>...] [-o <out>]
-  content2 [options] accounttax list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] accounttax patch <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] accounttax update <merchant-id> <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeeds custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeeds delete <merchant-id> <datafeed-id> [-p <v>...]
-  content2 [options] datafeeds get <merchant-id> <datafeed-id> [-p <v>...] [-o <out>]
-  content2 [options] datafeeds insert <merchant-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeeds list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] datafeeds patch <merchant-id> <datafeed-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeeds update <merchant-id> <datafeed-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeedstatuses custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] datafeedstatuses get <merchant-id> <datafeed-id> [-p <v>...] [-o <out>]
-  content2 [options] datafeedstatuses list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] inventory custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] inventory set <merchant-id> <store-code> <product-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] products custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] products delete <merchant-id> <product-id> [-p <v>...]
-  content2 [options] products get <merchant-id> <product-id> [-p <v>...] [-o <out>]
-  content2 [options] products insert <merchant-id> -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] products list <merchant-id> [-p <v>...] [-o <out>]
-  content2 [options] productstatuses custombatch -r <kv>... [-p <v>...] [-o <out>]
-  content2 [options] productstatuses get <merchant-id> <product-id> [-p <v>...] [-o <out>]
-  content2 [options] productstatuses list <merchant-id> [-p <v>...] [-o <out>]
+content2 [options]
+        accounts
+                authinfo [-p <v>]... [-o <out>]
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <merchant-id> <account-id> [-p <v>]...
+                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        accountshipping
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        accountstatuses
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+        accounttax
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <account-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                patch <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <merchant-id> <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        datafeeds
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <merchant-id> <datafeed-id> [-p <v>]...
+                get <merchant-id> <datafeed-id> [-p <v>]... [-o <out>]
+                insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                patch <merchant-id> <datafeed-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <merchant-id> <datafeed-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        datafeedstatuses
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <datafeed-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+        inventory
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                set <merchant-id> <store-code> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        products
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <merchant-id> <product-id> [-p <v>]...
+                get <merchant-id> <product-id> [-p <v>]... [-o <out>]
+                insert <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+        productstatuses
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <product-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
   content2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_content2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

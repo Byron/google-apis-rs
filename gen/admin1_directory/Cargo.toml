@@ -4,7 +4,7 @@
 [package]
 
 name = "google-admin1_directory"
-version = "0.1.6+20150314"
+version = "0.1.7+20150314"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with directory (protocol directory_v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory"
@@ -15,9 +15,10 @@ keywords = ["admin", "google", "protocol", "web", "api"]
 
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+json-tools = ">= 0.3.0"

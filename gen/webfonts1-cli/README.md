@@ -10,16 +10,18 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *webfonts* API can be found at the
+[official documentation site](https://developers.google.com/fonts/docs/developer_api).
+
 # Usage
 
-This documentation was generated from the *webfonts* API at revision *20140210*. The CLI is at version *0.1.0*.
+This documentation was generated from the *webfonts* API at revision *20140210*. The CLI is at version *0.2.0*.
 
 ```bash
-  webfonts1 [options] webfonts list [-p <v>...] [-o <out>]
+webfonts1 [options]
+        webfonts
+                list [-p <v>]... [-o <out>]
   webfonts1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_webfonts1_cli/index.html
 
 Configuration:
   --config-dir <folder>

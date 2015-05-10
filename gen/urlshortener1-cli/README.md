@@ -10,23 +10,25 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *urlshortener* API can be found at the
+[official documentation site](https://developers.google.com/url-shortener/v1/getting_started).
+
 # Usage
 
-This documentation was generated from the *urlshortener* API at revision *20150319*. The CLI is at version *0.1.0*.
+This documentation was generated from the *urlshortener* API at revision *20150319*. The CLI is at version *0.2.0*.
 
 ```bash
-  urlshortener1 [options] url get <short-url> [-p <v>...] [-o <out>]
-  urlshortener1 [options] url insert -r <kv>... [-p <v>...] [-o <out>]
-  urlshortener1 [options] url list [-p <v>...] [-o <out>]
+urlshortener1 [options]
+        url
+                get <short-url> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
   urlshortener1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_urlshortener1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

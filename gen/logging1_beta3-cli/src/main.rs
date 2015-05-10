@@ -2,81 +2,53 @@
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
 #![feature(plugin, exit_status)]
-#![plugin(docopt_macros)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate docopt;
+#[macro_use]
+extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_logging1_beta3 as api;
 
 use std::env;
 use std::io::{self, Write};
-
-docopt!(Options derive Debug, "
-Usage: 
-  logging1-beta3 [options] projects log-services-indexes-list <projects-id> <log-services-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-list <projects-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-create <projects-id> <log-services-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-delete <projects-id> <log-services-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-get <projects-id> <log-services-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-list <projects-id> <log-services-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-update <projects-id> <log-services-id> <sinks-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-delete <projects-id> <logs-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-entries-write <projects-id> <logs-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-list <projects-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-create <projects-id> <logs-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-delete <projects-id> <logs-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-get <projects-id> <logs-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-list <projects-id> <logs-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-update <projects-id> <logs-id> <sinks-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/index.html
-
-Configuration:
-  --scope <url>  
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
-  --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
-            a user-writable directory that we will create during the first invocation.
-            [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
-            and `rx` are placed into the same stream.
-");
+use clap::{App, SubCommand, Arg};
 
 mod cmn;
+
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: api::Logging<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl Engine {
-    fn _projects_log_services_indexes_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().log_services_indexes_list(&self.opt.arg_projects_id, &self.opt.arg_log_services_id);
-        for parg in self.opt.arg_v.iter() {
+impl<'n, 'a> Engine<'n, 'a> {
+    fn _projects_log_services_indexes_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().log_services_indexes_list(opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -94,56 +66,54 @@ impl Engine {
                 "depth" => {
                     call = call.depth(arg_from_str(value.unwrap_or("-0"), err, "depth", "integer"));
                 },
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "depth", "index-prefix", "log", "page-size"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().log_services_list(&self.opt.arg_projects_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_log_services_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().log_services_list(opt.value_of("projects-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -155,58 +125,56 @@ impl Engine {
                 "log" => {
                     call = call.log(value.unwrap_or(""));
                 },
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "log", "page-size"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_sinks_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _projects_log_services_sinks_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::LogSink::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -228,222 +196,215 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.projects().log_services_sinks_create(request, &self.opt.arg_projects_id, &self.opt.arg_log_services_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.projects().log_services_sinks_create(request, opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_sinks_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().log_services_sinks_delete(&self.opt.arg_projects_id, &self.opt.arg_log_services_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_log_services_sinks_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().log_services_sinks_delete(opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_sinks_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().log_services_sinks_get(&self.opt.arg_projects_id, &self.opt.arg_log_services_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_log_services_sinks_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().log_services_sinks_get(opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_sinks_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().log_services_sinks_list(&self.opt.arg_projects_id, &self.opt.arg_log_services_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_log_services_sinks_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().log_services_sinks_list(opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_log_services_sinks_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _projects_log_services_sinks_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::LogSink::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -465,118 +426,115 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.projects().log_services_sinks_update(request, &self.opt.arg_projects_id, &self.opt.arg_log_services_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.projects().log_services_sinks_update(request, opt.value_of("projects-id").unwrap_or(""), opt.value_of("log-services-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().logs_delete(&self.opt.arg_projects_id, &self.opt.arg_logs_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_logs_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_delete(opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_entries_write(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _projects_logs_entries_write(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::WriteLogEntriesRequest::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -599,64 +557,63 @@ impl Engine {
                         request.common_labels.as_mut().unwrap().insert(key.to_string(), value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["common-labels"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.projects().logs_entries_write(request, &self.opt.arg_projects_id, &self.opt.arg_logs_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.projects().logs_entries_write(request, opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().logs_list(&self.opt.arg_projects_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_logs_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_list(opt.value_of("projects-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "service-name" => {
@@ -671,58 +628,56 @@ impl Engine {
                 "page-size" => {
                     call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
                 },
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "service-name", "service-index-prefix", "page-size"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_sinks_create(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _projects_logs_sinks_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::LogSink::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -744,222 +699,215 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.projects().logs_sinks_create(request, &self.opt.arg_projects_id, &self.opt.arg_logs_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.projects().logs_sinks_create(request, opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_sinks_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().logs_sinks_delete(&self.opt.arg_projects_id, &self.opt.arg_logs_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_logs_sinks_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_sinks_delete(opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_sinks_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().logs_sinks_get(&self.opt.arg_projects_id, &self.opt.arg_logs_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_logs_sinks_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_sinks_get(opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_sinks_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.projects().logs_sinks_list(&self.opt.arg_projects_id, &self.opt.arg_logs_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _projects_logs_sinks_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().logs_sinks_list(opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _projects_logs_sinks_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _projects_logs_sinks_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::LogSink::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -981,115 +929,137 @@ impl Engine {
                         request.name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["destination", "name"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.projects().logs_sinks_update(request, &self.opt.arg_projects_id, &self.opt.arg_logs_id, &self.opt.arg_sinks_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.projects().logs_sinks_update(request, opt.value_of("projects-id").unwrap_or(""), opt.value_of("logs-id").unwrap_or(""), opt.value_of("sinks-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "$-xgafv"
-                |"access-token"
-                |"alt"
-                |"bearer-token"
-                |"callback"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pp"
-                |"pretty-print"
-                |"quota-user" => {
-                    let map = [
-                        ("$-xgafv", "$.xgafv"),
-                        ("access-token", "access_token"),
-                        ("bearer-token", "bearer_token"),
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
+        let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
-
-        if self.opt.cmd_projects {
-            if self.opt.cmd_log_services_indexes_list {
-                call_result = self._projects_log_services_indexes_list(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_list {
-                call_result = self._projects_log_services_list(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_sinks_create {
-                call_result = self._projects_log_services_sinks_create(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_sinks_delete {
-                call_result = self._projects_log_services_sinks_delete(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_sinks_get {
-                call_result = self._projects_log_services_sinks_get(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_sinks_list {
-                call_result = self._projects_log_services_sinks_list(dry_run, &mut err);
-            } else if self.opt.cmd_log_services_sinks_update {
-                call_result = self._projects_log_services_sinks_update(dry_run, &mut err);
-            } else if self.opt.cmd_logs_delete {
-                call_result = self._projects_logs_delete(dry_run, &mut err);
-            } else if self.opt.cmd_logs_entries_write {
-                call_result = self._projects_logs_entries_write(dry_run, &mut err);
-            } else if self.opt.cmd_logs_list {
-                call_result = self._projects_logs_list(dry_run, &mut err);
-            } else if self.opt.cmd_logs_sinks_create {
-                call_result = self._projects_logs_sinks_create(dry_run, &mut err);
-            } else if self.opt.cmd_logs_sinks_delete {
-                call_result = self._projects_logs_sinks_delete(dry_run, &mut err);
-            } else if self.opt.cmd_logs_sinks_get {
-                call_result = self._projects_logs_sinks_get(dry_run, &mut err);
-            } else if self.opt.cmd_logs_sinks_list {
-                call_result = self._projects_logs_sinks_list(dry_run, &mut err);
-            } else if self.opt.cmd_logs_sinks_update {
-                call_result = self._projects_logs_sinks_update(dry_run, &mut err);
-            } else {
-                unreachable!();
+        match self.opt.subcommand() {
+            ("projects", Some(opt)) => {
+                match opt.subcommand() {
+                    ("log-services-indexes-list", Some(opt)) => {
+                        call_result = self._projects_log_services_indexes_list(opt, dry_run, &mut err);
+                    },
+                    ("log-services-list", Some(opt)) => {
+                        call_result = self._projects_log_services_list(opt, dry_run, &mut err);
+                    },
+                    ("log-services-sinks-create", Some(opt)) => {
+                        call_result = self._projects_log_services_sinks_create(opt, dry_run, &mut err);
+                    },
+                    ("log-services-sinks-delete", Some(opt)) => {
+                        call_result = self._projects_log_services_sinks_delete(opt, dry_run, &mut err);
+                    },
+                    ("log-services-sinks-get", Some(opt)) => {
+                        call_result = self._projects_log_services_sinks_get(opt, dry_run, &mut err);
+                    },
+                    ("log-services-sinks-list", Some(opt)) => {
+                        call_result = self._projects_log_services_sinks_list(opt, dry_run, &mut err);
+                    },
+                    ("log-services-sinks-update", Some(opt)) => {
+                        call_result = self._projects_log_services_sinks_update(opt, dry_run, &mut err);
+                    },
+                    ("logs-delete", Some(opt)) => {
+                        call_result = self._projects_logs_delete(opt, dry_run, &mut err);
+                    },
+                    ("logs-entries-write", Some(opt)) => {
+                        call_result = self._projects_logs_entries_write(opt, dry_run, &mut err);
+                    },
+                    ("logs-list", Some(opt)) => {
+                        call_result = self._projects_logs_list(opt, dry_run, &mut err);
+                    },
+                    ("logs-sinks-create", Some(opt)) => {
+                        call_result = self._projects_logs_sinks_create(opt, dry_run, &mut err);
+                    },
+                    ("logs-sinks-delete", Some(opt)) => {
+                        call_result = self._projects_logs_sinks_delete(opt, dry_run, &mut err);
+                    },
+                    ("logs-sinks-get", Some(opt)) => {
+                        call_result = self._projects_logs_sinks_get(opt, dry_run, &mut err);
+                    },
+                    ("logs-sinks-list", Some(opt)) => {
+                        call_result = self._projects_logs_sinks_list(opt, dry_run, &mut err);
+                    },
+                    ("logs-sinks-update", Some(opt)) => {
+                        call_result = self._projects_logs_sinks_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("projects".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
             }
-        } else {
-            unreachable!();
         }
 
         if dry_run {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -1102,7 +1072,7 @@ impl Engine {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.flag_debug_auth {
+                                        if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
                                                     connector: hyper::net::HttpConnector(None) 
                                                 })
@@ -1115,7 +1085,7 @@ impl Engine {
                                         }, None);
 
         let client = 
-            if opt.flag_debug {
+            if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpConnector(None) 
                     })
@@ -1125,37 +1095,602 @@ impl Engine {
         let engine = Engine {
             opt: opt,
             hub: api::Logging::new(client, auth),
+            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user"],
+            gpm: vec![
+                    ("$-xgafv", "$.xgafv"),
+                    ("access-token", "access_token"),
+                    ("bearer-token", "bearer_token"),
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                ]
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 
 fn main() {
-    let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    let debug = opts.flag_debug;
-    match Engine::new(opts) {
+    let arg_data = [
+        ("projects", "methods: 'log-services-indexes-list', 'log-services-list', 'log-services-sinks-create', 'log-services-sinks-delete', 'log-services-sinks-get', 'log-services-sinks-list', 'log-services-sinks-update', 'logs-delete', 'logs-entries-write', 'logs-list', 'logs-sinks-create', 'logs-sinks-delete', 'logs-sinks-get', 'logs-sinks-list' and 'logs-sinks-update'", vec![
+            ("log-services-indexes-list",  
+                    Some(r##"Lists log service indexes associated with a log service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-indexes-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. A log service resource of the form `/projects/*/logServices/*`. The service indexes of the log service are returned. Example: `"/projects/myProj/logServices/appengine.googleapis.com"`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-list",  
+                    Some(r##"Lists log services associated with log entries ingested for a project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `projectName`. The project resource whose services are to be listed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-sinks-create",  
+                    Some(r##"Creates the specified log service sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-sinks-create",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. The name of the service in which to create a sink."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-sinks-delete",  
+                    Some(r##"Deletes the specified log service sink."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-sinks-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-sinks-get",  
+                    Some(r##"Gets the specified log service sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-sinks-get",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-sinks-list",  
+                    Some(r##"Lists log service sinks associated with the specified service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-sinks-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. The name of the service for which to list sinks."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `serviceName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("log-services-sinks-update",  
+                    Some(r##"Creates or update the specified log service sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_log-services-sinks-update",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"log-services-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-delete",  
+                    Some(r##"Deletes the specified log resource and all log entries contained in it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `logName`. The log resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `logName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-entries-write",  
+                    Some(r##"Creates one or more log entries in a log. You must supply a list of `LogEntry` objects, named `entries`. Each `LogEntry` object must contain a payload object and a `LogEntryMetadata` object that describes the entry. You must fill in all the fields of the entry, metadata, and payload. You can also supply a map, `commonLabels`, that supplies default (key, value) data for the `entries[].metadata.labels` maps, saving you the trouble of creating identical copies for each entry."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-entries-write",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `logName`. The name of the log resource into which to insert the log entries."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `logName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-list",  
+                    Some(r##"Lists log resources belonging to the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `projectName`. The project name for which to list the log resources."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-sinks-create",  
+                    Some(r##"Creates the specified log sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-sinks-create",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `logName`. The log in which to create a sink resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `logName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-sinks-delete",  
+                    Some(r##"Deletes the specified log sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-sinks-delete",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-sinks-get",  
+                    Some(r##"Gets the specified log sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-sinks-get",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink resource to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-sinks-list",  
+                    Some(r##"Lists log sinks associated with the specified log."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-sinks-list",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `logName`. The log for which to list sinks."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `logName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("logs-sinks-update",  
+                    Some(r##"Creates or updates the specified log sink resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/projects_logs-sinks-update",
+                  vec![
+                    (Some(r##"projects-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. The name of the sink to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"logs-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"sinks-id"##),
+                     None,
+                     Some(r##"Part of `sinkName`. See documentation of `projectsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+    ];
+    
+    let mut app = App::new("logging1-beta3")
+           .author("Sebastian Thiel <byronimo@gmail.com>")
+           .version("0.2.0+20150326")
+           .about("Google Cloud Logging API lets you create logs, ingest log entries, and manage log sinks.")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
+           .arg(Arg::with_name("folder")
+                   .long("config-dir")
+                   .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")
+                   .multiple(false)
+                   .takes_value(true))
+           .arg(Arg::with_name("debug")
+                   .long("debug")
+                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false))
+           .arg(Arg::with_name("debug-auth")
+                   .long("debug-auth")
+                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false));
+           
+           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name).about(about);
+           
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   scmd = scmd.after_help(url_info);
+           
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                       let arg_name_str = 
+                           match (arg_name, flag) {
+                                   (&Some(an), _       ) => an,
+                                   (_        , &Some(f)) => f,
+                                    _                    => unreachable!(),
+                            };
+                       let mut arg = Arg::with_name(arg_name_str);
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           
+        let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }

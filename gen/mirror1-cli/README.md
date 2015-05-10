@@ -10,44 +10,51 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *mirror* API can be found at the
+[official documentation site](https://developers.google.com/glass).
+
 # Usage
 
-This documentation was generated from the *mirror* API at revision *20150220*. The CLI is at version *0.1.0*.
+This documentation was generated from the *mirror* API at revision *20150220*. The CLI is at version *0.2.0*.
 
 ```bash
-  mirror1 [options] accounts insert <user-token> <account-type> <account-name> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts delete <id> [-p <v>...]
-  mirror1 [options] contacts get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] contacts insert -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts list [-p <v>...] [-o <out>]
-  mirror1 [options] contacts patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] locations get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] locations list [-p <v>...] [-o <out>]
-  mirror1 [options] settings get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions delete <id> [-p <v>...]
-  mirror1 [options] subscriptions insert -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions list [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-delete <item-id> <attachment-id> [-p <v>...]
-  mirror1 [options] timeline attachments-get <item-id> <attachment-id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-insert <item-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-list <item-id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline delete <id> [-p <v>...]
-  mirror1 [options] timeline get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline list [-p <v>...] [-o <out>]
-  mirror1 [options] timeline patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] timeline update <id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
+mirror1 [options]
+        accounts
+                insert <user-token> <account-type> <account-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        contacts
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+        locations
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        settings
+                get <id> [-p <v>]... [-o <out>]
+        subscriptions
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+        timeline
+                attachments-delete <item-id> <attachment-id> [-p <v>]...
+                attachments-get <item-id> <attachment-id> [-p <v>]... [-o <out>]
+                attachments-insert <item-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                attachments-list <item-id> [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
   mirror1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_mirror1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

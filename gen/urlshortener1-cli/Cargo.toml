@@ -4,7 +4,7 @@
 [package]
 
 name = "google-urlshortener1-cli"
-version = "0.1.0+20150319"
+version = "0.2.0+20150319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with urlshortener (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/urlshortener1-cli"
@@ -17,15 +17,14 @@ keywords = ["urlshortener", "google", "cli"]
 name = "urlshortener1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-urlshortener1]
 path = "../urlshortener1"

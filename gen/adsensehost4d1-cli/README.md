@@ -10,46 +10,53 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *AdSense Host* API can be found at the
+[official documentation site](https://developers.google.com/adsense/host/).
+
 # Usage
 
-This documentation was generated from the *AdSense Host* API at revision *20150307*. The CLI is at version *0.1.0*.
+This documentation was generated from the *AdSense Host* API at revision *20150307*. The CLI is at version *0.2.0*.
 
 ```bash
-  adsensehost4d1 [options] accounts adclients-get <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adclients-list <account-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-delete <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-get-ad-code <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-insert <account-id> <ad-client-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-patch <account-id> <ad-client-id> <ad-unit-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts adunits-update <account-id> <ad-client-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts get <account-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts list <filter-ad-client-id>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] accounts reports-generate <account-id> <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] adclients get <ad-client-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] adclients list [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] associationsessions start <product-code>... <website-url> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] associationsessions verify <token> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels delete <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels get <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels insert <ad-client-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels list <ad-client-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels patch <ad-client-id> <custom-channel-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] customchannels update <ad-client-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] reports generate <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] urlchannels delete <ad-client-id> <url-channel-id> [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] urlchannels insert <ad-client-id> -r <kv>... [-p <v>...] [-o <out>]
-  adsensehost4d1 [options] urlchannels list <ad-client-id> [-p <v>...] [-o <out>]
+adsensehost4d1 [options]
+        accounts
+                adclients-get <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+                adclients-list <account-id> [-p <v>]... [-o <out>]
+                adunits-delete <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-get-ad-code <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-insert <account-id> <ad-client-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                adunits-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+                adunits-patch <account-id> <ad-client-id> <ad-unit-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                adunits-update <account-id> <ad-client-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <account-id> [-p <v>]... [-o <out>]
+                list <filter-ad-client-id>... [-p <v>]... [-o <out>]
+                reports-generate <account-id> <start-date> <end-date> [-p <v>]... [-o <out>]
+        adclients
+                get <ad-client-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        associationsessions
+                start <product-code>... <website-url> [-p <v>]... [-o <out>]
+                verify <token> [-p <v>]... [-o <out>]
+        customchannels
+                delete <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                get <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                insert <ad-client-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <ad-client-id> [-p <v>]... [-o <out>]
+                patch <ad-client-id> <custom-channel-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <ad-client-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        reports
+                generate <start-date> <end-date> [-p <v>]... [-o <out>]
+        urlchannels
+                delete <ad-client-id> <url-channel-id> [-p <v>]... [-o <out>]
+                insert <ad-client-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <ad-client-id> [-p <v>]... [-o <out>]
   adsensehost4d1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_adsensehost4d1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

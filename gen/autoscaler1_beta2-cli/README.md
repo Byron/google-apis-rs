@@ -10,30 +10,34 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *autoscaler* API can be found at the
+[official documentation site](http://developers.google.com/compute/docs/autoscaler).
+
 # Usage
 
-This documentation was generated from the *autoscaler* API at revision *20141112*. The CLI is at version *0.1.0*.
+This documentation was generated from the *autoscaler* API at revision *20141112*. The CLI is at version *0.2.0*.
 
 ```bash
-  autoscaler1-beta2 [options] autoscalers delete <project> <zone> <autoscaler> [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] autoscalers get <project> <zone> <autoscaler> [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] autoscalers insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] autoscalers list <project> <zone> [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] autoscalers patch <project> <zone> <autoscaler> -r <kv>... [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] autoscalers update <project> <zone> <autoscaler> -r <kv>... [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] zone-operations delete <project> <zone> <operation> [-p <v>...]
-  autoscaler1-beta2 [options] zone-operations get <project> <zone> <operation> [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] zone-operations list <project> <zone> [-p <v>...] [-o <out>]
-  autoscaler1-beta2 [options] zones list <project> [-p <v>...] [-o <out>]
+autoscaler1-beta2 [options]
+        autoscalers
+                delete <project> <zone> <autoscaler> [-p <v>]... [-o <out>]
+                get <project> <zone> <autoscaler> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                patch <project> <zone> <autoscaler> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <zone> <autoscaler> (-r <kv>)... [-p <v>]... [-o <out>]
+        zone-operations
+                delete <project> <zone> <operation> [-p <v>]...
+                get <project> <zone> <operation> [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+        zones
+                list <project> [-p <v>]... [-o <out>]
   autoscaler1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_autoscaler1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

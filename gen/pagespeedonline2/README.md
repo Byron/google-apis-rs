@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-pagespeedonline2` library allows access to all features of the *Google pagespeedonline* service.
 
-This documentation was generated from *pagespeedonline* crate version *0.1.6+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *pagespeedonline* crate version *0.1.7+20150317*, where *20150317* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *pagespeedonline* *v2* API can be found at the
 [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
@@ -162,7 +162,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_pagespeedonline2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_pagespeedonline2/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangebuyer1d3"
-version = "0.1.6+20150326"
+version = "0.1.7+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Buyer (protocol v1.3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d3"
@@ -15,9 +15,10 @@ keywords = ["adexchangebuyer", "google", "protocol", "web", "api"]
 
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+json-tools = ">= 0.3.0"

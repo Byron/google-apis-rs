@@ -10,32 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *plus* API can be found at the
+[official documentation site](https://developers.google.com/+/api/).
+
 # Usage
 
-This documentation was generated from the *plus* API at revision *20150303*. The CLI is at version *0.1.0*.
+This documentation was generated from the *plus* API at revision *20150303*. The CLI is at version *0.2.0*.
 
 ```bash
-  plus1 [options] activities get <activity-id> [-p <v>...] [-o <out>]
-  plus1 [options] activities list <user-id> <collection> [-p <v>...] [-o <out>]
-  plus1 [options] activities search <query> [-p <v>...] [-o <out>]
-  plus1 [options] comments get <comment-id> [-p <v>...] [-o <out>]
-  plus1 [options] comments list <activity-id> [-p <v>...] [-o <out>]
-  plus1 [options] moments insert <user-id> <collection> -r <kv>... [-p <v>...] [-o <out>]
-  plus1 [options] moments list <user-id> <collection> [-p <v>...] [-o <out>]
-  plus1 [options] moments remove <id> [-p <v>...]
-  plus1 [options] people get <user-id> [-p <v>...] [-o <out>]
-  plus1 [options] people list <user-id> <collection> [-p <v>...] [-o <out>]
-  plus1 [options] people list-by-activity <activity-id> <collection> [-p <v>...] [-o <out>]
-  plus1 [options] people search <query> [-p <v>...] [-o <out>]
+plus1 [options]
+        activities
+                get <activity-id> [-p <v>]... [-o <out>]
+                list <user-id> <collection> [-p <v>]... [-o <out>]
+                search <query> [-p <v>]... [-o <out>]
+        comments
+                get <comment-id> [-p <v>]... [-o <out>]
+                list <activity-id> [-p <v>]... [-o <out>]
+        moments
+                insert <user-id> <collection> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <user-id> <collection> [-p <v>]... [-o <out>]
+                remove <id> [-p <v>]...
+        people
+                get <user-id> [-p <v>]... [-o <out>]
+                list <user-id> <collection> [-p <v>]... [-o <out>]
+                list-by-activity <activity-id> <collection> [-p <v>]... [-o <out>]
+                search <query> [-p <v>]... [-o <out>]
   plus1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_plus1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

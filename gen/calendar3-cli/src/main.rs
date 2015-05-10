@@ -2,195 +2,148 @@
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
 #![feature(plugin, exit_status)]
-#![plugin(docopt_macros)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate docopt;
+#[macro_use]
+extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_calendar3 as api;
 
 use std::env;
 use std::io::{self, Write};
-
-docopt!(Options derive Debug, "
-Usage: 
-  calendar3 [options] acl delete <calendar-id> <rule-id> [-p <v>...]
-  calendar3 [options] acl get <calendar-id> <rule-id> [-p <v>...] [-o <out>]
-  calendar3 [options] acl insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl list <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] acl patch <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl update <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list delete <calendar-id> [-p <v>...]
-  calendar3 [options] calendar-list get <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list insert -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list list [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list watch -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars clear <calendar-id> [-p <v>...]
-  calendar3 [options] calendars delete <calendar-id> [-p <v>...]
-  calendar3 [options] calendars get <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] calendars insert -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] channels stop -r <kv>... [-p <v>...]
-  calendar3 [options] colors get [-p <v>...] [-o <out>]
-  calendar3 [options] events delete <calendar-id> <event-id> [-p <v>...]
-  calendar3 [options] events get <calendar-id> <event-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events import <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events instances <calendar-id> <event-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events list <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events move <calendar-id> <event-id> <destination> [-p <v>...] [-o <out>]
-  calendar3 [options] events patch <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events quick-add <calendar-id> <text> [-p <v>...] [-o <out>]
-  calendar3 [options] events update <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] freebusy query -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] settings get <setting> [-p <v>...] [-o <out>]
-  calendar3 [options] settings list [-p <v>...] [-o <out>]
-  calendar3 [options] settings watch -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_calendar3_cli/index.html
-
-Configuration:
-  --scope <url>  
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
-  --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
-            a user-writable directory that we will create during the first invocation.
-            [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
-            and `rx` are placed into the same stream.
-");
+use clap::{App, SubCommand, Arg};
 
 mod cmn;
+
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: api::CalendarHub<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl Engine {
-    fn _acl_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.acl().delete(&self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
+impl<'n, 'a> Engine<'n, 'a> {
+    fn _acl_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.acl().delete(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("rule-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.acl().get(&self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _acl_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.acl().get(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("rule-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _acl_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::AclRule::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -236,58 +189,63 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "id", "kind", "role", "scope", "type", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.acl().insert(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.acl().insert(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.acl().list(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _acl_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.acl().list(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -302,52 +260,56 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "max-results", "page-token", "show-deleted"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _acl_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::AclRule::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -393,60 +355,65 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "id", "kind", "role", "scope", "type", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.acl().patch(request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.acl().patch(request, opt.value_of("calendar-id").unwrap_or(""), opt.value_of("rule-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _acl_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::AclRule::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -492,60 +459,65 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "id", "kind", "role", "scope", "type", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.acl().update(request, &self.opt.arg_calendar_id, &self.opt.arg_rule_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.acl().update(request, opt.value_of("calendar-id").unwrap_or(""), opt.value_of("rule-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _acl_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _acl_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -595,12 +567,13 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.acl().watch(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.acl().watch(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -615,142 +588,149 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "max-results", "page-token", "show-deleted"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.calendar_list().delete(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _calendar_list_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.calendar_list().delete(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.calendar_list().get(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _calendar_list_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.calendar_list().get(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendar_list_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::CalendarListEntry::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -814,61 +794,66 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.calendar_list().insert(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["color-rgb-format"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendar_list_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.calendar_list().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -889,52 +874,56 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "min-access-role", "show-deleted", "max-results", "page-token", "show-hidden"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendar_list_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::CalendarListEntry::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -998,63 +987,68 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.calendar_list().patch(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.calendar_list().patch(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["color-rgb-format"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendar_list_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::CalendarListEntry::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1118,63 +1112,68 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.calendar_list().update(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.calendar_list().update(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "color-rgb-format" => {
                     call = call.color_rgb_format(arg_from_str(value.unwrap_or("false"), err, "color-rgb-format", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["color-rgb-format"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendar_list_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendar_list_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1224,12 +1223,13 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.calendar_list().watch(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -1250,186 +1250,192 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "min-access-role", "show-deleted", "max-results", "page-token", "show-hidden"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_clear(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.calendars().clear(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _calendars_clear(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.calendars().clear(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.calendars().delete(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _calendars_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.calendars().delete(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.calendars().get(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _calendars_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.calendars().get(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendars_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Calendar::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1466,60 +1472,65 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.calendars().insert(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendars_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Calendar::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1556,60 +1567,65 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.calendars().patch(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.calendars().patch(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _calendars_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _calendars_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Calendar::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1646,60 +1662,65 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.calendars().update(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.calendars().update(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _channels_stop(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _channels_stop(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1749,149 +1770,152 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.channels().stop(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _colors_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _colors_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.colors().get();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().delete(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().delete(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().get(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().get(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "time-zone" => {
@@ -1903,52 +1927,56 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["time-zone", "always-include-email", "max-attendees"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_import(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _events_import(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Event::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2257,60 +2285,65 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.events().import(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.events().import(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _events_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Event::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2619,12 +2652,13 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.events().insert(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.events().insert(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
@@ -2633,50 +2667,54 @@ impl Engine {
                 "max-attendees" => {
                     call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-attendees", "send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_instances(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().instances(&self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().instances(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "time-zone" => {
@@ -2706,50 +2744,54 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["show-deleted", "time-max", "always-include-email", "max-results", "page-token", "time-min", "time-zone", "original-start", "max-attendees"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().list(&self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().list(opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
@@ -2803,101 +2845,109 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["show-hidden-invitations", "sync-token", "page-token", "time-max", "updated-min", "single-events", "i-cal-uid", "always-include-email", "order-by", "q", "show-deleted", "max-results", "time-min", "time-zone", "private-extended-property", "shared-extended-property", "max-attendees"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_move(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().move_(&self.opt.arg_calendar_id, &self.opt.arg_event_id, &self.opt.arg_destination);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_move(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().move_(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""), opt.value_of("destination").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _events_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Event::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3206,12 +3256,13 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.events().patch(request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.events().patch(request, opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
@@ -3223,101 +3274,109 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-attendees", "always-include-email", "send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_quick_add(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.events().quick_add(&self.opt.arg_calendar_id, &self.opt.arg_text);
-        for parg in self.opt.arg_v.iter() {
+    fn _events_quick_add(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.events().quick_add(opt.value_of("calendar-id").unwrap_or(""), opt.value_of("text").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _events_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Event::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3626,12 +3685,13 @@ impl Engine {
                         request.private_copy = Some(arg_from_str(value.unwrap_or("false"), err, "private-copy", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.events().update(request, &self.opt.arg_calendar_id, &self.opt.arg_event_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.events().update(request, opt.value_of("calendar-id").unwrap_or(""), opt.value_of("event-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "send-notifications" => {
@@ -3643,52 +3703,56 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-attendees", "always-include-email", "send-notifications"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _events_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _events_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3738,12 +3802,13 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.events().watch(request, &self.opt.arg_calendar_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.events().watch(request, opt.value_of("calendar-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "updated-min" => {
@@ -3797,52 +3862,56 @@ impl Engine {
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["show-hidden-invitations", "sync-token", "page-token", "time-max", "updated-min", "single-events", "i-cal-uid", "always-include-email", "order-by", "q", "show-deleted", "max-results", "time-min", "time-zone", "private-extended-property", "shared-extended-property", "max-attendees"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _freebusy_query(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _freebusy_query(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::FreeBusyRequest::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -3873,104 +3942,113 @@ impl Engine {
                         request.group_expansion_max = Some(arg_from_str(value.unwrap_or("-0"), err, "group-expansion-max", "integer"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["calendar-expansion-max", "group-expansion-max", "time-max", "time-min", "time-zone"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.freebusy().query(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _settings_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.settings().get(&self.opt.arg_setting);
-        for parg in self.opt.arg_v.iter() {
+    fn _settings_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.settings().get(opt.value_of("setting").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _settings_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _settings_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.settings().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -3982,52 +4060,56 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "max-results", "page-token"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _settings_watch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _settings_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -4077,12 +4159,13 @@ impl Engine {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.settings().watch(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "sync-token" => {
@@ -4094,180 +4177,250 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sync-token", "max-results", "page-token"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
+        let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
-
-        if self.opt.cmd_acl {
-            if self.opt.cmd_delete {
-                call_result = self._acl_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._acl_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._acl_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._acl_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._acl_patch(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._acl_update(dry_run, &mut err);
-            } else if self.opt.cmd_watch {
-                call_result = self._acl_watch(dry_run, &mut err);
-            } else {
-                unreachable!();
+        match self.opt.subcommand() {
+            ("acl", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._acl_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._acl_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._acl_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._acl_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._acl_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._acl_update(opt, dry_run, &mut err);
+                    },
+                    ("watch", Some(opt)) => {
+                        call_result = self._acl_watch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("acl".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("calendar-list", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._calendar_list_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._calendar_list_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._calendar_list_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._calendar_list_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._calendar_list_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._calendar_list_update(opt, dry_run, &mut err);
+                    },
+                    ("watch", Some(opt)) => {
+                        call_result = self._calendar_list_watch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("calendar-list".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("calendars", Some(opt)) => {
+                match opt.subcommand() {
+                    ("clear", Some(opt)) => {
+                        call_result = self._calendars_clear(opt, dry_run, &mut err);
+                    },
+                    ("delete", Some(opt)) => {
+                        call_result = self._calendars_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._calendars_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._calendars_insert(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._calendars_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._calendars_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("calendars".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("channels", Some(opt)) => {
+                match opt.subcommand() {
+                    ("stop", Some(opt)) => {
+                        call_result = self._channels_stop(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("channels".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("colors", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._colors_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("colors".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("events", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._events_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._events_get(opt, dry_run, &mut err);
+                    },
+                    ("import", Some(opt)) => {
+                        call_result = self._events_import(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._events_insert(opt, dry_run, &mut err);
+                    },
+                    ("instances", Some(opt)) => {
+                        call_result = self._events_instances(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._events_list(opt, dry_run, &mut err);
+                    },
+                    ("move", Some(opt)) => {
+                        call_result = self._events_move(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._events_patch(opt, dry_run, &mut err);
+                    },
+                    ("quick-add", Some(opt)) => {
+                        call_result = self._events_quick_add(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._events_update(opt, dry_run, &mut err);
+                    },
+                    ("watch", Some(opt)) => {
+                        call_result = self._events_watch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("events".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("freebusy", Some(opt)) => {
+                match opt.subcommand() {
+                    ("query", Some(opt)) => {
+                        call_result = self._freebusy_query(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("freebusy".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("settings", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._settings_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._settings_list(opt, dry_run, &mut err);
+                    },
+                    ("watch", Some(opt)) => {
+                        call_result = self._settings_watch(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("settings".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
             }
-        }
- else if self.opt.cmd_calendar_list {
-            if self.opt.cmd_delete {
-                call_result = self._calendar_list_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._calendar_list_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._calendar_list_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._calendar_list_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._calendar_list_patch(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._calendar_list_update(dry_run, &mut err);
-            } else if self.opt.cmd_watch {
-                call_result = self._calendar_list_watch(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_calendars {
-            if self.opt.cmd_clear {
-                call_result = self._calendars_clear(dry_run, &mut err);
-            } else if self.opt.cmd_delete {
-                call_result = self._calendars_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._calendars_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._calendars_insert(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._calendars_patch(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._calendars_update(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_channels {
-            if self.opt.cmd_stop {
-                call_result = self._channels_stop(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_colors {
-            if self.opt.cmd_get {
-                call_result = self._colors_get(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_events {
-            if self.opt.cmd_delete {
-                call_result = self._events_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._events_get(dry_run, &mut err);
-            } else if self.opt.cmd_import {
-                call_result = self._events_import(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._events_insert(dry_run, &mut err);
-            } else if self.opt.cmd_instances {
-                call_result = self._events_instances(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._events_list(dry_run, &mut err);
-            } else if self.opt.cmd_move {
-                call_result = self._events_move(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._events_patch(dry_run, &mut err);
-            } else if self.opt.cmd_quick_add {
-                call_result = self._events_quick_add(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._events_update(dry_run, &mut err);
-            } else if self.opt.cmd_watch {
-                call_result = self._events_watch(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_freebusy {
-            if self.opt.cmd_query {
-                call_result = self._freebusy_query(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_settings {
-            if self.opt.cmd_get {
-                call_result = self._settings_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._settings_list(dry_run, &mut err);
-            } else if self.opt.cmd_watch {
-                call_result = self._settings_watch(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        } else {
-            unreachable!();
         }
 
         if dry_run {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -4280,7 +4433,7 @@ impl Engine {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.flag_debug_auth {
+                                        if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
                                                     connector: hyper::net::HttpConnector(None) 
                                                 })
@@ -4293,7 +4446,7 @@ impl Engine {
                                         }, None);
 
         let client = 
-            if opt.flag_debug {
+            if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpConnector(None) 
                     })
@@ -4303,37 +4456,1057 @@ impl Engine {
         let engine = Engine {
             opt: opt,
             hub: api::CalendarHub::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 
 fn main() {
-    let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    let debug = opts.flag_debug;
-    match Engine::new(opts) {
+    let arg_data = [
+        ("acl", "methods: 'delete', 'get', 'insert', 'list', 'patch', 'update' and 'watch'", vec![
+            ("delete",  
+                    Some(r##"Deletes an access control rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_delete",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"rule-id"##),
+                     None,
+                     Some(r##"ACL rule identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns an access control rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_get",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"rule-id"##),
+                     None,
+                     Some(r##"ACL rule identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates an access control rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_insert",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Returns the rules in the access control list for the calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_list",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates an access control rule. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_patch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"rule-id"##),
+                     None,
+                     Some(r##"ACL rule identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates an access control rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_update",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"rule-id"##),
+                     None,
+                     Some(r##"ACL rule identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("watch",  
+                    Some(r##"Watch for changes to ACL resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/acl_watch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("calendar-list", "methods: 'delete', 'get', 'insert', 'list', 'patch', 'update' and 'watch'", vec![
+            ("delete",  
+                    Some(r##"Deletes an entry on the user's calendar list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_delete",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns an entry on the user's calendar list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_get",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Adds an entry to the user's calendar list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Returns entries on the user's calendar list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates an entry on the user's calendar list. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_patch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates an entry on the user's calendar list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_update",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("watch",  
+                    Some(r##"Watch for changes to CalendarList resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_watch",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("calendars", "methods: 'clear', 'delete', 'get', 'insert', 'patch' and 'update'", vec![
+            ("clear",  
+                    Some(r##"Clears a primary calendar. This operation deletes all events associated with the primary calendar of an account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_clear",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("delete",  
+                    Some(r##"Deletes a secondary calendar. Use calendars.clear for clearing all events on primary calendars."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_delete",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns metadata for a calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_get",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates a secondary calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates metadata for a calendar. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_patch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates metadata for a calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendars_update",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("channels", "methods: 'stop'", vec![
+            ("stop",  
+                    Some(r##"Stop watching resources through this channel"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/channels_stop",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ]),
+        
+        ("colors", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Returns the color definitions for calendars and events."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/colors_get",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("events", "methods: 'delete', 'get', 'import', 'insert', 'instances', 'list', 'move', 'patch', 'quick-add', 'update' and 'watch'", vec![
+            ("delete",  
+                    Some(r##"Deletes an event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_delete",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns an event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_get",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("import",  
+                    Some(r##"Imports an event. This operation is used to add a private copy of an existing event to a calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_import",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates an event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_insert",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances",  
+                    Some(r##"Returns instances of the specified recurring event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_instances",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Recurring event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Returns events on the specified calendar."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_list",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("move",  
+                    Some(r##"Moves an event to another calendar, i.e. changes an event's organizer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_move",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier of the source calendar where the event currently is on."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"destination"##),
+                     None,
+                     Some(r##"Calendar identifier of the target calendar where the event is to be moved to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates an event. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_patch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("quick-add",  
+                    Some(r##"Creates an event based on a simple text string."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_quick-add",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"text"##),
+                     None,
+                     Some(r##"The text describing the event to be created."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates an event."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_update",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"event-id"##),
+                     None,
+                     Some(r##"Event identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("watch",  
+                    Some(r##"Watch for changes to Events resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/events_watch",
+                  vec![
+                    (Some(r##"calendar-id"##),
+                     None,
+                     Some(r##"Calendar identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("freebusy", "methods: 'query'", vec![
+            ("query",  
+                    Some(r##"Returns free/busy information for a set of calendars."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/freebusy_query",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("settings", "methods: 'get', 'list' and 'watch'", vec![
+            ("get",  
+                    Some(r##"Returns a single user setting."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/settings_get",
+                  vec![
+                    (Some(r##"setting"##),
+                     None,
+                     Some(r##"The id of the user setting."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Returns all user settings for the authenticated user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/settings_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("watch",  
+                    Some(r##"Watch for changes to Settings resources."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/settings_watch",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+    ];
+    
+    let mut app = App::new("calendar3")
+           .author("Sebastian Thiel <byronimo@gmail.com>")
+           .version("0.2.0+20150326")
+           .about("Lets you manipulate events and other calendar data.")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
+           .arg(Arg::with_name("folder")
+                   .long("config-dir")
+                   .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")
+                   .multiple(false)
+                   .takes_value(true))
+           .arg(Arg::with_name("debug")
+                   .long("debug")
+                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false))
+           .arg(Arg::with_name("debug-auth")
+                   .long("debug-auth")
+                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false));
+           
+           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name).about(about);
+           
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   scmd = scmd.after_help(url_info);
+           
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                       let arg_name_str = 
+                           match (arg_name, flag) {
+                                   (&Some(an), _       ) => an,
+                                   (_        , &Some(f)) => f,
+                                    _                    => unreachable!(),
+                            };
+                       let mut arg = Arg::with_name(arg_name_str);
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           
+        let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }

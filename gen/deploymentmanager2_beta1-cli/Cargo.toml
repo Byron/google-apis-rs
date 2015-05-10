@@ -4,7 +4,7 @@
 [package]
 
 name = "google-deploymentmanager2_beta1-cli"
-version = "0.1.0+20150415"
+version = "0.2.0+20150415"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with deploymentmanager (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta1-cli"
@@ -17,15 +17,14 @@ keywords = ["deploymentmanager", "google", "cli"]
 name = "deploymentmanager2-beta1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-deploymentmanager2_beta1]
 path = "../deploymentmanager2_beta1"

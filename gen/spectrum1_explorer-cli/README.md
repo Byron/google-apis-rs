@@ -10,21 +10,23 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *spectrum* API can be found at the
+[official documentation site](http://developers.google.com/spectrum).
+
 # Usage
 
-This documentation was generated from the *spectrum* API at revision *20150112*. The CLI is at version *0.1.0*.
+This documentation was generated from the *spectrum* API at revision *20150112*. The CLI is at version *0.2.0*.
 
 ```bash
-  spectrum1-explorer [options] paws get-spectrum -r <kv>... [-p <v>...] [-o <out>]
-  spectrum1-explorer [options] paws get-spectrum-batch -r <kv>... [-p <v>...] [-o <out>]
-  spectrum1-explorer [options] paws init -r <kv>... [-p <v>...] [-o <out>]
-  spectrum1-explorer [options] paws notify-spectrum-use -r <kv>... [-p <v>...] [-o <out>]
-  spectrum1-explorer [options] paws register -r <kv>... [-p <v>...] [-o <out>]
-  spectrum1-explorer [options] paws verify-device -r <kv>... [-p <v>...] [-o <out>]
+spectrum1-explorer [options]
+        paws
+                get-spectrum (-r <kv>)... [-p <v>]... [-o <out>]
+                get-spectrum-batch (-r <kv>)... [-p <v>]... [-o <out>]
+                init (-r <kv>)... [-p <v>]... [-o <out>]
+                notify-spectrum-use (-r <kv>)... [-p <v>]... [-o <out>]
+                register (-r <kv>)... [-p <v>]... [-o <out>]
+                verify-device (-r <kv>)... [-p <v>]... [-o <out>]
   spectrum1-explorer --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli/index.html
 
 Configuration:
   --config-dir <folder>

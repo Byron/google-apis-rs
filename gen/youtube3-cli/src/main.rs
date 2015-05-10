@@ -4,12 +4,14 @@
 #![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+#[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_youtube3 as api;
 
 use std::env;
@@ -20,7 +22,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          protocol_from_str};
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -37,6 +39,8 @@ enum DoitError {
 struct Engine<'n, 'a> {
     opt: ArgMatches<'n, 'a>,
     hub: api::YouTube<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
@@ -601,7 +605,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-tag", "author", "bulletin", "channel-id", "channel-item", "channel-title", "click-tracking-url", "comment", "content-details", "creative-view-url", "cta-type", "custom-cta-button-text", "default", "description", "description-text", "destination-url", "etag", "favorite", "forecasting-url", "group-id", "height", "high", "id", "image-url", "impression-url", "kind", "like", "maxres", "medium", "playlist-id", "playlist-item", "playlist-item-id", "promoted-item", "published-at", "reason", "recommendation", "reference-url", "resource-id", "seed-resource-id", "snippet", "social", "standard", "subscription", "thumbnails", "title", "type", "upload", "url", "video-id", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -609,22 +614,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -645,7 +649,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -682,22 +688,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "published-before", "channel-id", "mine", "max-results", "region-code", "home", "published-after"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -718,7 +723,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -737,22 +744,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "debug-project-id-override" => {
                     call = call.debug_project_id_override(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of", "debug-project-id-override"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -794,25 +800,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "debug-project-id-override" => {
                     call = call.debug_project_id_override(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["tfmt", "on-behalf-of", "tlang", "debug-project-id-override"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -934,7 +939,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -951,26 +957,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "debug-project-id-override" => {
                     call = call.debug_project_id_override(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of", "sync", "debug-project-id-override"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -991,7 +996,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1013,22 +1020,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "debug-project-id-override" => {
                     call = call.debug_project_id_override(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of", "id", "debug-project-id-override"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1049,7 +1055,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1147,7 +1155,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1164,26 +1173,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "debug-project-id-override" => {
                     call = call.debug_project_id_override(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of", "sync", "debug-project-id-override"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1204,7 +1212,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1241,7 +1251,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.etag = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1252,26 +1263,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -1292,7 +1302,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1308,22 +1320,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1466,7 +1477,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1480,22 +1492,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1516,7 +1527,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1544,22 +1557,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "channel-id", "mine", "hl", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1580,7 +1592,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1707,7 +1721,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1718,22 +1733,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1754,7 +1768,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1797,22 +1813,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "category-id" => {
                     call = call.category_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["managed-by-me", "on-behalf-of-content-owner", "for-username", "mine", "max-results", "category-id", "page-token", "my-subscribers", "hl", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1833,7 +1848,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2466,7 +2483,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "corner-position", "country", "default", "default-language", "default-tab", "default-timing", "description", "duration-ms", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "google-plus-user-id", "height", "hidden-subscriber-count", "high", "id", "image", "invideo-promotion", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "maxres", "medium", "moderate-comments", "offset-ms", "overall-good-standing", "position", "privacy-status", "profile-color", "published-at", "related-playlists", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "type", "unsubscribed-trailer", "uploads", "url", "use-smart-timing", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -2477,22 +2495,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2513,7 +2530,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2676,7 +2695,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -2687,22 +2707,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "share-on-google-plus" => {
                     call = call.share_on_google_plus(arg_from_str(value.unwrap_or("false"), err, "share-on-google-plus", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["share-on-google-plus"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2723,7 +2742,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2763,22 +2784,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "all-threads-related-to-channel-id" => {
                     call = call.all_threads_related_to_channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["all-threads-related-to-channel-id", "channel-id", "video-id", "max-results", "page-token", "search-terms", "text-format", "id", "moderation-status"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2799,7 +2819,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2962,7 +2984,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -2970,22 +2993,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3006,7 +3028,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3019,22 +3043,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3167,7 +3190,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -3175,22 +3199,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3211,7 +3234,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3239,22 +3264,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "id" => {
                     call = call.id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "text-format", "id", "max-results", "parent-id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3275,7 +3299,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3288,22 +3314,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3335,22 +3360,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "ban-author" => {
                     call = call.ban_author(arg_from_str(value.unwrap_or("false"), err, "ban-author", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["ban-author"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3483,7 +3507,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -3491,22 +3516,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3527,7 +3551,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3549,22 +3575,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["region-code", "id", "hl"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3585,7 +3610,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3601,22 +3628,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["hl"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3637,7 +3663,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3653,22 +3681,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["hl"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3689,7 +3716,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3711,22 +3740,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "stream-id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3747,7 +3775,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3775,22 +3805,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "display-slate" => {
                     call = call.display_slate(arg_from_str(value.unwrap_or("false"), err, "display-slate", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "display-slate", "offset-time-ms", "walltime"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3811,7 +3840,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3830,22 +3861,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4120,7 +4150,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4134,22 +4165,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4170,7 +4200,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4204,22 +4236,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "broadcast-status" => {
                     call = call.broadcast_status(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["broadcast-status", "on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4240,7 +4271,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4259,22 +4292,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4295,7 +4327,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4554,7 +4588,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4568,22 +4603,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4604,7 +4638,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4623,22 +4659,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4777,7 +4812,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4791,22 +4827,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4827,7 +4862,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4858,22 +4895,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "id" => {
                     call = call.id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4894,7 +4930,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5017,7 +5055,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5031,22 +5070,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5067,7 +5105,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5080,22 +5120,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5342,7 +5381,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5353,22 +5393,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5389,7 +5428,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5420,22 +5461,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "id" => {
                     call = call.id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "playlist-id", "video-id", "max-results", "page-token", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5456,7 +5496,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5687,7 +5729,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5695,22 +5738,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5731,7 +5773,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5747,22 +5791,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6002,7 +6045,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6016,22 +6060,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6052,7 +6095,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6089,22 +6134,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "page-token", "hl", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6125,7 +6169,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6349,7 +6395,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6360,22 +6407,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6396,7 +6442,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6499,22 +6547,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["location-radius", "channel-id", "video-syndicated", "event-type", "channel-type", "video-caption", "published-after", "on-behalf-of-content-owner", "video-category-id", "for-content-owner", "region-code", "location", "for-developer", "video-type", "type", "topic-id", "published-before", "video-dimension", "video-license", "max-results", "related-to-video-id", "video-definition", "page-token", "video-duration", "relevance-language", "for-mine", "q", "safe-search", "video-embeddable", "order"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6535,7 +6582,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6548,22 +6597,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6907,7 +6955,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-type", "channel-id", "channel-title", "content-details", "default", "description", "etag", "height", "high", "id", "kind", "maxres", "medium", "new-item-count", "playlist-id", "published-at", "resource-id", "snippet", "standard", "subscriber-snippet", "thumbnails", "title", "total-item-count", "url", "video-id", "width"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6915,22 +6964,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6951,7 +6999,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6994,22 +7044,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "channel-id" => {
                     call = call.channel_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "id", "page-token", "my-subscribers", "for-channel-id", "order"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -7030,7 +7079,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7046,26 +7097,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -7086,7 +7136,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7102,22 +7154,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["hl"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -7138,7 +7189,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7160,22 +7213,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["region-code", "id", "hl"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -7196,7 +7248,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7212,22 +7266,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -7259,22 +7312,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -7295,7 +7347,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8176,7 +8230,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -8199,26 +8254,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "auto-levels" => {
                     call = call.auto_levels(arg_from_str(value.unwrap_or("false"), err, "auto-levels", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "auto-levels", "notify-subscribers", "stabilize"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -8239,7 +8293,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8282,22 +8338,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "chart" => {
                     call = call.chart(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "hl", "my-rating", "id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -8318,7 +8373,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8334,22 +8391,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -8408,7 +8464,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.video_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["comments", "language", "reason-id", "secondary-reason-id", "video-id"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -8419,22 +8476,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -9331,7 +9387,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -9342,22 +9399,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -9378,7 +9434,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -9449,7 +9507,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.image_bytes = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["corner-position", "duration-ms", "image-bytes", "image-url", "offset-ms", "position", "target-channel-id", "timing", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -9460,26 +9519,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -9511,22 +9569,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of-content-owner" => {
                     call = call.on_behalf_of_content_owner(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -9974,6 +10031,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         let engine = Engine {
             opt: opt,
             hub: api::YouTube::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
@@ -9995,1303 +10059,1425 @@ fn main() {
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("activities", "methods: 'insert' and 'list'", vec![
-            ("insert",  Some("Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
+            ("insert",  
+                    Some(r##"Posts a bulletin for a specific channel. (The user submitting the request must be authorized to act on the channel's behalf.)
         
-        Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite."), 
+        Note: Even though an activity resource can contain information about actions like a user rating a video or marking a video as a favorite, you need to use other API methods to generate those activity resources. For example, you would use the API's videos.rate() method to rate a video and the playlistItems.insert() method to mark a video as a favorite."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/activities_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user."), 
+            ("list",  
+                    Some(r##"Returns a list of channel activity events that match the request criteria. For example, you can retrieve events associated with a particular channel, events associated with the user's subscriptions and Google+ friends, or the YouTube home page feed, which is customized for each user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/activities_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("captions", "methods: 'delete', 'download', 'insert', 'list' and 'update'", vec![
-            ("delete",  Some("Deletes a specified caption track."), 
+            ("delete",  
+                    Some(r##"Deletes a specified caption track."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter identifies the caption track that is being deleted. The value is a caption track ID as identified by the id property in a caption resource."),
+                     Some(r##"The id parameter identifies the caption track that is being deleted. The value is a caption track ID as identified by the id property in a caption resource."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("download",  Some("Downloads a caption track. The caption track is returned in its original format unless the request specifies a value for the tfmt parameter and in its original language unless the request specifies a value for the tlang parameter."), 
+            ("download",  
+                    Some(r##"Downloads a caption track. The caption track is returned in its original format unless the request specifies a value for the tfmt parameter and in its original language unless the request specifies a value for the tlang parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_download",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter identifies the caption track that is being retrieved. The value is a caption track ID as identified by the id property in a caption resource."),
+                     Some(r##"The id parameter identifies the caption track that is being retrieved. The value is a caption track ID as identified by the id property in a caption resource."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Uploads a caption track."), 
+            ("insert",  
+                    Some(r##"Uploads a caption track."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of caption tracks that are associated with a specified video. Note that the API response does not contain the actual captions and that the captions.download method provides the ability to retrieve a caption track."), 
+            ("list",  
+                    Some(r##"Returns a list of caption tracks that are associated with a specified video. Note that the API response does not contain the actual captions and that the captions.download method provides the ability to retrieve a caption track."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("video-id"),
+                    (Some(r##"video-id"##),
                      None,
-                     Some("The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks."),
+                     Some(r##"The videoId parameter specifies the YouTube video ID of the video for which the API should return caption tracks."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a caption track. When updating a caption track, you can change the track's draft status, upload a new caption file for the track, or both."), 
+            ("update",  
+                    Some(r##"Updates a caption track. When updating a caption track, you can change the track's draft status, upload a new caption file for the track, or both."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/captions_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("channel-banners", "methods: 'insert'", vec![
-            ("insert",  Some("Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
+            ("insert",  
+                    Some(r##"Uploads a channel banner image to YouTube. This method represents the first two steps in a three-step process to update the banner image for a channel:
         
         - Call the channelBanners.insert method to upload the binary image data to YouTube. The image must have a 16:9 aspect ratio and be at least 2120x1192 pixels.
         - Extract the url property's value from the response that the API returns for step 1.
-        - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2."), 
+        - Call the channels.update method to update the channel's branding settings. Set the brandingSettings.image.bannerExternalUrl property's value to the URL obtained in step 2."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-banners_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("channel-sections", "methods: 'delete', 'insert', 'list' and 'update'", vec![
-            ("delete",  Some("Deletes a channelSection."), 
+            ("delete",  
+                    Some(r##"Deletes a channelSection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID."),
+                     Some(r##"The id parameter specifies the YouTube channelSection ID for the resource that is being deleted. In a channelSection resource, the id property specifies the YouTube channelSection ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Adds a channelSection for the authenticated user's channel."), 
+            ("insert",  
+                    Some(r##"Adds a channelSection for the authenticated user's channel."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns channelSection resources that match the API request criteria."), 
+            ("list",  
+                    Some(r##"Returns channelSection resources that match the API request criteria."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Update a channelSection."), 
+            ("update",  
+                    Some(r##"Update a channelSection."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channel-sections_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("channels", "methods: 'list' and 'update'", vec![
-            ("list",  Some("Returns a collection of zero or more channel resources that match the request criteria."), 
+            ("list",  
+                    Some(r##"Returns a collection of zero or more channel resources that match the request criteria."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channels_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a channel's metadata."), 
+            ("update",  
+                    Some(r##"Updates a channel's metadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channels_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("comment-threads", "methods: 'insert', 'list' and 'update'", vec![
-            ("insert",  Some("Creates a new comment thread and top level comment."), 
+            ("insert",  
+                    Some(r##"Creates a new comment thread and top level comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of comment threads that match the API request parameters."), 
+            ("list",  
+                    Some(r##"Returns a list of comment threads that match the API request parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies the commentThread resource parts that the API response will include. Supported values are id, snippet and replies."),
+                     Some(r##"The part parameter specifies the commentThread resource parts that the API response will include. Supported values are id, snippet and replies."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Modifies an existing comment."), 
+            ("update",  
+                    Some(r##"Modifies an existing comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("comments", "methods: 'delete', 'insert', 'list', 'mark-as-spam', 'set-moderation-status' and 'update'", vec![
-            ("delete",  Some("Deletes a comment."), 
+            ("delete",  
+                    Some(r##"Deletes a comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the comment ID for the resource that should be deleted."),
+                     Some(r##"The id parameter specifies the comment ID for the resource that should be deleted."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Creates a new comment.
+            ("insert",  
+                    Some(r##"Creates a new comment.
         
-        Note: to create a top level comment it is also necessary to create a comment thread. Both are accomplished through the commentThreads resource."), 
+        Note: to create a top level comment it is also necessary to create a comment thread. Both are accomplished through the commentThreads resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of comments that match the API request parameters."), 
+            ("list",  
+                    Some(r##"Returns a list of comments that match the API request parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies the comment resource parts that the API response will include. Supported values are id and snippet."),
+                     Some(r##"The part parameter specifies the comment resource parts that the API response will include. Supported values are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("mark-as-spam",  Some("Expresses the caller's opinion that a comment is spam."), 
+            ("mark-as-spam",  
+                    Some(r##"Expresses the caller's opinion that a comment is spam."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_mark-as-spam",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies a comma-separated list of IDs of comments which should get flagged as spam."),
+                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments which should get flagged as spam."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("set-moderation-status",  Some("Sets the moderation status of one or more comments."), 
+            ("set-moderation-status",  
+                    Some(r##"Sets the moderation status of one or more comments."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_set-moderation-status",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies a comma-separated list of IDs of comments whose moderation status should be updated."),
+                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments whose moderation status should be updated."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("moderation-status"),
+                    (Some(r##"moderation-status"##),
                      None,
-                     Some("Determines the new moderation status of the specified comments."),
+                     Some(r##"Determines the new moderation status of the specified comments."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("update",  Some("Modifies an existing comment."), 
+            ("update",  
+                    Some(r##"Modifies an existing comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("guide-categories", "methods: 'list'", vec![
-            ("list",  Some("Returns a list of categories that can be associated with YouTube channels."), 
+            ("list",  
+                    Some(r##"Returns a list of categories that can be associated with YouTube channels."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/guide-categories_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("i18n-languages", "methods: 'list'", vec![
-            ("list",  Some("Returns a list of supported languages."), 
+            ("list",  
+                    Some(r##"Returns a list of supported languages."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-languages_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("i18n-regions", "methods: 'list'", vec![
-            ("list",  Some("Returns a list of supported regions."), 
+            ("list",  
+                    Some(r##"Returns a list of supported regions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-regions_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("live-broadcasts", "methods: 'bind', 'control', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
-            ("bind",  Some("Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream."), 
+            ("bind",  
+                    Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the unique ID of the broadcast that is being bound to a video stream."),
+                     Some(r##"The id parameter specifies the unique ID of the broadcast that is being bound to a video stream."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("control",  Some("Controls the settings for a slate that can be displayed in the broadcast stream."), 
+            ("control",  
+                    Some(r##"Controls the settings for a slate that can be displayed in the broadcast stream."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_control",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated."),
+                     Some(r##"The id parameter specifies the YouTube live broadcast ID that uniquely identifies the broadcast in which the slate is being updated."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("delete",  Some("Deletes a broadcast."), 
+            ("delete",  
+                    Some(r##"Deletes a broadcast."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted."),
+                     Some(r##"The id parameter specifies the YouTube live broadcast ID for the resource that is being deleted."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Creates a broadcast."), 
+            ("insert",  
+                    Some(r##"Creates a broadcast."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of YouTube broadcasts that match the API request parameters."), 
+            ("list",  
+                    Some(r##"Returns a list of YouTube broadcasts that match the API request parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("transition",  Some("Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active."), 
+            ("transition",  
+                    Some(r##"Changes the status of a YouTube live broadcast and initiates any processes associated with the new status. For example, when you transition a broadcast's status to testing, YouTube starts to transmit video to that broadcast's monitor stream. Before calling this method, you should confirm that the value of the status.streamStatus property for the stream bound to your broadcast is active."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_transition",
                   vec![
-                    (Some("broadcast-status"),
+                    (Some(r##"broadcast-status"##),
                      None,
-                     Some("The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to."),
+                     Some(r##"The broadcastStatus parameter identifies the state to which the broadcast is changing. Note that to transition a broadcast to either the testing or live state, the status.streamStatus must be active for the stream that the broadcast is bound to."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the unique ID of the broadcast that is transitioning to another status."),
+                     Some(r##"The id parameter specifies the unique ID of the broadcast that is transitioning to another status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object."), 
+            ("update",  
+                    Some(r##"Updates a broadcast. For example, you could modify the broadcast settings defined in the liveBroadcast resource's contentDetails object."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("live-streams", "methods: 'delete', 'insert', 'list' and 'update'", vec![
-            ("delete",  Some("Deletes a video stream."), 
+            ("delete",  
+                    Some(r##"Deletes a video stream."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube live stream ID for the resource that is being deleted."),
+                     Some(r##"The id parameter specifies the YouTube live stream ID for the resource that is being deleted."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience."), 
+            ("insert",  
+                    Some(r##"Creates a video stream. The stream enables you to send your video to YouTube, which can then broadcast the video to your audience."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of video streams that match the API request parameters."), 
+            ("list",  
+                    Some(r##"Returns a list of video streams that match the API request parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status."),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings."), 
+            ("update",  
+                    Some(r##"Updates a video stream. If the properties that you want to change cannot be updated, then you need to create a new stream with the proper settings."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-streams_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("playlist-items", "methods: 'delete', 'insert', 'list' and 'update'", vec![
-            ("delete",  Some("Deletes a playlist item."), 
+            ("delete",  
+                    Some(r##"Deletes a playlist item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID."),
+                     Some(r##"The id parameter specifies the YouTube playlist item ID for the playlist item that is being deleted. In a playlistItem resource, the id property specifies the playlist item's ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Adds a resource to a playlist."), 
+            ("insert",  
+                    Some(r##"Adds a resource to a playlist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs."), 
+            ("list",  
+                    Some(r##"Returns a collection of playlist items that match the API request parameters. You can retrieve all of the playlist items in a specified playlist or retrieve one or more playlist items by their unique IDs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Modifies a playlist item. For example, you could update the item's position in the playlist."), 
+            ("update",  
+                    Some(r##"Modifies a playlist item. For example, you could update the item's position in the playlist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlist-items_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("playlists", "methods: 'delete', 'insert', 'list' and 'update'", vec![
-            ("delete",  Some("Deletes a playlist."), 
+            ("delete",  
+                    Some(r##"Deletes a playlist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID."),
+                     Some(r##"The id parameter specifies the YouTube playlist ID for the playlist that is being deleted. In a playlist resource, the id property specifies the playlist's ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Creates a playlist."), 
+            ("insert",  
+                    Some(r##"Creates a playlist."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs."), 
+            ("list",  
+                    Some(r##"Returns a collection of playlists that match the API request parameters. For example, you can retrieve all playlists that the authenticated user owns, or you can retrieve one or more playlists by their unique IDs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Modifies a playlist. For example, you could change a playlist's title, description, or privacy status."), 
+            ("update",  
+                    Some(r##"Modifies a playlist. For example, you could change a playlist's title, description, or privacy status."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/playlists_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("search", "methods: 'list'", vec![
-            ("list",  Some("Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource."), 
+            ("list",  
+                    Some(r##"Returns a collection of search results that match the query parameters specified in the API request. By default, a search result set identifies matching video, channel, and playlist resources, but you can also configure queries to only retrieve a specific type of resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/search_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("subscriptions", "methods: 'delete', 'insert' and 'list'", vec![
-            ("delete",  Some("Deletes a subscription."), 
+            ("delete",  
+                    Some(r##"Deletes a subscription."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID."),
+                     Some(r##"The id parameter specifies the YouTube subscription ID for the resource that is being deleted. In a subscription resource, the id property specifies the YouTube subscription ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("insert",  Some("Adds a subscription for the authenticated user's channel."), 
+            ("insert",  
+                    Some(r##"Adds a subscription for the authenticated user's channel."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns subscription resources that match the API request criteria."), 
+            ("list",  
+                    Some(r##"Returns subscription resources that match the API request criteria."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/subscriptions_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("thumbnails", "methods: 'set'", vec![
-            ("set",  Some("Uploads a custom video thumbnail to YouTube and sets it for a video."), 
+            ("set",  
+                    Some(r##"Uploads a custom video thumbnail to YouTube and sets it for a video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/thumbnails_set",
                   vec![
-                    (Some("video-id"),
+                    (Some(r##"video-id"##),
                      None,
-                     Some("The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided."),
+                     Some(r##"The videoId parameter specifies a YouTube video ID for which the custom video thumbnail is being provided."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("video-abuse-report-reasons", "methods: 'list'", vec![
-            ("list",  Some("Returns a list of abuse reasons that can be used for reporting abusive videos."), 
+            ("list",  
+                    Some(r##"Returns a list of abuse reasons that can be used for reporting abusive videos."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/video-abuse-report-reasons_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."),
+                     Some(r##"The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("video-categories", "methods: 'list'", vec![
-            ("list",  Some("Returns a list of categories that can be associated with YouTube videos."), 
+            ("list",  
+                    Some(r##"Returns a list of categories that can be associated with YouTube videos."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/video-categories_list",
                   vec![
-                    (Some("part"),
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."),
+                     Some(r##"The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("videos", "methods: 'delete', 'get-rating', 'insert', 'list', 'rate', 'report-abuse' and 'update'", vec![
-            ("delete",  Some("Deletes a YouTube video."), 
+            ("delete",  
+                    Some(r##"Deletes a YouTube video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_delete",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID."),
+                     Some(r##"The id parameter specifies the YouTube video ID for the resource that is being deleted. In a video resource, the id property specifies the video's ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get-rating",  Some("Retrieves the ratings that the authorized user gave to a list of specified videos."), 
+            ("get-rating",  
+                    Some(r##"Retrieves the ratings that the authorized user gave to a list of specified videos."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_get-rating",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID."),
+                     Some(r##"The id parameter specifies a comma-separated list of the YouTube video ID(s) for the resource(s) for which you are retrieving rating data. In a video resource, the id property specifies the video's ID."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("insert",  Some("Uploads a video to YouTube and optionally sets the video's metadata."), 
-                  vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Returns a list of videos that match the API request parameters."), 
+            ("insert",  
+                    Some(r##"Uploads a video to YouTube and optionally sets the video's metadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_insert",
                   vec![
-                    (Some("part"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Returns a list of videos that match the API request parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_list",
+                  vec![
+                    (Some(r##"part"##),
                      None,
-                     Some("The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties."),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("rate",  Some("Add a like or dislike rating to a video or remove a rating from a video."), 
+            ("rate",  
+                    Some(r##"Add a like or dislike rating to a video or remove a rating from a video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_rate",
                   vec![
-                    (Some("id"),
+                    (Some(r##"id"##),
                      None,
-                     Some("The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed."),
+                     Some(r##"The id parameter specifies the YouTube video ID of the video that is being rated or having its rating removed."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("rating"),
+                    (Some(r##"rating"##),
                      None,
-                     Some("Specifies the rating to record."),
+                     Some(r##"Specifies the rating to record."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("report-abuse",  Some("Report abuse for a video."), 
+            ("report-abuse",  
+                    Some(r##"Report abuse for a video."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_report-abuse",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("update",  Some("Updates a video's metadata."), 
+            ("update",  
+                    Some(r##"Updates a video's metadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/videos_update",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("watermarks", "methods: 'set' and 'unset'", vec![
-            ("set",  Some("Uploads a watermark image to YouTube and sets it for a channel."), 
+            ("set",  
+                    Some(r##"Uploads a watermark image to YouTube and sets it for a channel."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/watermarks_set",
                   vec![
-                    (Some("channel-id"),
+                    (Some(r##"channel-id"##),
                      None,
-                     Some("The channelId parameter specifies a YouTube channel ID for which the watermark is being provided."),
+                     Some(r##"The channelId parameter specifies a YouTube channel ID for which the watermark is being provided."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("unset",  Some("Deletes a watermark."), 
+            ("unset",  
+                    Some(r##"Deletes a watermark."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/watermarks_unset",
                   vec![
-                    (Some("channel-id"),
+                    (Some(r##"channel-id"##),
                      None,
-                     Some("The channelId parameter specifies a YouTube channel ID for which the watermark is being unset."),
+                     Some(r##"The channelId parameter specifies a YouTube channel ID for which the watermark is being unset."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
@@ -11328,11 +11514,12 @@ fn main() {
            for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::new(main_command_name).about(about);
            
-               for &(sub_command_name, ref desc, ref args) in subcommands {
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
                    let mut scmd = SubCommand::new(sub_command_name);
                    if let &Some(desc) = desc {
                        scmd = scmd.about(desc);
                    }
+                   scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
                        let arg_name_str = 

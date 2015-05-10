@@ -2,104 +2,53 @@
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
 #![feature(plugin, exit_status)]
-#![plugin(docopt_macros)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate docopt;
+#[macro_use]
+extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_adsense1d4 as api;
 
 use std::env;
 use std::io::{self, Write};
-
-docopt!(Options derive Debug, "
-Usage: 
-  adsense1d4 [options] accounts adclients-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-customchannels-list <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-get-ad-code <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts alerts-delete <account-id> <alert-id> [-p <v>...]
-  adsense1d4 [options] accounts alerts-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-adunits-list <account-id> <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-get <account-id> <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts get <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts list [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts payments-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-generate <account-id> <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-saved-generate <account-id> <saved-report-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-saved-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts savedadstyles-get <account-id> <saved-ad-style-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts savedadstyles-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts urlchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adclients list [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits customchannels-list <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits get <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits get-ad-code <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits list <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] alerts delete <alert-id> [-p <v>...]
-  adsense1d4 [options] alerts list [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels adunits-list <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels get <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels list <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] metadata dimensions-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] metadata metrics-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] payments list [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports generate <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports saved-generate <saved-report-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports saved-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] savedadstyles get <saved-ad-style-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] savedadstyles list [-p <v>...] [-o <out>]
-  adsense1d4 [options] urlchannels list <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_adsense1d4_cli/index.html
-
-Configuration:
-  --scope <url>  
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
-  --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
-            a user-writable directory that we will create during the first invocation.
-            [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
-            and `rx` are placed into the same stream.
-");
+use clap::{App, SubCommand, Arg};
 
 mod cmn;
+
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: api::AdSense<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl Engine {
-    fn _accounts_adclients_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().adclients_list(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
+impl<'n, 'a> Engine<'n, 'a> {
+    fn _accounts_adclients_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adclients_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -108,50 +57,54 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_adunits_customchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().adunits_customchannels_list(&self.opt.arg_account_id, &self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_adunits_customchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adunits_customchannels_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -160,142 +113,154 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_adunits_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().adunits_get(&self.opt.arg_account_id, &self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_adunits_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adunits_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_adunits_get_ad_code(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().adunits_get_ad_code(&self.opt.arg_account_id, &self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_adunits_get_ad_code(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adunits_get_ad_code(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_adunits_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().adunits_list(&self.opt.arg_account_id, &self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_adunits_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adunits_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -307,143 +272,150 @@ impl Engine {
                 "include-inactive" => {
                     call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-inactive", "page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_alerts_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().alerts_delete(&self.opt.arg_account_id, &self.opt.arg_alert_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_alerts_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().alerts_delete(opt.value_of("account-id").unwrap_or(""), opt.value_of("alert-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_alerts_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().alerts_list(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_alerts_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().alerts_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["locale"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_customchannels_adunits_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().customchannels_adunits_list(&self.opt.arg_account_id, &self.opt.arg_ad_client_id, &self.opt.arg_custom_channel_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_customchannels_adunits_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().customchannels_adunits_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("custom-channel-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -455,96 +427,104 @@ impl Engine {
                 "include-inactive" => {
                     call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-inactive", "page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_customchannels_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().customchannels_get(&self.opt.arg_account_id, &self.opt.arg_ad_client_id, &self.opt.arg_custom_channel_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_customchannels_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().customchannels_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("custom-channel-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_customchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().customchannels_list(&self.opt.arg_account_id, &self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_customchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().customchannels_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -553,99 +533,107 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().get(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().get(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "tree" => {
                     call = call.tree(arg_from_str(value.unwrap_or("false"), err, "tree", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["tree"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _accounts_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.accounts().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -654,97 +642,105 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_payments_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().payments_list(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_payments_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().payments_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_reports_generate(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _accounts_reports_generate(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut download_mode = false;
-        let mut call = self.hub.accounts().reports_generate(&self.opt.arg_account_id, &self.opt.arg_start_date, &self.opt.arg_end_date);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.accounts().reports_generate(opt.value_of("account-id").unwrap_or(""), opt.value_of("start-date").unwrap_or(""), opt.value_of("end-date").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-timezone-reporting" => {
@@ -774,57 +770,61 @@ impl Engine {
                 "currency" => {
                     call = call.currency(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sort", "locale", "metric", "max-results", "filter", "currency", "start-index", "use-timezone-reporting", "dimension"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
                     if !download_mode {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_reports_saved_generate(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().reports_saved_generate(&self.opt.arg_account_id, &self.opt.arg_saved_report_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_reports_saved_generate(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().reports_saved_generate(opt.value_of("account-id").unwrap_or(""), opt.value_of("saved-report-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
@@ -836,50 +836,54 @@ impl Engine {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["locale", "start-index", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_reports_saved_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().reports_saved_list(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_reports_saved_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().reports_saved_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -888,148 +892,104 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_savedadstyles_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().savedadstyles_get(&self.opt.arg_account_id, &self.opt.arg_saved_ad_style_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_savedadstyles_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().savedadstyles_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("saved-ad-style-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _accounts_savedadstyles_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().savedadstyles_list(&self.opt.arg_account_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _accounts_urlchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.accounts().urlchannels_list(&self.opt.arg_account_id, &self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _accounts_savedadstyles_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().savedadstyles_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1038,50 +998,110 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _adclients_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _accounts_urlchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().urlchannels_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _adclients_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.adclients().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1090,50 +1110,54 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _adunits_customchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.adunits().customchannels_list(&self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _adunits_customchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.adunits().customchannels_list(opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1142,142 +1166,154 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _adunits_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.adunits().get(&self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _adunits_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.adunits().get(opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _adunits_get_ad_code(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.adunits().get_ad_code(&self.opt.arg_ad_client_id, &self.opt.arg_ad_unit_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _adunits_get_ad_code(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.adunits().get_ad_code(opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _adunits_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.adunits().list(&self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _adunits_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.adunits().list(opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1289,143 +1325,150 @@ impl Engine {
                 "include-inactive" => {
                     call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-inactive", "page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _alerts_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.alerts().delete(&self.opt.arg_alert_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _alerts_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.alerts().delete(opt.value_of("alert-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _alerts_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _alerts_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.alerts().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["locale"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _customchannels_adunits_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.customchannels().adunits_list(&self.opt.arg_ad_client_id, &self.opt.arg_custom_channel_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _customchannels_adunits_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.customchannels().adunits_list(opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("custom-channel-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1437,96 +1480,104 @@ impl Engine {
                 "include-inactive" => {
                     call = call.include_inactive(arg_from_str(value.unwrap_or("false"), err, "include-inactive", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-inactive", "page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _customchannels_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.customchannels().get(&self.opt.arg_ad_client_id, &self.opt.arg_custom_channel_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _customchannels_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.customchannels().get(opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("custom-channel-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _customchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.customchannels().list(&self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _customchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.customchannels().list(opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1535,189 +1586,205 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _metadata_dimensions_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _metadata_dimensions_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.metadata().dimensions_list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _metadata_metrics_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _metadata_metrics_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.metadata().metrics_list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _payments_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _payments_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.payments().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _reports_generate(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _reports_generate(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut download_mode = false;
-        let mut call = self.hub.reports().generate(&self.opt.arg_start_date, &self.opt.arg_end_date);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.reports().generate(opt.value_of("start-date").unwrap_or(""), opt.value_of("end-date").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "use-timezone-reporting" => {
@@ -1750,57 +1817,61 @@ impl Engine {
                 "account-id" => {
                     call = call.add_account_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["sort", "locale", "metric", "max-results", "filter", "currency", "start-index", "use-timezone-reporting", "dimension", "account-id"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
                     if !download_mode {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _reports_saved_generate(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.reports().saved_generate(&self.opt.arg_saved_report_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _reports_saved_generate(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.reports().saved_generate(opt.value_of("saved-report-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "start-index" => {
@@ -1812,50 +1883,54 @@ impl Engine {
                 "locale" => {
                     call = call.locale(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["locale", "start-index", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _reports_saved_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _reports_saved_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.reports().saved_list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1864,96 +1939,104 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _savedadstyles_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.savedadstyles().get(&self.opt.arg_saved_ad_style_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _savedadstyles_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.savedadstyles().get(opt.value_of("saved-ad-style-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _savedadstyles_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _savedadstyles_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.savedadstyles().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -1962,50 +2045,54 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _urlchannels_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.urlchannels().list(&self.opt.arg_ad_client_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _urlchannels_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.urlchannels().list(opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "page-token" => {
@@ -2014,192 +2101,269 @@ impl Engine {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
+        let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
-
-        if self.opt.cmd_accounts {
-            if self.opt.cmd_adclients_list {
-                call_result = self._accounts_adclients_list(dry_run, &mut err);
-            } else if self.opt.cmd_adunits_customchannels_list {
-                call_result = self._accounts_adunits_customchannels_list(dry_run, &mut err);
-            } else if self.opt.cmd_adunits_get {
-                call_result = self._accounts_adunits_get(dry_run, &mut err);
-            } else if self.opt.cmd_adunits_get_ad_code {
-                call_result = self._accounts_adunits_get_ad_code(dry_run, &mut err);
-            } else if self.opt.cmd_adunits_list {
-                call_result = self._accounts_adunits_list(dry_run, &mut err);
-            } else if self.opt.cmd_alerts_delete {
-                call_result = self._accounts_alerts_delete(dry_run, &mut err);
-            } else if self.opt.cmd_alerts_list {
-                call_result = self._accounts_alerts_list(dry_run, &mut err);
-            } else if self.opt.cmd_customchannels_adunits_list {
-                call_result = self._accounts_customchannels_adunits_list(dry_run, &mut err);
-            } else if self.opt.cmd_customchannels_get {
-                call_result = self._accounts_customchannels_get(dry_run, &mut err);
-            } else if self.opt.cmd_customchannels_list {
-                call_result = self._accounts_customchannels_list(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._accounts_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._accounts_list(dry_run, &mut err);
-            } else if self.opt.cmd_payments_list {
-                call_result = self._accounts_payments_list(dry_run, &mut err);
-            } else if self.opt.cmd_reports_generate {
-                call_result = self._accounts_reports_generate(dry_run, &mut err);
-            } else if self.opt.cmd_reports_saved_generate {
-                call_result = self._accounts_reports_saved_generate(dry_run, &mut err);
-            } else if self.opt.cmd_reports_saved_list {
-                call_result = self._accounts_reports_saved_list(dry_run, &mut err);
-            } else if self.opt.cmd_savedadstyles_get {
-                call_result = self._accounts_savedadstyles_get(dry_run, &mut err);
-            } else if self.opt.cmd_savedadstyles_list {
-                call_result = self._accounts_savedadstyles_list(dry_run, &mut err);
-            } else if self.opt.cmd_urlchannels_list {
-                call_result = self._accounts_urlchannels_list(dry_run, &mut err);
-            } else {
-                unreachable!();
+        match self.opt.subcommand() {
+            ("accounts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("adclients-list", Some(opt)) => {
+                        call_result = self._accounts_adclients_list(opt, dry_run, &mut err);
+                    },
+                    ("adunits-customchannels-list", Some(opt)) => {
+                        call_result = self._accounts_adunits_customchannels_list(opt, dry_run, &mut err);
+                    },
+                    ("adunits-get", Some(opt)) => {
+                        call_result = self._accounts_adunits_get(opt, dry_run, &mut err);
+                    },
+                    ("adunits-get-ad-code", Some(opt)) => {
+                        call_result = self._accounts_adunits_get_ad_code(opt, dry_run, &mut err);
+                    },
+                    ("adunits-list", Some(opt)) => {
+                        call_result = self._accounts_adunits_list(opt, dry_run, &mut err);
+                    },
+                    ("alerts-delete", Some(opt)) => {
+                        call_result = self._accounts_alerts_delete(opt, dry_run, &mut err);
+                    },
+                    ("alerts-list", Some(opt)) => {
+                        call_result = self._accounts_alerts_list(opt, dry_run, &mut err);
+                    },
+                    ("customchannels-adunits-list", Some(opt)) => {
+                        call_result = self._accounts_customchannels_adunits_list(opt, dry_run, &mut err);
+                    },
+                    ("customchannels-get", Some(opt)) => {
+                        call_result = self._accounts_customchannels_get(opt, dry_run, &mut err);
+                    },
+                    ("customchannels-list", Some(opt)) => {
+                        call_result = self._accounts_customchannels_list(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._accounts_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._accounts_list(opt, dry_run, &mut err);
+                    },
+                    ("payments-list", Some(opt)) => {
+                        call_result = self._accounts_payments_list(opt, dry_run, &mut err);
+                    },
+                    ("reports-generate", Some(opt)) => {
+                        call_result = self._accounts_reports_generate(opt, dry_run, &mut err);
+                    },
+                    ("reports-saved-generate", Some(opt)) => {
+                        call_result = self._accounts_reports_saved_generate(opt, dry_run, &mut err);
+                    },
+                    ("reports-saved-list", Some(opt)) => {
+                        call_result = self._accounts_reports_saved_list(opt, dry_run, &mut err);
+                    },
+                    ("savedadstyles-get", Some(opt)) => {
+                        call_result = self._accounts_savedadstyles_get(opt, dry_run, &mut err);
+                    },
+                    ("savedadstyles-list", Some(opt)) => {
+                        call_result = self._accounts_savedadstyles_list(opt, dry_run, &mut err);
+                    },
+                    ("urlchannels-list", Some(opt)) => {
+                        call_result = self._accounts_urlchannels_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("accounts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("adclients", Some(opt)) => {
+                match opt.subcommand() {
+                    ("list", Some(opt)) => {
+                        call_result = self._adclients_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("adclients".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("adunits", Some(opt)) => {
+                match opt.subcommand() {
+                    ("customchannels-list", Some(opt)) => {
+                        call_result = self._adunits_customchannels_list(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._adunits_get(opt, dry_run, &mut err);
+                    },
+                    ("get-ad-code", Some(opt)) => {
+                        call_result = self._adunits_get_ad_code(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._adunits_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("adunits".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("alerts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._alerts_delete(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._alerts_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("alerts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("customchannels", Some(opt)) => {
+                match opt.subcommand() {
+                    ("adunits-list", Some(opt)) => {
+                        call_result = self._customchannels_adunits_list(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._customchannels_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._customchannels_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("customchannels".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("metadata", Some(opt)) => {
+                match opt.subcommand() {
+                    ("dimensions-list", Some(opt)) => {
+                        call_result = self._metadata_dimensions_list(opt, dry_run, &mut err);
+                    },
+                    ("metrics-list", Some(opt)) => {
+                        call_result = self._metadata_metrics_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("metadata".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("payments", Some(opt)) => {
+                match opt.subcommand() {
+                    ("list", Some(opt)) => {
+                        call_result = self._payments_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("payments".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("reports", Some(opt)) => {
+                match opt.subcommand() {
+                    ("generate", Some(opt)) => {
+                        call_result = self._reports_generate(opt, dry_run, &mut err);
+                    },
+                    ("saved-generate", Some(opt)) => {
+                        call_result = self._reports_saved_generate(opt, dry_run, &mut err);
+                    },
+                    ("saved-list", Some(opt)) => {
+                        call_result = self._reports_saved_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("reports".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("savedadstyles", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._savedadstyles_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._savedadstyles_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("savedadstyles".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("urlchannels", Some(opt)) => {
+                match opt.subcommand() {
+                    ("list", Some(opt)) => {
+                        call_result = self._urlchannels_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("urlchannels".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
             }
-        }
- else if self.opt.cmd_adclients {
-            if self.opt.cmd_list {
-                call_result = self._adclients_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_adunits {
-            if self.opt.cmd_customchannels_list {
-                call_result = self._adunits_customchannels_list(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._adunits_get(dry_run, &mut err);
-            } else if self.opt.cmd_get_ad_code {
-                call_result = self._adunits_get_ad_code(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._adunits_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_alerts {
-            if self.opt.cmd_delete {
-                call_result = self._alerts_delete(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._alerts_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_customchannels {
-            if self.opt.cmd_adunits_list {
-                call_result = self._customchannels_adunits_list(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._customchannels_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._customchannels_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_metadata {
-            if self.opt.cmd_dimensions_list {
-                call_result = self._metadata_dimensions_list(dry_run, &mut err);
-            } else if self.opt.cmd_metrics_list {
-                call_result = self._metadata_metrics_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_payments {
-            if self.opt.cmd_list {
-                call_result = self._payments_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_reports {
-            if self.opt.cmd_generate {
-                call_result = self._reports_generate(dry_run, &mut err);
-            } else if self.opt.cmd_saved_generate {
-                call_result = self._reports_saved_generate(dry_run, &mut err);
-            } else if self.opt.cmd_saved_list {
-                call_result = self._reports_saved_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_savedadstyles {
-            if self.opt.cmd_get {
-                call_result = self._savedadstyles_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._savedadstyles_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_urlchannels {
-            if self.opt.cmd_list {
-                call_result = self._urlchannels_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        } else {
-            unreachable!();
         }
 
         if dry_run {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -2212,7 +2376,7 @@ impl Engine {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.flag_debug_auth {
+                                        if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
                                                     connector: hyper::net::HttpConnector(None) 
                                                 })
@@ -2225,7 +2389,7 @@ impl Engine {
                                         }, None);
 
         let client = 
-            if opt.flag_debug {
+            if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpConnector(None) 
                     })
@@ -2235,37 +2399,1073 @@ impl Engine {
         let engine = Engine {
             opt: opt,
             hub: api::AdSense::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 
 fn main() {
-    let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    let debug = opts.flag_debug;
-    match Engine::new(opts) {
+    let arg_data = [
+        ("accounts", "methods: 'adclients-list', 'adunits-customchannels-list', 'adunits-get', 'adunits-get-ad-code', 'adunits-list', 'alerts-delete', 'alerts-list', 'customchannels-adunits-list', 'customchannels-get', 'customchannels-list', 'get', 'list', 'payments-list', 'reports-generate', 'reports-saved-generate', 'reports-saved-list', 'savedadstyles-get', 'savedadstyles-list' and 'urlchannels-list'", vec![
+            ("adclients-list",  
+                    Some(r##"List all ad clients in the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adclients-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account for which to list ad clients."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("adunits-customchannels-list",  
+                    Some(r##"List all custom channels which the specified ad unit belongs to."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adunits-customchannels-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit for which to list custom channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("adunits-get",  
+                    Some(r##"Gets the specified ad unit in the specified ad client for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adunits-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to get the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("adunits-get-ad-code",  
+                    Some(r##"Get ad code for the specified ad unit."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adunits-get-ad-code",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account which contains the ad client."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client with contains the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit to get the code for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("adunits-list",  
+                    Some(r##"List all ad units in the specified ad client for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adunits-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list ad units."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("alerts-delete",  
+                    Some(r##"Dismiss (delete) the specified alert from the specified publisher AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_alerts-delete",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account which contains the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"alert-id"##),
+                     None,
+                     Some(r##"Alert to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("alerts-list",  
+                    Some(r##"List the alerts for the specified AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_alerts-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account for which to retrieve the alerts."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("customchannels-adunits-list",  
+                    Some(r##"List all ad units in the specified custom channel."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_customchannels-adunits-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the custom channel."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"custom-channel-id"##),
+                     None,
+                     Some(r##"Custom channel for which to list ad units."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("customchannels-get",  
+                    Some(r##"Get the specified custom channel from the specified ad client for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_customchannels-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the custom channel."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"custom-channel-id"##),
+                     None,
+                     Some(r##"Custom channel to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("customchannels-list",  
+                    Some(r##"List all custom channels in the specified ad client for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_customchannels-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list custom channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Get information about the selected AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to get information about."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"List all accounts available to this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("payments-list",  
+                    Some(r##"List the payments for the specified AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_payments-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account for which to retrieve the payments."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("reports-generate",  
+                    Some(r##"Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_reports-generate",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account upon which to report."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"start-date"##),
+                     None,
+                     Some(r##"Start of the date range to report on in "YYYY-MM-DD" format, inclusive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"end-date"##),
+                     None,
+                     Some(r##"End of the date range to report on in "YYYY-MM-DD" format, inclusive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("reports-saved-generate",  
+                    Some(r##"Generate an AdSense report based on the saved report ID sent in the query parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_reports-saved-generate",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the saved reports belong."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"saved-report-id"##),
+                     None,
+                     Some(r##"The saved report to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("reports-saved-list",  
+                    Some(r##"List all saved reports in the specified AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_reports-saved-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the saved reports belong."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("savedadstyles-get",  
+                    Some(r##"List a specific saved ad style for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_savedadstyles-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account for which to get the saved ad style."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"saved-ad-style-id"##),
+                     None,
+                     Some(r##"Saved ad style to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("savedadstyles-list",  
+                    Some(r##"List all saved ad styles in the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_savedadstyles-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account for which to list saved ad styles."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("urlchannels-list",  
+                    Some(r##"List all URL channels in the specified ad client for the specified account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_urlchannels-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account to which the ad client belongs."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list URL channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("adclients", "methods: 'list'", vec![
+            ("list",  
+                    Some(r##"List all ad clients in this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/adclients_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("adunits", "methods: 'customchannels-list', 'get', 'get-ad-code' and 'list'", vec![
+            ("customchannels-list",  
+                    Some(r##"List all custom channels which the specified ad unit belongs to."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/adunits_customchannels-list",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit for which to list custom channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Gets the specified ad unit in the specified ad client."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/adunits_get",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to get the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-ad-code",  
+                    Some(r##"Get ad code for the specified ad unit."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/adunits_get-ad-code",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client with contains the ad unit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-unit-id"##),
+                     None,
+                     Some(r##"Ad unit to get the code for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"List all ad units in the specified ad client for this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/adunits_list",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list ad units."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("alerts", "methods: 'delete' and 'list'", vec![
+            ("delete",  
+                    Some(r##"Dismiss (delete) the specified alert from the publisher's AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/alerts_delete",
+                  vec![
+                    (Some(r##"alert-id"##),
+                     None,
+                     Some(r##"Alert to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("list",  
+                    Some(r##"List the alerts for this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/alerts_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("customchannels", "methods: 'adunits-list', 'get' and 'list'", vec![
+            ("adunits-list",  
+                    Some(r##"List all ad units in the specified custom channel."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/customchannels_adunits-list",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the custom channel."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"custom-channel-id"##),
+                     None,
+                     Some(r##"Custom channel for which to list ad units."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Get the specified custom channel from the specified ad client."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/customchannels_get",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client which contains the custom channel."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"custom-channel-id"##),
+                     None,
+                     Some(r##"Custom channel to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"List all custom channels in the specified ad client for this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/customchannels_list",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list custom channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("metadata", "methods: 'dimensions-list' and 'metrics-list'", vec![
+            ("dimensions-list",  
+                    Some(r##"List the metadata for the dimensions available to this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/metadata_dimensions-list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("metrics-list",  
+                    Some(r##"List the metadata for the metrics available to this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/metadata_metrics-list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("payments", "methods: 'list'", vec![
+            ("list",  
+                    Some(r##"List the payments for this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/payments_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("reports", "methods: 'generate', 'saved-generate' and 'saved-list'", vec![
+            ("generate",  
+                    Some(r##"Generate an AdSense report based on the report request sent in the query parameters. Returns the result as JSON; to retrieve output in CSV format specify "alt=csv" as a query parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/reports_generate",
+                  vec![
+                    (Some(r##"start-date"##),
+                     None,
+                     Some(r##"Start of the date range to report on in "YYYY-MM-DD" format, inclusive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"end-date"##),
+                     None,
+                     Some(r##"End of the date range to report on in "YYYY-MM-DD" format, inclusive."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("saved-generate",  
+                    Some(r##"Generate an AdSense report based on the saved report ID sent in the query parameters."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/reports_saved-generate",
+                  vec![
+                    (Some(r##"saved-report-id"##),
+                     None,
+                     Some(r##"The saved report to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("saved-list",  
+                    Some(r##"List all saved reports in this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/reports_saved-list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("savedadstyles", "methods: 'get' and 'list'", vec![
+            ("get",  
+                    Some(r##"Get a specific saved ad style from the user's account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/savedadstyles_get",
+                  vec![
+                    (Some(r##"saved-ad-style-id"##),
+                     None,
+                     Some(r##"Saved ad style to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"List all saved ad styles in the user's account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/savedadstyles_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("urlchannels", "methods: 'list'", vec![
+            ("list",  
+                    Some(r##"List all URL channels in the specified ad client for this AdSense account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/urlchannels_list",
+                  vec![
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client for which to list URL channels."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+    ];
+    
+    let mut app = App::new("adsense1d4")
+           .author("Sebastian Thiel <byronimo@gmail.com>")
+           .version("0.2.0+20150326")
+           .about("Gives AdSense publishers access to their inventory and the ability to generate reports")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsense1d4_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
+           .arg(Arg::with_name("folder")
+                   .long("config-dir")
+                   .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")
+                   .multiple(false)
+                   .takes_value(true))
+           .arg(Arg::with_name("debug")
+                   .long("debug")
+                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false))
+           .arg(Arg::with_name("debug-auth")
+                   .long("debug-auth")
+                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false));
+           
+           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name).about(about);
+           
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   scmd = scmd.after_help(url_info);
+           
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                       let arg_name_str = 
+                           match (arg_name, flag) {
+                                   (&Some(an), _       ) => an,
+                                   (_        , &Some(f)) => f,
+                                    _                    => unreachable!(),
+                            };
+                       let mut arg = Arg::with_name(arg_name_str);
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           
+        let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }

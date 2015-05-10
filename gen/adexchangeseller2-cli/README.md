@@ -10,34 +10,36 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Ad Exchange Seller* API can be found at the
+[official documentation site](https://developers.google.com/ad-exchange/seller-rest/).
+
 # Usage
 
-This documentation was generated from the *Ad Exchange Seller* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Ad Exchange Seller* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  adexchangeseller2 [options] accounts adclients-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts alerts-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts customchannels-get <account-id> <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts customchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts get <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts list [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts metadata-dimensions-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts metadata-metrics-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts preferreddeals-get <account-id> <deal-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts preferreddeals-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts reports-generate <account-id> <start-date> <end-date> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts reports-saved-generate <account-id> <saved-report-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts reports-saved-list <account-id> [-p <v>...] [-o <out>]
-  adexchangeseller2 [options] accounts urlchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
+adexchangeseller2 [options]
+        accounts
+                adclients-list <account-id> [-p <v>]... [-o <out>]
+                alerts-list <account-id> [-p <v>]... [-o <out>]
+                customchannels-get <account-id> <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                customchannels-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+                get <account-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                metadata-dimensions-list <account-id> [-p <v>]... [-o <out>]
+                metadata-metrics-list <account-id> [-p <v>]... [-o <out>]
+                preferreddeals-get <account-id> <deal-id> [-p <v>]... [-o <out>]
+                preferreddeals-list <account-id> [-p <v>]... [-o <out>]
+                reports-generate <account-id> <start-date> <end-date> [-p <v>]... [-o <out>]
+                reports-saved-generate <account-id> <saved-report-id> [-p <v>]... [-o <out>]
+                reports-saved-list <account-id> [-p <v>]... [-o <out>]
+                urlchannels-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
   adexchangeseller2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_adexchangeseller2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

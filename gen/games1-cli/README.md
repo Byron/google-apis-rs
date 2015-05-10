@@ -10,72 +10,88 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Games* API can be found at the
+[official documentation site](https://developers.google.com/games/services/).
+
 # Usage
 
-This documentation was generated from the *Games* API at revision *20150413*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Games* API at revision *20150413*. The CLI is at version *0.2.0*.
 
 ```bash
-  games1 [options] achievement-definitions list [-p <v>...] [-o <out>]
-  games1 [options] achievements increment <achievement-id> <steps-to-increment> [-p <v>...] [-o <out>]
-  games1 [options] achievements list <player-id> [-p <v>...] [-o <out>]
-  games1 [options] achievements reveal <achievement-id> [-p <v>...] [-o <out>]
-  games1 [options] achievements set-steps-at-least <achievement-id> <steps> [-p <v>...] [-o <out>]
-  games1 [options] achievements unlock <achievement-id> [-p <v>...] [-o <out>]
-  games1 [options] achievements update-multiple -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] applications get <application-id> [-p <v>...] [-o <out>]
-  games1 [options] applications played [-p <v>...]
-  games1 [options] events list-by-player [-p <v>...] [-o <out>]
-  games1 [options] events list-definitions [-p <v>...] [-o <out>]
-  games1 [options] events record -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] leaderboards get <leaderboard-id> [-p <v>...] [-o <out>]
-  games1 [options] leaderboards list [-p <v>...] [-o <out>]
-  games1 [options] metagame get-metagame-config [-p <v>...] [-o <out>]
-  games1 [options] metagame list-categories-by-player <player-id> <collection> [-p <v>...] [-o <out>]
-  games1 [options] players get <player-id> [-p <v>...] [-o <out>]
-  games1 [options] players list <collection> [-p <v>...] [-o <out>]
-  games1 [options] pushtokens remove -r <kv>... [-p <v>...]
-  games1 [options] pushtokens update -r <kv>... [-p <v>...]
-  games1 [options] quest-milestones claim <quest-id> <milestone-id> <request-id> [-p <v>...]
-  games1 [options] quests accept <quest-id> [-p <v>...] [-o <out>]
-  games1 [options] quests list <player-id> [-p <v>...] [-o <out>]
-  games1 [options] revisions check <client-revision> [-p <v>...] [-o <out>]
-  games1 [options] rooms create -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] rooms decline <room-id> [-p <v>...] [-o <out>]
-  games1 [options] rooms dismiss <room-id> [-p <v>...]
-  games1 [options] rooms get <room-id> [-p <v>...] [-o <out>]
-  games1 [options] rooms join <room-id> -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] rooms leave <room-id> -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] rooms list [-p <v>...] [-o <out>]
-  games1 [options] rooms report-status <room-id> -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] scores get <player-id> <leaderboard-id> <time-span> [-p <v>...] [-o <out>]
-  games1 [options] scores list <leaderboard-id> <collection> <time-span> [-p <v>...] [-o <out>]
-  games1 [options] scores list-window <leaderboard-id> <collection> <time-span> [-p <v>...] [-o <out>]
-  games1 [options] scores submit <leaderboard-id> <score> [-p <v>...] [-o <out>]
-  games1 [options] scores submit-multiple -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] snapshots get <snapshot-id> [-p <v>...] [-o <out>]
-  games1 [options] snapshots list <player-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches cancel <match-id> [-p <v>...]
-  games1 [options] turn-based-matches create -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches decline <match-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches dismiss <match-id> [-p <v>...]
-  games1 [options] turn-based-matches finish <match-id> -r <kv>... [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches get <match-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches join <match-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches leave <match-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches leave-turn <match-id> <match-version> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches list [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches rematch <match-id> [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches sync [-p <v>...] [-o <out>]
-  games1 [options] turn-based-matches take-turn <match-id> -r <kv>... [-p <v>...] [-o <out>]
+games1 [options]
+        achievement-definitions
+                list [-p <v>]... [-o <out>]
+        achievements
+                increment <achievement-id> <steps-to-increment> [-p <v>]... [-o <out>]
+                list <player-id> [-p <v>]... [-o <out>]
+                reveal <achievement-id> [-p <v>]... [-o <out>]
+                set-steps-at-least <achievement-id> <steps> [-p <v>]... [-o <out>]
+                unlock <achievement-id> [-p <v>]... [-o <out>]
+                update-multiple (-r <kv>)... [-p <v>]... [-o <out>]
+        applications
+                get <application-id> [-p <v>]... [-o <out>]
+                played [-p <v>]...
+        events
+                list-by-player [-p <v>]... [-o <out>]
+                list-definitions [-p <v>]... [-o <out>]
+                record (-r <kv>)... [-p <v>]... [-o <out>]
+        leaderboards
+                get <leaderboard-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        metagame
+                get-metagame-config [-p <v>]... [-o <out>]
+                list-categories-by-player <player-id> <collection> [-p <v>]... [-o <out>]
+        players
+                get <player-id> [-p <v>]... [-o <out>]
+                list <collection> [-p <v>]... [-o <out>]
+        pushtokens
+                remove (-r <kv>)... [-p <v>]...
+                update (-r <kv>)... [-p <v>]...
+        quest-milestones
+                claim <quest-id> <milestone-id> <request-id> [-p <v>]...
+        quests
+                accept <quest-id> [-p <v>]... [-o <out>]
+                list <player-id> [-p <v>]... [-o <out>]
+        revisions
+                check <client-revision> [-p <v>]... [-o <out>]
+        rooms
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                decline <room-id> [-p <v>]... [-o <out>]
+                dismiss <room-id> [-p <v>]...
+                get <room-id> [-p <v>]... [-o <out>]
+                join <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                leave <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                report-status <room-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        scores
+                get <player-id> <leaderboard-id> <time-span> [-p <v>]... [-o <out>]
+                list <leaderboard-id> <collection> <time-span> [-p <v>]... [-o <out>]
+                list-window <leaderboard-id> <collection> <time-span> [-p <v>]... [-o <out>]
+                submit <leaderboard-id> <score> [-p <v>]... [-o <out>]
+                submit-multiple (-r <kv>)... [-p <v>]... [-o <out>]
+        snapshots
+                get <snapshot-id> [-p <v>]... [-o <out>]
+                list <player-id> [-p <v>]... [-o <out>]
+        turn-based-matches
+                cancel <match-id> [-p <v>]...
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                decline <match-id> [-p <v>]... [-o <out>]
+                dismiss <match-id> [-p <v>]...
+                finish <match-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <match-id> [-p <v>]... [-o <out>]
+                join <match-id> [-p <v>]... [-o <out>]
+                leave <match-id> [-p <v>]... [-o <out>]
+                leave-turn <match-id> <match-version> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                rematch <match-id> [-p <v>]... [-o <out>]
+                sync [-p <v>]... [-o <out>]
+                take-turn <match-id> (-r <kv>)... [-p <v>]... [-o <out>]
   games1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_games1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

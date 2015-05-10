@@ -12,32 +12,31 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 
 # Usage
 
-This documentation was generated from the *pubsub* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *pubsub* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  pubsub1-beta2 [options] projects subscriptions-acknowledge <subscription> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-create <name> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-delete <subscription> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-get <subscription> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-list <project> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-modify-ack-deadline <subscription> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-modify-push-config <subscription> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects subscriptions-pull <subscription> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-create <name> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-delete <topic> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-get <topic> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-list <project> [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-publish <topic> -r <kv>... [-p <v>...] [-o <out>]
-  pubsub1-beta2 [options] projects topics-subscriptions-list <topic> [-p <v>...] [-o <out>]
+pubsub1-beta2 [options]
+        projects
+                subscriptions-acknowledge <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-delete <subscription> [-p <v>]... [-o <out>]
+                subscriptions-get <subscription> [-p <v>]... [-o <out>]
+                subscriptions-list <project> [-p <v>]... [-o <out>]
+                subscriptions-modify-ack-deadline <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-modify-push-config <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-pull <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                topics-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                topics-delete <topic> [-p <v>]... [-o <out>]
+                topics-get <topic> [-p <v>]... [-o <out>]
+                topics-list <project> [-p <v>]... [-o <out>]
+                topics-publish <topic> (-r <kv>)... [-p <v>]... [-o <out>]
+                topics-subscriptions-list <topic> [-p <v>]... [-o <out>]
   pubsub1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

@@ -10,32 +10,35 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *replicapool* API can be found at the
+[official documentation site](https://developers.google.com/compute/docs/instance-groups/manager/v1beta2).
+
 # Usage
 
-This documentation was generated from the *replicapool* API at revision *20150223*. The CLI is at version *0.1.0*.
+This documentation was generated from the *replicapool* API at revision *20150223*. The CLI is at version *0.2.0*.
 
 ```bash
-  replicapool1-beta2 [options] instance-group-managers abandon-instances <project> <zone> <instance-group-manager> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers delete <project> <zone> <instance-group-manager> [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers delete-instances <project> <zone> <instance-group-manager> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers get <project> <zone> <instance-group-manager> [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers insert <project> <zone> <size> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers list <project> <zone> [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers recreate-instances <project> <zone> <instance-group-manager> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers resize <project> <zone> <instance-group-manager> <size> [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers set-instance-template <project> <zone> <instance-group-manager> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] instance-group-managers set-target-pools <project> <zone> <instance-group-manager> -r <kv>... [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] zone-operations get <project> <zone> <operation> [-p <v>...] [-o <out>]
-  replicapool1-beta2 [options] zone-operations list <project> <zone> [-p <v>...] [-o <out>]
+replicapool1-beta2 [options]
+        instance-group-managers
+                abandon-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                delete-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                insert <project> <zone> <size> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                recreate-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                resize <project> <zone> <instance-group-manager> <size> [-p <v>]... [-o <out>]
+                set-instance-template <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-target-pools <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+        zone-operations
+                get <project> <zone> <operation> [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
   replicapool1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

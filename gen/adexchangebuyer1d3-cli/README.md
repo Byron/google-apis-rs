@@ -10,41 +10,49 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Ad Exchange Buyer* API can be found at the
+[official documentation site](https://developers.google.com/ad-exchange/buyer-rest).
+
 # Usage
 
-This documentation was generated from the *Ad Exchange Buyer* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Ad Exchange Buyer* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  adexchangebuyer1d3 [options] accounts get <id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] accounts list [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] accounts patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] accounts update <id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] billing-info get <account-id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] billing-info list [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] budget get <account-id> <billing-id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] budget patch <account-id> <billing-id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] budget update <account-id> <billing-id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] creatives get <account-id> <buyer-creative-id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] creatives insert -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] creatives list [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] direct-deals get <id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] direct-deals list [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] performance-report list <account-id> <end-date-time> <start-date-time> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] pretargeting-config delete <account-id> <config-id> [-p <v>...]
-  adexchangebuyer1d3 [options] pretargeting-config get <account-id> <config-id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] pretargeting-config insert <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] pretargeting-config list <account-id> [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] pretargeting-config patch <account-id> <config-id> -r <kv>... [-p <v>...] [-o <out>]
-  adexchangebuyer1d3 [options] pretargeting-config update <account-id> <config-id> -r <kv>... [-p <v>...] [-o <out>]
+adexchangebuyer1d3 [options]
+        accounts
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+        billing-info
+                get <account-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        budget
+                get <account-id> <billing-id> [-p <v>]... [-o <out>]
+                patch <account-id> <billing-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <account-id> <billing-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        creatives
+                get <account-id> <buyer-creative-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        direct-deals
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        performance-report
+                list <account-id> <end-date-time> <start-date-time> [-p <v>]... [-o <out>]
+        pretargeting-config
+                delete <account-id> <config-id> [-p <v>]...
+                get <account-id> <config-id> [-p <v>]... [-o <out>]
+                insert <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <account-id> [-p <v>]... [-o <out>]
+                patch <account-id> <config-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <account-id> <config-id> (-r <kv>)... [-p <v>]... [-o <out>]
   adexchangebuyer1d3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

@@ -10,40 +10,46 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *bigquery* API can be found at the
+[official documentation site](https://cloud.google.com/bigquery/).
+
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *bigquery* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  bigquery2 [options] datasets delete <project-id> <dataset-id> [-p <v>...]
-  bigquery2 [options] datasets get <project-id> <dataset-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] datasets insert <project-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] datasets list <project-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] datasets patch <project-id> <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] datasets update <project-id> <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] jobs get <project-id> <job-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] jobs get-query-results <project-id> <job-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] jobs insert <project-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  bigquery2 [options] jobs list <project-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] jobs query <project-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] projects list [-p <v>...] [-o <out>]
-  bigquery2 [options] tabledata insert-all <project-id> <dataset-id> <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] tabledata list <project-id> <dataset-id> <table-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] tables delete <project-id> <dataset-id> <table-id> [-p <v>...]
-  bigquery2 [options] tables get <project-id> <dataset-id> <table-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] tables insert <project-id> <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] tables list <project-id> <dataset-id> [-p <v>...] [-o <out>]
-  bigquery2 [options] tables patch <project-id> <dataset-id> <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  bigquery2 [options] tables update <project-id> <dataset-id> <table-id> -r <kv>... [-p <v>...] [-o <out>]
+bigquery2 [options]
+        datasets
+                delete <project-id> <dataset-id> [-p <v>]...
+                get <project-id> <dataset-id> [-p <v>]... [-o <out>]
+                insert <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project-id> [-p <v>]... [-o <out>]
+                patch <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        jobs
+                get <project-id> <job-id> [-p <v>]... [-o <out>]
+                get-query-results <project-id> <job-id> [-p <v>]... [-o <out>]
+                insert <project-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <project-id> [-p <v>]... [-o <out>]
+                query <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        projects
+                list [-p <v>]... [-o <out>]
+        tabledata
+                insert-all <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
+        tables
+                delete <project-id> <dataset-id> <table-id> [-p <v>]...
+                get <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
+                insert <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project-id> <dataset-id> [-p <v>]... [-o <out>]
+                patch <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
   bigquery2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_bigquery2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

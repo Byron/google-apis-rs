@@ -10,97 +10,105 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Maps Engine* API can be found at the
+[official documentation site](https://developers.google.com/maps-engine/).
+
 # Usage
 
-This documentation was generated from the *Maps Engine* API at revision *20150414*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Maps Engine* API at revision *20150414*. The CLI is at version *0.2.0*.
 
 ```bash
-  mapsengine1 [options] assets get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] assets list [-p <v>...] [-o <out>]
-  mapsengine1 [options] assets parents-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] assets permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers cancel-processing <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers create -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers delete <id> [-p <v>...]
-  mapsengine1 [options] layers get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers get-published <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers list [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers list-published [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers parents-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] layers permissions-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers permissions-batch-update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers process <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers publish <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] layers unpublish <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps create -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps delete <id> [-p <v>...]
-  mapsengine1 [options] maps get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps get-published <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps list [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps list-published [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] maps permissions-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps permissions-batch-update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps publish <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] maps unpublish <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] projects icons-create <project-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mapsengine1 [options] projects icons-get <project-id> <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] projects icons-list <project-id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] projects list [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections cancel-processing <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections create -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections delete <id> [-p <v>...]
-  mapsengine1 [options] raster-collections get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections list [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections parents-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] raster-collections permissions-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections permissions-batch-update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections process <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections rasters-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections rasters-batch-insert <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] raster-collections rasters-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters delete <id> [-p <v>...]
-  mapsengine1 [options] rasters files-insert <id> <filename> -u (simple|resumable) <file> <mime> [-p <v>...]
-  mapsengine1 [options] rasters get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters list <project-id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters parents-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] rasters permissions-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters permissions-batch-update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters process <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] rasters upload -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables create -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables delete <id> [-p <v>...]
-  mapsengine1 [options] tables features-batch-delete <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] tables features-batch-insert <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] tables features-batch-patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] tables features-get <table-id> <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables features-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables files-insert <id> <filename> -u (simple|resumable) <file> <mime> [-p <v>...]
-  mapsengine1 [options] tables get <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables list [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables parents-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables patch <id> -r <kv>... [-p <v>...]
-  mapsengine1 [options] tables permissions-batch-delete <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables permissions-batch-update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables permissions-list <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables process <id> [-p <v>...] [-o <out>]
-  mapsengine1 [options] tables upload -r <kv>... [-p <v>...] [-o <out>]
+mapsengine1 [options]
+        assets
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                parents-list <id> [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+        layers
+                cancel-processing <id> [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                get-published <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                list-published [-p <v>]... [-o <out>]
+                parents-list <id> [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]...
+                permissions-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-batch-update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+                process <id> [-p <v>]... [-o <out>]
+                publish <id> [-p <v>]... [-o <out>]
+                unpublish <id> [-p <v>]... [-o <out>]
+        maps
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                get-published <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                list-published [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]...
+                permissions-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-batch-update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+                publish <id> [-p <v>]... [-o <out>]
+                unpublish <id> [-p <v>]... [-o <out>]
+        projects
+                icons-create <project-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                icons-get <project-id> <id> [-p <v>]... [-o <out>]
+                icons-list <project-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        raster-collections
+                cancel-processing <id> [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                parents-list <id> [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]...
+                permissions-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-batch-update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+                process <id> [-p <v>]... [-o <out>]
+                rasters-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                rasters-batch-insert <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                rasters-list <id> [-p <v>]... [-o <out>]
+        rasters
+                delete <id> [-p <v>]...
+                files-insert <id> <filename> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                list <project-id> [-p <v>]... [-o <out>]
+                parents-list <id> [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]...
+                permissions-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-batch-update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+                process <id> [-p <v>]... [-o <out>]
+                upload (-r <kv>)... [-p <v>]... [-o <out>]
+        tables
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <id> [-p <v>]...
+                features-batch-delete <id> (-r <kv>)... [-p <v>]...
+                features-batch-insert <id> (-r <kv>)... [-p <v>]...
+                features-batch-patch <id> (-r <kv>)... [-p <v>]...
+                features-get <table-id> <id> [-p <v>]... [-o <out>]
+                features-list <id> [-p <v>]... [-o <out>]
+                files-insert <id> <filename> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]...
+                get <id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                parents-list <id> [-p <v>]... [-o <out>]
+                patch <id> (-r <kv>)... [-p <v>]...
+                permissions-batch-delete <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-batch-update <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-list <id> [-p <v>]... [-o <out>]
+                process <id> [-p <v>]... [-o <out>]
+                upload (-r <kv>)... [-p <v>]... [-o <out>]
   mapsengine1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_mapsengine1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

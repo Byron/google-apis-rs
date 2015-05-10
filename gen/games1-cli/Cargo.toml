@@ -4,7 +4,7 @@
 [package]
 
 name = "google-games1-cli"
-version = "0.1.0+20150413"
+version = "0.2.0+20150413"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/games1-cli"
@@ -17,15 +17,14 @@ keywords = ["games", "google", "cli"]
 name = "games1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-games1]
 path = "../games1"

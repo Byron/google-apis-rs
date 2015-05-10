@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-webfonts1` library allows access to all features of the *Google webfonts* service.
 
-This documentation was generated from *webfonts* crate version *0.1.6+20140210*, where *20140210* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *webfonts* crate version *0.1.7+20140210*, where *20140210* is the exact revision of the *webfonts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *webfonts* *v1* API can be found at the
 [official documentation site](https://developers.google.com/fonts/docs/developer_api).
@@ -158,7 +158,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_webfonts1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_webfonts1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

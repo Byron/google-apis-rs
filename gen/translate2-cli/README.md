@@ -10,18 +10,22 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *translate* API can be found at the
+[official documentation site](https://developers.google.com/translate/v2/using_rest).
+
 # Usage
 
-This documentation was generated from the *translate* API at revision *20141123*. The CLI is at version *0.1.0*.
+This documentation was generated from the *translate* API at revision *20141123*. The CLI is at version *0.2.0*.
 
 ```bash
-  translate2 [options] detections list <q>... [-p <v>...] [-o <out>]
-  translate2 [options] languages list [-p <v>...] [-o <out>]
-  translate2 [options] translations list <q>... <target> [-p <v>...] [-o <out>]
+translate2 [options]
+        detections
+                list <q>... [-p <v>]... [-o <out>]
+        languages
+                list [-p <v>]... [-o <out>]
+        translations
+                list <q>... <target> [-p <v>]... [-o <out>]
   translate2 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_translate2_cli/index.html
 
 Configuration:
   --config-dir <folder>

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-blogger3` library allows access to all features of the *Google blogger* service.
 
-This documentation was generated from *blogger* crate version *0.1.6+20150422*, where *20150422* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *blogger* crate version *0.1.7+20150422*, where *20150422* is the exact revision of the *blogger:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *blogger* *v3* API can be found at the
 [official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
@@ -190,7 +190,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_blogger3/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_blogger3/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-tasks1` library allows access to all features of the *Google tasks* service.
 
-This documentation was generated from *tasks* crate version *0.1.6+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *tasks* crate version *0.1.7+20141121*, where *20141121* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *tasks* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
@@ -176,7 +176,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_tasks1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_tasks1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

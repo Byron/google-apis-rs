@@ -17,13 +17,14 @@ keywords = ["drive", "google", "cli"]
 name = "drive2"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-clap = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-drive2]
 path = "../drive2"

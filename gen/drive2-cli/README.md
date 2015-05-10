@@ -93,9 +93,6 @@ drive2 [options]
                 update <file-id> <revision-id> (-r <kv>)... [-p <v>]... [-o <out>]
   drive2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_drive2_cli
-
 Configuration:
   [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 

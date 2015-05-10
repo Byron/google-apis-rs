@@ -12,62 +12,71 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20150309*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Android Enterprise* API at revision *20150309*. The CLI is at version *0.2.0*.
 
 ```bash
-  androidenterprise1 [options] collections delete <enterprise-id> <collection-id> [-p <v>...]
-  androidenterprise1 [options] collections get <enterprise-id> <collection-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collections insert <enterprise-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collections list <enterprise-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collections patch <enterprise-id> <collection-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collections update <enterprise-id> <collection-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collectionviewers delete <enterprise-id> <collection-id> <user-id> [-p <v>...]
-  androidenterprise1 [options] collectionviewers get <enterprise-id> <collection-id> <user-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collectionviewers list <enterprise-id> <collection-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collectionviewers patch <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] collectionviewers update <enterprise-id> <collection-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] devices get <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] devices get-state <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] devices list <enterprise-id> <user-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] devices set-state <enterprise-id> <user-id> <device-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises delete <enterprise-id> [-p <v>...]
-  androidenterprise1 [options] enterprises enroll <token> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises get <enterprise-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises insert <token> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises list <domain> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises set-account <enterprise-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] enterprises unenroll <enterprise-id> [-p <v>...]
-  androidenterprise1 [options] entitlements delete <enterprise-id> <user-id> <entitlement-id> [-p <v>...]
-  androidenterprise1 [options] entitlements get <enterprise-id> <user-id> <entitlement-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] entitlements list <enterprise-id> <user-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] entitlements patch <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] entitlements update <enterprise-id> <user-id> <entitlement-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] grouplicenses get <enterprise-id> <group-license-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] grouplicenses list <enterprise-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] grouplicenseusers list <enterprise-id> <group-license-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] installs delete <enterprise-id> <user-id> <device-id> <install-id> [-p <v>...]
-  androidenterprise1 [options] installs get <enterprise-id> <user-id> <device-id> <install-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] installs list <enterprise-id> <user-id> <device-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] installs patch <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] installs update <enterprise-id> <user-id> <device-id> <install-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] permissions get <permission-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] products get <enterprise-id> <product-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] products get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] products get-permissions <enterprise-id> <product-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] products update-permissions <enterprise-id> <product-id> -r <kv>... [-p <v>...] [-o <out>]
-  androidenterprise1 [options] users generate-token <enterprise-id> <user-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] users get <enterprise-id> <user-id> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] users list <enterprise-id> <email> [-p <v>...] [-o <out>]
-  androidenterprise1 [options] users revoke-token <enterprise-id> <user-id> [-p <v>...]
+androidenterprise1 [options]
+        collections
+                delete <enterprise-id> <collection-id> [-p <v>]...
+                get <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
+                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        collectionviewers
+                delete <enterprise-id> <collection-id> <user-id> [-p <v>]...
+                get <enterprise-id> <collection-id> <user-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <collection-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <collection-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <collection-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        devices
+                get <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
+                get-state <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                set-state <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        enterprises
+                delete <enterprise-id> [-p <v>]...
+                enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <enterprise-id> [-p <v>]... [-o <out>]
+                insert <token> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <domain> [-p <v>]... [-o <out>]
+                set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                unenroll <enterprise-id> [-p <v>]...
+        entitlements
+                delete <enterprise-id> <user-id> <entitlement-id> [-p <v>]...
+                get <enterprise-id> <user-id> <entitlement-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> <entitlement-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> <entitlement-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        grouplicenses
+                get <enterprise-id> <group-license-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
+        grouplicenseusers
+                list <enterprise-id> <group-license-id> [-p <v>]... [-o <out>]
+        installs
+                delete <enterprise-id> <user-id> <device-id> <install-id> [-p <v>]...
+                get <enterprise-id> <user-id> <device-id> <install-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> <device-id> <install-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> <device-id> <install-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        permissions
+                get <permission-id> [-p <v>]... [-o <out>]
+        products
+                get <enterprise-id> <product-id> [-p <v>]... [-o <out>]
+                get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>]... [-o <out>]
+                get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]
+                update-permissions <enterprise-id> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        users
+                generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                list <enterprise-id> <email> [-p <v>]... [-o <out>]
+                revoke-token <enterprise-id> <user-id> [-p <v>]...
   androidenterprise1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

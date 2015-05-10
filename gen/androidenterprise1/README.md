@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *0.1.6+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *Android Enterprise* crate version *0.1.7+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.AndroidEnterprise.html) ... 
@@ -186,7 +186,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_androidenterprise1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_androidenterprise1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

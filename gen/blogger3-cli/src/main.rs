@@ -2,148 +2,106 @@
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
 #![feature(plugin, exit_status)]
-#![plugin(docopt_macros)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate docopt;
+#[macro_use]
+extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_blogger3 as api;
 
 use std::env;
 use std::io::{self, Write};
-
-docopt!(Options derive Debug, "
-Usage: 
-  blogger3 [options] blog-user-infos get <user-id> <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs get <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs get-by-url <url> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs list-by-user <user-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments approve <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments delete <blog-id> <post-id> <comment-id> [-p <v>...]
-  blogger3 [options] comments get <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments list <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments list-by-blog <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments mark-as-spam <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments remove-content <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] page-views get <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages delete <blog-id> <page-id> [-p <v>...]
-  blogger3 [options] pages get <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] pages list <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages patch <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] pages publish <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages revert <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages update <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] post-user-infos get <user-id> <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] post-user-infos list <user-id> <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts delete <blog-id> <post-id> [-p <v>...]
-  blogger3 [options] posts get <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts get-by-path <blog-id> <path> [-p <v>...] [-o <out>]
-  blogger3 [options] posts insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] posts list <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts patch <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] posts publish <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts revert <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts search <blog-id> <q> [-p <v>...] [-o <out>]
-  blogger3 [options] posts update <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] users get <user-id> [-p <v>...] [-o <out>]
-  blogger3 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_blogger3_cli/index.html
-
-Configuration:
-  --scope <url>  
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
-  --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
-            a user-writable directory that we will create during the first invocation.
-            [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
-            and `rx` are placed into the same stream.
-");
+use clap::{App, SubCommand, Arg};
 
 mod cmn;
+
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: api::Blogger<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl Engine {
-    fn _blog_user_infos_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.blog_user_infos().get(&self.opt.arg_user_id, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+impl<'n, 'a> Engine<'n, 'a> {
+    fn _blog_user_infos_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.blog_user_infos().get(opt.value_of("user-id").unwrap_or(""), opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "max-posts" => {
                     call = call.max_posts(arg_from_str(value.unwrap_or("-0"), err, "max-posts", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-posts"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _blogs_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.blogs().get(&self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _blogs_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.blogs().get(opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -152,99 +110,107 @@ impl Engine {
                 "max-posts" => {
                     call = call.max_posts(arg_from_str(value.unwrap_or("-0"), err, "max-posts", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-posts", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _blogs_get_by_url(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.blogs().get_by_url(&self.opt.arg_url);
-        for parg in self.opt.arg_v.iter() {
+    fn _blogs_get_by_url(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.blogs().get_by_url(opt.value_of("url").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
                     call = call.view(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _blogs_list_by_user(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.blogs().list_by_user(&self.opt.arg_user_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _blogs_list_by_user(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.blogs().list_by_user(opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -259,189 +225,200 @@ impl Engine {
                 "fetch-user-info" => {
                     call = call.fetch_user_info(arg_from_str(value.unwrap_or("false"), err, "fetch-user-info", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "fetch-user-info", "role", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_approve(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().approve(&self.opt.arg_blog_id, &self.opt.arg_post_id, &self.opt.arg_comment_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_approve(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().approve(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().delete(&self.opt.arg_blog_id, &self.opt.arg_post_id, &self.opt.arg_comment_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().delete(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().get(&self.opt.arg_blog_id, &self.opt.arg_post_id, &self.opt.arg_comment_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().get(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
                     call = call.view(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().list(&self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().list(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -465,50 +442,54 @@ impl Engine {
                 "end-date" => {
                     call = call.end_date(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_list_by_blog(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().list_by_blog(&self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_list_by_blog(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().list_by_blog(opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "status" => {
@@ -529,286 +510,305 @@ impl Engine {
                 "end-date" => {
                     call = call.end_date(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_mark_as_spam(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().mark_as_spam(&self.opt.arg_blog_id, &self.opt.arg_post_id, &self.opt.arg_comment_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_mark_as_spam(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().mark_as_spam(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _comments_remove_content(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.comments().remove_content(&self.opt.arg_blog_id, &self.opt.arg_post_id, &self.opt.arg_comment_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _comments_remove_content(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.comments().remove_content(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""), opt.value_of("comment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _page_views_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.page_views().get(&self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _page_views_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.page_views().get(opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "range" => {
                     call = call.add_range(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["range"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.pages().delete(&self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _pages_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.pages().delete(opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.pages().get(&self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _pages_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.pages().get(opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
                     call = call.view(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _pages_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -900,61 +900,66 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.pages().insert(request, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.pages().insert(request, opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "is-draft" => {
                     call = call.is_draft(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["is-draft"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.pages().list(&self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _pages_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.pages().list(opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -972,52 +977,56 @@ impl Engine {
                 "fetch-bodies" => {
                     call = call.fetch_bodies(arg_from_str(value.unwrap_or("false"), err, "fetch-bodies", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "page-token", "fetch-bodies", "max-results", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _pages_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1109,12 +1118,13 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.pages().patch(request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.pages().patch(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revert" => {
@@ -1123,144 +1133,156 @@ impl Engine {
                 "publish" => {
                     call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["revert", "publish"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_publish(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.pages().publish(&self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _pages_publish(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.pages().publish(opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_revert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.pages().revert(&self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _pages_revert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.pages().revert(opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _pages_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _pages_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1352,12 +1374,13 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.pages().update(request, &self.opt.arg_blog_id, &self.opt.arg_page_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.pages().update(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revert" => {
@@ -1366,99 +1389,107 @@ impl Engine {
                 "publish" => {
                     call = call.publish(arg_from_str(value.unwrap_or("false"), err, "publish", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["revert", "publish"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _post_user_infos_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.post_user_infos().get(&self.opt.arg_user_id, &self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _post_user_infos_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.post_user_infos().get(opt.value_of("user-id").unwrap_or(""), opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "max-comments" => {
                     call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-comments"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _post_user_infos_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.post_user_infos().list(&self.opt.arg_user_id, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _post_user_infos_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.post_user_infos().list(opt.value_of("user-id").unwrap_or(""), opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -1488,94 +1519,97 @@ impl Engine {
                 "end-date" => {
                     call = call.end_date(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().delete(&self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().delete(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().get(&self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().get(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -1590,50 +1624,54 @@ impl Engine {
                 "fetch-body" => {
                     call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["fetch-body", "max-comments", "fetch-images", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_get_by_path(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().get_by_path(&self.opt.arg_blog_id, &self.opt.arg_path);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_get_by_path(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().get_by_path(opt.value_of("blog-id").unwrap_or(""), opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -1642,52 +1680,56 @@ impl Engine {
                 "max-comments" => {
                     call = call.max_comments(arg_from_str(value.unwrap_or("-0"), err, "max-comments", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-comments", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _posts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1833,12 +1875,13 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.posts().insert(request, &self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.posts().insert(request, opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "is-draft" => {
@@ -1850,50 +1893,54 @@ impl Engine {
                 "fetch-body" => {
                     call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["fetch-images", "is-draft", "fetch-body"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().list(&self.opt.arg_blog_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().list(opt.value_of("blog-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "view" => {
@@ -1926,52 +1973,56 @@ impl Engine {
                 "end-date" => {
                     call = call.end_date(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "fetch-images", "view"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _posts_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2117,12 +2168,13 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.posts().patch(request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.posts().patch(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revert" => {
@@ -2140,145 +2192,157 @@ impl Engine {
                 "fetch-body" => {
                     call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-comments", "revert", "fetch-images", "publish", "fetch-body"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_publish(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().publish(&self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_publish(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().publish(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "publish-date" => {
                     call = call.publish_date(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["publish-date"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_revert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().revert(&self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_revert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().revert(opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_search(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.posts().search(&self.opt.arg_blog_id, &self.opt.arg_q);
-        for parg in self.opt.arg_v.iter() {
+    fn _posts_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.posts().search(opt.value_of("blog-id").unwrap_or(""), opt.value_of("q").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "order-by" => {
@@ -2287,52 +2351,56 @@ impl Engine {
                 "fetch-bodies" => {
                     call = call.fetch_bodies(arg_from_str(value.unwrap_or("false"), err, "fetch-bodies", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["order-by", "fetch-bodies"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _posts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _posts_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -2478,12 +2546,13 @@ impl Engine {
                         request.published = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.posts().update(request, &self.opt.arg_blog_id, &self.opt.arg_post_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.posts().update(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "revert" => {
@@ -2501,218 +2570,288 @@ impl Engine {
                 "fetch-body" => {
                     call = call.fetch_body(arg_from_str(value.unwrap_or("false"), err, "fetch-body", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["max-comments", "revert", "fetch-images", "publish", "fetch-body"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _users_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.users().get(&self.opt.arg_user_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _users_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().get(opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
+        let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
-
-        if self.opt.cmd_blog_user_infos {
-            if self.opt.cmd_get {
-                call_result = self._blog_user_infos_get(dry_run, &mut err);
-            } else {
-                unreachable!();
+        match self.opt.subcommand() {
+            ("blog-user-infos", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._blog_user_infos_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("blog-user-infos".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("blogs", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._blogs_get(opt, dry_run, &mut err);
+                    },
+                    ("get-by-url", Some(opt)) => {
+                        call_result = self._blogs_get_by_url(opt, dry_run, &mut err);
+                    },
+                    ("list-by-user", Some(opt)) => {
+                        call_result = self._blogs_list_by_user(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("blogs".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("comments", Some(opt)) => {
+                match opt.subcommand() {
+                    ("approve", Some(opt)) => {
+                        call_result = self._comments_approve(opt, dry_run, &mut err);
+                    },
+                    ("delete", Some(opt)) => {
+                        call_result = self._comments_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._comments_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._comments_list(opt, dry_run, &mut err);
+                    },
+                    ("list-by-blog", Some(opt)) => {
+                        call_result = self._comments_list_by_blog(opt, dry_run, &mut err);
+                    },
+                    ("mark-as-spam", Some(opt)) => {
+                        call_result = self._comments_mark_as_spam(opt, dry_run, &mut err);
+                    },
+                    ("remove-content", Some(opt)) => {
+                        call_result = self._comments_remove_content(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("comments".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("page-views", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._page_views_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("page-views".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("pages", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._pages_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._pages_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._pages_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._pages_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._pages_patch(opt, dry_run, &mut err);
+                    },
+                    ("publish", Some(opt)) => {
+                        call_result = self._pages_publish(opt, dry_run, &mut err);
+                    },
+                    ("revert", Some(opt)) => {
+                        call_result = self._pages_revert(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._pages_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("pages".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("post-user-infos", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._post_user_infos_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._post_user_infos_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("post-user-infos".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("posts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._posts_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._posts_get(opt, dry_run, &mut err);
+                    },
+                    ("get-by-path", Some(opt)) => {
+                        call_result = self._posts_get_by_path(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._posts_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._posts_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._posts_patch(opt, dry_run, &mut err);
+                    },
+                    ("publish", Some(opt)) => {
+                        call_result = self._posts_publish(opt, dry_run, &mut err);
+                    },
+                    ("revert", Some(opt)) => {
+                        call_result = self._posts_revert(opt, dry_run, &mut err);
+                    },
+                    ("search", Some(opt)) => {
+                        call_result = self._posts_search(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._posts_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("posts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("users", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._users_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("users".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
             }
-        }
- else if self.opt.cmd_blogs {
-            if self.opt.cmd_get {
-                call_result = self._blogs_get(dry_run, &mut err);
-            } else if self.opt.cmd_get_by_url {
-                call_result = self._blogs_get_by_url(dry_run, &mut err);
-            } else if self.opt.cmd_list_by_user {
-                call_result = self._blogs_list_by_user(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_comments {
-            if self.opt.cmd_approve {
-                call_result = self._comments_approve(dry_run, &mut err);
-            } else if self.opt.cmd_delete {
-                call_result = self._comments_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._comments_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._comments_list(dry_run, &mut err);
-            } else if self.opt.cmd_list_by_blog {
-                call_result = self._comments_list_by_blog(dry_run, &mut err);
-            } else if self.opt.cmd_mark_as_spam {
-                call_result = self._comments_mark_as_spam(dry_run, &mut err);
-            } else if self.opt.cmd_remove_content {
-                call_result = self._comments_remove_content(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_page_views {
-            if self.opt.cmd_get {
-                call_result = self._page_views_get(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_pages {
-            if self.opt.cmd_delete {
-                call_result = self._pages_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._pages_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._pages_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._pages_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._pages_patch(dry_run, &mut err);
-            } else if self.opt.cmd_publish {
-                call_result = self._pages_publish(dry_run, &mut err);
-            } else if self.opt.cmd_revert {
-                call_result = self._pages_revert(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._pages_update(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_post_user_infos {
-            if self.opt.cmd_get {
-                call_result = self._post_user_infos_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._post_user_infos_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_posts {
-            if self.opt.cmd_delete {
-                call_result = self._posts_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._posts_get(dry_run, &mut err);
-            } else if self.opt.cmd_get_by_path {
-                call_result = self._posts_get_by_path(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._posts_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._posts_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._posts_patch(dry_run, &mut err);
-            } else if self.opt.cmd_publish {
-                call_result = self._posts_publish(dry_run, &mut err);
-            } else if self.opt.cmd_revert {
-                call_result = self._posts_revert(dry_run, &mut err);
-            } else if self.opt.cmd_search {
-                call_result = self._posts_search(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._posts_update(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_users {
-            if self.opt.cmd_get {
-                call_result = self._users_get(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        } else {
-            unreachable!();
         }
 
         if dry_run {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -2725,7 +2864,7 @@ impl Engine {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.flag_debug_auth {
+                                        if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
                                                     connector: hyper::net::HttpConnector(None) 
                                                 })
@@ -2738,7 +2877,7 @@ impl Engine {
                                         }, None);
 
         let client = 
-            if opt.flag_debug {
+            if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpConnector(None) 
                     })
@@ -2748,37 +2887,1065 @@ impl Engine {
         let engine = Engine {
             opt: opt,
             hub: api::Blogger::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 
 fn main() {
-    let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    let debug = opts.flag_debug;
-    match Engine::new(opts) {
+    let arg_data = [
+        ("blog-user-infos", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Gets one blog and user info pair by blogId and userId."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blog-user-infos_get",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("blogs", "methods: 'get', 'get-by-url' and 'list-by-user'", vec![
+            ("get",  
+                    Some(r##"Gets one blog by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_get",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-by-url",  
+                    Some(r##"Retrieve a Blog by URL."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_get-by-url",
+                  vec![
+                    (Some(r##"url"##),
+                     None,
+                     Some(r##"The URL of the blog to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list-by-user",  
+                    Some(r##"Retrieves a list of blogs, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/blogs_list-by-user",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"ID of the user whose blogs are to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("comments", "methods: 'approve', 'delete', 'get', 'list', 'list-by-blog', 'mark-as-spam' and 'remove-content'", vec![
+            ("approve",  
+                    Some(r##"Marks a comment as not spam."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_approve",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"comment-id"##),
+                     None,
+                     Some(r##"The ID of the comment to mark as not spam."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("delete",  
+                    Some(r##"Delete a comment by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_delete",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"comment-id"##),
+                     None,
+                     Some(r##"The ID of the comment to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Gets one comment by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_get",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to containing the comment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"ID of the post to fetch posts from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"comment-id"##),
+                     None,
+                     Some(r##"The ID of the comment to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves the comments for a post, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_list",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch comments from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"ID of the post to fetch posts from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list-by-blog",  
+                    Some(r##"Retrieves the comments for a blog, across all posts, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_list-by-blog",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch comments from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("mark-as-spam",  
+                    Some(r##"Marks a comment as spam."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_mark-as-spam",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"comment-id"##),
+                     None,
+                     Some(r##"The ID of the comment to mark as spam."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("remove-content",  
+                    Some(r##"Removes the content of a comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/comments_remove-content",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"comment-id"##),
+                     None,
+                     Some(r##"The ID of the comment to delete content from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("page-views", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Retrieve pageview stats for a Blog."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/page-views_get",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("pages", "methods: 'delete', 'get', 'insert', 'list', 'patch', 'publish', 'revert' and 'update'", vec![
+            ("delete",  
+                    Some(r##"Delete a page by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_delete",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the Page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Gets one blog page by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_get",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog containing the page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the page to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Add a page."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_insert",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to add the page to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves the pages for a blog, optionally including non-LIVE statuses."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_list",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch Pages from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Update a page. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_patch",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the Page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("publish",  
+                    Some(r##"Publishes a draft page."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_publish",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("revert",  
+                    Some(r##"Revert a published or scheduled page to draft state."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_revert",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Update a page."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/pages_update",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"page-id"##),
+                     None,
+                     Some(r##"The ID of the Page."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("post-user-infos", "methods: 'get' and 'list'", vec![
+            ("get",  
+                    Some(r##"Gets one post and user info pair, by post ID and user ID. The post user info contains per-user information about the post, such as access rights, specific to the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/post-user-infos_get",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the post to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of post and post user info pairs, possibly filtered. The post user info contains per-user information about the post, such as access rights, specific to the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/post-user-infos_list",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"ID of the user for the per-user information to be fetched. Either the word 'self' (sans quote marks) or the user's profile identifier."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch posts from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("posts", "methods: 'delete', 'get', 'get-by-path', 'insert', 'list', 'patch', 'publish', 'revert', 'search' and 'update'", vec![
+            ("delete",  
+                    Some(r##"Delete a post by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_delete",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Get a post by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_get",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch the post from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the post"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-by-path",  
+                    Some(r##"Retrieve a Post by Path."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_get-by-path",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch the post from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"Path of the Post to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Add a post."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_insert",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to add the post to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of posts, possibly filtered."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_list",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch posts from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Update a post. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_patch",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("publish",  
+                    Some(r##"Publishes a draft post, optionally at the specific time of the given publishDate parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_publish",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("revert",  
+                    Some(r##"Revert a published or scheduled post to draft state."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_revert",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("search",  
+                    Some(r##"Search for a post."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_search",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"ID of the blog to fetch the post from."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"q"##),
+                     None,
+                     Some(r##"Query terms to search this blog for matching posts."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Update a post."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/posts_update",
+                  vec![
+                    (Some(r##"blog-id"##),
+                     None,
+                     Some(r##"The ID of the Blog."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"post-id"##),
+                     None,
+                     Some(r##"The ID of the Post."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("users", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Gets one user by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_blogger3_cli/users_get",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The ID of the user to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+    ];
+    
+    let mut app = App::new("blogger3")
+           .author("Sebastian Thiel <byronimo@gmail.com>")
+           .version("0.2.0+20150422")
+           .about("API for access to the data within Blogger.")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_blogger3_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
+           .arg(Arg::with_name("folder")
+                   .long("config-dir")
+                   .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")
+                   .multiple(false)
+                   .takes_value(true))
+           .arg(Arg::with_name("debug")
+                   .long("debug")
+                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false))
+           .arg(Arg::with_name("debug-auth")
+                   .long("debug-auth")
+                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false));
+           
+           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name).about(about);
+           
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   scmd = scmd.after_help(url_info);
+           
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                       let arg_name_str = 
+                           match (arg_name, flag) {
+                                   (&Some(an), _       ) => an,
+                                   (_        , &Some(f)) => f,
+                                    _                    => unreachable!(),
+                            };
+                       let mut arg = Arg::with_name(arg_name_str);
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           
+        let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }

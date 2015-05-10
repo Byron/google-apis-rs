@@ -103,9 +103,6 @@ youtube3 [options]
                 unset <channel-id> [-p <v>]...
   youtube3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_youtube3_cli
-
 Configuration:
   [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 

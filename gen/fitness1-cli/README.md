@@ -10,32 +10,34 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *fitness* API can be found at the
+[official documentation site](https://developers.google.com/fit/rest/).
+
 # Usage
 
-This documentation was generated from the *fitness* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *fitness* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  fitness1 [options] users data-sources-create <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-datasets-delete <user-id> <data-source-id> <dataset-id> [-p <v>...]
-  fitness1 [options] users data-sources-datasets-get <user-id> <data-source-id> <dataset-id> [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-datasets-patch <user-id> <data-source-id> <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-delete <user-id> <data-source-id> [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-get <user-id> <data-source-id> [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-list <user-id> [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-patch <user-id> <data-source-id> -r <kv>... [-p <v>...] [-o <out>]
-  fitness1 [options] users data-sources-update <user-id> <data-source-id> -r <kv>... [-p <v>...] [-o <out>]
-  fitness1 [options] users sessions-delete <user-id> <session-id> [-p <v>...]
-  fitness1 [options] users sessions-list <user-id> [-p <v>...] [-o <out>]
-  fitness1 [options] users sessions-update <user-id> <session-id> -r <kv>... [-p <v>...] [-o <out>]
+fitness1 [options]
+        users
+                data-sources-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                data-sources-datasets-delete <user-id> <data-source-id> <dataset-id> [-p <v>]...
+                data-sources-datasets-get <user-id> <data-source-id> <dataset-id> [-p <v>]... [-o <out>]
+                data-sources-datasets-patch <user-id> <data-source-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                data-sources-delete <user-id> <data-source-id> [-p <v>]... [-o <out>]
+                data-sources-get <user-id> <data-source-id> [-p <v>]... [-o <out>]
+                data-sources-list <user-id> [-p <v>]... [-o <out>]
+                data-sources-patch <user-id> <data-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                data-sources-update <user-id> <data-source-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                sessions-delete <user-id> <session-id> [-p <v>]...
+                sessions-list <user-id> [-p <v>]... [-o <out>]
+                sessions-update <user-id> <session-id> (-r <kv>)... [-p <v>]... [-o <out>]
   fitness1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_fitness1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

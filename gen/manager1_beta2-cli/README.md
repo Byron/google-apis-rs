@@ -10,28 +10,31 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *manager* API can be found at the
+[official documentation site](https://developers.google.com/deployment-manager/).
+
 # Usage
 
-This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *0.1.0*.
+This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *0.2.0*.
 
 ```bash
-  manager1-beta2 [options] deployments delete <project-id> <region> <deployment-name> [-p <v>...]
-  manager1-beta2 [options] deployments get <project-id> <region> <deployment-name> [-p <v>...] [-o <out>]
-  manager1-beta2 [options] deployments insert <project-id> <region> -r <kv>... [-p <v>...] [-o <out>]
-  manager1-beta2 [options] deployments list <project-id> <region> [-p <v>...] [-o <out>]
-  manager1-beta2 [options] templates delete <project-id> <template-name> [-p <v>...]
-  manager1-beta2 [options] templates get <project-id> <template-name> [-p <v>...] [-o <out>]
-  manager1-beta2 [options] templates insert <project-id> -r <kv>... [-p <v>...] [-o <out>]
-  manager1-beta2 [options] templates list <project-id> [-p <v>...] [-o <out>]
+manager1-beta2 [options]
+        deployments
+                delete <project-id> <region> <deployment-name> [-p <v>]...
+                get <project-id> <region> <deployment-name> [-p <v>]... [-o <out>]
+                insert <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project-id> <region> [-p <v>]... [-o <out>]
+        templates
+                delete <project-id> <template-name> [-p <v>]...
+                get <project-id> <template-name> [-p <v>]... [-o <out>]
+                insert <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project-id> [-p <v>]... [-o <out>]
   manager1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_manager1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

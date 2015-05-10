@@ -10,26 +10,28 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *datastore* API can be found at the
+[official documentation site](https://developers.google.com/datastore/).
+
 # Usage
 
-This documentation was generated from the *datastore* API at revision *20150402*. The CLI is at version *0.1.0*.
+This documentation was generated from the *datastore* API at revision *20150402*. The CLI is at version *0.2.0*.
 
 ```bash
-  datastore1-beta2 [options] datasets allocate-ids <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  datastore1-beta2 [options] datasets begin-transaction <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  datastore1-beta2 [options] datasets commit <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  datastore1-beta2 [options] datasets lookup <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  datastore1-beta2 [options] datasets rollback <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  datastore1-beta2 [options] datasets run-query <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
+datastore1-beta2 [options]
+        datasets
+                allocate-ids <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                begin-transaction <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                commit <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                lookup <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                rollback <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                run-query <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
   datastore1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_datastore1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

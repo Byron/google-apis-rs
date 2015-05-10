@@ -138,7 +138,7 @@ pub trait Delegate {
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
     ///
     /// Return retry information.
-    fn http_error(&mut self, &hyper::HttpError) -> Retry {
+    fn http_error(&mut self, &hyper::Error) -> Retry {
         Retry::Abort
     }
 
@@ -173,7 +173,10 @@ pub trait Delegate {
     /// Called after we have retrieved a new upload URL for a resumable upload to store it
     /// in case we fail or cancel. That way, we can attempt to resume the upload later, 
     /// see `upload_url()`.
-    fn store_upload_url(&mut self, url: &str) {
+    /// It will also be called with None after a successful upload, which allows the delegate
+    /// to forget the URL. That way, we will not attempt to resume an upload that has already
+    /// finished.
+    fn store_upload_url(&mut self, url: Option<&str>) {
         let _ = url;
     }
 
@@ -247,7 +250,7 @@ impl Delegate for DefaultDelegate {}
 #[derive(Debug)]
 pub enum Error {
     /// The http connection failed
-    HttpError(hyper::HttpError),
+    HttpError(hyper::Error),
 
     /// An attempt was made to upload a resource with size stored in field `.0`
     /// even though the maximum upload size is what is stored in field `.1`.
@@ -290,8 +293,20 @@ impl Display for Error {
                 writeln!(f, "The application's API key was not found in the configuration").ok();
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
-            Error::BadRequest(ref err) 
-                => writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message),
+            Error::BadRequest(ref err) => {
+                try!(writeln!(f, "Bad Requst ({}): {}", err.error.code, err.error.message));
+                for err in err.error.errors.iter() {
+                    try!(writeln!(f, "    {}: {}, {}{}", 
+                                            err.domain, 
+                                            err.message, 
+                                            err.reason,
+                                            match &err.location {
+                                                &Some(ref loc) => format!("@{}", loc),
+                                                &None => String::new(),
+                                            }));
+                }
+                Ok(())
+            },
             Error::MissingToken(ref err) =>
                 writeln!(f, "Token retrieval failed with error: {}", err),
             Error::Cancelled => 
@@ -459,6 +474,16 @@ impl<'a> Read for MultiPartReader<'a> {
 header!{
     #[doc="The `X-Upload-Content-Type` header."]
     (XUploadContentType, "X-Upload-Content-Type") => [Mime]
+
+    xupload_content_type {
+        test_header!(
+            test1,
+            vec![b"text/plain"],
+            Some(HeaderField(
+                vec![Mime(TopLevel::Text, SubLevel::Plain, Vec::new())]
+                )));
+
+    }
 }
 
 #[derive(Clone, PartialEq, Debug)]
@@ -576,7 +601,7 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
 impl<'a, A> ResumableUploadHelper<'a, A>
     where A: oauth2::GetToken {
 
-    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::HttpResult<hyper::client::Response>> {
+    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::Result<hyper::client::Response>> {
         loop {
             match self.client.post(self.url)
                 .header(UserAgent(self.user_agent.to_string()))
@@ -612,7 +637,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
     /// returns None if operation was cancelled by delegate, or the HttpResult.
     /// It can be that we return the result just because we didn't understand the status code -
     /// caller should check for status himself before assuming it's OK to use
-    pub fn upload(&mut self) -> Option<hyper::HttpResult<hyper::client::Response>> {
+    pub fn upload(&mut self) -> Option<hyper::Result<hyper::client::Response>> {
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status() {

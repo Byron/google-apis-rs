@@ -10,55 +10,62 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *storage* API can be found at the
+[official documentation site](https://developers.google.com/storage/docs/json_api/).
+
 # Usage
 
-This documentation was generated from the *storage* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *storage* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  storage1 [options] bucket-access-controls delete <bucket> <entity> [-p <v>...]
-  storage1 [options] bucket-access-controls get <bucket> <entity> [-p <v>...] [-o <out>]
-  storage1 [options] bucket-access-controls insert <bucket> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] bucket-access-controls list <bucket> [-p <v>...] [-o <out>]
-  storage1 [options] bucket-access-controls patch <bucket> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] bucket-access-controls update <bucket> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] buckets delete <bucket> [-p <v>...]
-  storage1 [options] buckets get <bucket> [-p <v>...] [-o <out>]
-  storage1 [options] buckets insert <project> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] buckets list <project> [-p <v>...] [-o <out>]
-  storage1 [options] buckets patch <bucket> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] buckets update <bucket> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] channels stop -r <kv>... [-p <v>...]
-  storage1 [options] default-object-access-controls delete <bucket> <entity> [-p <v>...]
-  storage1 [options] default-object-access-controls get <bucket> <entity> [-p <v>...] [-o <out>]
-  storage1 [options] default-object-access-controls insert <bucket> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] default-object-access-controls list <bucket> [-p <v>...] [-o <out>]
-  storage1 [options] default-object-access-controls patch <bucket> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] default-object-access-controls update <bucket> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] object-access-controls delete <bucket> <object> <entity> [-p <v>...]
-  storage1 [options] object-access-controls get <bucket> <object> <entity> [-p <v>...] [-o <out>]
-  storage1 [options] object-access-controls insert <bucket> <object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] object-access-controls list <bucket> <object> [-p <v>...] [-o <out>]
-  storage1 [options] object-access-controls patch <bucket> <object> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] object-access-controls update <bucket> <object> <entity> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects compose <destination-bucket> <destination-object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects copy <source-bucket> <source-object> <destination-bucket> <destination-object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects delete <bucket> <object> [-p <v>...]
-  storage1 [options] objects get <bucket> <object> [-p <v>...] [-o <out>]
-  storage1 [options] objects insert <bucket> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  storage1 [options] objects list <bucket> [-p <v>...] [-o <out>]
-  storage1 [options] objects patch <bucket> <object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects rewrite <source-bucket> <source-object> <destination-bucket> <destination-object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects update <bucket> <object> -r <kv>... [-p <v>...] [-o <out>]
-  storage1 [options] objects watch-all <bucket> -r <kv>... [-p <v>...] [-o <out>]
+storage1 [options]
+        bucket-access-controls
+                delete <bucket> <entity> [-p <v>]...
+                get <bucket> <entity> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                patch <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+        buckets
+                delete <bucket> [-p <v>]...
+                get <bucket> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+        channels
+                stop (-r <kv>)... [-p <v>]...
+        default-object-access-controls
+                delete <bucket> <entity> [-p <v>]...
+                get <bucket> <entity> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                patch <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <bucket> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+        object-access-controls
+                delete <bucket> <object> <entity> [-p <v>]...
+                get <bucket> <object> <entity> [-p <v>]... [-o <out>]
+                insert <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <bucket> <object> [-p <v>]... [-o <out>]
+                patch <bucket> <object> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <bucket> <object> <entity> (-r <kv>)... [-p <v>]... [-o <out>]
+        objects
+                compose <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
+                copy <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <bucket> <object> [-p <v>]...
+                get <bucket> <object> [-p <v>]... [-o <out>]
+                insert <bucket> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                list <bucket> [-p <v>]... [-o <out>]
+                patch <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
+                rewrite <source-bucket> <source-object> <destination-bucket> <destination-object> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <bucket> <object> (-r <kv>)... [-p <v>]... [-o <out>]
+                watch-all <bucket> (-r <kv>)... [-p <v>]... [-o <out>]
   storage1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_storage1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

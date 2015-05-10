@@ -10,32 +10,39 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *coordinate* API can be found at the
+[official documentation site](https://developers.google.com/coordinate/).
+
 # Usage
 
-This documentation was generated from the *coordinate* API at revision *20141215*. The CLI is at version *0.1.0*.
+This documentation was generated from the *coordinate* API at revision *20141215*. The CLI is at version *0.2.0*.
 
 ```bash
-  coordinate1 [options] custom-field-def list <team-id> [-p <v>...] [-o <out>]
-  coordinate1 [options] jobs get <team-id> <job-id> [-p <v>...] [-o <out>]
-  coordinate1 [options] jobs insert <team-id> <address> <lat> <lng> <title> -r <kv>... [-p <v>...] [-o <out>]
-  coordinate1 [options] jobs list <team-id> [-p <v>...] [-o <out>]
-  coordinate1 [options] jobs patch <team-id> <job-id> -r <kv>... [-p <v>...] [-o <out>]
-  coordinate1 [options] jobs update <team-id> <job-id> -r <kv>... [-p <v>...] [-o <out>]
-  coordinate1 [options] location list <team-id> <worker-email> <start-timestamp-ms> [-p <v>...] [-o <out>]
-  coordinate1 [options] schedule get <team-id> <job-id> [-p <v>...] [-o <out>]
-  coordinate1 [options] schedule patch <team-id> <job-id> -r <kv>... [-p <v>...] [-o <out>]
-  coordinate1 [options] schedule update <team-id> <job-id> -r <kv>... [-p <v>...] [-o <out>]
-  coordinate1 [options] team list [-p <v>...] [-o <out>]
-  coordinate1 [options] worker list <team-id> [-p <v>...] [-o <out>]
+coordinate1 [options]
+        custom-field-def
+                list <team-id> [-p <v>]... [-o <out>]
+        jobs
+                get <team-id> <job-id> [-p <v>]... [-o <out>]
+                insert <team-id> <address> <lat> <lng> <title> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <team-id> [-p <v>]... [-o <out>]
+                patch <team-id> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <team-id> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        location
+                list <team-id> <worker-email> <start-timestamp-ms> [-p <v>]... [-o <out>]
+        schedule
+                get <team-id> <job-id> [-p <v>]... [-o <out>]
+                patch <team-id> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <team-id> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        team
+                list [-p <v>]... [-o <out>]
+        worker
+                list <team-id> [-p <v>]... [-o <out>]
   coordinate1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_coordinate1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

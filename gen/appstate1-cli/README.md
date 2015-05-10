@@ -10,25 +10,27 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *App State* API can be found at the
+[official documentation site](https://developers.google.com/games/services/web/api/states).
+
 # Usage
 
-This documentation was generated from the *App State* API at revision *20150414*. The CLI is at version *0.1.0*.
+This documentation was generated from the *App State* API at revision *20150414*. The CLI is at version *0.2.0*.
 
 ```bash
-  appstate1 [options] states clear <state-key> [-p <v>...] [-o <out>]
-  appstate1 [options] states delete <state-key> [-p <v>...]
-  appstate1 [options] states get <state-key> [-p <v>...] [-o <out>]
-  appstate1 [options] states list [-p <v>...] [-o <out>]
-  appstate1 [options] states update <state-key> -r <kv>... [-p <v>...] [-o <out>]
+appstate1 [options]
+        states
+                clear <state-key> [-p <v>]... [-o <out>]
+                delete <state-key> [-p <v>]...
+                get <state-key> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                update <state-key> (-r <kv>)... [-p <v>]... [-o <out>]
   appstate1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_appstate1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

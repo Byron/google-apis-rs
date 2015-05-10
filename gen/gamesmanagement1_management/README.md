@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-gamesmanagement1_management` library allows access to all features of the *Google Games Management* service.
 
-This documentation was generated from *Games Management* crate version *0.1.6+20150413*, where *20150413* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *Games Management* crate version *0.1.7+20150413*, where *20150413* is the exact revision of the *gamesManagement:v1management* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *Games Management* *v1_management* API can be found at the
 [official documentation site](https://developers.google.com/games/services).
@@ -172,7 +172,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_gamesmanagement1_management/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_gamesmanagement1_management/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-content2` library allows access to all features of the *Google Shopping Content* service.
 
-This documentation was generated from *Shopping Content* crate version *0.1.6+20150421*, where *20150421* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *Shopping Content* crate version *0.1.7+20150421*, where *20150421* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *Shopping Content* *v2* API can be found at the
 [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -186,7 +186,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_content2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_content2/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

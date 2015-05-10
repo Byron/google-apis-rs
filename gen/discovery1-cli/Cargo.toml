@@ -17,14 +17,14 @@ keywords = ["discovery", "google", "cli"]
 name = "discovery1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-clap = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-discovery1]
 path = "../discovery1"

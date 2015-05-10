@@ -4,7 +4,7 @@
 [package]
 
 name = "google-identitytoolkit3"
-version = "0.1.6+20150406"
+version = "0.1.7+20150406"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Identity Toolkit (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3"
@@ -15,9 +15,10 @@ keywords = ["identitytoolkit", "google", "protocol", "web", "api"]
 
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+json-tools = ">= 0.3.0"

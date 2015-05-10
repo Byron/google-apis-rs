@@ -10,66 +10,68 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Tag Manager* API can be found at the
+[official documentation site](https://developers.google.com/tag-manager/api/v1/).
+
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20150121*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Tag Manager* API at revision *20150121*. The CLI is at version *0.2.0*.
 
 ```bash
-  tagmanager1 [options] accounts containers-create <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-delete <account-id> <container-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-get <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-list <account-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-macros-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-macros-delete <account-id> <container-id> <macro-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-macros-get <account-id> <container-id> <macro-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-macros-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-macros-update <account-id> <container-id> <macro-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-rules-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-rules-delete <account-id> <container-id> <rule-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-rules-get <account-id> <container-id> <rule-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-rules-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-rules-update <account-id> <container-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-tags-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-tags-get <account-id> <container-id> <tag-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-tags-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-tags-update <account-id> <container-id> <tag-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-delete <account-id> <container-id> <trigger-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-triggers-get <account-id> <container-id> <trigger-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-triggers-update <account-id> <container-id> <trigger-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-update <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-variables-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-variables-delete <account-id> <container-id> <variable-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-variables-get <account-id> <container-id> <variable-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-variables-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-variables-update <account-id> <container-id> <variable-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-create <account-id> <container-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-delete <account-id> <container-id> <container-version-id> [-p <v>...]
-  tagmanager1 [options] accounts containers-versions-get <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-list <account-id> <container-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-publish <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-restore <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-undelete <account-id> <container-id> <container-version-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts containers-versions-update <account-id> <container-id> <container-version-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts get <account-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts list [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts permissions-create <account-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts permissions-delete <account-id> <permission-id> [-p <v>...]
-  tagmanager1 [options] accounts permissions-get <account-id> <permission-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts permissions-list <account-id> [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts permissions-update <account-id> <permission-id> -r <kv>... [-p <v>...] [-o <out>]
-  tagmanager1 [options] accounts update <account-id> -r <kv>... [-p <v>...] [-o <out>]
+tagmanager1 [options]
+        accounts
+                containers-create <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-delete <account-id> <container-id> [-p <v>]...
+                containers-get <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-list <account-id> [-p <v>]... [-o <out>]
+                containers-macros-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-macros-delete <account-id> <container-id> <macro-id> [-p <v>]...
+                containers-macros-get <account-id> <container-id> <macro-id> [-p <v>]... [-o <out>]
+                containers-macros-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-macros-update <account-id> <container-id> <macro-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-rules-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-rules-delete <account-id> <container-id> <rule-id> [-p <v>]...
+                containers-rules-get <account-id> <container-id> <rule-id> [-p <v>]... [-o <out>]
+                containers-rules-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-rules-update <account-id> <container-id> <rule-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-tags-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>]...
+                containers-tags-get <account-id> <container-id> <tag-id> [-p <v>]... [-o <out>]
+                containers-tags-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-tags-update <account-id> <container-id> <tag-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-triggers-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-triggers-delete <account-id> <container-id> <trigger-id> [-p <v>]...
+                containers-triggers-get <account-id> <container-id> <trigger-id> [-p <v>]... [-o <out>]
+                containers-triggers-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-triggers-update <account-id> <container-id> <trigger-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-update <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-variables-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-variables-delete <account-id> <container-id> <variable-id> [-p <v>]...
+                containers-variables-get <account-id> <container-id> <variable-id> [-p <v>]... [-o <out>]
+                containers-variables-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-variables-update <account-id> <container-id> <variable-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-versions-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-versions-delete <account-id> <container-id> <container-version-id> [-p <v>]...
+                containers-versions-get <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
+                containers-versions-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-versions-publish <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
+                containers-versions-restore <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
+                containers-versions-undelete <account-id> <container-id> <container-version-id> [-p <v>]... [-o <out>]
+                containers-versions-update <account-id> <container-id> <container-version-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <account-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                permissions-create <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                permissions-delete <account-id> <permission-id> [-p <v>]...
+                permissions-get <account-id> <permission-id> [-p <v>]... [-o <out>]
+                permissions-list <account-id> [-p <v>]... [-o <out>]
+                permissions-update <account-id> <permission-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
   tagmanager1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_tagmanager1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

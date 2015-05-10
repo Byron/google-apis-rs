@@ -10,21 +10,23 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *appsactivity* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/activity/).
+
 # Usage
 
-This documentation was generated from the *appsactivity* API at revision *20140828*. The CLI is at version *0.1.0*.
+This documentation was generated from the *appsactivity* API at revision *20140828*. The CLI is at version *0.2.0*.
 
 ```bash
-  appsactivity1 [options] activities list [-p <v>...] [-o <out>]
+appsactivity1 [options]
+        activities
+                list [-p <v>]... [-o <out>]
   appsactivity1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_appsactivity1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

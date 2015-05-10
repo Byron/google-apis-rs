@@ -10,29 +10,31 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *container* API can be found at the
+[official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
+
 # Usage
 
-This documentation was generated from the *container* API at revision *20150420*. The CLI is at version *0.1.0*.
+This documentation was generated from the *container* API at revision *20150420*. The CLI is at version *0.2.0*.
 
 ```bash
-  container1-beta1 [options] projects clusters-list <project-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects operations-list <project-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-clusters-create <project-id> <zone-id> -r <kv>... [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-clusters-delete <project-id> <zone-id> <cluster-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-clusters-get <project-id> <zone-id> <cluster-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-clusters-list <project-id> <zone-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-operations-get <project-id> <zone-id> <operation-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-operations-list <project-id> <zone-id> [-p <v>...] [-o <out>]
-  container1-beta1 [options] projects zones-tokens-get <master-project-id> <zone-id> <project-number> <cluster-name> [-p <v>...] [-o <out>]
+container1-beta1 [options]
+        projects
+                clusters-list <project-id> [-p <v>]... [-o <out>]
+                operations-list <project-id> [-p <v>]... [-o <out>]
+                zones-clusters-create <project-id> <zone-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                zones-clusters-delete <project-id> <zone-id> <cluster-id> [-p <v>]... [-o <out>]
+                zones-clusters-get <project-id> <zone-id> <cluster-id> [-p <v>]... [-o <out>]
+                zones-clusters-list <project-id> <zone-id> [-p <v>]... [-o <out>]
+                zones-operations-get <project-id> <zone-id> <operation-id> [-p <v>]... [-o <out>]
+                zones-operations-list <project-id> <zone-id> [-p <v>]... [-o <out>]
+                zones-tokens-get <master-project-id> <zone-id> <project-number> <cluster-name> [-p <v>]... [-o <out>]
   container1-beta1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_container1_beta1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

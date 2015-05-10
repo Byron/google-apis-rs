@@ -255,6 +255,7 @@ extern crate serde;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
+extern crate json_tools;
 
 mod cmn;
 
@@ -7216,7 +7217,7 @@ impl<'a, C, A> I18nLanguageListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -7426,6 +7427,7 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, ChannelBannerResource)>
 		where RS: ReadSeek {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7467,11 +7469,20 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -7847,7 +7858,7 @@ impl<'a, C, A> ChannelSectionListCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -8104,6 +8115,7 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8144,11 +8156,20 @@ impl<'a, C, A> ChannelSectionInsertCall<'a, C, A> where C: BorrowMut<hyper::Clie
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -8415,7 +8436,7 @@ impl<'a, C, A> ChannelSectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -8624,6 +8645,7 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, ChannelSection)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8661,11 +8683,20 @@ impl<'a, C, A> ChannelSectionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -8948,7 +8979,7 @@ impl<'a, C, A> GuideCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -9188,6 +9219,7 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9228,11 +9260,20 @@ impl<'a, C, A> PlaylistInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -9553,7 +9594,7 @@ impl<'a, C, A> PlaylistListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -9843,7 +9884,7 @@ impl<'a, C, A> PlaylistDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -10052,6 +10093,7 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Playlist)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -10089,11 +10131,20 @@ impl<'a, C, A> PlaylistUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -10362,7 +10413,7 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -10663,6 +10714,7 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -10695,11 +10747,20 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -10993,7 +11054,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -11308,7 +11369,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -11537,7 +11598,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -11765,7 +11826,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -11994,6 +12055,7 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Video)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12031,11 +12093,20 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -12337,6 +12408,7 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Video)>
 		where RS: ReadSeek {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12394,11 +12466,20 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -12802,6 +12883,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -12836,11 +12918,20 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -13150,7 +13241,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -13448,7 +13539,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -13819,7 +13910,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -14276,7 +14367,7 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -14560,7 +14651,7 @@ impl<'a, C, A> CommentThreadListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -14843,6 +14934,7 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, CommentThread)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -14877,11 +14969,20 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -15117,6 +15218,7 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, CommentThread)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15154,11 +15256,20 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -15408,6 +15519,7 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -15448,11 +15560,20 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -15730,7 +15851,7 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -16002,7 +16123,7 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -16272,6 +16393,7 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveStream)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16312,11 +16434,20 @@ impl<'a, C, A> LiveStreamInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -16574,6 +16705,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Comment)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16608,11 +16740,20 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -16861,7 +17002,7 @@ impl<'a, C, A> CommentSetModerationStatuCall<'a, C, A> where C: BorrowMut<hyper:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -17084,7 +17225,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -17325,7 +17466,7 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -17575,6 +17716,7 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Comment)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17609,11 +17751,20 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -17855,7 +18006,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -18055,6 +18206,7 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18092,11 +18244,20 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -18419,7 +18580,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -18735,7 +18896,7 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -18959,6 +19120,7 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18996,11 +19158,20 @@ impl<'a, C, A> PlaylistItemInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -19253,7 +19424,7 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -19506,7 +19677,7 @@ impl<'a, C, A> PlaylistItemListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -19769,6 +19940,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, PlaylistItem)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -19803,11 +19975,20 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -20034,6 +20215,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<hyper::client::Response>
 		where RS: ReadSeek {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -20075,11 +20257,20 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -20415,7 +20606,7 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -20670,7 +20861,7 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -20947,6 +21138,7 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -20987,11 +21179,20 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -21260,6 +21461,7 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, LiveBroadcast)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -21300,11 +21502,20 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -21623,7 +21834,7 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -21909,7 +22120,7 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -22164,7 +22375,7 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -22459,7 +22670,7 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -22727,7 +22938,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -22930,6 +23141,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Caption)>
 		where RS: ReadSeek {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -22981,11 +23193,20 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -23374,7 +23595,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -23671,7 +23892,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -23888,6 +24109,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Perform the operation you have build so far.
     fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Caption)>
 		where RS: ReadSeek {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -23939,11 +24161,20 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -24335,7 +24566,7 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -24632,7 +24863,7 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -24905,6 +25136,7 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Activity)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -24939,11 +25171,20 @@ impl<'a, C, A> ActivityInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 

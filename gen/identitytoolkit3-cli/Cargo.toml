@@ -4,7 +4,7 @@
 [package]
 
 name = "google-identitytoolkit3-cli"
-version = "0.1.0+20150406"
+version = "0.2.0+20150406"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Identity Toolkit (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3-cli"
@@ -17,15 +17,14 @@ keywords = ["identitytoolkit", "google", "cli"]
 name = "identitytoolkit3"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-identitytoolkit3]
 path = "../identitytoolkit3"

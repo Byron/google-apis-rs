@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *customsearch* crate version *0.1.6+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+//! This documentation was generated from *customsearch* crate version *0.1.7+20131205*, where *20131205* is the exact revision of the *customsearch:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 //! 
 //! Everything else about the *customsearch* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/custom-search/v1/using_rest).
@@ -189,7 +189,7 @@
 //! 
 //! * [PODs][wiki-pod] are handed by copy
 //! * strings are passed as `&str`
-//! * [request values](trait.RequestValue.html) are borrowed
+//! * [request values](trait.RequestValue.html) are moved
 //! 
 //! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 //! 
@@ -198,7 +198,6 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
@@ -214,6 +213,7 @@ extern crate serde;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
+extern crate json_tools;
 
 mod cmn;
 
@@ -339,7 +339,7 @@ impl<'a, C, A> Customsearch<C, A>
         Customsearch {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.6".to_string(),
+            _user_agent: "google-api-rust-client/0.1.7".to_string(),
         }
     }
 
@@ -348,7 +348,7 @@ impl<'a, C, A> Customsearch<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.6`.
+    /// It defaults to `google-api-rust-client/0.1.7`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1099,7 +1099,7 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -1107,7 +1107,7 @@ impl<'a, C, A> CseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         loop {
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();

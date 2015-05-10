@@ -10,25 +10,30 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *reports* API can be found at the
+[official documentation site](https://developers.google.com/admin-sdk/reports/).
+
 # Usage
 
-This documentation was generated from the *reports* API at revision *20150115*. The CLI is at version *0.1.0*.
+This documentation was generated from the *reports* API at revision *20150115*. The CLI is at version *0.2.0*.
 
 ```bash
-  admin1-reports [options] activities list <user-key> <application-name> [-p <v>...] [-o <out>]
-  admin1-reports [options] activities watch <user-key> <application-name> -r <kv>... [-p <v>...] [-o <out>]
-  admin1-reports [options] channels stop -r <kv>... [-p <v>...]
-  admin1-reports [options] customer-usage-reports get <date> [-p <v>...] [-o <out>]
-  admin1-reports [options] user-usage-report get <user-key> <date> [-p <v>...] [-o <out>]
+admin1-reports [options]
+        activities
+                list <user-key> <application-name> [-p <v>]... [-o <out>]
+                watch <user-key> <application-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        channels
+                stop (-r <kv>)... [-p <v>]...
+        customer-usage-reports
+                get <date> [-p <v>]... [-o <out>]
+        user-usage-report
+                get <user-key> <date> [-p <v>]... [-o <out>]
   admin1-reports --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_admin1_reports_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

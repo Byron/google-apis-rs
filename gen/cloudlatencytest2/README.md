@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudlatencytest2` library allows access to all features of the *Google cloudlatencytest* service.
 
-This documentation was generated from *cloudlatencytest* crate version *0.1.6+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *cloudlatencytest* crate version *0.1.7+20150206*, where *20150206* is the exact revision of the *cloudlatencytest:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudlatencytest2/struct.Cloudlatencytest.html) ... 
@@ -160,7 +160,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_cloudlatencytest2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_cloudlatencytest2/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

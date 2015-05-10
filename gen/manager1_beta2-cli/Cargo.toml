@@ -4,7 +4,7 @@
 [package]
 
 name = "google-manager1_beta2-cli"
-version = "0.1.0+20140915"
+version = "0.2.0+20140915"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with manager (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/manager1_beta2-cli"
@@ -17,15 +17,14 @@ keywords = ["manager", "google", "cli"]
 name = "manager1-beta2"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-manager1_beta2]
 path = "../manager1_beta2"

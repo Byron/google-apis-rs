@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsense1d4-cli"
-version = "0.1.0+20150326"
+version = "0.2.0+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli"
@@ -17,15 +17,14 @@ keywords = ["adsense", "google", "cli"]
 name = "adsense1d4"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-adsense1d4]
 path = "../adsense1d4"

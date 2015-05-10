@@ -10,25 +10,32 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *gan* API can be found at the
+[official documentation site](https://developers.google.com/affiliate-network/).
+
 # Usage
 
-This documentation was generated from the *gan* API at revision *20130205*. The CLI is at version *0.1.0*.
+This documentation was generated from the *gan* API at revision *20130205*. The CLI is at version *0.2.0*.
 
 ```bash
-  gan1-beta1 [options] advertisers get <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] advertisers list <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] cc-offers list <publisher> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] events list <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] links get <role> <role-id> <link-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] links insert <role> <role-id> -r <kv>... [-p <v>...] [-o <out>]
-  gan1-beta1 [options] links list <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] publishers get <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] publishers list <role> <role-id> [-p <v>...] [-o <out>]
-  gan1-beta1 [options] reports get <role> <role-id> <report-type> [-p <v>...] [-o <out>]
+gan1-beta1 [options]
+        advertisers
+                get <role> <role-id> [-p <v>]... [-o <out>]
+                list <role> <role-id> [-p <v>]... [-o <out>]
+        cc-offers
+                list <publisher> [-p <v>]... [-o <out>]
+        events
+                list <role> <role-id> [-p <v>]... [-o <out>]
+        links
+                get <role> <role-id> <link-id> [-p <v>]... [-o <out>]
+                insert <role> <role-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <role> <role-id> [-p <v>]... [-o <out>]
+        publishers
+                get <role> <role-id> [-p <v>]... [-o <out>]
+                list <role> <role-id> [-p <v>]... [-o <out>]
+        reports
+                get <role> <role-id> <report-type> [-p <v>]... [-o <out>]
   gan1-beta1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_gan1_beta1_cli/index.html
 
 Configuration:
   --config-dir <folder>

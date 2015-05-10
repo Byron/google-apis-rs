@@ -10,20 +10,24 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Civic Info* API can be found at the
+[official documentation site](https://developers.google.com/civic-information).
+
 # Usage
 
-This documentation was generated from the *Civic Info* API at revision *20150302*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Civic Info* API at revision *20150302*. The CLI is at version *0.2.0*.
 
 ```bash
-  civicinfo2 [options] divisions search [-p <v>...] [-o <out>]
-  civicinfo2 [options] elections election-query [-p <v>...] [-o <out>]
-  civicinfo2 [options] elections voter-info-query <address> [-p <v>...] [-o <out>]
-  civicinfo2 [options] representatives representative-info-by-address [-p <v>...] [-o <out>]
-  civicinfo2 [options] representatives representative-info-by-division <ocd-id> [-p <v>...] [-o <out>]
+civicinfo2 [options]
+        divisions
+                search [-p <v>]... [-o <out>]
+        elections
+                election-query [-p <v>]... [-o <out>]
+                voter-info-query <address> [-p <v>]... [-o <out>]
+        representatives
+                representative-info-by-address [-p <v>]... [-o <out>]
+                representative-info-by-division <ocd-id> [-p <v>]... [-o <out>]
   civicinfo2 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_civicinfo2_cli/index.html
 
 Configuration:
   --config-dir <folder>

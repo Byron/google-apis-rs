@@ -10,53 +10,60 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *fusiontables* API can be found at the
+[official documentation site](https://developers.google.com/fusiontables).
+
 # Usage
 
-This documentation was generated from the *fusiontables* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *fusiontables* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  fusiontables2 [options] column delete <table-id> <column-id> [-p <v>...]
-  fusiontables2 [options] column get <table-id> <column-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] column insert <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] column list <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] column patch <table-id> <column-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] column update <table-id> <column-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] query sql <sql> [-p <v>...] [-o <out>]
-  fusiontables2 [options] query sql-get <sql> [-p <v>...] [-o <out>]
-  fusiontables2 [options] style delete <table-id> <style-id> [-p <v>...]
-  fusiontables2 [options] style get <table-id> <style-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] style insert <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] style list <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] style patch <table-id> <style-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] style update <table-id> <style-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] table copy <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] table delete <table-id> [-p <v>...]
-  fusiontables2 [options] table get <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] table import-rows <table-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  fusiontables2 [options] table import-table <name> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  fusiontables2 [options] table insert -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] table list [-p <v>...] [-o <out>]
-  fusiontables2 [options] table patch <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] table replace-rows <table-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  fusiontables2 [options] table update <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] task delete <table-id> <task-id> [-p <v>...]
-  fusiontables2 [options] task get <table-id> <task-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] task list <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] template delete <table-id> <template-id> [-p <v>...]
-  fusiontables2 [options] template get <table-id> <template-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] template insert <table-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] template list <table-id> [-p <v>...] [-o <out>]
-  fusiontables2 [options] template patch <table-id> <template-id> -r <kv>... [-p <v>...] [-o <out>]
-  fusiontables2 [options] template update <table-id> <template-id> -r <kv>... [-p <v>...] [-o <out>]
+fusiontables2 [options]
+        column
+                delete <table-id> <column-id> [-p <v>]...
+                get <table-id> <column-id> [-p <v>]... [-o <out>]
+                insert <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <table-id> [-p <v>]... [-o <out>]
+                patch <table-id> <column-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <table-id> <column-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        query
+                sql <sql> [-p <v>]... [-o <out>]
+                sql-get <sql> [-p <v>]... [-o <out>]
+        style
+                delete <table-id> <style-id> [-p <v>]...
+                get <table-id> <style-id> [-p <v>]... [-o <out>]
+                insert <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <table-id> [-p <v>]... [-o <out>]
+                patch <table-id> <style-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <table-id> <style-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        table
+                copy <table-id> [-p <v>]... [-o <out>]
+                delete <table-id> [-p <v>]...
+                get <table-id> [-p <v>]... [-o <out>]
+                import-rows <table-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                import-table <name> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                replace-rows <table-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                update <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        task
+                delete <table-id> <task-id> [-p <v>]...
+                get <table-id> <task-id> [-p <v>]... [-o <out>]
+                list <table-id> [-p <v>]... [-o <out>]
+        template
+                delete <table-id> <template-id> [-p <v>]...
+                get <table-id> <template-id> [-p <v>]... [-o <out>]
+                insert <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <table-id> [-p <v>]... [-o <out>]
+                patch <table-id> <template-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <table-id> <template-id> (-r <kv>)... [-p <v>]... [-o <out>]
   fusiontables2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_fusiontables2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

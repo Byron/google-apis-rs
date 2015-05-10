@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2-cli"
-version = "0.1.0+20150421"
+version = "0.2.0+20150421"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2-cli"
@@ -17,15 +17,14 @@ keywords = ["content", "google", "cli"]
 name = "content2"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-content2]
 path = "../content2"

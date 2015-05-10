@@ -18,12 +18,11 @@ Everything else about the *discovery* API can be found at the
 This documentation was generated from the *discovery* API at revision *00000000*. The CLI is at version *0.2.0*.
 
 ```bash
-  discovery1 [options] apis get-rest <api> <version> [-p <v>...] [-o <out>]
-  discovery1 [options] apis list [-p <v>...] [-o <out>]
+discovery1 [options]
+        apis
+                get-rest <api> <version> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
   discovery1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_discovery1_cli/index.html
 
 Configuration:
   --config-dir <folder>

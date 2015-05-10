@@ -10,34 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *tasks* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/tasks/firstapp).
+
 # Usage
 
-This documentation was generated from the *tasks* API at revision *20141121*. The CLI is at version *0.1.0*.
+This documentation was generated from the *tasks* API at revision *20141121*. The CLI is at version *0.2.0*.
 
 ```bash
-  tasks1 [options] tasklists delete <tasklist> [-p <v>...]
-  tasks1 [options] tasklists get <tasklist> [-p <v>...] [-o <out>]
-  tasks1 [options] tasklists insert -r <kv>... [-p <v>...] [-o <out>]
-  tasks1 [options] tasklists list [-p <v>...] [-o <out>]
-  tasks1 [options] tasklists patch <tasklist> -r <kv>... [-p <v>...] [-o <out>]
-  tasks1 [options] tasklists update <tasklist> -r <kv>... [-p <v>...] [-o <out>]
-  tasks1 [options] tasks clear <tasklist> [-p <v>...]
-  tasks1 [options] tasks delete <tasklist> <task> [-p <v>...]
-  tasks1 [options] tasks get <tasklist> <task> [-p <v>...] [-o <out>]
-  tasks1 [options] tasks insert <tasklist> -r <kv>... [-p <v>...] [-o <out>]
-  tasks1 [options] tasks list <tasklist> [-p <v>...] [-o <out>]
-  tasks1 [options] tasks move <tasklist> <task> [-p <v>...] [-o <out>]
-  tasks1 [options] tasks patch <tasklist> <task> -r <kv>... [-p <v>...] [-o <out>]
-  tasks1 [options] tasks update <tasklist> <task> -r <kv>... [-p <v>...] [-o <out>]
+tasks1 [options]
+        tasklists
+                delete <tasklist> [-p <v>]...
+                get <tasklist> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <tasklist> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <tasklist> (-r <kv>)... [-p <v>]... [-o <out>]
+        tasks
+                clear <tasklist> [-p <v>]...
+                delete <tasklist> <task> [-p <v>]...
+                get <tasklist> <task> [-p <v>]... [-o <out>]
+                insert <tasklist> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <tasklist> [-p <v>]... [-o <out>]
+                move <tasklist> <task> [-p <v>]... [-o <out>]
+                patch <tasklist> <task> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <tasklist> <task> (-r <kv>)... [-p <v>]... [-o <out>]
   tasks1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_tasks1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-admin2_email_migration-cli"
-version = "0.1.0+20150303"
+version = "0.2.0+20150303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with admin (protocol email_migration_v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin2_email_migration-cli"
@@ -17,15 +17,14 @@ keywords = ["admin", "google", "cli"]
 name = "admin2-email-migration"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-admin2_email_migration]
 path = "../admin2_email_migration"

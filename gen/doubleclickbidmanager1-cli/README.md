@@ -10,23 +10,27 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *DoubleClick Bid Manager* API can be found at the
+[official documentation site](https://developers.google.com/bid-manager/).
+
 # Usage
 
-This documentation was generated from the *DoubleClick Bid Manager* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *DoubleClick Bid Manager* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  doubleclickbidmanager1 [options] lineitems downloadlineitems -r <kv>... [-p <v>...] [-o <out>]
-  doubleclickbidmanager1 [options] lineitems uploadlineitems -r <kv>... [-p <v>...] [-o <out>]
-  doubleclickbidmanager1 [options] queries createquery -r <kv>... [-p <v>...] [-o <out>]
-  doubleclickbidmanager1 [options] queries deletequery <query-id> [-p <v>...]
-  doubleclickbidmanager1 [options] queries getquery <query-id> [-p <v>...] [-o <out>]
-  doubleclickbidmanager1 [options] queries listqueries [-p <v>...] [-o <out>]
-  doubleclickbidmanager1 [options] queries runquery <query-id> -r <kv>... [-p <v>...]
-  doubleclickbidmanager1 [options] reports listreports <query-id> [-p <v>...] [-o <out>]
+doubleclickbidmanager1 [options]
+        lineitems
+                downloadlineitems (-r <kv>)... [-p <v>]... [-o <out>]
+                uploadlineitems (-r <kv>)... [-p <v>]... [-o <out>]
+        queries
+                createquery (-r <kv>)... [-p <v>]... [-o <out>]
+                deletequery <query-id> [-p <v>]...
+                getquery <query-id> [-p <v>]... [-o <out>]
+                listqueries [-p <v>]... [-o <out>]
+                runquery <query-id> (-r <kv>)... [-p <v>]...
+        reports
+                listreports <query-id> [-p <v>]... [-o <out>]
   doubleclickbidmanager1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/index.html
 
 Configuration:
   --config-dir <folder>

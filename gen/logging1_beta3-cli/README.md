@@ -12,33 +12,32 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 
 # Usage
 
-This documentation was generated from the *logging* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *logging* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  logging1-beta3 [options] projects log-services-indexes-list <projects-id> <log-services-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-list <projects-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-create <projects-id> <log-services-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-delete <projects-id> <log-services-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-get <projects-id> <log-services-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-list <projects-id> <log-services-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects log-services-sinks-update <projects-id> <log-services-id> <sinks-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-delete <projects-id> <logs-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-entries-write <projects-id> <logs-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-list <projects-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-create <projects-id> <logs-id> -r <kv>... [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-delete <projects-id> <logs-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-get <projects-id> <logs-id> <sinks-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-list <projects-id> <logs-id> [-p <v>...] [-o <out>]
-  logging1-beta3 [options] projects logs-sinks-update <projects-id> <logs-id> <sinks-id> -r <kv>... [-p <v>...] [-o <out>]
+logging1-beta3 [options]
+        projects
+                log-services-indexes-list <projects-id> <log-services-id> [-p <v>]... [-o <out>]
+                log-services-list <projects-id> [-p <v>]... [-o <out>]
+                log-services-sinks-create <projects-id> <log-services-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                log-services-sinks-delete <projects-id> <log-services-id> <sinks-id> [-p <v>]... [-o <out>]
+                log-services-sinks-get <projects-id> <log-services-id> <sinks-id> [-p <v>]... [-o <out>]
+                log-services-sinks-list <projects-id> <log-services-id> [-p <v>]... [-o <out>]
+                log-services-sinks-update <projects-id> <log-services-id> <sinks-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                logs-delete <projects-id> <logs-id> [-p <v>]... [-o <out>]
+                logs-entries-write <projects-id> <logs-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                logs-list <projects-id> [-p <v>]... [-o <out>]
+                logs-sinks-create <projects-id> <logs-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                logs-sinks-delete <projects-id> <logs-id> <sinks-id> [-p <v>]... [-o <out>]
+                logs-sinks-get <projects-id> <logs-id> <sinks-id> [-p <v>]... [-o <out>]
+                logs-sinks-list <projects-id> <logs-id> [-p <v>]... [-o <out>]
+                logs-sinks-update <projects-id> <logs-id> <sinks-id> (-r <kv>)... [-p <v>]... [-o <out>]
   logging1-beta3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_logging1_beta3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

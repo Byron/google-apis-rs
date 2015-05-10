@@ -10,27 +10,29 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *licensing* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/licensing/).
+
 # Usage
 
-This documentation was generated from the *licensing* API at revision *20140122*. The CLI is at version *0.1.0*.
+This documentation was generated from the *licensing* API at revision *20140122*. The CLI is at version *0.2.0*.
 
 ```bash
-  licensing1 [options] license-assignments delete <product-id> <sku-id> <user-id> [-p <v>...]
-  licensing1 [options] license-assignments get <product-id> <sku-id> <user-id> [-p <v>...] [-o <out>]
-  licensing1 [options] license-assignments insert <product-id> <sku-id> -r <kv>... [-p <v>...] [-o <out>]
-  licensing1 [options] license-assignments list-for-product <product-id> <customer-id> [-p <v>...] [-o <out>]
-  licensing1 [options] license-assignments list-for-product-and-sku <product-id> <sku-id> <customer-id> [-p <v>...] [-o <out>]
-  licensing1 [options] license-assignments patch <product-id> <sku-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  licensing1 [options] license-assignments update <product-id> <sku-id> <user-id> -r <kv>... [-p <v>...] [-o <out>]
+licensing1 [options]
+        license-assignments
+                delete <product-id> <sku-id> <user-id> [-p <v>]...
+                get <product-id> <sku-id> <user-id> [-p <v>]... [-o <out>]
+                insert <product-id> <sku-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list-for-product <product-id> <customer-id> [-p <v>]... [-o <out>]
+                list-for-product-and-sku <product-id> <sku-id> <customer-id> [-p <v>]... [-o <out>]
+                patch <product-id> <sku-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <product-id> <sku-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
   licensing1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_licensing1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

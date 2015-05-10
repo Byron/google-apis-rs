@@ -10,28 +10,31 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *prediction* API can be found at the
+[official documentation site](https://developers.google.com/prediction/docs/developer-guide).
+
 # Usage
 
-This documentation was generated from the *prediction* API at revision *20140522*. The CLI is at version *0.1.0*.
+This documentation was generated from the *prediction* API at revision *20140522*. The CLI is at version *0.2.0*.
 
 ```bash
-  prediction1d6 [options] hostedmodels predict <project> <hosted-model-name> -r <kv>... [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels analyze <project> <id> [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels delete <project> <id> [-p <v>...]
-  prediction1d6 [options] trainedmodels get <project> <id> [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels insert <project> -r <kv>... [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels list <project> [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels predict <project> <id> -r <kv>... [-p <v>...] [-o <out>]
-  prediction1d6 [options] trainedmodels update <project> <id> -r <kv>... [-p <v>...] [-o <out>]
+prediction1d6 [options]
+        hostedmodels
+                predict <project> <hosted-model-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        trainedmodels
+                analyze <project> <id> [-p <v>]... [-o <out>]
+                delete <project> <id> [-p <v>]...
+                get <project> <id> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                predict <project> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <id> (-r <kv>)... [-p <v>]... [-o <out>]
   prediction1d6 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_prediction1d6_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

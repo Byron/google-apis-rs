@@ -10,47 +10,56 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Games Management* API can be found at the
+[official documentation site](https://developers.google.com/games/services).
+
 # Usage
 
-This documentation was generated from the *Games Management* API at revision *20150413*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Games Management* API at revision *20150413*. The CLI is at version *0.2.0*.
 
 ```bash
-  gamesmanagement1-management [options] achievements reset <achievement-id> [-p <v>...] [-o <out>]
-  gamesmanagement1-management [options] achievements reset-all [-p <v>...] [-o <out>]
-  gamesmanagement1-management [options] achievements reset-all-for-all-players [-p <v>...]
-  gamesmanagement1-management [options] achievements reset-for-all-players <achievement-id> [-p <v>...]
-  gamesmanagement1-management [options] achievements reset-multiple-for-all-players -r <kv>... [-p <v>...]
-  gamesmanagement1-management [options] applications list-hidden <application-id> [-p <v>...] [-o <out>]
-  gamesmanagement1-management [options] events reset <event-id> [-p <v>...]
-  gamesmanagement1-management [options] events reset-all [-p <v>...]
-  gamesmanagement1-management [options] events reset-all-for-all-players [-p <v>...]
-  gamesmanagement1-management [options] events reset-for-all-players <event-id> [-p <v>...]
-  gamesmanagement1-management [options] events reset-multiple-for-all-players -r <kv>... [-p <v>...]
-  gamesmanagement1-management [options] players hide <application-id> <player-id> [-p <v>...]
-  gamesmanagement1-management [options] players unhide <application-id> <player-id> [-p <v>...]
-  gamesmanagement1-management [options] quests reset <quest-id> [-p <v>...]
-  gamesmanagement1-management [options] quests reset-all [-p <v>...]
-  gamesmanagement1-management [options] quests reset-all-for-all-players [-p <v>...]
-  gamesmanagement1-management [options] quests reset-for-all-players <quest-id> [-p <v>...]
-  gamesmanagement1-management [options] quests reset-multiple-for-all-players -r <kv>... [-p <v>...]
-  gamesmanagement1-management [options] rooms reset [-p <v>...]
-  gamesmanagement1-management [options] rooms reset-for-all-players [-p <v>...]
-  gamesmanagement1-management [options] scores reset <leaderboard-id> [-p <v>...] [-o <out>]
-  gamesmanagement1-management [options] scores reset-all [-p <v>...] [-o <out>]
-  gamesmanagement1-management [options] scores reset-all-for-all-players [-p <v>...]
-  gamesmanagement1-management [options] scores reset-for-all-players <leaderboard-id> [-p <v>...]
-  gamesmanagement1-management [options] scores reset-multiple-for-all-players -r <kv>... [-p <v>...]
-  gamesmanagement1-management [options] turn-based-matches reset [-p <v>...]
-  gamesmanagement1-management [options] turn-based-matches reset-for-all-players [-p <v>...]
+gamesmanagement1-management [options]
+        achievements
+                reset <achievement-id> [-p <v>]... [-o <out>]
+                reset-all [-p <v>]... [-o <out>]
+                reset-all-for-all-players [-p <v>]...
+                reset-for-all-players <achievement-id> [-p <v>]...
+                reset-multiple-for-all-players (-r <kv>)... [-p <v>]...
+        applications
+                list-hidden <application-id> [-p <v>]... [-o <out>]
+        events
+                reset <event-id> [-p <v>]...
+                reset-all [-p <v>]...
+                reset-all-for-all-players [-p <v>]...
+                reset-for-all-players <event-id> [-p <v>]...
+                reset-multiple-for-all-players (-r <kv>)... [-p <v>]...
+        players
+                hide <application-id> <player-id> [-p <v>]...
+                unhide <application-id> <player-id> [-p <v>]...
+        quests
+                reset <quest-id> [-p <v>]...
+                reset-all [-p <v>]...
+                reset-all-for-all-players [-p <v>]...
+                reset-for-all-players <quest-id> [-p <v>]...
+                reset-multiple-for-all-players (-r <kv>)... [-p <v>]...
+        rooms
+                reset [-p <v>]...
+                reset-for-all-players [-p <v>]...
+        scores
+                reset <leaderboard-id> [-p <v>]... [-o <out>]
+                reset-all [-p <v>]... [-o <out>]
+                reset-all-for-all-players [-p <v>]...
+                reset-for-all-players <leaderboard-id> [-p <v>]...
+                reset-multiple-for-all-players (-r <kv>)... [-p <v>]...
+        turn-based-matches
+                reset [-p <v>]...
+                reset-for-all-players [-p <v>]...
   gamesmanagement1-management --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_gamesmanagement1_management_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

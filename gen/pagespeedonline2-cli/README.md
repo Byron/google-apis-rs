@@ -10,16 +10,18 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *pagespeedonline* API can be found at the
+[official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
+
 # Usage
 
-This documentation was generated from the *pagespeedonline* API at revision *20150317*. The CLI is at version *0.1.0*.
+This documentation was generated from the *pagespeedonline* API at revision *20150317*. The CLI is at version *0.2.0*.
 
 ```bash
-  pagespeedonline2 [options] pagespeedapi runpagespeed <url> [-p <v>...] [-o <out>]
+pagespeedonline2 [options]
+        pagespeedapi
+                runpagespeed <url> [-p <v>]... [-o <out>]
   pagespeedonline2 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_pagespeedonline2_cli/index.html
 
 Configuration:
   --config-dir <folder>

@@ -10,16 +10,18 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *audit* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/admin-audit/get_started).
+
 # Usage
 
-This documentation was generated from the *audit* API at revision *20150419*. The CLI is at version *0.1.0*.
+This documentation was generated from the *audit* API at revision *20150419*. The CLI is at version *0.2.0*.
 
 ```bash
-  audit1 [options] activities list <customer-id> <application-id> [-p <v>...] [-o <out>]
+audit1 [options]
+        activities
+                list <customer-id> <application-id> [-p <v>]... [-o <out>]
   audit1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_audit1_cli/index.html
 
 Configuration:
   --config-dir <folder>

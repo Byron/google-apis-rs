@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fusiontables* crate version *0.1.6+20150326*, where *20150326* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+//! This documentation was generated from *fusiontables* crate version *0.1.7+20150326*, where *20150326* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 //! 
 //! Everything else about the *fusiontables* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/fusiontables).
@@ -187,7 +187,7 @@
 //! 
 //! * [PODs][wiki-pod] are handed by copy
 //! * strings are passed as `&str`
-//! * [request values](trait.RequestValue.html) are borrowed
+//! * [request values](trait.RequestValue.html) are moved
 //! 
 //! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 //! 
@@ -196,7 +196,6 @@
 //! [google-go-api]: https://github.com/google/google-api-go-client
 //! 
 //! 
-#![feature(std_misc)]
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any 
@@ -212,6 +211,7 @@ extern crate serde;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
+extern crate json_tools;
 
 mod cmn;
 
@@ -335,7 +335,7 @@ impl<'a, C, A> Fusiontables<C, A>
         Fusiontables {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.6".to_string(),
+            _user_agent: "google-api-rust-client/0.1.7".to_string(),
         }
     }
 
@@ -359,7 +359,7 @@ impl<'a, C, A> Fusiontables<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.6`.
+    /// It defaults to `google-api-rust-client/0.1.7`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1956,7 +1956,7 @@ impl<'a, C, A> StyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -1978,7 +1978,7 @@ impl<'a, C, A> StyleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2162,6 +2162,7 @@ impl<'a, C, A> StyleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, StyleSetting)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2218,11 +2219,20 @@ impl<'a, C, A> StyleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -2245,7 +2255,7 @@ impl<'a, C, A> StyleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2436,6 +2446,7 @@ impl<'a, C, A> StyleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, StyleSetting)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -2491,11 +2502,20 @@ impl<'a, C, A> StyleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -2518,7 +2538,7 @@ impl<'a, C, A> StyleInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2749,7 +2769,7 @@ impl<'a, C, A> StyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -2771,7 +2791,7 @@ impl<'a, C, A> StyleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2999,7 +3019,7 @@ impl<'a, C, A> StyleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -3021,7 +3041,7 @@ impl<'a, C, A> StyleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3191,6 +3211,7 @@ impl<'a, C, A> StylePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, StyleSetting)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -3247,11 +3268,20 @@ impl<'a, C, A> StylePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -3274,7 +3304,7 @@ impl<'a, C, A> StylePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3528,7 +3558,7 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -3550,7 +3580,7 @@ impl<'a, C, A> TaskListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3789,7 +3819,7 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -3811,7 +3841,7 @@ impl<'a, C, A> TaskDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4030,7 +4060,7 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -4052,7 +4082,7 @@ impl<'a, C, A> TaskGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4231,6 +4261,7 @@ impl<'a, C, A> ColumnInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Column)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4286,11 +4317,20 @@ impl<'a, C, A> ColumnInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -4313,7 +4353,7 @@ impl<'a, C, A> ColumnInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4495,6 +4535,7 @@ impl<'a, C, A> ColumnUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Column)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -4551,11 +4592,20 @@ impl<'a, C, A> ColumnUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -4578,7 +4628,7 @@ impl<'a, C, A> ColumnUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4827,7 +4877,7 @@ impl<'a, C, A> ColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -4849,7 +4899,7 @@ impl<'a, C, A> ColumnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5033,6 +5083,7 @@ impl<'a, C, A> ColumnPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Column)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5089,11 +5140,20 @@ impl<'a, C, A> ColumnPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -5116,7 +5176,7 @@ impl<'a, C, A> ColumnPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5356,7 +5416,7 @@ impl<'a, C, A> ColumnDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -5378,7 +5438,7 @@ impl<'a, C, A> ColumnDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5597,7 +5657,7 @@ impl<'a, C, A> ColumnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -5619,7 +5679,7 @@ impl<'a, C, A> ColumnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5799,6 +5859,7 @@ impl<'a, C, A> TemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Template)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -5855,11 +5916,20 @@ impl<'a, C, A> TemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -5882,7 +5952,7 @@ impl<'a, C, A> TemplateUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6131,7 +6201,7 @@ impl<'a, C, A> TemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -6153,7 +6223,7 @@ impl<'a, C, A> TemplateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6385,7 +6455,7 @@ impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -6407,7 +6477,7 @@ impl<'a, C, A> TemplateDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6576,6 +6646,7 @@ impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Template)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6631,11 +6702,20 @@ impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -6658,7 +6738,7 @@ impl<'a, C, A> TemplateInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6840,6 +6920,7 @@ impl<'a, C, A> TemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Template)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6896,11 +6977,20 @@ impl<'a, C, A> TemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -6923,7 +7013,7 @@ impl<'a, C, A> TemplatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7164,7 +7254,7 @@ impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -7186,7 +7276,7 @@ impl<'a, C, A> TemplateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7423,7 +7513,7 @@ impl<'a, C, A> QuerySqlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -7445,7 +7535,7 @@ impl<'a, C, A> QuerySqlGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7693,7 +7783,7 @@ impl<'a, C, A> QuerySqlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -7715,7 +7805,7 @@ impl<'a, C, A> QuerySqlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7907,6 +7997,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -7965,11 +8056,20 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -7992,7 +8092,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8263,7 +8363,7 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -8301,7 +8401,7 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -8359,7 +8459,7 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url_str);
+                                dlg.store_upload_url(Some(url_str));
                             }
 
                             cmn::ResumableUploadHelper {
@@ -8387,6 +8487,7 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
                                     dlg.finished(false);
                                     return Err(Error::Failure(res))
                                 }
@@ -8592,6 +8693,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8650,11 +8752,20 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -8677,7 +8788,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8912,7 +9023,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -8934,7 +9045,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9092,6 +9203,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
     /// Perform the operation you have build so far.
     pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -9122,11 +9234,20 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = io::Cursor::new(json::to_vec(&self._request));
+        let mut request_value_reader = 
+            {
+                let json_cache = json::to_string(&self._request).unwrap();
+                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
+                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
+                                        .filter_key_value_by_type(TokenType::Null)
+                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
+                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
+                mem_dst
+            };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
@@ -9149,7 +9270,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9368,7 +9489,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -9390,7 +9511,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9591,7 +9712,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -9613,7 +9734,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9869,7 +9990,7 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -9907,7 +10028,7 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -9965,7 +10086,7 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url_str);
+                                dlg.store_upload_url(Some(url_str));
                             }
 
                             cmn::ResumableUploadHelper {
@@ -9993,6 +10114,7 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
                                     dlg.finished(false);
                                     return Err(Error::Failure(res))
                                 }
@@ -10240,7 +10362,7 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -10278,7 +10400,7 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                     response
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                         .header(UserAgent(self.hub._user_agent.clone()))
                         .header(auth_header.clone());
                     if protocol == "simple" {
@@ -10336,7 +10458,7 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
                             if upload_url_from_server {
-                                dlg.store_upload_url(url_str);
+                                dlg.store_upload_url(Some(url_str));
                             }
 
                             cmn::ResumableUploadHelper {
@@ -10364,6 +10486,7 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
                                 if !res.status.is_success() {
+                                    dlg.store_upload_url(None);
                                     dlg.finished(false);
                                     return Err(Error::Failure(res))
                                 }
@@ -10599,7 +10722,7 @@ impl<'a, C, A> TableCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         
         if params.len() > 0 {
             url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params.iter().map(|t| (t.0, t.1.as_ref()))));
+            url.push_str(&url::form_urlencoded::serialize(params));
         }
 
 
@@ -10621,7 +10744,7 @@ impl<'a, C, A> TableCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.as_ref())
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 

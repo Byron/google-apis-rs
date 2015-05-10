@@ -4,7 +4,7 @@
 [package]
 
 name = "google-reseller1_sandbox-cli"
-version = "0.1.0+20141112"
+version = "0.2.0+20141112"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with reseller (protocol v1sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox-cli"
@@ -17,15 +17,14 @@ keywords = ["reseller", "google", "cli"]
 name = "reseller1-sandbox"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-reseller1_sandbox]
 path = "../reseller1_sandbox"

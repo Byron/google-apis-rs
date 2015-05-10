@@ -17,13 +17,14 @@ keywords = ["youtube", "google", "cli"]
 name = "youtube3"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-clap = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-youtube3]
 path = "../youtube3"

@@ -2,92 +2,55 @@
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
 #![feature(plugin, exit_status)]
-#![plugin(docopt_macros)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
-extern crate docopt;
+#[macro_use]
+extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
-extern crate rustc_serialize;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_mirror1 as api;
 
 use std::env;
 use std::io::{self, Write};
-
-docopt!(Options derive Debug, "
-Usage: 
-  mirror1 [options] accounts insert <user-token> <account-type> <account-name> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts delete <id> [-p <v>...]
-  mirror1 [options] contacts get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] contacts insert -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts list [-p <v>...] [-o <out>]
-  mirror1 [options] contacts patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] contacts update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] locations get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] locations list [-p <v>...] [-o <out>]
-  mirror1 [options] settings get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions delete <id> [-p <v>...]
-  mirror1 [options] subscriptions insert -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions list [-p <v>...] [-o <out>]
-  mirror1 [options] subscriptions update <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-delete <item-id> <attachment-id> [-p <v>...]
-  mirror1 [options] timeline attachments-get <item-id> <attachment-id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-insert <item-id> -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline attachments-list <item-id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline delete <id> [-p <v>...]
-  mirror1 [options] timeline get <id> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline insert -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mirror1 [options] timeline list [-p <v>...] [-o <out>]
-  mirror1 [options] timeline patch <id> -r <kv>... [-p <v>...] [-o <out>]
-  mirror1 [options] timeline update <id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  mirror1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_mirror1_cli/index.html
-
-Configuration:
-  --scope <url>  
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
-            If unset, it defaults to the shortest scope url for a particular method.
-  --config-dir <folder>
-            A directory into which we will store our persistent data. Defaults to 
-            a user-writable directory that we will create during the first invocation.
-            [default: ~/.google-service-cli]
-  --debug
-            Output all server communication to standard error. `tx` and `rx` are placed 
-            into the same stream.
-  --debug-auth
-            Output all communication related to authentication to standard error. `tx` 
-            and `rx` are placed into the same stream.
-");
+use clap::{App, SubCommand, Arg};
 
 mod cmn;
+
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
-          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError};
+          input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use rustc_serialize::json;
+use serde::json;
+use clap::ArgMatches;
 
-struct Engine {
-    opt: Options,
+enum DoitError {
+    IoError(String, io::Error),
+    ApiError(api::Error),
+}
+
+struct Engine<'n, 'a> {
+    opt: ArgMatches<'n, 'a>,
     hub: api::Mirror<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl Engine {
-    fn _accounts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+impl<'n, 'a> Engine<'n, 'a> {
+    fn _accounts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Account::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -112,147 +75,155 @@ impl Engine {
                                         request.features.as_mut().unwrap().push(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["features", "password"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.accounts().insert(request, &self.opt.arg_user_token, &self.opt.arg_account_type, &self.opt.arg_account_name);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.accounts().insert(request, opt.value_of("user-token").unwrap_or(""), opt.value_of("account-type").unwrap_or(""), opt.value_of("account-name").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.contacts().delete(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _contacts_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.contacts().delete(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.contacts().get(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _contacts_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.contacts().get(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _contacts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Contact::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -310,106 +281,115 @@ impl Engine {
                         request.speakable_name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "display-name", "id", "image-urls", "kind", "phone-number", "priority", "sharing-features", "source", "speakable-name", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.contacts().insert(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _contacts_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.contacts().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _contacts_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Contact::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -467,60 +447,65 @@ impl Engine {
                         request.speakable_name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "display-name", "id", "image-urls", "kind", "phone-number", "priority", "sharing-features", "source", "speakable-name", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.contacts().patch(request, &self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.contacts().patch(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _contacts_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _contacts_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Contact::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -578,242 +563,258 @@ impl Engine {
                         request.speakable_name = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "display-name", "id", "image-urls", "kind", "phone-number", "priority", "sharing-features", "source", "speakable-name", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.contacts().update(request, &self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.contacts().update(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _locations_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.locations().get(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _locations_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.locations().get(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _locations_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _locations_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.locations().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _settings_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.settings().get(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _settings_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.settings().get(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _subscriptions_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.subscriptions().delete(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _subscriptions_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.subscriptions().delete(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _subscriptions_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _subscriptions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Subscription::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -889,106 +890,115 @@ impl Engine {
                         request.callback_url = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["callback-url", "collection", "id", "item-id", "kind", "notification", "operation", "updated", "user-token", "verify-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.subscriptions().insert(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _subscriptions_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _subscriptions_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.subscriptions().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _subscriptions_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _subscriptions_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::Subscription::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1064,350 +1074,363 @@ impl Engine {
                         request.callback_url = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["callback-url", "collection", "id", "item-id", "kind", "notification", "operation", "updated", "user-token", "verify-token"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
-        let mut call = self.hub.subscriptions().update(request, &self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+        let mut call = self.hub.subscriptions().update(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _timeline_attachments_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.timeline().attachments_delete(&self.opt.arg_item_id, &self.opt.arg_attachment_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok(mut response) => {
-                    None
-                }
-            }
-        }
-    }
-
-    fn _timeline_attachments_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut download_mode = false;
-        let mut call = self.hub.timeline().attachments_get(&self.opt.arg_item_id, &self.opt.arg_attachment_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _timeline_attachments_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.timeline().attachments_delete(opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _timeline_attachments_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut download_mode = false;
+        let mut call = self.hub.timeline().attachments_get(opt.value_of("item-id").unwrap_or(""), opt.value_of("attachment-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
                     if !download_mode {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_attachments_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.timeline().attachments_insert(&self.opt.arg_item_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _timeline_attachments_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.timeline().attachments_insert(opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = 
-            if self.opt.cmd_simple {
-                "simple"
-            } else if self.opt.cmd_resumable {
-                "resumable"
-            } else { 
-                unreachable!() 
+        let vals = opt.values_of("mode").unwrap();
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
-        let mut input_file = input_file_from_opts(&self.opt.arg_file, err);
-        let mime_type = input_mime_from_opts(&self.opt.arg_mime, err);
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
-                "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                "resumable" => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
-                _ => unreachable!(),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Standard => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_attachments_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.timeline().attachments_list(&self.opt.arg_item_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _timeline_attachments_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.timeline().attachments_list(opt.value_of("item-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_delete(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.timeline().delete(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _timeline_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.timeline().delete(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok(mut response) => {
-                    None
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_get(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        let mut call = self.hub.timeline().get(&self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
+    fn _timeline_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.timeline().get(opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_insert(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _timeline_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         
         let mut request = api::TimelineItem::default();
         let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
             let mut temp_cursor = field_cursor.clone();
@@ -1613,68 +1636,67 @@ impl Engine {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "accuracy", "address", "bundle-id", "canonical-url", "created", "creator", "delivery-time", "display-name", "display-time", "etag", "html", "id", "image-urls", "in-reply-to", "is-bundle-cover", "is-deleted", "is-pinned", "kind", "latitude", "level", "location", "longitude", "notification", "phone-number", "pin-score", "priority", "self-link", "sharing-features", "source", "source-item-id", "speakable-name", "speakable-text", "speakable-type", "text", "timestamp", "title", "type", "updated"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
         let mut call = self.hub.timeline().insert(request);
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = 
-            if self.opt.cmd_simple {
-                "simple"
-            } else if self.opt.cmd_resumable {
-                "resumable"
-            } else { 
-                unreachable!() 
-            };
-        let mut input_file = input_file_from_opts(&self.opt.arg_file, err);
-        let mime_type = input_mime_from_opts(&self.opt.arg_mime, err);
+        let vals = opt.values_of("mode").unwrap();
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
             match match protocol {
-                "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                "resumable" => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
-                _ => unreachable!(),
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Standard => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _timeline_list(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
+    fn _timeline_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
         let mut call = self.hub.timeline().list();
-        for parg in self.opt.arg_v.iter() {
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
                 "source-item-id" => {
@@ -1698,672 +1720,727 @@ impl Engine {
                 "bundle-id" => {
                     call = call.bundle_id(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["order-by", "include-deleted", "max-results", "page-token", "source-item-id", "pinned-only", "bundle-id"]
+                                                            ));
+                    }
+                }
             }
         }
-        let protocol = "standard-request";
+        let protocol = CallType::Standard;
         if dry_run {
-            None
+            Ok(())
         } else {
             assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
             }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _timeline_patch(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        
-        let mut request = api::TimelineItem::default();
-        let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-            fn request_creator_init(request: &mut api::TimelineItem) {
-                if request.creator.is_none() {
-                    request.creator = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::TimelineItem) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_notification_init(request: &mut api::TimelineItem) {
-                if request.notification.is_none() {
-                    request.notification = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "display-time" => {
-                        request.display_time = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.kind" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.display-name" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.accept-types" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().accept_types.is_none() {
-                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.image-urls" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().image_urls.is_none() {
-                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.priority" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().priority = Some(arg_from_str(value.unwrap_or("-0"), err, "creator.priority", "integer"));
-                    },
-                "creator.source" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().source = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.phone-number" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.sharing-features" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().sharing_features.is_none() {
-                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.type" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.id" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.speakable-name" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().speakable_name = Some(value.unwrap_or("").to_string());
-                    },
-                "text" => {
-                        request_creator_init(&mut request);
-                        request.text = Some(value.unwrap_or("").to_string());
-                    },
-                "is-bundle-cover" => {
-                        request_creator_init(&mut request);
-                        request.is_bundle_cover = Some(arg_from_str(value.unwrap_or("false"), err, "is-bundle-cover", "boolean"));
-                    },
-                "etag" => {
-                        request_creator_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_creator_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "is-deleted" => {
-                        request_creator_init(&mut request);
-                        request.is_deleted = Some(arg_from_str(value.unwrap_or("false"), err, "is-deleted", "boolean"));
-                    },
-                "bundle-id" => {
-                        request_creator_init(&mut request);
-                        request.bundle_id = Some(value.unwrap_or("").to_string());
-                    },
-                "is-pinned" => {
-                        request_creator_init(&mut request);
-                        request.is_pinned = Some(arg_from_str(value.unwrap_or("false"), err, "is-pinned", "boolean"));
-                    },
-                "title" => {
-                        request_creator_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "pin-score" => {
-                        request_creator_init(&mut request);
-                        request.pin_score = Some(arg_from_str(value.unwrap_or("-0"), err, "pin-score", "integer"));
-                    },
-                "speakable-text" => {
-                        request_creator_init(&mut request);
-                        request.speakable_text = Some(value.unwrap_or("").to_string());
-                    },
-                "html" => {
-                        request_creator_init(&mut request);
-                        request.html = Some(value.unwrap_or("").to_string());
-                    },
-                "location.kind" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "location.display-name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "location.timestamp" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
-                    },
-                "location.longitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
-                    },
-                "location.address" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
-                    },
-                "location.latitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
-                    },
-                "location.id" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "location.accuracy" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
-                    },
-                "source-item-id" => {
-                        request_location_init(&mut request);
-                        request.source_item_id = Some(value.unwrap_or("").to_string());
-                    },
-                "in-reply-to" => {
-                        request_location_init(&mut request);
-                        request.in_reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_location_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "canonical-url" => {
-                        request_location_init(&mut request);
-                        request.canonical_url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_location_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_location_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "notification.level" => {
-                        request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
-                    },
-                "notification.delivery-time" => {
-                        request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
-                    },
-                "speakable-type" => {
-                        request_notification_init(&mut request);
-                        request.speakable_type = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_notification_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
-                }
-            }
-        }
-        let mut call = self.hub.timeline().patch(request, &self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        let protocol = "standard-request";
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
-            match match protocol {
-                "standard-request" => call.doit(),
-                _ => unreachable!(),
-            } {
-                Err(api_err) => Some(api_err),
-                Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
-                }
-            }
-        }
-    }
-
-    fn _timeline_update(&self, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Option<api::Error> {
-        
-        let mut request = api::TimelineItem::default();
-        let mut field_cursor = FieldCursor::default();
-        for kvarg in self.opt.arg_kv.iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-            fn request_creator_init(request: &mut api::TimelineItem) {
-                if request.creator.is_none() {
-                    request.creator = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::TimelineItem) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_notification_init(request: &mut api::TimelineItem) {
-                if request.notification.is_none() {
-                    request.notification = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "display-time" => {
-                        request.display_time = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.kind" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.display-name" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.accept-types" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().accept_types.is_none() {
-                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.image-urls" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().image_urls.is_none() {
-                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.priority" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().priority = Some(arg_from_str(value.unwrap_or("-0"), err, "creator.priority", "integer"));
-                    },
-                "creator.source" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().source = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.phone-number" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.sharing-features" => {
-                        request_creator_init(&mut request);
-                        if request.creator.as_mut().unwrap().sharing_features.is_none() {
-                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
-                        }
-                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "creator.type" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.id" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "creator.speakable-name" => {
-                        request_creator_init(&mut request);
-                        request.creator.as_mut().unwrap().speakable_name = Some(value.unwrap_or("").to_string());
-                    },
-                "text" => {
-                        request_creator_init(&mut request);
-                        request.text = Some(value.unwrap_or("").to_string());
-                    },
-                "is-bundle-cover" => {
-                        request_creator_init(&mut request);
-                        request.is_bundle_cover = Some(arg_from_str(value.unwrap_or("false"), err, "is-bundle-cover", "boolean"));
-                    },
-                "etag" => {
-                        request_creator_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_creator_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "is-deleted" => {
-                        request_creator_init(&mut request);
-                        request.is_deleted = Some(arg_from_str(value.unwrap_or("false"), err, "is-deleted", "boolean"));
-                    },
-                "bundle-id" => {
-                        request_creator_init(&mut request);
-                        request.bundle_id = Some(value.unwrap_or("").to_string());
-                    },
-                "is-pinned" => {
-                        request_creator_init(&mut request);
-                        request.is_pinned = Some(arg_from_str(value.unwrap_or("false"), err, "is-pinned", "boolean"));
-                    },
-                "title" => {
-                        request_creator_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "pin-score" => {
-                        request_creator_init(&mut request);
-                        request.pin_score = Some(arg_from_str(value.unwrap_or("-0"), err, "pin-score", "integer"));
-                    },
-                "speakable-text" => {
-                        request_creator_init(&mut request);
-                        request.speakable_text = Some(value.unwrap_or("").to_string());
-                    },
-                "html" => {
-                        request_creator_init(&mut request);
-                        request.html = Some(value.unwrap_or("").to_string());
-                    },
-                "location.kind" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "location.display-name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "location.timestamp" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
-                    },
-                "location.longitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
-                    },
-                "location.address" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
-                    },
-                "location.latitude" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
-                    },
-                "location.id" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "location.accuracy" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
-                    },
-                "source-item-id" => {
-                        request_location_init(&mut request);
-                        request.source_item_id = Some(value.unwrap_or("").to_string());
-                    },
-                "in-reply-to" => {
-                        request_location_init(&mut request);
-                        request.in_reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_location_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "canonical-url" => {
-                        request_location_init(&mut request);
-                        request.canonical_url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_location_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_location_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "notification.level" => {
-                        request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
-                    },
-                "notification.delivery-time" => {
-                        request_notification_init(&mut request);
-                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
-                    },
-                "speakable-type" => {
-                        request_notification_init(&mut request);
-                        request.speakable_type = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_notification_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
-                }
-            }
-        }
-        let mut call = self.hub.timeline().update(request, &self.opt.arg_id);
-        for parg in self.opt.arg_v.iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
-            }
-        }
-        let protocol = 
-            if self.opt.cmd_simple {
-                "simple"
-            } else if self.opt.cmd_resumable {
-                "resumable"
-            } else { 
-                unreachable!() 
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
             };
-        let mut input_file = input_file_from_opts(&self.opt.arg_file, err);
-        let mime_type = input_mime_from_opts(&self.opt.arg_mime, err);
-        if dry_run {
-            None
-        } else {
-            assert!(err.issues.len() == 0);
-            if self.opt.flag_scope.len() > 0 {
-                call = call.add_scope(&self.opt.flag_scope);
-            }
-            let mut ostream = writer_from_opts(self.opt.flag_o, &self.opt.arg_out);
             match match protocol {
-                "simple" => call.upload(input_file.unwrap(), mime_type.unwrap()),
-                "resumable" => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
-                _ => unreachable!(),
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
             } {
-                Err(api_err) => Some(api_err),
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
-                    None
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
                 }
             }
         }
     }
 
-    fn _doit(&self, dry_run: bool) -> (Option<api::Error>, Option<InvalidOptionsError>) {
-        let mut err = InvalidOptionsError::new();
-        let mut call_result: Option<api::Error>;
-        let mut err_opt: Option<InvalidOptionsError> = None;
-
-        if self.opt.cmd_accounts {
-            if self.opt.cmd_insert {
-                call_result = self._accounts_insert(dry_run, &mut err);
-            } else {
-                unreachable!();
+    fn _timeline_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut request = api::TimelineItem::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_creator_init(request: &mut api::TimelineItem) {
+                if request.creator.is_none() {
+                    request.creator = Some(Default::default());
+                }
+            }
+            
+            fn request_location_init(request: &mut api::TimelineItem) {
+                if request.location.is_none() {
+                    request.location = Some(Default::default());
+                }
+            }
+            
+            fn request_notification_init(request: &mut api::TimelineItem) {
+                if request.notification.is_none() {
+                    request.notification = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "display-time" => {
+                        request.display_time = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.kind" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.display-name" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.accept-types" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().accept_types.is_none() {
+                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.image-urls" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().image_urls.is_none() {
+                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.priority" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().priority = Some(arg_from_str(value.unwrap_or("-0"), err, "creator.priority", "integer"));
+                    },
+                "creator.source" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().source = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.phone-number" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().phone_number = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.sharing-features" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().sharing_features.is_none() {
+                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.type" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.id" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.speakable-name" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().speakable_name = Some(value.unwrap_or("").to_string());
+                    },
+                "text" => {
+                        request_creator_init(&mut request);
+                        request.text = Some(value.unwrap_or("").to_string());
+                    },
+                "is-bundle-cover" => {
+                        request_creator_init(&mut request);
+                        request.is_bundle_cover = Some(arg_from_str(value.unwrap_or("false"), err, "is-bundle-cover", "boolean"));
+                    },
+                "etag" => {
+                        request_creator_init(&mut request);
+                        request.etag = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request_creator_init(&mut request);
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                "is-deleted" => {
+                        request_creator_init(&mut request);
+                        request.is_deleted = Some(arg_from_str(value.unwrap_or("false"), err, "is-deleted", "boolean"));
+                    },
+                "bundle-id" => {
+                        request_creator_init(&mut request);
+                        request.bundle_id = Some(value.unwrap_or("").to_string());
+                    },
+                "is-pinned" => {
+                        request_creator_init(&mut request);
+                        request.is_pinned = Some(arg_from_str(value.unwrap_or("false"), err, "is-pinned", "boolean"));
+                    },
+                "title" => {
+                        request_creator_init(&mut request);
+                        request.title = Some(value.unwrap_or("").to_string());
+                    },
+                "pin-score" => {
+                        request_creator_init(&mut request);
+                        request.pin_score = Some(arg_from_str(value.unwrap_or("-0"), err, "pin-score", "integer"));
+                    },
+                "speakable-text" => {
+                        request_creator_init(&mut request);
+                        request.speakable_text = Some(value.unwrap_or("").to_string());
+                    },
+                "html" => {
+                        request_creator_init(&mut request);
+                        request.html = Some(value.unwrap_or("").to_string());
+                    },
+                "location.kind" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
+                    },
+                "location.display-name" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "location.timestamp" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
+                    },
+                "location.longitude" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
+                    },
+                "location.address" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
+                    },
+                "location.latitude" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
+                    },
+                "location.id" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "location.accuracy" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
+                    },
+                "source-item-id" => {
+                        request_location_init(&mut request);
+                        request.source_item_id = Some(value.unwrap_or("").to_string());
+                    },
+                "in-reply-to" => {
+                        request_location_init(&mut request);
+                        request.in_reply_to = Some(value.unwrap_or("").to_string());
+                    },
+                "updated" => {
+                        request_location_init(&mut request);
+                        request.updated = Some(value.unwrap_or("").to_string());
+                    },
+                "canonical-url" => {
+                        request_location_init(&mut request);
+                        request.canonical_url = Some(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request_location_init(&mut request);
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "created" => {
+                        request_location_init(&mut request);
+                        request.created = Some(value.unwrap_or("").to_string());
+                    },
+                "notification.level" => {
+                        request_notification_init(&mut request);
+                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
+                    },
+                "notification.delivery-time" => {
+                        request_notification_init(&mut request);
+                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
+                    },
+                "speakable-type" => {
+                        request_notification_init(&mut request);
+                        request.speakable_type = Some(value.unwrap_or("").to_string());
+                    },
+                "self-link" => {
+                        request_notification_init(&mut request);
+                        request.self_link = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "accuracy", "address", "bundle-id", "canonical-url", "created", "creator", "delivery-time", "display-name", "display-time", "etag", "html", "id", "image-urls", "in-reply-to", "is-bundle-cover", "is-deleted", "is-pinned", "kind", "latitude", "level", "location", "longitude", "notification", "phone-number", "pin-score", "priority", "self-link", "sharing-features", "source", "source-item-id", "speakable-name", "speakable-text", "speakable-type", "text", "timestamp", "title", "type", "updated"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                }
             }
         }
- else if self.opt.cmd_contacts {
-            if self.opt.cmd_delete {
-                call_result = self._contacts_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._contacts_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._contacts_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._contacts_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._contacts_patch(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._contacts_update(dry_run, &mut err);
-            } else {
-                unreachable!();
+        let mut call = self.hub.timeline().patch(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
- else if self.opt.cmd_locations {
-            if self.opt.cmd_get {
-                call_result = self._locations_get(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._locations_list(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_settings {
-            if self.opt.cmd_get {
-                call_result = self._settings_get(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_subscriptions {
-            if self.opt.cmd_delete {
-                call_result = self._subscriptions_delete(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._subscriptions_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._subscriptions_list(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._subscriptions_update(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
-        }
- else if self.opt.cmd_timeline {
-            if self.opt.cmd_attachments_delete {
-                call_result = self._timeline_attachments_delete(dry_run, &mut err);
-            } else if self.opt.cmd_attachments_get {
-                call_result = self._timeline_attachments_get(dry_run, &mut err);
-            } else if self.opt.cmd_attachments_insert {
-                call_result = self._timeline_attachments_insert(dry_run, &mut err);
-            } else if self.opt.cmd_attachments_list {
-                call_result = self._timeline_attachments_list(dry_run, &mut err);
-            } else if self.opt.cmd_delete {
-                call_result = self._timeline_delete(dry_run, &mut err);
-            } else if self.opt.cmd_get {
-                call_result = self._timeline_get(dry_run, &mut err);
-            } else if self.opt.cmd_insert {
-                call_result = self._timeline_insert(dry_run, &mut err);
-            } else if self.opt.cmd_list {
-                call_result = self._timeline_list(dry_run, &mut err);
-            } else if self.opt.cmd_patch {
-                call_result = self._timeline_patch(dry_run, &mut err);
-            } else if self.opt.cmd_update {
-                call_result = self._timeline_update(dry_run, &mut err);
-            } else {
-                unreachable!();
-            }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
         } else {
-            unreachable!();
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _timeline_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut request = api::TimelineItem::default();
+        let mut field_cursor = FieldCursor::default();
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+            fn request_creator_init(request: &mut api::TimelineItem) {
+                if request.creator.is_none() {
+                    request.creator = Some(Default::default());
+                }
+            }
+            
+            fn request_location_init(request: &mut api::TimelineItem) {
+                if request.location.is_none() {
+                    request.location = Some(Default::default());
+                }
+            }
+            
+            fn request_notification_init(request: &mut api::TimelineItem) {
+                if request.notification.is_none() {
+                    request.notification = Some(Default::default());
+                }
+            }
+            
+            match &temp_cursor.to_string()[..] {
+                "display-time" => {
+                        request.display_time = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.kind" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.display-name" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.accept-types" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().accept_types.is_none() {
+                           request.creator.as_mut().unwrap().accept_types = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().accept_types.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.image-urls" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().image_urls.is_none() {
+                           request.creator.as_mut().unwrap().image_urls = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().image_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.priority" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().priority = Some(arg_from_str(value.unwrap_or("-0"), err, "creator.priority", "integer"));
+                    },
+                "creator.source" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().source = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.phone-number" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().phone_number = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.sharing-features" => {
+                        request_creator_init(&mut request);
+                        if request.creator.as_mut().unwrap().sharing_features.is_none() {
+                           request.creator.as_mut().unwrap().sharing_features = Some(Default::default());
+                        }
+                                        request.creator.as_mut().unwrap().sharing_features.as_mut().unwrap().push(value.unwrap_or("").to_string());
+                    },
+                "creator.type" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.id" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "creator.speakable-name" => {
+                        request_creator_init(&mut request);
+                        request.creator.as_mut().unwrap().speakable_name = Some(value.unwrap_or("").to_string());
+                    },
+                "text" => {
+                        request_creator_init(&mut request);
+                        request.text = Some(value.unwrap_or("").to_string());
+                    },
+                "is-bundle-cover" => {
+                        request_creator_init(&mut request);
+                        request.is_bundle_cover = Some(arg_from_str(value.unwrap_or("false"), err, "is-bundle-cover", "boolean"));
+                    },
+                "etag" => {
+                        request_creator_init(&mut request);
+                        request.etag = Some(value.unwrap_or("").to_string());
+                    },
+                "id" => {
+                        request_creator_init(&mut request);
+                        request.id = Some(value.unwrap_or("").to_string());
+                    },
+                "is-deleted" => {
+                        request_creator_init(&mut request);
+                        request.is_deleted = Some(arg_from_str(value.unwrap_or("false"), err, "is-deleted", "boolean"));
+                    },
+                "bundle-id" => {
+                        request_creator_init(&mut request);
+                        request.bundle_id = Some(value.unwrap_or("").to_string());
+                    },
+                "is-pinned" => {
+                        request_creator_init(&mut request);
+                        request.is_pinned = Some(arg_from_str(value.unwrap_or("false"), err, "is-pinned", "boolean"));
+                    },
+                "title" => {
+                        request_creator_init(&mut request);
+                        request.title = Some(value.unwrap_or("").to_string());
+                    },
+                "pin-score" => {
+                        request_creator_init(&mut request);
+                        request.pin_score = Some(arg_from_str(value.unwrap_or("-0"), err, "pin-score", "integer"));
+                    },
+                "speakable-text" => {
+                        request_creator_init(&mut request);
+                        request.speakable_text = Some(value.unwrap_or("").to_string());
+                    },
+                "html" => {
+                        request_creator_init(&mut request);
+                        request.html = Some(value.unwrap_or("").to_string());
+                    },
+                "location.kind" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
+                    },
+                "location.display-name" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
+                    },
+                "location.timestamp" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().timestamp = Some(value.unwrap_or("").to_string());
+                    },
+                "location.longitude" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.longitude", "number"));
+                    },
+                "location.address" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().address = Some(value.unwrap_or("").to_string());
+                    },
+                "location.latitude" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.latitude", "number"));
+                    },
+                "location.id" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
+                    },
+                "location.accuracy" => {
+                        request_location_init(&mut request);
+                        request.location.as_mut().unwrap().accuracy = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.accuracy", "number"));
+                    },
+                "source-item-id" => {
+                        request_location_init(&mut request);
+                        request.source_item_id = Some(value.unwrap_or("").to_string());
+                    },
+                "in-reply-to" => {
+                        request_location_init(&mut request);
+                        request.in_reply_to = Some(value.unwrap_or("").to_string());
+                    },
+                "updated" => {
+                        request_location_init(&mut request);
+                        request.updated = Some(value.unwrap_or("").to_string());
+                    },
+                "canonical-url" => {
+                        request_location_init(&mut request);
+                        request.canonical_url = Some(value.unwrap_or("").to_string());
+                    },
+                "kind" => {
+                        request_location_init(&mut request);
+                        request.kind = Some(value.unwrap_or("").to_string());
+                    },
+                "created" => {
+                        request_location_init(&mut request);
+                        request.created = Some(value.unwrap_or("").to_string());
+                    },
+                "notification.level" => {
+                        request_notification_init(&mut request);
+                        request.notification.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
+                    },
+                "notification.delivery-time" => {
+                        request_notification_init(&mut request);
+                        request.notification.as_mut().unwrap().delivery_time = Some(value.unwrap_or("").to_string());
+                    },
+                "speakable-type" => {
+                        request_notification_init(&mut request);
+                        request.speakable_type = Some(value.unwrap_or("").to_string());
+                    },
+                "self-link" => {
+                        request_notification_init(&mut request);
+                        request.self_link = Some(value.unwrap_or("").to_string());
+                    },
+                _ => {
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accept-types", "accuracy", "address", "bundle-id", "canonical-url", "created", "creator", "delivery-time", "display-name", "display-time", "etag", "html", "id", "image-urls", "in-reply-to", "is-bundle-cover", "is-deleted", "is-pinned", "kind", "latitude", "level", "location", "longitude", "notification", "phone-number", "pin-score", "priority", "self-link", "sharing-features", "source", "source-item-id", "speakable-name", "speakable-text", "speakable-type", "text", "timestamp", "title", "type", "updated"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                }
+            }
+        }
+        let mut call = self.hub.timeline().update(request, opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap();
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Standard => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
+        let mut err = InvalidOptionsError::new();
+        let mut call_result: Result<(), DoitError> = Ok(());
+        let mut err_opt: Option<InvalidOptionsError> = None;
+        match self.opt.subcommand() {
+            ("accounts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("insert", Some(opt)) => {
+                        call_result = self._accounts_insert(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("accounts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("contacts", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._contacts_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._contacts_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._contacts_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._contacts_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._contacts_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._contacts_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("contacts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("locations", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._locations_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._locations_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("locations".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("settings", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._settings_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("settings".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("subscriptions", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._subscriptions_delete(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._subscriptions_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._subscriptions_list(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._subscriptions_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("subscriptions".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("timeline", Some(opt)) => {
+                match opt.subcommand() {
+                    ("attachments-delete", Some(opt)) => {
+                        call_result = self._timeline_attachments_delete(opt, dry_run, &mut err);
+                    },
+                    ("attachments-get", Some(opt)) => {
+                        call_result = self._timeline_attachments_get(opt, dry_run, &mut err);
+                    },
+                    ("attachments-insert", Some(opt)) => {
+                        call_result = self._timeline_attachments_insert(opt, dry_run, &mut err);
+                    },
+                    ("attachments-list", Some(opt)) => {
+                        call_result = self._timeline_attachments_list(opt, dry_run, &mut err);
+                    },
+                    ("delete", Some(opt)) => {
+                        call_result = self._timeline_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._timeline_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._timeline_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._timeline_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._timeline_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._timeline_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("timeline".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            _ => {
+                err.issues.push(CLIError::MissingCommandError);
+                writeln!(io::stderr(), "{}\n", self.opt.usage()).ok();
+            }
         }
 
         if dry_run {
             if err.issues.len() > 0 {
                 err_opt = Some(err);
             }
+            Err(err_opt)
+        } else {
+            Ok(call_result)
         }
-        (call_result, err_opt)
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: Options) -> Result<Engine, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
-            let config_dir = match cmn::assure_config_dir_exists(&opt.flag_config_dir) {
+            let config_dir = match cmn::assure_config_dir_exists(opt.value_of("folder").unwrap_or("~/.google-service-cli")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
@@ -2376,7 +2453,7 @@ impl Engine {
         };
 
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
-                                        if opt.flag_debug_auth {
+                                        if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
                                                     connector: hyper::net::HttpConnector(None) 
                                                 })
@@ -2389,7 +2466,7 @@ impl Engine {
                                         }, None);
 
         let client = 
-            if opt.flag_debug {
+            if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
                         connector: hyper::net::HttpConnector(None) 
                     })
@@ -2399,37 +2476,713 @@ impl Engine {
         let engine = Engine {
             opt: opt,
             hub: api::Mirror::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
-            (_, Some(err)) => Err(err),
-            _ => Ok(engine),
+            Err(Some(err)) => Err(err),
+            Err(None)      => Ok(engine),
+            Ok(_)          => unreachable!(),
         }
     }
 
-    // Execute the call with all the bells and whistles, informing the caller only if there was an error.
-    // The absense of one indicates success.
-    fn doit(&self) -> Option<api::Error> {
-        self._doit(false).0
+    fn doit(&self) -> Result<(), DoitError> {
+        match self._doit(false) {
+            Ok(res) => res,
+            Err(_) => unreachable!(),
+        }
     }
 }
 
 fn main() {
-    let opts: Options = Options::docopt().decode().unwrap_or_else(|e| e.exit());
-    let debug = opts.flag_debug;
-    match Engine::new(opts) {
+    let upload_value_names = ["mode", "file"];
+    let arg_data = [
+        ("accounts", "methods: 'insert'", vec![
+            ("insert",  
+                    Some(r##"Inserts a new account for a user"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/accounts_insert",
+                  vec![
+                    (Some(r##"user-token"##),
+                     None,
+                     Some(r##"The ID for the user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"account-type"##),
+                     None,
+                     Some(r##"Account type to be passed to Android Account Manager."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"account-name"##),
+                     None,
+                     Some(r##"The name of the account to be passed to the Android Account Manager."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("contacts", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("delete",  
+                    Some(r##"Deletes a contact."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_delete",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Gets a single contact by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_get",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Inserts a new contact."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of contacts for the authenticated user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates a contact in place. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_patch",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates a contact in place."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/contacts_update",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("locations", "methods: 'get' and 'list'", vec![
+            ("get",  
+                    Some(r##"Gets a single location by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/locations_get",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the location or latest for the last known location."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of locations for the user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/locations_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("settings", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Gets a single setting by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/settings_get",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the setting. The following IDs are valid: 
+        - locale - The key to the user’s language/locale (BCP 47 identifier) that Glassware should use to render localized content. 
+        - timezone - The key to the user’s current time zone region as defined in the tz database. Example: America/Los_Angeles."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("subscriptions", "methods: 'delete', 'insert', 'list' and 'update'", vec![
+            ("delete",  
+                    Some(r##"Deletes a subscription."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/subscriptions_delete",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the subscription."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates a new subscription."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/subscriptions_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of subscriptions for the authenticated user and service."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/subscriptions_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates an existing subscription in place."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/subscriptions_update",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the subscription."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("timeline", "methods: 'attachments-delete', 'attachments-get', 'attachments-insert', 'attachments-list', 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("attachments-delete",  
+                    Some(r##"Deletes an attachment from a timeline item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_attachments-delete",
+                  vec![
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"The ID of the timeline item the attachment belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"The ID of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("attachments-get",  
+                    Some(r##"Retrieves an attachment on a timeline item by item ID and attachment ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_attachments-get",
+                  vec![
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"The ID of the timeline item the attachment belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"attachment-id"##),
+                     None,
+                     Some(r##"The ID of the attachment."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("attachments-insert",  
+                    Some(r##"Adds a new attachment to a timeline item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_attachments-insert",
+                  vec![
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"The ID of the timeline item the attachment belongs to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("attachments-list",  
+                    Some(r##"Returns a list of attachments for a timeline item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_attachments-list",
+                  vec![
+                    (Some(r##"item-id"##),
+                     None,
+                     Some(r##"The ID of the timeline item whose attachments should be listed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("delete",  
+                    Some(r##"Deletes a timeline item."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_delete",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the timeline item."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("get",  
+                    Some(r##"Gets a single timeline item by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_get",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the timeline item."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Inserts a new item into the timeline."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_insert",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves a list of timeline items for the authenticated user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates a timeline item in place. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_patch",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the timeline item."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates a timeline item in place."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_mirror1_cli/timeline_update",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The ID of the timeline item."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+    ];
+    
+    let mut app = App::new("mirror1")
+           .author("Sebastian Thiel <byronimo@gmail.com>")
+           .version("0.2.0+20150220")
+           .about("API for interacting with Glass users via the timeline.")
+           .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mirror1_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
+           .arg(Arg::with_name("folder")
+                   .long("config-dir")
+                   .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")
+                   .multiple(false)
+                   .takes_value(true))
+           .arg(Arg::with_name("debug")
+                   .long("debug")
+                   .help("Output all server communication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false))
+           .arg(Arg::with_name("debug-auth")
+                   .long("debug-auth")
+                   .help("Output all communication related to authentication to standard error. `tx` and `rx` are placed into the same stream.")
+                   .multiple(false)
+                   .takes_value(false));
+           
+           for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+               let mut mcmd = SubCommand::new(main_command_name).about(about);
+           
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
+                   let mut scmd = SubCommand::new(sub_command_name);
+                   if let &Some(desc) = desc {
+                       scmd = scmd.about(desc);
+                   }
+                   scmd = scmd.after_help(url_info);
+           
+                   for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
+                       let arg_name_str = 
+                           match (arg_name, flag) {
+                                   (&Some(an), _       ) => an,
+                                   (_        , &Some(f)) => f,
+                                    _                    => unreachable!(),
+                            };
+                       let mut arg = Arg::with_name(arg_name_str);
+                       if let &Some(short_flag) = flag {
+                           arg = arg.short(short_flag);
+                       }
+                       if let &Some(desc) = desc {
+                           arg = arg.help(desc);
+                       }
+                       if arg_name.is_some() && flag.is_some() {
+                           arg = arg.takes_value(true);
+                       }
+                       if let &Some(required) = required {
+                           arg = arg.required(required);
+                       }
+                       if let &Some(multi) = multi {
+                           arg = arg.multiple(multi);
+                       }
+                       if arg_name_str == "mode" {
+                           arg = arg.number_of_values(2);
+                           arg = arg.value_names(&upload_value_names);
+           
+                           scmd = scmd.arg(Arg::with_name("mime")
+                                               .short("m")
+                                               .requires("mode")
+                                               .required(false)
+                                               .help("The file's mime time, like 'application/octet-stream'")
+                                               .takes_value(true));
+                       }
+                       scmd = scmd.arg(arg);
+                   }
+                   mcmd = mcmd.subcommand(scmd);
+               }
+               app = app.subcommand(mcmd);
+           }
+           
+        let matches = app.get_matches();
+
+    let debug = matches.is_present("debug");
+    match Engine::new(matches) {
         Err(err) => {
-            writeln!(io::stderr(), "{}", err).ok();
             env::set_exit_status(err.exit_code);
+            writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
-            if let Some(err) = engine.doit() {
-                if debug {
-                    writeln!(io::stderr(), "{:?}", err).ok();
-                } else {
-                    writeln!(io::stderr(), "{}", err).ok();
-                }
+            if let Err(doit_err) = engine.doit() {
                 env::set_exit_status(1);
+                match doit_err {
+                    DoitError::IoError(path, err) => {
+                        writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
+                    },
+                    DoitError::ApiError(err) => {
+                        if debug {
+                            writeln!(io::stderr(), "{:?}", err).ok();
+                        } else {
+                            writeln!(io::stderr(), "{}", err).ok();
+                        }
+                    }
+                }
             }
         }
     }

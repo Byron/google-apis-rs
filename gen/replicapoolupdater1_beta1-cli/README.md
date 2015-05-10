@@ -10,29 +10,32 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *replicapoolupdater* API can be found at the
+[official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
+
 # Usage
 
-This documentation was generated from the *replicapoolupdater* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *replicapoolupdater* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  replicapoolupdater1-beta1 [options] rolling-updates cancel <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates get <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates list <project> <zone> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates list-instance-updates <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates pause <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates resume <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] rolling-updates rollback <project> <zone> <rolling-update> [-p <v>...] [-o <out>]
-  replicapoolupdater1-beta1 [options] zone-operations get <project> <zone> <operation> [-p <v>...] [-o <out>]
+replicapoolupdater1-beta1 [options]
+        rolling-updates
+                cancel <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+                get <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                list-instance-updates <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+                pause <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+                resume <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+                rollback <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
+        zone-operations
+                get <project> <zone> <operation> [-p <v>]... [-o <out>]
   replicapoolupdater1-beta1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

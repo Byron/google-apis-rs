@@ -10,40 +10,47 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *plusDomains* API can be found at the
+[official documentation site](https://developers.google.com/+/domains/).
+
 # Usage
 
-This documentation was generated from the *plusDomains* API at revision *20150303*. The CLI is at version *0.1.0*.
+This documentation was generated from the *plusDomains* API at revision *20150303*. The CLI is at version *0.2.0*.
 
 ```bash
-  plusdomains1 [options] activities get <activity-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] activities insert <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  plusdomains1 [options] activities list <user-id> <collection> [-p <v>...] [-o <out>]
-  plusdomains1 [options] audiences list <user-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles add-people <circle-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles get <circle-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles insert <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles list <user-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles patch <circle-id> -r <kv>... [-p <v>...] [-o <out>]
-  plusdomains1 [options] circles remove <circle-id> [-p <v>...]
-  plusdomains1 [options] circles remove-people <circle-id> [-p <v>...]
-  plusdomains1 [options] circles update <circle-id> -r <kv>... [-p <v>...] [-o <out>]
-  plusdomains1 [options] comments get <comment-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] comments insert <activity-id> -r <kv>... [-p <v>...] [-o <out>]
-  plusdomains1 [options] comments list <activity-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] media insert <user-id> <collection> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  plusdomains1 [options] people get <user-id> [-p <v>...] [-o <out>]
-  plusdomains1 [options] people list <user-id> <collection> [-p <v>...] [-o <out>]
-  plusdomains1 [options] people list-by-activity <activity-id> <collection> [-p <v>...] [-o <out>]
-  plusdomains1 [options] people list-by-circle <circle-id> [-p <v>...] [-o <out>]
+plusdomains1 [options]
+        activities
+                get <activity-id> [-p <v>]... [-o <out>]
+                insert <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <user-id> <collection> [-p <v>]... [-o <out>]
+        audiences
+                list <user-id> [-p <v>]... [-o <out>]
+        circles
+                add-people <circle-id> [-p <v>]... [-o <out>]
+                get <circle-id> [-p <v>]... [-o <out>]
+                insert <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <user-id> [-p <v>]... [-o <out>]
+                patch <circle-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                remove <circle-id> [-p <v>]...
+                remove-people <circle-id> [-p <v>]...
+                update <circle-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        comments
+                get <comment-id> [-p <v>]... [-o <out>]
+                insert <activity-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <activity-id> [-p <v>]... [-o <out>]
+        media
+                insert <user-id> <collection> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+        people
+                get <user-id> [-p <v>]... [-o <out>]
+                list <user-id> <collection> [-p <v>]... [-o <out>]
+                list-by-activity <activity-id> <collection> [-p <v>]... [-o <out>]
+                list-by-circle <circle-id> [-p <v>]... [-o <out>]
   plusdomains1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_plusdomains1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

@@ -10,32 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *webmasters* API can be found at the
+[official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
+
 # Usage
 
-This documentation was generated from the *webmasters* API at revision *20140908*. The CLI is at version *0.1.0*.
+This documentation was generated from the *webmasters* API at revision *20140908*. The CLI is at version *0.2.0*.
 
 ```bash
-  webmasters3 [options] sitemaps delete <site-url> <feedpath> [-p <v>...]
-  webmasters3 [options] sitemaps get <site-url> <feedpath> [-p <v>...] [-o <out>]
-  webmasters3 [options] sitemaps list <site-url> [-p <v>...] [-o <out>]
-  webmasters3 [options] sitemaps submit <site-url> <feedpath> [-p <v>...]
-  webmasters3 [options] sites add <site-url> [-p <v>...]
-  webmasters3 [options] sites delete <site-url> [-p <v>...]
-  webmasters3 [options] sites get <site-url> [-p <v>...] [-o <out>]
-  webmasters3 [options] sites list [-p <v>...] [-o <out>]
-  webmasters3 [options] urlcrawlerrorscounts query <site-url> [-p <v>...] [-o <out>]
-  webmasters3 [options] urlcrawlerrorssamples get <site-url> <url> <category> <platform> [-p <v>...] [-o <out>]
-  webmasters3 [options] urlcrawlerrorssamples list <site-url> <category> <platform> [-p <v>...] [-o <out>]
-  webmasters3 [options] urlcrawlerrorssamples mark-as-fixed <site-url> <url> <category> <platform> [-p <v>...]
+webmasters3 [options]
+        sitemaps
+                delete <site-url> <feedpath> [-p <v>]...
+                get <site-url> <feedpath> [-p <v>]... [-o <out>]
+                list <site-url> [-p <v>]... [-o <out>]
+                submit <site-url> <feedpath> [-p <v>]...
+        sites
+                add <site-url> [-p <v>]...
+                delete <site-url> [-p <v>]...
+                get <site-url> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        urlcrawlerrorscounts
+                query <site-url> [-p <v>]... [-o <out>]
+        urlcrawlerrorssamples
+                get <site-url> <url> <category> <platform> [-p <v>]... [-o <out>]
+                list <site-url> <category> <platform> [-p <v>]... [-o <out>]
+                mark-as-fixed <site-url> <url> <category> <platform> [-p <v>]...
   webmasters3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_webmasters3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

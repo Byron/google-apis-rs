@@ -10,50 +10,52 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *gmail* API can be found at the
+[official documentation site](https://developers.google.com/gmail/api/).
+
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20150303*. The CLI is at version *0.1.0*.
+This documentation was generated from the *gmail* API at revision *20150303*. The CLI is at version *0.2.0*.
 
 ```bash
-  gmail1 [options] users drafts-create <user-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users drafts-delete <user-id> <id> [-p <v>...]
-  gmail1 [options] users drafts-get <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users drafts-list <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users drafts-send <user-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users drafts-update <user-id> <id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users get-profile <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users history-list <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users labels-create <user-id> -r <kv>... [-p <v>...] [-o <out>]
-  gmail1 [options] users labels-delete <user-id> <id> [-p <v>...]
-  gmail1 [options] users labels-get <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users labels-list <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users labels-patch <user-id> <id> -r <kv>... [-p <v>...] [-o <out>]
-  gmail1 [options] users labels-update <user-id> <id> -r <kv>... [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-attachments-get <user-id> <message-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-delete <user-id> <id> [-p <v>...]
-  gmail1 [options] users messages-get <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-import <user-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-insert <user-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-list <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-modify <user-id> <id> -r <kv>... [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-send <user-id> -r <kv>... -u (simple|resumable) <file> <mime> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-trash <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users messages-untrash <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users threads-delete <user-id> <id> [-p <v>...]
-  gmail1 [options] users threads-get <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users threads-list <user-id> [-p <v>...] [-o <out>]
-  gmail1 [options] users threads-modify <user-id> <id> -r <kv>... [-p <v>...] [-o <out>]
-  gmail1 [options] users threads-trash <user-id> <id> [-p <v>...] [-o <out>]
-  gmail1 [options] users threads-untrash <user-id> <id> [-p <v>...] [-o <out>]
+gmail1 [options]
+        users
+                drafts-create <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                drafts-delete <user-id> <id> [-p <v>]...
+                drafts-get <user-id> <id> [-p <v>]... [-o <out>]
+                drafts-list <user-id> [-p <v>]... [-o <out>]
+                drafts-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                drafts-update <user-id> <id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                get-profile <user-id> [-p <v>]... [-o <out>]
+                history-list <user-id> [-p <v>]... [-o <out>]
+                labels-create <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                labels-delete <user-id> <id> [-p <v>]...
+                labels-get <user-id> <id> [-p <v>]... [-o <out>]
+                labels-list <user-id> [-p <v>]... [-o <out>]
+                labels-patch <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                labels-update <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                messages-attachments-get <user-id> <message-id> <id> [-p <v>]... [-o <out>]
+                messages-delete <user-id> <id> [-p <v>]...
+                messages-get <user-id> <id> [-p <v>]... [-o <out>]
+                messages-import <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-insert <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-list <user-id> [-p <v>]... [-o <out>]
+                messages-modify <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                messages-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                messages-trash <user-id> <id> [-p <v>]... [-o <out>]
+                messages-untrash <user-id> <id> [-p <v>]... [-o <out>]
+                threads-delete <user-id> <id> [-p <v>]...
+                threads-get <user-id> <id> [-p <v>]... [-o <out>]
+                threads-list <user-id> [-p <v>]... [-o <out>]
+                threads-modify <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
+                threads-trash <user-id> <id> [-p <v>]... [-o <out>]
+                threads-untrash <user-id> <id> [-p <v>]... [-o <out>]
   gmail1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_gmail1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

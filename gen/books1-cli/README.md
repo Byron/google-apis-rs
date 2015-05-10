@@ -10,64 +10,74 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *books* API can be found at the
+[official documentation site](https://developers.google.com/books/docs/v1/getting_started).
+
 # Usage
 
-This documentation was generated from the *books* API at revision *20150401*. The CLI is at version *0.1.0*.
+This documentation was generated from the *books* API at revision *20150401*. The CLI is at version *0.2.0*.
 
 ```bash
-  books1 [options] bookshelves get <user-id> <shelf> [-p <v>...] [-o <out>]
-  books1 [options] bookshelves list <user-id> [-p <v>...] [-o <out>]
-  books1 [options] bookshelves volumes-list <user-id> <shelf> [-p <v>...] [-o <out>]
-  books1 [options] cloudloading add-book [-p <v>...] [-o <out>]
-  books1 [options] cloudloading delete-book <volume-id> [-p <v>...]
-  books1 [options] cloudloading update-book -r <kv>... [-p <v>...] [-o <out>]
-  books1 [options] dictionary list-offline-metadata <cpksver> [-p <v>...] [-o <out>]
-  books1 [options] layers annotation-data-get <volume-id> <layer-id> <annotation-data-id> <content-version> [-p <v>...] [-o <out>]
-  books1 [options] layers annotation-data-list <volume-id> <layer-id> <content-version> [-p <v>...] [-o <out>]
-  books1 [options] layers get <volume-id> <summary-id> [-p <v>...] [-o <out>]
-  books1 [options] layers list <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] layers volume-annotations-get <volume-id> <layer-id> <annotation-id> [-p <v>...] [-o <out>]
-  books1 [options] layers volume-annotations-list <volume-id> <layer-id> <content-version> [-p <v>...] [-o <out>]
-  books1 [options] myconfig get-user-settings [-p <v>...] [-o <out>]
-  books1 [options] myconfig release-download-access <volume-ids>... <cpksver> [-p <v>...] [-o <out>]
-  books1 [options] myconfig request-access <source> <volume-id> <nonce> <cpksver> [-p <v>...] [-o <out>]
-  books1 [options] myconfig sync-volume-licenses <source> <nonce> <cpksver> [-p <v>...] [-o <out>]
-  books1 [options] myconfig update-user-settings -r <kv>... [-p <v>...] [-o <out>]
-  books1 [options] mylibrary annotations-delete <annotation-id> [-p <v>...]
-  books1 [options] mylibrary annotations-insert -r <kv>... [-p <v>...] [-o <out>]
-  books1 [options] mylibrary annotations-list [-p <v>...] [-o <out>]
-  books1 [options] mylibrary annotations-summary <layer-ids>... <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] mylibrary annotations-update <annotation-id> -r <kv>... [-p <v>...] [-o <out>]
-  books1 [options] mylibrary bookshelves-add-volume <shelf> <volume-id> [-p <v>...]
-  books1 [options] mylibrary bookshelves-clear-volumes <shelf> [-p <v>...]
-  books1 [options] mylibrary bookshelves-get <shelf> [-p <v>...] [-o <out>]
-  books1 [options] mylibrary bookshelves-list [-p <v>...] [-o <out>]
-  books1 [options] mylibrary bookshelves-move-volume <shelf> <volume-id> <volume-position> [-p <v>...]
-  books1 [options] mylibrary bookshelves-remove-volume <shelf> <volume-id> [-p <v>...]
-  books1 [options] mylibrary bookshelves-volumes-list <shelf> [-p <v>...] [-o <out>]
-  books1 [options] mylibrary readingpositions-get <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] mylibrary readingpositions-set-position <volume-id> <timestamp> <position> [-p <v>...]
-  books1 [options] onboarding list-categories [-p <v>...] [-o <out>]
-  books1 [options] onboarding list-category-volumes [-p <v>...] [-o <out>]
-  books1 [options] promooffer accept [-p <v>...]
-  books1 [options] promooffer dismiss [-p <v>...]
-  books1 [options] promooffer get [-p <v>...] [-o <out>]
-  books1 [options] volumes associated-list <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] volumes get <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] volumes list <q> [-p <v>...] [-o <out>]
-  books1 [options] volumes mybooks-list [-p <v>...] [-o <out>]
-  books1 [options] volumes recommended-list [-p <v>...] [-o <out>]
-  books1 [options] volumes recommended-rate <rating> <volume-id> [-p <v>...] [-o <out>]
-  books1 [options] volumes useruploaded-list [-p <v>...] [-o <out>]
+books1 [options]
+        bookshelves
+                get <user-id> <shelf> [-p <v>]... [-o <out>]
+                list <user-id> [-p <v>]... [-o <out>]
+                volumes-list <user-id> <shelf> [-p <v>]... [-o <out>]
+        cloudloading
+                add-book [-p <v>]... [-o <out>]
+                delete-book <volume-id> [-p <v>]...
+                update-book (-r <kv>)... [-p <v>]... [-o <out>]
+        dictionary
+                list-offline-metadata <cpksver> [-p <v>]... [-o <out>]
+        layers
+                annotation-data-get <volume-id> <layer-id> <annotation-data-id> <content-version> [-p <v>]... [-o <out>]
+                annotation-data-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
+                get <volume-id> <summary-id> [-p <v>]... [-o <out>]
+                list <volume-id> [-p <v>]... [-o <out>]
+                volume-annotations-get <volume-id> <layer-id> <annotation-id> [-p <v>]... [-o <out>]
+                volume-annotations-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]
+        myconfig
+                get-user-settings [-p <v>]... [-o <out>]
+                release-download-access <volume-ids>... <cpksver> [-p <v>]... [-o <out>]
+                request-access <source> <volume-id> <nonce> <cpksver> [-p <v>]... [-o <out>]
+                sync-volume-licenses <source> <nonce> <cpksver> [-p <v>]... [-o <out>]
+                update-user-settings (-r <kv>)... [-p <v>]... [-o <out>]
+        mylibrary
+                annotations-delete <annotation-id> [-p <v>]...
+                annotations-insert (-r <kv>)... [-p <v>]... [-o <out>]
+                annotations-list [-p <v>]... [-o <out>]
+                annotations-summary <layer-ids>... <volume-id> [-p <v>]... [-o <out>]
+                annotations-update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                bookshelves-add-volume <shelf> <volume-id> [-p <v>]...
+                bookshelves-clear-volumes <shelf> [-p <v>]...
+                bookshelves-get <shelf> [-p <v>]... [-o <out>]
+                bookshelves-list [-p <v>]... [-o <out>]
+                bookshelves-move-volume <shelf> <volume-id> <volume-position> [-p <v>]...
+                bookshelves-remove-volume <shelf> <volume-id> [-p <v>]...
+                bookshelves-volumes-list <shelf> [-p <v>]... [-o <out>]
+                readingpositions-get <volume-id> [-p <v>]... [-o <out>]
+                readingpositions-set-position <volume-id> <timestamp> <position> [-p <v>]...
+        onboarding
+                list-categories [-p <v>]... [-o <out>]
+                list-category-volumes [-p <v>]... [-o <out>]
+        promooffer
+                accept [-p <v>]...
+                dismiss [-p <v>]...
+                get [-p <v>]... [-o <out>]
+        volumes
+                associated-list <volume-id> [-p <v>]... [-o <out>]
+                get <volume-id> [-p <v>]... [-o <out>]
+                list <q> [-p <v>]... [-o <out>]
+                mybooks-list [-p <v>]... [-o <out>]
+                recommended-list [-p <v>]... [-o <out>]
+                recommended-rate <rating> <volume-id> [-p <v>]... [-o <out>]
+                useruploaded-list [-p <v>]... [-o <out>]
   books1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_books1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

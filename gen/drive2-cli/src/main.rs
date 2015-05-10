@@ -4,12 +4,14 @@
 #![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
+#[macro_use]
 extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
 extern crate hyper;
 extern crate mime;
+extern crate strsim;
 extern crate google_drive2 as api;
 
 use std::env;
@@ -20,7 +22,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          protocol_from_str};
+          calltype_from_str, remove_json_null_values};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -37,6 +39,8 @@ enum DoitError {
 struct Engine<'n, 'a> {
     opt: ArgMatches<'n, 'a>,
     hub: api::Drive<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
+    gp: Vec<&'static str>,
+    gpm: Vec<(&'static str, &'static str)>,
 }
 
 
@@ -56,22 +60,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-subscribed" => {
                     call = call.include_subscribed(arg_from_str(value.unwrap_or("false"), err, "include-subscribed", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-subscribed", "max-change-id-count", "start-change-id"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -92,7 +95,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -105,22 +110,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -141,7 +145,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -163,22 +169,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "app-filter-extensions" => {
                     call = call.app_filter_extensions(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["language-code", "app-filter-extensions", "app-filter-mime-types"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -199,7 +204,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -212,22 +219,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -248,7 +254,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -276,22 +284,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "include-deleted", "max-results", "start-change-id", "include-subscribed"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -312,7 +319,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -374,7 +383,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -397,22 +407,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "include-deleted", "max-results", "start-change-id", "include-subscribed"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -433,7 +442,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -495,7 +506,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -503,22 +515,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -547,22 +558,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -591,22 +601,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -627,7 +636,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -667,7 +678,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["child-link", "id", "kind", "self-link"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -675,22 +687,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -711,7 +722,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -733,22 +746,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["q", "page-token", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -769,7 +781,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -782,22 +796,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -829,22 +842,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-deleted"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -865,7 +877,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -990,7 +1004,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.file_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anchor", "author", "comment-id", "content", "context", "created-date", "deleted", "display-name", "email-address", "file-id", "file-title", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "self-link", "status", "type", "url", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -998,22 +1013,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1034,7 +1048,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1059,22 +1075,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["updated-min", "include-deleted", "max-results", "page-token"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1095,7 +1110,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1220,7 +1237,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.file_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anchor", "author", "comment-id", "content", "context", "created-date", "deleted", "display-name", "email-address", "file-id", "file-title", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "self-link", "status", "type", "url", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1228,22 +1246,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1264,7 +1281,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1389,7 +1408,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.file_id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["anchor", "author", "comment-id", "content", "context", "created-date", "deleted", "display-name", "email-address", "file-id", "file-title", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "self-link", "status", "type", "url", "value"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1397,22 +1417,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -1433,7 +1452,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1936,7 +1957,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.modified_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shared", "shared-with-me-date", "sharing-user", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -1965,22 +1987,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["convert", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2001,7 +2022,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2014,22 +2037,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2058,22 +2080,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2115,25 +2136,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "acknowledge-abuse" => {
                     call = call.acknowledge_abuse(arg_from_str(value.unwrap_or("false"), err, "acknowledge-abuse", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2155,7 +2175,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
                     if !download_mode {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -2661,7 +2683,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.modified_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shared", "shared-with-me-date", "sharing-user", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -2693,26 +2716,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "convert" => {
                     call = call.convert(arg_from_str(value.unwrap_or("false"), err, "convert", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["convert", "use-content-as-indexable-text", "ocr-language", "visibility", "pinned", "ocr", "timed-text-track-name", "timed-text-language"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -2733,7 +2755,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2761,22 +2785,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "corpus" => {
                     call = call.corpus(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["q", "page-token", "corpus", "projection", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -2797,7 +2820,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3300,7 +3325,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.modified_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shared", "shared-with-me-date", "sharing-user", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -3344,22 +3370,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "add-parents" => {
                     call = call.add_parents(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["add-parents", "convert", "ocr", "set-modified-date", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3380,7 +3405,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3393,22 +3420,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3429,7 +3455,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3442,22 +3470,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3478,7 +3505,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3491,22 +3520,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -3527,7 +3555,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4030,7 +4060,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.modified_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "alternate-link", "altitude", "aperture", "app-data-contents", "auth-key", "camera-make", "camera-model", "color-space", "copyable", "created-date", "date", "default-open-with-link", "description", "display-name", "domain", "download-url", "duration-millis", "editable", "email-address", "embed-link", "etag", "explicitly-trashed", "export-links", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "file-size", "flash-used", "focal-length", "folder-color-rgb", "head-revision-id", "height", "hidden", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-authenticated-user", "iso-speed", "kind", "labels", "last-modifying-user", "last-modifying-user-name", "last-viewed-by-me-date", "latitude", "lens", "location", "longitude", "marked-viewed-by-me-date", "max-aperture-value", "md5-checksum", "metering-mode", "mime-type", "modified-by-me-date", "modified-date", "name", "open-with-links", "original-filename", "owner-names", "permission-id", "photo-link", "picture", "quota-bytes-used", "restricted", "role", "rotation", "self-link", "sensor", "shared", "shared-with-me-date", "sharing-user", "starred", "subject-distance", "text", "thumbnail", "thumbnail-link", "title", "trashed", "type", "url", "user-permission", "value", "version", "video-media-metadata", "viewed", "web-content-link", "web-view-link", "white-balance", "width", "with-link", "writers-can-share"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4074,26 +4105,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "add-parents" => {
                     call = call.add_parents(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["add-parents", "convert", "ocr", "set-modified-date", "use-content-as-indexable-text", "ocr-language", "new-revision", "pinned", "remove-parents", "update-viewed-date", "timed-text-track-name", "timed-text-language"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -4114,7 +4144,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4176,7 +4208,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.id = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "expiration", "id", "kind", "params", "payload", "resource-id", "resource-uri", "token", "type"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4197,25 +4230,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "acknowledge-abuse" => {
                     call = call.acknowledge_abuse(arg_from_str(value.unwrap_or("false"), err, "acknowledge-abuse", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["revision-id", "update-viewed-date", "acknowledge-abuse", "projection"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4237,7 +4269,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
                     if !download_mode {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -4253,22 +4287,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4297,22 +4330,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4333,7 +4365,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4376,7 +4410,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.parent_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-root", "kind", "parent-link", "self-link"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4384,22 +4419,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4420,7 +4454,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4433,22 +4469,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4469,7 +4504,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4482,22 +4519,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4526,22 +4562,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4562,7 +4597,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4575,22 +4612,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4611,7 +4647,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4684,7 +4722,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4698,22 +4737,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "email-message" => {
                     call = call.email_message(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["email-message", "send-notification-emails"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4734,7 +4772,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4747,22 +4787,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4783,7 +4822,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4856,7 +4897,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4867,22 +4909,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["transfer-ownership"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -4903,7 +4944,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4976,7 +5019,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-roles", "auth-key", "domain", "email-address", "etag", "id", "kind", "name", "photo-link", "role", "self-link", "type", "value", "with-link"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -4987,22 +5031,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["transfer-ownership"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5023,7 +5066,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5039,22 +5084,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "visibility" => {
                     call = call.visibility(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["visibility"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5086,22 +5130,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "visibility" => {
                     call = call.visibility(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["visibility"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5122,7 +5165,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5168,7 +5213,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "key", "kind", "self-link", "value", "visibility"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5176,22 +5222,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5212,7 +5257,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5225,22 +5272,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5261,7 +5307,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5307,7 +5355,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "key", "kind", "self-link", "value", "visibility"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5318,22 +5367,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "visibility" => {
                     call = call.visibility(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["visibility"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5354,7 +5402,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5400,7 +5450,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.self_link = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "key", "kind", "self-link", "value", "visibility"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5411,22 +5462,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "visibility" => {
                     call = call.visibility(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["visibility"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5447,7 +5497,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5464,25 +5516,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "revision" => {
                     call = call.revision(arg_from_str(value.unwrap_or("-0"), err, "revision", "integer"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    if key == "alt" && value.unwrap_or("unset") == "media" {
-                        download_mode = true;
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
                     }
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["revision"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5522,26 +5573,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "base-revision" => {
                     call = call.base_revision(value.unwrap_or(""));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["base-revision"]
+                                                            ));
+                    }
+                }
             }
         }
         let vals = opt.values_of("mode").unwrap();
-        let protocol = protocol_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
         let mut input_file = input_file_from_opts(vals[1], err);
         let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
         if dry_run {
@@ -5570,22 +5620,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5617,22 +5666,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["include-deleted"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5653,7 +5701,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5749,7 +5799,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.created_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "content", "created-date", "deleted", "display-name", "email-address", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "reply-id", "url", "verb"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5757,22 +5808,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5793,7 +5843,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5815,22 +5867,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "include-deleted" => {
                     call = call.include_deleted(arg_from_str(value.unwrap_or("false"), err, "include-deleted", "boolean"));
                 },
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &["page-token", "include-deleted", "max-results"]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5851,7 +5902,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5947,7 +6000,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.created_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "content", "created-date", "deleted", "display-name", "email-address", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "reply-id", "url", "verb"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -5955,22 +6009,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -5991,7 +6044,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6087,7 +6142,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.created_date = Some(value.unwrap_or("").to_string());
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "content", "created-date", "deleted", "display-name", "email-address", "html-content", "is-authenticated-user", "kind", "modified-date", "permission-id", "picture", "reply-id", "url", "verb"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6095,22 +6151,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6131,7 +6186,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6144,22 +6201,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6188,22 +6244,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6224,7 +6279,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6237,22 +6294,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6273,7 +6329,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6405,7 +6463,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.published = Some(arg_from_str(value.unwrap_or("false"), err, "published", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "download-url", "email-address", "etag", "export-links", "file-size", "id", "is-authenticated-user", "kind", "last-modifying-user", "last-modifying-user-name", "md5-checksum", "mime-type", "modified-date", "original-filename", "permission-id", "picture", "pinned", "publish-auto", "published", "published-link", "published-outside-domain", "self-link", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6413,22 +6472,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6449,7 +6507,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6581,7 +6641,8 @@ impl<'n, 'a> Engine<'n, 'a> {
                         request.published = Some(arg_from_str(value.unwrap_or("false"), err, "published", "boolean"));
                     },
                 _ => {
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string())));
+                    let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "download-url", "email-address", "etag", "export-links", "file-size", "id", "is-authenticated-user", "kind", "last-modifying-user", "last-modifying-user-name", "md5-checksum", "mime-type", "modified-date", "original-filename", "permission-id", "picture", "pinned", "publish-auto", "published", "published-link", "published-outside-domain", "self-link", "url"]);
+                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                 }
             }
         }
@@ -6589,22 +6650,21 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "alt"
-                |"fields"
-                |"key"
-                |"oauth-token"
-                |"pretty-print"
-                |"quota-user"
-                |"user-ip" => {
-                    let map = [
-                        ("oauth-token", "oauth_token"),
-                        ("pretty-print", "prettyPrint"),
-                        ("quota-user", "quotaUser"),
-                        ("user-ip", "userIp"),
-                    ];
-                    call = call.param(map.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"))
-                },
-                _ => err.issues.push(CLIError::UnknownParameter(key.to_string())),
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                Vec::new() + &self.gp + &[]
+                                                            ));
+                    }
+                }
             }
         }
         let protocol = CallType::Standard;
@@ -6625,7 +6685,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    serde::json::to_writer_pretty(&mut ostream, &output_schema).unwrap();
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6973,6 +7035,13 @@ impl<'n, 'a> Engine<'n, 'a> {
         let engine = Engine {
             opt: opt,
             hub: api::Drive::new(client, auth),
+            gp: vec!["alt", "fields", "key", "oauth-token", "pretty-print", "quota-user", "user-ip"],
+            gpm: vec![
+                    ("oauth-token", "oauth_token"),
+                    ("pretty-print", "prettyPrint"),
+                    ("quota-user", "quotaUser"),
+                    ("user-ip", "userIp"),
+                ]
         };
 
         match engine._doit(true) {
@@ -6994,1441 +7063,1559 @@ fn main() {
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("about", "methods: 'get'", vec![
-            ("get",  Some("Gets the information about the current user along with Drive API settings"), 
+            ("get",  
+                    Some(r##"Gets the information about the current user along with Drive API settings"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/about_get",
                   vec![
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("apps", "methods: 'get' and 'list'", vec![
-            ("get",  Some("Gets a specific app."), 
+            ("get",  
+                    Some(r##"Gets a specific app."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/apps_get",
                   vec![
-                    (Some("app-id"),
+                    (Some(r##"app-id"##),
                      None,
-                     Some("The ID of the app."),
+                     Some(r##"The ID of the app."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a user's installed apps."), 
+            ("list",  
+                    Some(r##"Lists a user's installed apps."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/apps_list",
                   vec![
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("changes", "methods: 'get', 'list' and 'watch'", vec![
-            ("get",  Some("Gets a specific change."), 
+            ("get",  
+                    Some(r##"Gets a specific change."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_get",
                   vec![
-                    (Some("change-id"),
+                    (Some(r##"change-id"##),
                      None,
-                     Some("The ID of the change."),
+                     Some(r##"The ID of the change."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists the changes for a user."), 
+            ("list",  
+                    Some(r##"Lists the changes for a user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_list",
                   vec![
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("watch",  Some("Subscribe to changes for a user."), 
+            ("watch",  
+                    Some(r##"Subscribe to changes for a user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/changes_watch",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("channels", "methods: 'stop'", vec![
-            ("stop",  Some("Stop watching resources through this channel"), 
+            ("stop",  
+                    Some(r##"Stop watching resources through this channel"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/channels_stop",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
             ]),
         
         ("children", "methods: 'delete', 'get', 'insert' and 'list'", vec![
-            ("delete",  Some("Removes a child from a folder."), 
+            ("delete",  
+                    Some(r##"Removes a child from a folder."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_delete",
                   vec![
-                    (Some("folder-id"),
+                    (Some(r##"folder-id"##),
                      None,
-                     Some("The ID of the folder."),
+                     Some(r##"The ID of the folder."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("child-id"),
+                    (Some(r##"child-id"##),
                      None,
-                     Some("The ID of the child."),
+                     Some(r##"The ID of the child."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a specific child reference."), 
+            ("get",  
+                    Some(r##"Gets a specific child reference."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_get",
                   vec![
-                    (Some("folder-id"),
+                    (Some(r##"folder-id"##),
                      None,
-                     Some("The ID of the folder."),
+                     Some(r##"The ID of the folder."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("child-id"),
+                    (Some(r##"child-id"##),
                      None,
-                     Some("The ID of the child."),
+                     Some(r##"The ID of the child."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Inserts a file into a folder."), 
+            ("insert",  
+                    Some(r##"Inserts a file into a folder."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_insert",
                   vec![
-                    (Some("folder-id"),
+                    (Some(r##"folder-id"##),
                      None,
-                     Some("The ID of the folder."),
+                     Some(r##"The ID of the folder."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a folder's children."), 
+            ("list",  
+                    Some(r##"Lists a folder's children."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/children_list",
                   vec![
-                    (Some("folder-id"),
+                    (Some(r##"folder-id"##),
                      None,
-                     Some("The ID of the folder."),
+                     Some(r##"The ID of the folder."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("comments", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  Some("Deletes a comment."), 
+            ("delete",  
+                    Some(r##"Deletes a comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a comment by ID."), 
+            ("get",  
+                    Some(r##"Gets a comment by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Creates a new comment on the given file."), 
+            ("insert",  
+                    Some(r##"Creates a new comment on the given file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_insert",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a file's comments."), 
+            ("list",  
+                    Some(r##"Lists a file's comments."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates an existing comment. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates an existing comment. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates an existing comment."), 
+            ("update",  
+                    Some(r##"Updates an existing comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/comments_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("files", "methods: 'copy', 'delete', 'empty-trash', 'get', 'insert', 'list', 'patch', 'touch', 'trash', 'untrash', 'update' and 'watch'", vec![
-            ("copy",  Some("Creates a copy of the specified file."), 
+            ("copy",  
+                    Some(r##"Creates a copy of the specified file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_copy",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to copy."),
+                     Some(r##"The ID of the file to copy."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("delete",  Some("Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file."), 
+            ("delete",  
+                    Some(r##"Permanently deletes a file by ID. Skips the trash. The currently authenticated user must own the file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to delete."),
+                     Some(r##"The ID of the file to delete."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("empty-trash",  Some("Permanently deletes all of the user's trashed files."), 
+            ("empty-trash",  
+                    Some(r##"Permanently deletes all of the user's trashed files."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_empty-trash",
                   vec![
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a file's metadata by ID."), 
+            ("get",  
+                    Some(r##"Gets a file's metadata by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file in question."),
+                     Some(r##"The ID for the file in question."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Insert a new file."), 
+            ("insert",  
+                    Some(r##"Insert a new file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_insert",
                   vec![
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists the user's files."), 
+            ("list",  
+                    Some(r##"Lists the user's files."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_list",
                   vec![
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates file metadata and/or content. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates file metadata and/or content. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to update."),
+                     Some(r##"The ID of the file to update."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("touch",  Some("Set the file's updated time to the current server time."), 
+            ("touch",  
+                    Some(r##"Set the file's updated time to the current server time."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_touch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to update."),
+                     Some(r##"The ID of the file to update."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("trash",  Some("Moves a file to the trash."), 
+            ("trash",  
+                    Some(r##"Moves a file to the trash."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_trash",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to trash."),
+                     Some(r##"The ID of the file to trash."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("untrash",  Some("Restores a file from the trash."), 
+            ("untrash",  
+                    Some(r##"Restores a file from the trash."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_untrash",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to untrash."),
+                     Some(r##"The ID of the file to untrash."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates file metadata and/or content."), 
+            ("update",  
+                    Some(r##"Updates file metadata and/or content."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file to update."),
+                     Some(r##"The ID of the file to update."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("watch",  Some("Subscribe to changes on a file"), 
+            ("watch",  
+                    Some(r##"Subscribe to changes on a file"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/files_watch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file in question."),
+                     Some(r##"The ID for the file in question."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("parents", "methods: 'delete', 'get', 'insert' and 'list'", vec![
-            ("delete",  Some("Removes a parent from a file."), 
+            ("delete",  
+                    Some(r##"Removes a parent from a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("parent-id"),
+                    (Some(r##"parent-id"##),
                      None,
-                     Some("The ID of the parent."),
+                     Some(r##"The ID of the parent."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a specific parent reference."), 
+            ("get",  
+                    Some(r##"Gets a specific parent reference."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("parent-id"),
+                    (Some(r##"parent-id"##),
                      None,
-                     Some("The ID of the parent."),
+                     Some(r##"The ID of the parent."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Adds a parent folder for a file."), 
+            ("insert",  
+                    Some(r##"Adds a parent folder for a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_insert",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a file's parents."), 
+            ("list",  
+                    Some(r##"Lists a file's parents."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/parents_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("permissions", "methods: 'delete', 'get', 'get-id-for-email', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  Some("Deletes a permission from a file."), 
+            ("delete",  
+                    Some(r##"Deletes a permission from a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("permission-id"),
+                    (Some(r##"permission-id"##),
                      None,
-                     Some("The ID for the permission."),
+                     Some(r##"The ID for the permission."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a permission by ID."), 
+            ("get",  
+                    Some(r##"Gets a permission by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("permission-id"),
+                    (Some(r##"permission-id"##),
                      None,
-                     Some("The ID for the permission."),
+                     Some(r##"The ID for the permission."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("get-id-for-email",  Some("Returns the permission ID for an email address."), 
+            ("get-id-for-email",  
+                    Some(r##"Returns the permission ID for an email address."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_get-id-for-email",
                   vec![
-                    (Some("email"),
+                    (Some(r##"email"##),
                      None,
-                     Some("The email address for which to return a permission ID"),
+                     Some(r##"The email address for which to return a permission ID"##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Inserts a permission for a file."), 
+            ("insert",  
+                    Some(r##"Inserts a permission for a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_insert",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a file's permissions."), 
+            ("list",  
+                    Some(r##"Lists a file's permissions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates a permission. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates a permission. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("permission-id"),
+                    (Some(r##"permission-id"##),
                      None,
-                     Some("The ID for the permission."),
+                     Some(r##"The ID for the permission."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a permission."), 
+            ("update",  
+                    Some(r##"Updates a permission."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/permissions_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("permission-id"),
+                    (Some(r##"permission-id"##),
                      None,
-                     Some("The ID for the permission."),
+                     Some(r##"The ID for the permission."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("properties", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  Some("Deletes a property."), 
+            ("delete",  
+                    Some(r##"Deletes a property."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("property-key"),
+                    (Some(r##"property-key"##),
                      None,
-                     Some("The key of the property."),
+                     Some(r##"The key of the property."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a property by its key."), 
+            ("get",  
+                    Some(r##"Gets a property by its key."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("property-key"),
+                    (Some(r##"property-key"##),
                      None,
-                     Some("The key of the property."),
+                     Some(r##"The key of the property."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Adds a property to a file."), 
+            ("insert",  
+                    Some(r##"Adds a property to a file."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_insert",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a file's properties."), 
+            ("list",  
+                    Some(r##"Lists a file's properties."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates a property. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates a property. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("property-key"),
+                    (Some(r##"property-key"##),
                      None,
-                     Some("The key of the property."),
+                     Some(r##"The key of the property."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a property."), 
+            ("update",  
+                    Some(r##"Updates a property."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/properties_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("property-key"),
+                    (Some(r##"property-key"##),
                      None,
-                     Some("The key of the property."),
+                     Some(r##"The key of the property."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("realtime", "methods: 'get' and 'update'", vec![
-            ("get",  Some("Exports the contents of the Realtime API data model associated with this file as JSON."), 
+            ("get",  
+                    Some(r##"Exports the contents of the Realtime API data model associated with this file as JSON."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file that the Realtime API data model is associated with."),
+                     Some(r##"The ID of the file that the Realtime API data model is associated with."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Overwrites the Realtime API data model associated with this file with the provided JSON data model."), 
+            ("update",  
+                    Some(r##"Overwrites the Realtime API data model associated with this file with the provided JSON data model."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/realtime_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file that the Realtime API data model is associated with."),
+                     Some(r##"The ID of the file that the Realtime API data model is associated with."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("mode"),
-                     Some("u"),
-                     Some("Specify the upload protocol (simple|resumable) and the file to upload"),
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
             ]),
         
         ("replies", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
-            ("delete",  Some("Deletes a reply."), 
+            ("delete",  
+                    Some(r##"Deletes a reply."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("reply-id"),
+                    (Some(r##"reply-id"##),
                      None,
-                     Some("The ID of the reply."),
+                     Some(r##"The ID of the reply."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a reply."), 
+            ("get",  
+                    Some(r##"Gets a reply."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("reply-id"),
+                    (Some(r##"reply-id"##),
                      None,
-                     Some("The ID of the reply."),
+                     Some(r##"The ID of the reply."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("insert",  Some("Creates a new reply to the given comment."), 
+            ("insert",  
+                    Some(r##"Creates a new reply to the given comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_insert",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists all of the replies to a comment."), 
+            ("list",  
+                    Some(r##"Lists all of the replies to a comment."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates an existing reply. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates an existing reply. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("reply-id"),
+                    (Some(r##"reply-id"##),
                      None,
-                     Some("The ID of the reply."),
+                     Some(r##"The ID of the reply."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates an existing reply."), 
+            ("update",  
+                    Some(r##"Updates an existing reply."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/replies_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("comment-id"),
+                    (Some(r##"comment-id"##),
                      None,
-                     Some("The ID of the comment."),
+                     Some(r##"The ID of the comment."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("reply-id"),
+                    (Some(r##"reply-id"##),
                      None,
-                     Some("The ID of the reply."),
+                     Some(r##"The ID of the reply."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
             ]),
         
         ("revisions", "methods: 'delete', 'get', 'list', 'patch' and 'update'", vec![
-            ("delete",  Some("Removes a revision."), 
+            ("delete",  
+                    Some(r##"Removes a revision."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_delete",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("revision-id"),
+                    (Some(r##"revision-id"##),
                      None,
-                     Some("The ID of the revision."),
+                     Some(r##"The ID of the revision."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
                   ]),
-            ("get",  Some("Gets a specific revision."), 
+            ("get",  
+                    Some(r##"Gets a specific revision."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_get",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("revision-id"),
+                    (Some(r##"revision-id"##),
                      None,
-                     Some("The ID of the revision."),
+                     Some(r##"The ID of the revision."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("list",  Some("Lists a file's revisions."), 
+            ("list",  
+                    Some(r##"Lists a file's revisions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_list",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID of the file."),
+                     Some(r##"The ID of the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("patch",  Some("Updates a revision. This method supports patch semantics."), 
+            ("patch",  
+                    Some(r##"Updates a revision. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_patch",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("revision-id"),
+                    (Some(r##"revision-id"##),
                      None,
-                     Some("The ID for the revision."),
+                     Some(r##"The ID for the revision."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
-            ("update",  Some("Updates a revision."), 
+            ("update",  
+                    Some(r##"Updates a revision."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_drive2_cli/revisions_update",
                   vec![
-                    (Some("file-id"),
+                    (Some(r##"file-id"##),
                      None,
-                     Some("The ID for the file."),
+                     Some(r##"The ID for the file."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("revision-id"),
+                    (Some(r##"revision-id"##),
                      None,
-                     Some("The ID for the revision."),
+                     Some(r##"The ID for the revision."##),
                      Some(true),
                      Some(false)),
         
-                    (Some("kv"),
-                     Some("r"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
         
-                    (Some("v"),
-                     Some("p"),
-                     Some("Set various fields of the request structure"),
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
                      Some(false),
                      Some(true)),
         
-                    (Some("out"),
-                     Some("o"),
-                     Some("Specify the file into which to write the programs output"),
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
                   ]),
@@ -8465,11 +8652,12 @@ fn main() {
            for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
                let mut mcmd = SubCommand::new(main_command_name).about(about);
            
-               for &(sub_command_name, ref desc, ref args) in subcommands {
+               for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
                    let mut scmd = SubCommand::new(sub_command_name);
                    if let &Some(desc) = desc {
                        scmd = scmd.about(desc);
                    }
+                   scmd = scmd.after_help(url_info);
            
                    for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
                        let arg_name_str = 

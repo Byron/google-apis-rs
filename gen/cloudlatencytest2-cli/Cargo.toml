@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudlatencytest2-cli"
-version = "0.1.0+20150206"
+version = "0.2.0+20150206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudlatencytest (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2-cli"
@@ -16,15 +16,14 @@ keywords = ["cloudlatencytest", "google", "cli"]
 name = "cloudlatencytest2"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-cloudlatencytest2]
 path = "../cloudlatencytest2"

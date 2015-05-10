@@ -10,31 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *deploymentmanager* API can be found at the
+[official documentation site](https://developers.google.com/deployment-manager/).
+
 # Usage
 
-This documentation was generated from the *deploymentmanager* API at revision *20150415*. The CLI is at version *0.1.0*.
+This documentation was generated from the *deploymentmanager* API at revision *20150415*. The CLI is at version *0.2.0*.
 
 ```bash
-  deploymentmanager2-beta1 [options] deployments delete <project> <deployment> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] deployments get <project> <deployment> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] deployments insert <project> -r <kv>... [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] deployments list <project> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] manifests get <project> <deployment> <manifest> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] manifests list <project> <deployment> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] operations get <project> <operation> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] operations list <project> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] resources get <project> <deployment> <resource> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] resources list <project> <deployment> [-p <v>...] [-o <out>]
-  deploymentmanager2-beta1 [options] types list <project> [-p <v>...] [-o <out>]
+deploymentmanager2-beta1 [options]
+        deployments
+                delete <project> <deployment> [-p <v>]... [-o <out>]
+                get <project> <deployment> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+        manifests
+                get <project> <deployment> <manifest> [-p <v>]... [-o <out>]
+                list <project> <deployment> [-p <v>]... [-o <out>]
+        operations
+                get <project> <operation> [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+        resources
+                get <project> <deployment> <resource> [-p <v>]... [-o <out>]
+                list <project> <deployment> [-p <v>]... [-o <out>]
+        types
+                list <project> [-p <v>]... [-o <out>]
   deploymentmanager2-beta1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_deploymentmanager2_beta1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

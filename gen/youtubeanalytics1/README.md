@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtubeanalytics1` library allows access to all features of the *Google YouTube Analytics* service.
 
-This documentation was generated from *YouTube Analytics* crate version *0.1.6+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *YouTube Analytics* crate version *0.1.7+20150304*, where *20150304* is the exact revision of the *youtubeAnalytics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *YouTube Analytics* *v1* API can be found at the
 [official documentation site](http://developers.google.com/youtube/analytics/).
@@ -171,7 +171,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_youtubeanalytics1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

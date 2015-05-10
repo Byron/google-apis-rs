@@ -4,7 +4,7 @@
 [package]
 
 name = "google-analytics3-cli"
-version = "0.1.0+20150305"
+version = "0.2.0+20150305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with analytics (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3-cli"
@@ -17,15 +17,14 @@ keywords = ["analytics", "google", "cli"]
 name = "analytics3"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-analytics3]
 path = "../analytics3"

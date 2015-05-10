@@ -10,27 +10,29 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *Identity Toolkit* API can be found at the
+[official documentation site](https://developers.google.com/identity-toolkit/v3/).
+
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20150406*. The CLI is at version *0.1.0*.
+This documentation was generated from the *Identity Toolkit* API at revision *20150406*. The CLI is at version *0.2.0*.
 
 ```bash
-  identitytoolkit3 [options] relyingparty create-auth-uri -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty delete-account -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty download-account -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty get-account-info -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty get-oob-confirmation-code -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty get-public-keys [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty get-recaptcha-param [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty reset-password -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty set-account-info -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty upload-account -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty verify-assertion -r <kv>... [-p <v>...] [-o <out>]
-  identitytoolkit3 [options] relyingparty verify-password -r <kv>... [-p <v>...] [-o <out>]
+identitytoolkit3 [options]
+        relyingparty
+                create-auth-uri (-r <kv>)... [-p <v>]... [-o <out>]
+                delete-account (-r <kv>)... [-p <v>]... [-o <out>]
+                download-account (-r <kv>)... [-p <v>]... [-o <out>]
+                get-account-info (-r <kv>)... [-p <v>]... [-o <out>]
+                get-oob-confirmation-code (-r <kv>)... [-p <v>]... [-o <out>]
+                get-public-keys [-p <v>]... [-o <out>]
+                get-recaptcha-param [-p <v>]... [-o <out>]
+                reset-password (-r <kv>)... [-p <v>]... [-o <out>]
+                set-account-info (-r <kv>)... [-p <v>]... [-o <out>]
+                upload-account (-r <kv>)... [-p <v>]... [-o <out>]
+                verify-assertion (-r <kv>)... [-p <v>]... [-o <out>]
+                verify-password (-r <kv>)... [-p <v>]... [-o <out>]
   identitytoolkit3 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/index.html
 
 Configuration:
   --config-dir <folder>

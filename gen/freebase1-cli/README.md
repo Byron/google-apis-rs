@@ -10,17 +10,19 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *freebase* API can be found at the
+[official documentation site](https://developers.google.com/freebase/).
+
 # Usage
 
-This documentation was generated from the *freebase* API at revision *20150330*. The CLI is at version *0.1.0*.
+This documentation was generated from the *freebase* API at revision *20150330*. The CLI is at version *0.2.0*.
 
 ```bash
-  freebase1 [options] methods reconcile [-p <v>...] [-o <out>]
-  freebase1 [options] methods search [-p <v>...] [-o <out>]
+freebase1 [options]
+        methods
+                reconcile [-p <v>]... [-o <out>]
+                search [-p <v>]... [-o <out>]
   freebase1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_freebase1_cli/index.html
 
 Configuration:
   --config-dir <folder>

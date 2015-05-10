@@ -10,16 +10,18 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *QPX Express* API can be found at the
+[official documentation site](http://developers.google.com/qpx-express).
+
 # Usage
 
-This documentation was generated from the *QPX Express* API at revision *20140321*. The CLI is at version *0.1.0*.
+This documentation was generated from the *QPX Express* API at revision *20140321*. The CLI is at version *0.2.0*.
 
 ```bash
-  qpxexpress1 [options] trips search -r <kv>... [-p <v>...] [-o <out>]
+qpxexpress1 [options]
+        trips
+                search (-r <kv>)... [-p <v>]... [-o <out>]
   qpxexpress1 --help
-
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_qpxexpress1_cli/index.html
 
 Configuration:
   --config-dir <folder>

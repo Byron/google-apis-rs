@@ -4,7 +4,7 @@
 [package]
 
 name = "google-books1-cli"
-version = "0.1.0+20150401"
+version = "0.2.0+20150401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with books (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/books1-cli"
@@ -17,15 +17,14 @@ keywords = ["books", "google", "cli"]
 name = "books1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-books1]
 path = "../books1"

@@ -10,80 +10,94 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *genomics* API can be found at the
+[official documentation site](https://developers.google.com/genomics/v1beta2/reference).
+
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *genomics* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  genomics1-beta2 [options] annotation-sets create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotation-sets delete <annotation-set-id> [-p <v>...]
-  genomics1-beta2 [options] annotation-sets get <annotation-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotation-sets patch <annotation-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotation-sets search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotation-sets update <annotation-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations batch-create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations delete <annotation-id> [-p <v>...]
-  genomics1-beta2 [options] annotations get <annotation-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations patch <annotation-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] annotations update <annotation-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] callsets create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] callsets delete <call-set-id> [-p <v>...]
-  genomics1-beta2 [options] callsets get <call-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] callsets patch <call-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] callsets search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] callsets update <call-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets delete <dataset-id> [-p <v>...]
-  genomics1-beta2 [options] datasets get <dataset-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets list [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets patch <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets undelete <dataset-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] datasets update <dataset-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] experimental jobs-create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] jobs cancel <job-id> [-p <v>...]
-  genomics1-beta2 [options] jobs get <job-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] jobs search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets align -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets call -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets coveragebuckets-list <read-group-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets delete <read-group-set-id> [-p <v>...]
-  genomics1-beta2 [options] readgroupsets export -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets get <read-group-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets import -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets patch <read-group-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] readgroupsets update <read-group-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] reads search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] references bases-list <reference-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] references get <reference-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] references search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] referencesets get <reference-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] referencesets search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] streaming-readstore streamreads -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variants create -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variants delete <variant-id> [-p <v>...]
-  genomics1-beta2 [options] variants get <variant-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variants search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variants update <variant-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets delete <variant-set-id> [-p <v>...]
-  genomics1-beta2 [options] variantsets export <variant-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets get <variant-set-id> [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets import-variants <variant-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets merge-variants <variant-set-id> -r <kv>... [-p <v>...]
-  genomics1-beta2 [options] variantsets patch <variant-set-id> -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets search -r <kv>... [-p <v>...] [-o <out>]
-  genomics1-beta2 [options] variantsets update <variant-set-id> -r <kv>... [-p <v>...] [-o <out>]
+genomics1-beta2 [options]
+        annotation-sets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <annotation-set-id> [-p <v>]...
+                get <annotation-set-id> [-p <v>]... [-o <out>]
+                patch <annotation-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <annotation-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        annotations
+                batch-create (-r <kv>)... [-p <v>]... [-o <out>]
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <annotation-id> [-p <v>]...
+                get <annotation-id> [-p <v>]... [-o <out>]
+                patch <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <annotation-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        callsets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <call-set-id> [-p <v>]...
+                get <call-set-id> [-p <v>]... [-o <out>]
+                patch <call-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <call-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        datasets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <dataset-id> [-p <v>]...
+                get <dataset-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                undelete <dataset-id> [-p <v>]... [-o <out>]
+                update <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        experimental
+                jobs-create (-r <kv>)... [-p <v>]... [-o <out>]
+        jobs
+                cancel <job-id> [-p <v>]...
+                get <job-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        readgroupsets
+                align (-r <kv>)... [-p <v>]... [-o <out>]
+                call (-r <kv>)... [-p <v>]... [-o <out>]
+                coveragebuckets-list <read-group-set-id> [-p <v>]... [-o <out>]
+                delete <read-group-set-id> [-p <v>]...
+                export (-r <kv>)... [-p <v>]... [-o <out>]
+                get <read-group-set-id> [-p <v>]... [-o <out>]
+                import (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        reads
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        references
+                bases-list <reference-id> [-p <v>]... [-o <out>]
+                get <reference-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        referencesets
+                get <reference-set-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        streaming-readstore
+                streamreads (-r <kv>)... [-p <v>]... [-o <out>]
+        variants
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <variant-id> [-p <v>]...
+                get <variant-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        variantsets
+                delete <variant-set-id> [-p <v>]...
+                export <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <variant-set-id> [-p <v>]... [-o <out>]
+                import-variants <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                merge-variants <variant-set-id> (-r <kv>)... [-p <v>]...
+                patch <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+                update <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
   genomics1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_genomics1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

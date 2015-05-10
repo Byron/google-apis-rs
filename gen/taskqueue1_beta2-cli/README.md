@@ -10,28 +10,31 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *taskqueue* API can be found at the
+[official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).
+
 # Usage
 
-This documentation was generated from the *taskqueue* API at revision *20141111*. The CLI is at version *0.1.0*.
+This documentation was generated from the *taskqueue* API at revision *20141111*. The CLI is at version *0.2.0*.
 
 ```bash
-  taskqueue1-beta2 [options] taskqueues get <project> <taskqueue> [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks delete <project> <taskqueue> <task> [-p <v>...]
-  taskqueue1-beta2 [options] tasks get <project> <taskqueue> <task> [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks insert <project> <taskqueue> -r <kv>... [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks lease <project> <taskqueue> <num-tasks> <lease-secs> [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks list <project> <taskqueue> [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks patch <project> <taskqueue> <task> <new-lease-seconds> -r <kv>... [-p <v>...] [-o <out>]
-  taskqueue1-beta2 [options] tasks update <project> <taskqueue> <task> <new-lease-seconds> -r <kv>... [-p <v>...] [-o <out>]
+taskqueue1-beta2 [options]
+        taskqueues
+                get <project> <taskqueue> [-p <v>]... [-o <out>]
+        tasks
+                delete <project> <taskqueue> <task> [-p <v>]...
+                get <project> <taskqueue> <task> [-p <v>]... [-o <out>]
+                insert <project> <taskqueue> (-r <kv>)... [-p <v>]... [-o <out>]
+                lease <project> <taskqueue> <num-tasks> <lease-secs> [-p <v>]... [-o <out>]
+                list <project> <taskqueue> [-p <v>]... [-o <out>]
+                patch <project> <taskqueue> <task> <new-lease-seconds> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <taskqueue> <task> <new-lease-seconds> (-r <kv>)... [-p <v>]... [-o <out>]
   taskqueue1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

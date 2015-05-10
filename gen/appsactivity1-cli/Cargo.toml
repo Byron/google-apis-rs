@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appsactivity1-cli"
-version = "0.1.0+20140828"
+version = "0.2.0+20140828"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appsactivity (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appsactivity1-cli"
@@ -17,15 +17,14 @@ keywords = ["appsactivity", "google", "cli"]
 name = "appsactivity1"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-appsactivity1]
 path = "../appsactivity1"

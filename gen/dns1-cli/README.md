@@ -10,29 +10,34 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *dns* API can be found at the
+[official documentation site](https://developers.google.com/cloud-dns).
+
 # Usage
 
-This documentation was generated from the *dns* API at revision *20150218*. The CLI is at version *0.1.0*.
+This documentation was generated from the *dns* API at revision *20150218*. The CLI is at version *0.2.0*.
 
 ```bash
-  dns1 [options] changes create <project> <managed-zone> -r <kv>... [-p <v>...] [-o <out>]
-  dns1 [options] changes get <project> <managed-zone> <change-id> [-p <v>...] [-o <out>]
-  dns1 [options] changes list <project> <managed-zone> [-p <v>...] [-o <out>]
-  dns1 [options] managed-zones create <project> -r <kv>... [-p <v>...] [-o <out>]
-  dns1 [options] managed-zones delete <project> <managed-zone> [-p <v>...]
-  dns1 [options] managed-zones get <project> <managed-zone> [-p <v>...] [-o <out>]
-  dns1 [options] managed-zones list <project> [-p <v>...] [-o <out>]
-  dns1 [options] projects get <project> [-p <v>...] [-o <out>]
-  dns1 [options] resource-record-sets list <project> <managed-zone> [-p <v>...] [-o <out>]
+dns1 [options]
+        changes
+                create <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <project> <managed-zone> <change-id> [-p <v>]... [-o <out>]
+                list <project> <managed-zone> [-p <v>]... [-o <out>]
+        managed-zones
+                create <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <project> <managed-zone> [-p <v>]...
+                get <project> <managed-zone> [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+        projects
+                get <project> [-p <v>]... [-o <out>]
+        resource-record-sets
+                list <project> <managed-zone> [-p <v>]... [-o <out>]
   dns1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_dns1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

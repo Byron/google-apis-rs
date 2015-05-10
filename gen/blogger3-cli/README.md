@@ -10,53 +10,62 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *blogger* API can be found at the
+[official documentation site](https://developers.google.com/blogger/docs/3.0/getting_started).
+
 # Usage
 
-This documentation was generated from the *blogger* API at revision *20150422*. The CLI is at version *0.1.0*.
+This documentation was generated from the *blogger* API at revision *20150422*. The CLI is at version *0.2.0*.
 
 ```bash
-  blogger3 [options] blog-user-infos get <user-id> <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs get <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs get-by-url <url> [-p <v>...] [-o <out>]
-  blogger3 [options] blogs list-by-user <user-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments approve <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments delete <blog-id> <post-id> <comment-id> [-p <v>...]
-  blogger3 [options] comments get <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments list <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments list-by-blog <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments mark-as-spam <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] comments remove-content <blog-id> <post-id> <comment-id> [-p <v>...] [-o <out>]
-  blogger3 [options] page-views get <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages delete <blog-id> <page-id> [-p <v>...]
-  blogger3 [options] pages get <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] pages list <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages patch <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] pages publish <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages revert <blog-id> <page-id> [-p <v>...] [-o <out>]
-  blogger3 [options] pages update <blog-id> <page-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] post-user-infos get <user-id> <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] post-user-infos list <user-id> <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts delete <blog-id> <post-id> [-p <v>...]
-  blogger3 [options] posts get <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts get-by-path <blog-id> <path> [-p <v>...] [-o <out>]
-  blogger3 [options] posts insert <blog-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] posts list <blog-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts patch <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] posts publish <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts revert <blog-id> <post-id> [-p <v>...] [-o <out>]
-  blogger3 [options] posts search <blog-id> <q> [-p <v>...] [-o <out>]
-  blogger3 [options] posts update <blog-id> <post-id> -r <kv>... [-p <v>...] [-o <out>]
-  blogger3 [options] users get <user-id> [-p <v>...] [-o <out>]
+blogger3 [options]
+        blog-user-infos
+                get <user-id> <blog-id> [-p <v>]... [-o <out>]
+        blogs
+                get <blog-id> [-p <v>]... [-o <out>]
+                get-by-url <url> [-p <v>]... [-o <out>]
+                list-by-user <user-id> [-p <v>]... [-o <out>]
+        comments
+                approve <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
+                delete <blog-id> <post-id> <comment-id> [-p <v>]...
+                get <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
+                list <blog-id> <post-id> [-p <v>]... [-o <out>]
+                list-by-blog <blog-id> [-p <v>]... [-o <out>]
+                mark-as-spam <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
+                remove-content <blog-id> <post-id> <comment-id> [-p <v>]... [-o <out>]
+        page-views
+                get <blog-id> [-p <v>]... [-o <out>]
+        pages
+                delete <blog-id> <page-id> [-p <v>]...
+                get <blog-id> <page-id> [-p <v>]... [-o <out>]
+                insert <blog-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <blog-id> [-p <v>]... [-o <out>]
+                patch <blog-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                publish <blog-id> <page-id> [-p <v>]... [-o <out>]
+                revert <blog-id> <page-id> [-p <v>]... [-o <out>]
+                update <blog-id> <page-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        post-user-infos
+                get <user-id> <blog-id> <post-id> [-p <v>]... [-o <out>]
+                list <user-id> <blog-id> [-p <v>]... [-o <out>]
+        posts
+                delete <blog-id> <post-id> [-p <v>]...
+                get <blog-id> <post-id> [-p <v>]... [-o <out>]
+                get-by-path <blog-id> <path> [-p <v>]... [-o <out>]
+                insert <blog-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <blog-id> [-p <v>]... [-o <out>]
+                patch <blog-id> <post-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                publish <blog-id> <post-id> [-p <v>]... [-o <out>]
+                revert <blog-id> <post-id> [-p <v>]... [-o <out>]
+                search <blog-id> <q> [-p <v>]... [-o <out>]
+                update <blog-id> <post-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        users
+                get <user-id> [-p <v>]... [-o <out>]
   blogger3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_blogger3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

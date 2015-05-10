@@ -4,7 +4,7 @@
 [package]
 
 name = "google-siteverification1"
-version = "0.1.6+20131007"
+version = "0.1.7+20131007"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with siteVerification (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/siteverification1"
@@ -15,9 +15,10 @@ keywords = ["siteVerification", "google", "protocol", "web", "api"]
 
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
 url = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+json-tools = ">= 0.3.0"

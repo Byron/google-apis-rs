@@ -10,30 +10,34 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *doubleclicksearch* API can be found at the
+[official documentation site](https://developers.google.com/doubleclick-search/).
+
 # Usage
 
-This documentation was generated from the *doubleclicksearch* API at revision *20150303*. The CLI is at version *0.1.0*.
+This documentation was generated from the *doubleclicksearch* API at revision *20150303*. The CLI is at version *0.2.0*.
 
 ```bash
-  doubleclicksearch2 [options] conversion get <agency-id> <advertiser-id> <engine-account-id> <end-date> <row-count> <start-date> <start-row> [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] conversion insert -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] conversion patch <advertiser-id> <agency-id> <end-date> <engine-account-id> <row-count> <start-date> <start-row> -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] conversion update -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] conversion update-availability -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] reports generate -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] reports get <report-id> [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] reports get-file <report-id> <report-fragment> [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] reports request -r <kv>... [-p <v>...] [-o <out>]
-  doubleclicksearch2 [options] saved-columns list <agency-id> <advertiser-id> [-p <v>...] [-o <out>]
+doubleclicksearch2 [options]
+        conversion
+                get <agency-id> <advertiser-id> <engine-account-id> <end-date> <row-count> <start-date> <start-row> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <advertiser-id> <agency-id> <end-date> <engine-account-id> <row-count> <start-date> <start-row> (-r <kv>)... [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+                update-availability (-r <kv>)... [-p <v>]... [-o <out>]
+        reports
+                generate (-r <kv>)... [-p <v>]... [-o <out>]
+                get <report-id> [-p <v>]... [-o <out>]
+                get-file <report-id> <report-fragment> [-p <v>]... [-o <out>]
+                request (-r <kv>)... [-p <v>]... [-o <out>]
+        saved-columns
+                list <agency-id> <advertiser-id> [-p <v>]... [-o <out>]
   doubleclicksearch2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_doubleclicksearch2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

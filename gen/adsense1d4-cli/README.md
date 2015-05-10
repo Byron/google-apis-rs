@@ -10,58 +10,69 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *AdSense* API can be found at the
+[official documentation site](https://developers.google.com/adsense/management/).
+
 # Usage
 
-This documentation was generated from the *AdSense* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *AdSense* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  adsense1d4 [options] accounts adclients-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-customchannels-list <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-get-ad-code <account-id> <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts adunits-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts alerts-delete <account-id> <alert-id> [-p <v>...]
-  adsense1d4 [options] accounts alerts-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-adunits-list <account-id> <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-get <account-id> <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts customchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts get <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts list [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts payments-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-generate <account-id> <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-saved-generate <account-id> <saved-report-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts reports-saved-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts savedadstyles-get <account-id> <saved-ad-style-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts savedadstyles-list <account-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] accounts urlchannels-list <account-id> <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adclients list [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits customchannels-list <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits get <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits get-ad-code <ad-client-id> <ad-unit-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] adunits list <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] alerts delete <alert-id> [-p <v>...]
-  adsense1d4 [options] alerts list [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels adunits-list <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels get <ad-client-id> <custom-channel-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] customchannels list <ad-client-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] metadata dimensions-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] metadata metrics-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] payments list [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports generate <start-date> <end-date> [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports saved-generate <saved-report-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] reports saved-list [-p <v>...] [-o <out>]
-  adsense1d4 [options] savedadstyles get <saved-ad-style-id> [-p <v>...] [-o <out>]
-  adsense1d4 [options] savedadstyles list [-p <v>...] [-o <out>]
-  adsense1d4 [options] urlchannels list <ad-client-id> [-p <v>...] [-o <out>]
+adsense1d4 [options]
+        accounts
+                adclients-list <account-id> [-p <v>]... [-o <out>]
+                adunits-customchannels-list <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-get-ad-code <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                adunits-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+                alerts-delete <account-id> <alert-id> [-p <v>]...
+                alerts-list <account-id> [-p <v>]... [-o <out>]
+                customchannels-adunits-list <account-id> <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                customchannels-get <account-id> <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                customchannels-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+                get <account-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                payments-list <account-id> [-p <v>]... [-o <out>]
+                reports-generate <account-id> <start-date> <end-date> [-p <v>]... [-o <out>]
+                reports-saved-generate <account-id> <saved-report-id> [-p <v>]... [-o <out>]
+                reports-saved-list <account-id> [-p <v>]... [-o <out>]
+                savedadstyles-get <account-id> <saved-ad-style-id> [-p <v>]... [-o <out>]
+                savedadstyles-list <account-id> [-p <v>]... [-o <out>]
+                urlchannels-list <account-id> <ad-client-id> [-p <v>]... [-o <out>]
+        adclients
+                list [-p <v>]... [-o <out>]
+        adunits
+                customchannels-list <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                get <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                get-ad-code <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
+                list <ad-client-id> [-p <v>]... [-o <out>]
+        alerts
+                delete <alert-id> [-p <v>]...
+                list [-p <v>]... [-o <out>]
+        customchannels
+                adunits-list <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                get <ad-client-id> <custom-channel-id> [-p <v>]... [-o <out>]
+                list <ad-client-id> [-p <v>]... [-o <out>]
+        metadata
+                dimensions-list [-p <v>]... [-o <out>]
+                metrics-list [-p <v>]... [-o <out>]
+        payments
+                list [-p <v>]... [-o <out>]
+        reports
+                generate <start-date> <end-date> [-p <v>]... [-o <out>]
+                saved-generate <saved-report-id> [-p <v>]... [-o <out>]
+                saved-list [-p <v>]... [-o <out>]
+        savedadstyles
+                get <saved-ad-style-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+        urlchannels
+                list <ad-client-id> [-p <v>]... [-o <out>]
   adsense1d4 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_adsense1d4_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

@@ -10,31 +10,34 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *resourceviews* API can be found at the
+[official documentation site](https://developers.google.com/compute/).
+
 # Usage
 
-This documentation was generated from the *resourceviews* API at revision *20150302*. The CLI is at version *0.1.0*.
+This documentation was generated from the *resourceviews* API at revision *20150302*. The CLI is at version *0.2.0*.
 
 ```bash
-  resourceviews1-beta2 [options] zone-operations get <project> <zone> <operation> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-operations list <project> <zone> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views add-resources <project> <zone> <resource-view> -r <kv>... [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views delete <project> <zone> <resource-view> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views get <project> <zone> <resource-view> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views get-service <project> <zone> <resource-view> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views insert <project> <zone> -r <kv>... [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views list <project> <zone> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views list-resources <project> <zone> <resource-view> [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views remove-resources <project> <zone> <resource-view> -r <kv>... [-p <v>...] [-o <out>]
-  resourceviews1-beta2 [options] zone-views set-service <project> <zone> <resource-view> -r <kv>... [-p <v>...] [-o <out>]
+resourceviews1-beta2 [options]
+        zone-operations
+                get <project> <zone> <operation> [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+        zone-views
+                add-resources <project> <zone> <resource-view> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <project> <zone> <resource-view> [-p <v>]... [-o <out>]
+                get <project> <zone> <resource-view> [-p <v>]... [-o <out>]
+                get-service <project> <zone> <resource-view> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                list-resources <project> <zone> <resource-view> [-p <v>]... [-o <out>]
+                remove-resources <project> <zone> <resource-view> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-service <project> <zone> <resource-view> (-r <kv>)... [-p <v>]... [-o <out>]
   resourceviews1-beta2 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_resourceviews1_beta2_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

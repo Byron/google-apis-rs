@@ -4,7 +4,7 @@
 [package]
 
 name = "google-spectrum1_explorer-cli"
-version = "0.1.0+20150112"
+version = "0.2.0+20150112"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with spectrum (protocol v1explorer)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/spectrum1_explorer-cli"
@@ -17,15 +17,14 @@ keywords = ["spectrum", "google", "cli"]
 name = "spectrum1-explorer"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-spectrum1_explorer]
 path = "../spectrum1_explorer"

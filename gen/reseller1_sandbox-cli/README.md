@@ -10,34 +10,37 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *reseller* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/reseller/).
+
 # Usage
 
-This documentation was generated from the *reseller* API at revision *20141112*. The CLI is at version *0.1.0*.
+This documentation was generated from the *reseller* API at revision *20141112*. The CLI is at version *0.2.0*.
 
 ```bash
-  reseller1-sandbox [options] customers get <customer-id> [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] customers insert -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] customers patch <customer-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] customers update <customer-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions activate <customer-id> <subscription-id> [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions change-plan <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions change-renewal-settings <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions change-seats <customer-id> <subscription-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions delete <customer-id> <subscription-id> <deletion-type> [-p <v>...]
-  reseller1-sandbox [options] subscriptions get <customer-id> <subscription-id> [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions insert <customer-id> -r <kv>... [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions list [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions start-paid-service <customer-id> <subscription-id> [-p <v>...] [-o <out>]
-  reseller1-sandbox [options] subscriptions suspend <customer-id> <subscription-id> [-p <v>...] [-o <out>]
+reseller1-sandbox [options]
+        customers
+                get <customer-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <customer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <customer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        subscriptions
+                activate <customer-id> <subscription-id> [-p <v>]... [-o <out>]
+                change-plan <customer-id> <subscription-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                change-renewal-settings <customer-id> <subscription-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                change-seats <customer-id> <subscription-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <customer-id> <subscription-id> <deletion-type> [-p <v>]...
+                get <customer-id> <subscription-id> [-p <v>]... [-o <out>]
+                insert <customer-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                start-paid-service <customer-id> <subscription-id> [-p <v>]... [-o <out>]
+                suspend <customer-id> <subscription-id> [-p <v>]... [-o <out>]
   reseller1-sandbox --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

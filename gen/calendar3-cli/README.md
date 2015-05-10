@@ -10,57 +10,66 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *calendar* API can be found at the
+[official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
+
 # Usage
 
-This documentation was generated from the *calendar* API at revision *20150326*. The CLI is at version *0.1.0*.
+This documentation was generated from the *calendar* API at revision *20150326*. The CLI is at version *0.2.0*.
 
 ```bash
-  calendar3 [options] acl delete <calendar-id> <rule-id> [-p <v>...]
-  calendar3 [options] acl get <calendar-id> <rule-id> [-p <v>...] [-o <out>]
-  calendar3 [options] acl insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl list <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] acl patch <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl update <calendar-id> <rule-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] acl watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list delete <calendar-id> [-p <v>...]
-  calendar3 [options] calendar-list get <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list insert -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list list [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendar-list watch -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars clear <calendar-id> [-p <v>...]
-  calendar3 [options] calendars delete <calendar-id> [-p <v>...]
-  calendar3 [options] calendars get <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] calendars insert -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars patch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] calendars update <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] channels stop -r <kv>... [-p <v>...]
-  calendar3 [options] colors get [-p <v>...] [-o <out>]
-  calendar3 [options] events delete <calendar-id> <event-id> [-p <v>...]
-  calendar3 [options] events get <calendar-id> <event-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events import <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events insert <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events instances <calendar-id> <event-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events list <calendar-id> [-p <v>...] [-o <out>]
-  calendar3 [options] events move <calendar-id> <event-id> <destination> [-p <v>...] [-o <out>]
-  calendar3 [options] events patch <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events quick-add <calendar-id> <text> [-p <v>...] [-o <out>]
-  calendar3 [options] events update <calendar-id> <event-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] events watch <calendar-id> -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] freebusy query -r <kv>... [-p <v>...] [-o <out>]
-  calendar3 [options] settings get <setting> [-p <v>...] [-o <out>]
-  calendar3 [options] settings list [-p <v>...] [-o <out>]
-  calendar3 [options] settings watch -r <kv>... [-p <v>...] [-o <out>]
+calendar3 [options]
+        acl
+                delete <calendar-id> <rule-id> [-p <v>]...
+                get <calendar-id> <rule-id> [-p <v>]... [-o <out>]
+                insert <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <calendar-id> [-p <v>]... [-o <out>]
+                patch <calendar-id> <rule-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <calendar-id> <rule-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                watch <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        calendar-list
+                delete <calendar-id> [-p <v>]...
+                get <calendar-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                watch (-r <kv>)... [-p <v>]... [-o <out>]
+        calendars
+                clear <calendar-id> [-p <v>]...
+                delete <calendar-id> [-p <v>]...
+                get <calendar-id> [-p <v>]... [-o <out>]
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        channels
+                stop (-r <kv>)... [-p <v>]...
+        colors
+                get [-p <v>]... [-o <out>]
+        events
+                delete <calendar-id> <event-id> [-p <v>]...
+                get <calendar-id> <event-id> [-p <v>]... [-o <out>]
+                import <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances <calendar-id> <event-id> [-p <v>]... [-o <out>]
+                list <calendar-id> [-p <v>]... [-o <out>]
+                move <calendar-id> <event-id> <destination> [-p <v>]... [-o <out>]
+                patch <calendar-id> <event-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                quick-add <calendar-id> <text> [-p <v>]... [-o <out>]
+                update <calendar-id> <event-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                watch <calendar-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        freebusy
+                query (-r <kv>)... [-p <v>]... [-o <out>]
+        settings
+                get <setting> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                watch (-r <kv>)... [-p <v>]... [-o <out>]
   calendar3 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_calendar3_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

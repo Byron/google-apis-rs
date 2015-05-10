@@ -10,55 +10,64 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *SQL Admin* API can be found at the
+[official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
+
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20150305*. The CLI is at version *0.1.0*.
+This documentation was generated from the *SQL Admin* API at revision *20150305*. The CLI is at version *0.2.0*.
 
 ```bash
-  sqladmin1-beta4 [options] backup-runs get <project> <instance> <id> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] backup-runs list <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases delete <project> <instance> <database> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases get <project> <instance> <database> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases insert <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases list <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases patch <project> <instance> <database> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] databases update <project> <instance> <database> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] flags list [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances clone <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances delete <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances export <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances get <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances import <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances insert <project> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances list <project> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances patch <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances promote-replica <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances reset-ssl-config <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances restart <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances restore-backup <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances start-replica <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances stop-replica <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] instances update <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] operations get <project> <operation> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] operations list <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] ssl-certs delete <project> <instance> <sha1-fingerprint> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] ssl-certs get <project> <instance> <sha1-fingerprint> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] ssl-certs insert <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] ssl-certs list <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] tiers list <project> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] users delete <project> <instance> <host> <name> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] users insert <project> <instance> -r <kv>... [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] users list <project> <instance> [-p <v>...] [-o <out>]
-  sqladmin1-beta4 [options] users update <project> <instance> <host> <name> -r <kv>... [-p <v>...] [-o <out>]
+sqladmin1-beta4 [options]
+        backup-runs
+                get <project> <instance> <id> [-p <v>]... [-o <out>]
+                list <project> <instance> [-p <v>]... [-o <out>]
+        databases
+                delete <project> <instance> <database> [-p <v>]... [-o <out>]
+                get <project> <instance> <database> [-p <v>]... [-o <out>]
+                insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <instance> [-p <v>]... [-o <out>]
+                patch <project> <instance> <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <instance> <database> (-r <kv>)... [-p <v>]... [-o <out>]
+        flags
+                list [-p <v>]... [-o <out>]
+        instances
+                clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <project> <instance> [-p <v>]... [-o <out>]
+                export <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <project> <instance> [-p <v>]... [-o <out>]
+                import <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                promote-replica <project> <instance> [-p <v>]... [-o <out>]
+                reset-ssl-config <project> <instance> [-p <v>]... [-o <out>]
+                restart <project> <instance> [-p <v>]... [-o <out>]
+                restore-backup <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                start-replica <project> <instance> [-p <v>]... [-o <out>]
+                stop-replica <project> <instance> [-p <v>]... [-o <out>]
+                update <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+        operations
+                get <project> <operation> [-p <v>]... [-o <out>]
+                list <project> <instance> [-p <v>]... [-o <out>]
+        ssl-certs
+                delete <project> <instance> <sha1-fingerprint> [-p <v>]... [-o <out>]
+                get <project> <instance> <sha1-fingerprint> [-p <v>]... [-o <out>]
+                insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <instance> [-p <v>]... [-o <out>]
+        tiers
+                list <project> [-p <v>]... [-o <out>]
+        users
+                delete <project> <instance> <host> <name> [-p <v>]... [-o <out>]
+                insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <instance> [-p <v>]... [-o <out>]
+                update <project> <instance> <host> <name> (-r <kv>)... [-p <v>]... [-o <out>]
   sqladmin1-beta4 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

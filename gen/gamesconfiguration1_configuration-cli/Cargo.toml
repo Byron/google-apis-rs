@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration-cli"
-version = "0.1.0+20150413"
+version = "0.2.0+20150413"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration-cli"
@@ -17,15 +17,14 @@ keywords = ["gamesConfiguration", "google", "cli"]
 name = "gamesconfiguration1-configuration"
 
 [dependencies]
-hyper = "*"
+hyper = ">= 0.4.0"
 mime = "*"
 yup-oauth2 = "*"
-docopt = "*"
-docopt_macros = "*"
-rustc-serialize = "*"
+strsim = "*"
 yup-hyper-mock = "*"
 serde = ">= 0.3.0"
 serde_macros = "*"
+clap = "*"
 
 [dependencies.google-gamesconfiguration1_configuration]
 path = "../gamesconfiguration1_configuration"

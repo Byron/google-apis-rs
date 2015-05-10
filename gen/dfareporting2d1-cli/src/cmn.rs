@@ -1,9 +1,10 @@
 // COPY OF 'src/rust/cli/cmn.rs'
 // DO NOT EDIT
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
-use rustc_serialize::json;
+use serde::json;
 use mime::Mime;
 use clap::{App, SubCommand};
+use strsim;
 
 use std::fs;
 use std::env;
@@ -18,18 +19,70 @@ use std::default::Default;
 
 const FIELD_SEP: char = '.';
 
-/// Unused for now, can be used once https://github.com/kbknapp/clap-rs/issues/87
-/// is available
-pub enum UploadProtocol {
-    Simple,
-    Resumable,
+// Based on @erickt user comment. Thanks for the idea !
+// Remove all keys whose values are null from given value (changed in place)
+pub fn remove_json_null_values(value: &mut json::value::Value) {
+    match *value {
+        json::value::Value::Object(ref mut map) => {
+            let mut for_removal = Vec::new();
+
+            for (key, mut value) in map.iter_mut() {
+                if value.is_null() {
+                    for_removal.push(key.clone());
+                } else {
+                    remove_json_null_values(&mut value);
+                }
+            }
+
+            for key in &for_removal {
+                map.remove(key);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn did_you_mean<'a>(v: &str, possible_values: &[&'a str]) -> Option<&'a str> {
+
+    let mut candidate: Option<(f64, &str)> = None;
+    for pv in possible_values {
+        let confidence = strsim::jaro_winkler(v, pv);
+        if confidence > 0.8 && (candidate.is_none() || (candidate.as_ref().unwrap().0 < confidence)) {
+            candidate = Some((confidence, pv));
+        }
+    }
+    match candidate {
+        None => None,
+        Some((_, candidate)) => Some(candidate),
+    }
+}
+
+pub enum CallType {
+    Upload(UploadProtocol),
+    Standard,
+}
+
+arg_enum!{
+    pub enum UploadProtocol {
+        Simple,
+        Resumable
+    }
 }
 
 impl AsRef<str> for UploadProtocol {
     fn as_ref(&self) -> &str {
         match *self {
             UploadProtocol::Simple => "simple",
-            UploadProtocol::Resumable => "resumable",
+            UploadProtocol::Resumable => "resumable"
+        }
+    }
+}
+
+impl AsRef<str> for CallType {
+    fn as_ref(&self) -> &str {
+        match *self {
+            CallType::Upload(ref proto) => proto.as_ref(),
+            CallType::Standard => "standard-request"
         }
     }
 }
@@ -105,6 +158,49 @@ impl FieldCursor {
         Ok(())
     }
 
+    pub fn did_you_mean(value: &str, possible_values: &[&str]) -> Option<String> {
+        if value.len() == 0 {
+            return None
+        }
+
+        let mut last_c = FIELD_SEP;
+
+        let mut field = String::new();
+        let mut output = String::new();
+
+        let push_field = |fs: &mut String, f: &mut String| {
+            if f.len() > 0 {
+                fs.push_str(
+                    match did_you_mean(&f, possible_values) {
+                        Some(candidate) => candidate,
+                        None => &f,
+                    });
+                f.truncate(0);
+            }
+        };
+
+        for (cid, c) in value.chars().enumerate() {
+            if c == FIELD_SEP {
+                if last_c != FIELD_SEP {
+                    push_field(&mut output, &mut field);
+                }
+                output.push(c);
+            } else {
+                field.push(c);
+            }
+
+            last_c = c;
+        }
+
+        push_field(&mut output, &mut field);
+
+        if &output == value {
+            None
+        } else {
+            Some(output)
+        }
+    }
+
     pub fn num_fields(&self) -> usize {
         self.0.len()
     }
@@ -129,6 +225,17 @@ pub fn parse_kv_arg<'a>(kv: &'a str, err: &mut InvalidOptionsError, for_hashmap:
     }
 }
 
+pub fn calltype_from_str(name: &str, valid_protocols: Vec<String>, err: &mut InvalidOptionsError) -> CallType {
+    CallType::Upload(
+        match UploadProtocol::from_str(name) {
+            Ok(up) => up,
+            Err(msg) => {
+                err.issues.push(CLIError::InvalidUploadProtocol(name.to_string(), valid_protocols)); 
+                UploadProtocol::Simple
+            }
+        })
+}
+
 pub fn input_file_from_opts(file_path: &str, err: &mut InvalidOptionsError) -> Option<fs::File> {
     match fs::File::open(file_path) {
         Ok(f) => Some(f),
@@ -149,13 +256,14 @@ pub fn input_mime_from_opts(mime: &str, err: &mut InvalidOptionsError) -> Option
     }
 }
 
-// May panic if we can't open the file - this is anticipated, we can't currently communicate this 
-// kind of error: TODO: fix this architecture :)
-pub fn writer_from_opts(flag: bool, arg: &str) -> Box<Write> {
-    if !flag || arg == "-" {
-        Box::new(stdout())
-    } else {
-        Box::new(fs::OpenOptions::new().create(true).write(true).open(arg).unwrap())
+pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
+    let f = arg.unwrap_or("-");
+    match f {
+        "-" => Ok(Box::new(stdout())),
+        _ => match fs::OpenOptions::new().create(true).write(true).open(f) {
+            Ok(f) => Ok(Box::new(f)),
+            Err(io_err) => Err(io_err),
+        }
     }
 }
 
@@ -168,7 +276,7 @@ pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError,
     match FromStr::from_str(arg) {
         Err(perr) => {
             err.issues.push(
-                CLIError::ParseError((arg_name, arg_type, arg.to_string(), format!("{}", perr)))
+                CLIError::ParseError(arg_name, arg_type, arg.to_string(), format!("{}", perr))
             );
             Default::default()
         },
@@ -188,49 +296,47 @@ impl JsonTokenStorage {
 }
 
 impl TokenStorage for JsonTokenStorage {
-    type Error = io::Error;
+    type Error = json::Error;
 
     // NOTE: logging might be interesting, currently we swallow all errors
-    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Option<io::Error> {
+    fn set(&mut self, scope_hash: u64, _: &Vec<&str>, token: Option<Token>) -> Result<(), json::Error> {
         match token {
             None => {
                 match fs::remove_file(self.path(scope_hash)) {
                     Err(err) => 
                         match err.kind() {
-                            io::ErrorKind::NotFound => None,
-                            _ => Some(err)
+                            io::ErrorKind::NotFound => Ok(()),
+                            _ => Err(json::Error::IoError(err))
                         },
-                    Ok(_) => None
+                    Ok(_) => Ok(()),
                 }
             }
             Some(token) => {
-                let json_token = json::encode(&token).unwrap();
                 match fs::OpenOptions::new().create(true).write(true).open(&self.path(scope_hash)) {
                     Ok(mut f) => {
-                        match f.write(json_token.as_bytes()) {
-                            Ok(_) => None,
-                            Err(io_err) => Some(io_err),
+                        match json::to_writer_pretty(&mut f, &token) {
+                            Ok(_) => Ok(()),
+                            Err(io_err) => Err(json::Error::IoError(io_err)),
                         }
                     },
-                    Err(io_err) => Some(io_err)
+                    Err(io_err) => Err(json::Error::IoError(io_err))
                 }
             }
         }
     }
 
-    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, io::Error> {
+    fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, json::Error> {
         match fs::File::open(&self.path(scope_hash)) {
             Ok(mut f) => {
-                let mut json_string = String::new();
-                match f.read_to_string(&mut json_string) {
-                    Ok(_) => Ok(Some(json::decode::<Token>(&json_string).unwrap())),
-                    Err(io_err) => Err(io_err),
+                match json::de::from_reader(f) {
+                    Ok(token) => Ok(Some(token)),
+                    Err(err)  => Err(err),
                 }
             },
             Err(io_err) => {
                 match io_err.kind() {
                     io::ErrorKind::NotFound => Ok(None),
-                    _ => Err(io_err)
+                    _ => Err(json::Error::IoError(io_err))
                 }
             }
         }
@@ -240,7 +346,7 @@ impl TokenStorage for JsonTokenStorage {
 
 #[derive(Debug)]
 pub enum ApplicationSecretError {
-    DecoderError((String, json::DecoderError)),
+    DecoderError((String, json::Error)),
     FormatError(String),    
 }
 
@@ -248,10 +354,10 @@ impl fmt::Display for ApplicationSecretError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             ApplicationSecretError::DecoderError((ref path, ref err))
-                => writeln!(f, "Could not decode file at '{}' with error: {}", 
+                => writeln!(f, "Could not decode file at '{}' with error: {}.", 
                             path, err),
             ApplicationSecretError::FormatError(ref path)
-                => writeln!(f, "'installed' field is unset in secret file at '{}'", 
+                => writeln!(f, "'installed' field is unset in secret file at '{}'.", 
                             path),
         }
     }
@@ -270,15 +376,15 @@ impl fmt::Display for ConfigurationError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             ConfigurationError::DirectoryCreationFailed((ref dir, ref err))
-                => writeln!(f, "Directory '{}' could not be created with error: {}", dir, err),
+                => writeln!(f, "Directory '{}' could not be created with error: {}.", dir, err),
             ConfigurationError::DirectoryUnset 
-                => writeln!(f, "--config-dir was unset or empty"),
+                => writeln!(f, "--config-dir was unset or empty."),
             ConfigurationError::HomeExpansionFailed(ref dir)
-                => writeln!(f, "Couldn't find HOME directory of current user, failed to expand '{}'", dir),
+                => writeln!(f, "Couldn't find HOME directory of current user, failed to expand '{}'.", dir),
             ConfigurationError::Secret(ref err)
                 => writeln!(f, "Secret -> {}", err),
             ConfigurationError::IOError((ref path, ref err))
-                => writeln!(f, "IO operation failed on path '{}' with error: {}", path, err),
+                => writeln!(f, "IO operation failed on path '{}' with error: {}.", path, err),
         }
     }
 }
@@ -293,9 +399,9 @@ impl fmt::Display for InputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             InputError::IOError((ref file_path, ref io_err))
-                => writeln!(f, "Failed to open '{}' for reading with error: {}", file_path, io_err),
+                => writeln!(f, "Failed to open '{}' for reading with error: {}.", file_path, io_err),
             InputError::Mime(ref mime)
-                => writeln!(f, "'{}' is not a known mime-type", mime),
+                => writeln!(f, "'{}' is not a known mime-type.", mime),
         }
     }
 }
@@ -304,7 +410,7 @@ impl fmt::Display for InputError {
 pub enum FieldError {
     PopOnEmpty(String),
     TrailingFieldSep(String),
-    Unknown(String),
+    Unknown(String, Option<String>, Option<String>),
     Empty,
 }
 
@@ -313,13 +419,26 @@ impl fmt::Display for FieldError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             FieldError::PopOnEmpty(ref field)
-                => writeln!(f, "'{}': Cannot move up on empty field cursor", field),
+                => writeln!(f, "'{}': Cannot move up on empty field cursor.", field),
             FieldError::TrailingFieldSep(ref field)
-                => writeln!(f, "'{}': Single field separator may not be last character", field),
-            FieldError::Unknown(ref field)
-                => writeln!(f, "Field '{}' does not exist", field),
+                => writeln!(f, "'{}': Single field separator may not be last character.", field),
+            FieldError::Unknown(ref field, ref suggestion, ref value) => {
+                let suffix = 
+                    match *suggestion {
+                        Some(ref s) => {
+                            let kv = 
+                                match *value {
+                                    Some(ref v) => format!("{}={}", s, v),
+                                    None => s.clone(),
+                                };
+                            format!(" Did you mean '{}' ?", kv)
+                        },
+                        None => String::new(),
+                    };
+                writeln!(f, "Field '{}' does not exist.{}", field, suffix)
+            },
             FieldError::Empty
-                => writeln!(f, "Field names must not be empty"),
+                => writeln!(f, "Field names must not be empty."),
         }
     }
 }
@@ -328,11 +447,14 @@ impl fmt::Display for FieldError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
-    ParseError((&'static str, &'static str, String, String)),
-    UnknownParameter(String),
+    ParseError(&'static str, &'static str, String, String),
+    UnknownParameter(String, Vec<&'static str>),
+    InvalidUploadProtocol(String, Vec<String>),
     InvalidKeyValueSyntax(String, bool),
     Input(InputError),
     Field(FieldError),
+    MissingCommandError,
+    MissingMethodError(String),
 }
 
 impl fmt::Display for CLIError {
@@ -341,15 +463,25 @@ impl fmt::Display for CLIError {
             CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
             CLIError::Input(ref err) => write!(f, "Input -> {}", err),
             CLIError::Field(ref err) => write!(f, "Field -> {}", err),
-            CLIError::ParseError((arg_name, type_name, ref value, ref err_desc)) 
-                => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}",
+            CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names) 
+                => writeln!(f, "'{}' is not a valid upload protocol. Choose from one of {}.", proto_name, valid_names.connect(", ")),
+            CLIError::ParseError(arg_name, type_name, ref value, ref err_desc) 
+                => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}.",
                             arg_name, value, type_name, err_desc),
-            CLIError::UnknownParameter(ref param_name) 
-                => writeln!(f, "Parameter '{}' is unknown.", param_name),
+            CLIError::UnknownParameter(ref param_name, ref possible_values) => {
+                let mut suffix = 
+                    match did_you_mean(param_name, &possible_values) {
+                        Some(v) => format!(" Did you mean '{}' ?", v),
+                        None => String::new(),
+                    };
+                write!(f, "Parameter '{}' is unknown.{}\n", param_name, suffix)
+            },
             CLIError::InvalidKeyValueSyntax(ref kv, is_hashmap) => {
                 let hashmap_info = if is_hashmap { "hashmap " } else { "" };
-                writeln!(f, "'{}' does not match {}pattern <key>=<value>", kv, hashmap_info)
+                writeln!(f, "'{}' does not match {}pattern <key>=<value>.", kv, hashmap_info)
             },
+            CLIError::MissingCommandError => writeln!(f, "Please specify the main sub-command."),
+            CLIError::MissingMethodError(ref cmd) => writeln!(f, "Please specify the method to call on the '{}' command.", cmd),
         }
     }
 }
@@ -416,7 +548,7 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
 
 pub fn application_secret_from_directory(dir: &str, 
                                          secret_basename: &str, 
-                                         json_app_secret: &str)
+                                         json_console_secret: &str)
                                                         -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
     let secret_str = || secret_path.as_path().to_str().unwrap().to_string();
@@ -435,7 +567,10 @@ pub fn application_secret_from_directory(dir: &str,
                     err = match fs::OpenOptions::new().create(true).write(true).open(&secret_path) {
                         Err(cfe) => cfe,
                         Ok(mut f) => {
-                            match f.write(json_app_secret.as_bytes()) {
+                            // Assure we convert 'ugly' json string into pretty one
+                            let console_secret: ConsoleApplicationSecret 
+                                            = json::from_str(json_console_secret).unwrap();
+                            match json::to_writer_pretty(&mut f, &console_secret) {
                                 Err(io_err) => io_err,
                                 Ok(_) => continue,
                             }
@@ -446,23 +581,24 @@ pub fn application_secret_from_directory(dir: &str,
                 return secret_io_error(err)
             },
             Ok(mut f) => {
-                let mut json_encoded_secret = String::new();
-                if let Err(io_err) = f.read_to_string(&mut json_encoded_secret) {
-                    return secret_io_error(io_err)
-                }
-                match json::decode::<ConsoleApplicationSecret>(&json_encoded_secret) {
-                    Err(json_decode_error) => return Err(CLIError::Configuration(
-                        ConfigurationError::Secret(ApplicationSecretError::DecoderError(
-                                                (secret_str(), json_decode_error)
+                match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
+                    Err(json::Error::IoError(err)) => 
+                        return secret_io_error(err),
+                    Err(json_err) => 
+                        return Err(CLIError::Configuration(
+                            ConfigurationError::Secret(
+                                ApplicationSecretError::DecoderError(
+                                                (secret_str(), json_err)
                                               )))),
-                    Ok(console_secret) => match console_secret.installed {
-                        Some(secret) => return Ok(secret),
-                        None => return Err(
-                                    CLIError::Configuration(
-                                    ConfigurationError::Secret(
-                                    ApplicationSecretError::FormatError(secret_str())
-                                    )))
-                    },
+                    Ok(console_secret) => 
+                        match console_secret.installed {
+                            Some(secret) => return Ok(secret),
+                            None => return Err(
+                                        CLIError::Configuration(
+                                        ConfigurationError::Secret(
+                                        ApplicationSecretError::FormatError(secret_str())
+                                        )))
+                        },
                 }
             }
         }

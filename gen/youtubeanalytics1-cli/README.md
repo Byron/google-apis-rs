@@ -10,30 +10,36 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *YouTube Analytics* API can be found at the
+[official documentation site](http://developers.google.com/youtube/analytics/).
+
 # Usage
 
-This documentation was generated from the *YouTube Analytics* API at revision *20150304*. The CLI is at version *0.1.0*.
+This documentation was generated from the *YouTube Analytics* API at revision *20150304*. The CLI is at version *0.2.0*.
 
 ```bash
-  youtubeanalytics1 [options] batch-report-definitions list <on-behalf-of-content-owner> [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] batch-reports list <batch-report-definition-id> <on-behalf-of-content-owner> [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] group-items delete <id> [-p <v>...]
-  youtubeanalytics1 [options] group-items insert -r <kv>... [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] group-items list <group-id> [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] groups delete <id> [-p <v>...]
-  youtubeanalytics1 [options] groups insert -r <kv>... [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] groups list [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] groups update -r <kv>... [-p <v>...] [-o <out>]
-  youtubeanalytics1 [options] reports query <ids> <start-date> <end-date> <metrics> [-p <v>...] [-o <out>]
+youtubeanalytics1 [options]
+        batch-report-definitions
+                list <on-behalf-of-content-owner> [-p <v>]... [-o <out>]
+        batch-reports
+                list <batch-report-definition-id> <on-behalf-of-content-owner> [-p <v>]... [-o <out>]
+        group-items
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list <group-id> [-p <v>]... [-o <out>]
+        groups
+                delete <id> [-p <v>]...
+                insert (-r <kv>)... [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                update (-r <kv>)... [-p <v>]... [-o <out>]
+        reports
+                query <ids> <start-date> <end-date> <metrics> [-p <v>]... [-o <out>]
   youtubeanalytics1 --help
 
-All documentation details can be found at
-http://byron.github.io/google-apis-rs/google_youtubeanalytics1_cli/index.html
-
 Configuration:
-  --scope <url>  
+  [--scope <url>]...
             Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it.
+            requires the user to grant this application permission to use it. 
             If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 

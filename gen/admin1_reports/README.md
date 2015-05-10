@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_reports` library allows access to all features of the *Google reports* service.
 
-This documentation was generated from *reports* crate version *0.1.6+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *reports* crate version *0.1.7+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *reports* *v1_reports* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -183,7 +183,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_admin1_reports/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_admin1_reports/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

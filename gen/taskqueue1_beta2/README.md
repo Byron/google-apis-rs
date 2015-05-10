@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-taskqueue1_beta2` library allows access to all features of the *Google taskqueue* service.
 
-This documentation was generated from *taskqueue* crate version *0.1.6+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.6*.
+This documentation was generated from *taskqueue* crate version *0.1.7+20141111*, where *20141111* is the exact revision of the *taskqueue:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
 
 Everything else about the *taskqueue* *v1_beta2* API can be found at the
 [official documentation site](https://developers.google.com/appengine/docs/python/taskqueue/rest).
@@ -167,7 +167,7 @@ These will always take a single argument, for which the following statements are
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](http://byron.github.io/google-apis-rs/google_taskqueue1_beta2/trait.RequestValue.html) are borrowed
+* [request values](http://byron.github.io/google-apis-rs/google_taskqueue1_beta2/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 
