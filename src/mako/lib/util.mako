@@ -49,5 +49,5 @@ ${canonicalName}\
 </%def>
 
 <%def name="program_name()" buffered="True">\
-${self.library_name().replace('_', '-')}\
+${util.program_name(name, version)}\
 </%def>

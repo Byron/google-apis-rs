@@ -18,8 +18,11 @@ make:
     - api
     - cli
 html_index:
+  download_base_url: http://dl.byronimo.de
   asset_urls:
     crates_img: https://raw.githubusercontent.com/rust-lang/crates.io/master/public/favicon.ico
+    ubuntu_img: http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png
+    osx_img: http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74
 directories:
   # directory under which all generated sources should reside
   output: gen
