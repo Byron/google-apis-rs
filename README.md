@@ -195,7 +195,7 @@ with sufficient rights to write the files.
 $ src/bash/linux-deployment-to-downloads.bash ...
 ```
 
-Now the programs have been places in the right spot to be downloadable from the documentation index
+Now the programs have been placed in the right spot to be downloadable from the documentation index
 which is built next.
 
 ## Build Documentation and post it onto GitHub
@@ -204,7 +204,7 @@ The last step will update the documentation index to point to the latest program
 For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be 
 hosted statically anywhere if required.
 
-Please note that the generated download URLs are based on the `html_index.download_base_url` key in the 
+Please note that the generated download URLs are based on the `url_info.download_base_url` key in the 
 `etc/api/shared.yaml` file, in case you want to host the downloads anywhere else. In the latter case, you may 
 want to adjust other base-urls as well.
 
