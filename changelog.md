@@ -2,7 +2,7 @@
 
 ## cli-v0.2.0 (2015-05-10)
 
-I proudly present, the first release [you can actually use][youtube-workflow]!
+The first release [you can actually use][youtube-workflow]!
 
 #### Features
 
