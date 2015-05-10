@@ -72,7 +72,7 @@ DO NOT EDIT !
             <a href="${crates_io_url(an, v)}"><img src="${html_index.asset_urls.crates_img}" title="This API on crates.io" height="16" width="16"/></a>
             % else:
             % for os_name in ('ubuntu', 'osx'):
-            <a href="${html_index.download_base_url + '/google.rs/%s/%s/%s/%s' % (api_name, ad.cargo.build_version, os_name, program_name(an, v))}"><img src="${html_index.asset_urls.get('%s_img' % os_name)}" title="Download the 64bit program" height="16" width="16"/></a>
+            <a href="${html_index.download_base_url + '/google.rs/%s/%s/%s/%s' % (api_name, ad.cargo.build_version, os_name, program_name(an, v))}"><img src="${html_index.asset_urls.get('%s_img' % os_name)}" title="Download the pre-compiled 64bit program for ${os_name}" height="16" width="16"/></a>
             % endfor ## each os
             % endif
             % if not loop.last:
