@@ -1,17 +1,25 @@
 <%
     import os
+    import yaml
     from util import (gen_crate_dir, api_index)
 
     title = 'Google Service Documentation for Rust'
 
+    # type cache: {'api': type-api.yaml-contents }
+    tc = dict()
+    for api_type in make.types:
+        data = yaml.load_all(open(os.path.join(directories.api_base, 'type-%s.yaml' % api_type)))
+        tc[api_type] = type(directories)(data.next())
+    # end for each type to load cache for
+
     first_api_prefix = None
-    for ti in make.types:
-        if ti.documentation_engine != 'rustdoc':
+    for ad in tc.values():
+        if ad.make.documentation_engine != 'rustdoc':
             continue
         for an in sorted(api.list.keys()):
             for v in api.list[an]:
-                if api_index(DOC_ROOT, an, v, ti):
-                    first_api_prefix = gen_crate_dir(an, v, ti)
+                if api_index(DOC_ROOT, an, v, ad.make):
+                    first_api_prefix = gen_crate_dir(an, v, ad.make)
                     break
             # for each version
         # for each api name
@@ -46,19 +54,20 @@ DO NOT EDIT !
     % for v in api.list[an]:
         <% 
             has_any_index = False
-            types = list()
-            for ti in make.types:
-                if api_index(DOC_ROOT, an, v, ti):
+            type_names = list()
+            for api_name, ad in tc.iteritems():
+                if api_index(DOC_ROOT, an, v, ad.make):
                     has_any_index = True
-                    types.append(ti)
+                    type_names.append(api_name)
             # end for each type
         %>\
         % if not has_any_index:
             <% continue %>\
         % endif
         <span class="text">${an} ${v} (
-        % for ti in types:
-            <a class="mod" href="${api_index(DOC_ROOT, an, v, ti)}" title="${ti.id.upper()} docs for the ${an} ${v}">${ti.id.upper()}</a>
+        % for api_name in type_names:
+            <% ad = tc[api_name] %>
+            <a class="mod" href="${api_index(DOC_ROOT, an, v, ad.make)}" title="${ad.make.id.upper()} docs for the ${an} ${v}">${ad.make.id.upper()}</a>
             % if not loop.last:
 , 
             % endif

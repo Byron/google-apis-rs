@@ -15,12 +15,8 @@ api:
 make:
   # All known program ids.
   types:
-    - id: api
-      target_suffix: ''
-      documentation_engine: rustdoc
-    - id: cli
-      target_suffix: -cli
-      documentation_engine: mkdocs
+    - api
+    - cli
 directories:
   # directory under which all generated sources should reside
   output: gen

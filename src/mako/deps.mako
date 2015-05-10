@@ -138,7 +138,7 @@ publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
 
 % if global_targets:
-${doc_index}: ${' '.join('docs-' + ti.id for ti in make.types)} ${' '.join(gen_type_cfg_path(ti.id) for ti in make.types)}
+${doc_index}: ${' '.join('docs-' + api_name for api_name in make.types)} ${' '.join(gen_type_cfg_path(api_name) for api_name in make.types)}
 	$(PYPATH) $(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 	@echo Documentation index created at '$@'
 docs-all: ${doc_index}
