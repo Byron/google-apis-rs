@@ -3,7 +3,7 @@
 # to be served as 
 tar_file=${1:?Must be .tar file produced by any of the *-deploy.sh scripts}
 program_type=${2:?Is the type of the program contained in the tar file, e.g. cli}
-version=${3:?The program version contained in the tar file}
+version=${3:?The program version contained in the tar file, e.g. 0.2.0 (no leading v)}
 os_name=${4:?The OS name on which the contents of the tar files was produced, e.g. osx, ubuntu}
 base_dir=${5:?Is the root path of the download directory, e.g. /var/www/downloads}
 
