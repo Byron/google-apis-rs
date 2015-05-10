@@ -17,7 +17,11 @@ make:
   types:
     - api
     - cli
-html_index:
+  # All known platforms we build for, using prettyfied, custom names
+  platforms:
+    - ubuntu
+    - osx
+url_info:
   download_base_url: http://dl.byronimo.de
   asset_urls:
     crates_img: https://raw.githubusercontent.com/rust-lang/crates.io/master/public/favicon.ico

@@ -1,5 +1,5 @@
 <%
-    from util import (markdown_comment, new_context)
+    from util import (markdown_comment, new_context, program_download_url)
     from cli import (CONFIG_DIR, CONFIG_DIR_FLAG, SCOPE_FLAG, application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG)
 
     c = new_context(schemas, resources, context.get('methods'))
@@ -20,6 +20,16 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 Everything else about the *${util.canonical_name()}* API can be found at the
 [official documentation site](${documentationLink}).
 % endif
+
+# Downloads
+
+You can download the pre-compiled 64bit binaries for the following platforms:
+
+% for os_name in make.platforms:
+* ![icon](${url_info.asset_urls.get('%s_img' % os_name)}) [${os_name}](${program_download_url(url_info.download_base_url, 'cli', cargo.build_version, os_name, name, version)})
+% endfor
+
+Find the source code [on github](${util.github_source_root_url()}).
 
 # Usage
 
