@@ -109,6 +109,111 @@ make wheezy-build
 
 You will find your *release* build in the *build/* subdirectory of the project's root.
 
+# Deployment
+
+The deployment process is not very automated, but this paragraph shall document the steps required
+to obtain a release build on various platforms and deploy them.
+
+## Setup API and CLI version numbers
+
+The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves 
+to the supported program types, being *cli* and *api* at the time of writing. You can change the 
+version for all expected artifacts by editing the respective key inside of the yaml (*cargo.build_version*
+at the time of writing).
+
+The following script would regenerate all higher-level programs (*CLI*), add the result to git and push it.
+
+```bash
+$ make gen-all-cli
+# Use the version you are comfortable with in the changelog - sometimes you only want to 
+# update one program type. Here we go with a multi-version, containing all version strings
+# in one heading. It's just for the visuals, after all.
+$ clog --setversion=api-v<api-version>
+$ git add .
+$ git commit -m "chore(versionup): added code for latest version"
+$ git tag api-v<api-version> cli-v<cli-version> && git push --tags origin master
+```
+
+## Publish API to Cargo
+
+Before anything else happens, be sure we publish the latest APIs to cargo.
+
+```bash
+# We want as many publishes to work as possible ... -k keeps going on error.
+# sometimes uploads fail spuriously, and just need to be retried.
+$ make publish-api -k
+# another attempt to do this should not do actual work
+$ make publish-api
+# all clear ? Please proceed ... .
+```
+
+The previous call will have created plenty of marker files, which need to be committed to the repository to prevent to 
+attempt multiple publishes of the same version.
+
+```bash
+$ git add .
+$ git commit -m "chore(cargo): publish latest version to crates.io"
+$ git push origin master
+```
+
+## Release-Build on all Platforms
+
+Please apply the following script to your build-systems. Currently it differentiates between Linux and OSX.
+
+```bash
+# We use the `cli` program type, but it could be any type to builds a binary
+# Parallelize with -j4, but prepare for occasionally failed builds due to out-of-memory situations
+# or cargo interfering with itself. You might have to run this multiple times, thus -k
+# Also adjust -j to suit the capabilities of your machine.
+$ make cargo-cli ARGS="build --release" -j4 -k
+
+# Finally, gather the build result by executing the respective utility script, 
+# depending on the platform you build on
+$ src/bash/linux-deploy.bash ... # OR 
+
+$ src/bash/osx-deploy.bash ...
+```
+
+At the end of this step, you will have `tar` files which contain all build-artifacts for deployment
+on a CDN.
+
+## Deploy Build-Artifacts on CDN
+
+Here we copy the tar files onto the CDN or VPS you are using, and apply a script to place it
+at the right spot for the download.
+
+```bash
+$ scp *.tar.gz user@your-cdn-or-vps.org
+```
+
+On the CDN, you want to execute the deployment script - the following example assumes a valid login
+with sufficient rights to write the files.
+
+```bash
+# This script requires you to type in information already contained in the tar file - it's easy to 
+# do though ;).
+$ src/bash/linux-deployment-to-downloads.bash ...
+```
+
+Now the programs have been places in the right spot to be downloadable from the documentation index
+which is built next.
+
+## Build Documentation and post it onto GitHub
+
+The last step will update the documentation index to point to the latest program versions.
+For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be 
+hosted statically anywhere if required.
+
+Please note that the generated download URLs are based on the `html_index.download_base_url` key in the 
+`etc/api/shared.yaml` file, in case you want to host the downloads anywhere else. In the latter case, you may 
+want to adjust other base-urls as well.
+
+```bash
+# This will run rust-doc on all APIs, generate the index html file and run gh-import at the end.
+# The latter might require user-input in case no credentials are setup.
+$ make github-pages
+```
+
 # License
 
 The license of everything not explicitly under a different license are licensed as specified in `LICENSE.md`.
