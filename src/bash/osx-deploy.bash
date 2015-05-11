@@ -8,6 +8,6 @@ tar_file=${tar_basename}.tar.gz
 dest_dir=build/$tar_basename
 mkdir -p $dest_dir || exit $?
 find -E gen -perm +0111 -type f -path "*/${rtype}/*" -not \( -name "*.*" -or -name "*script*" -or -regex ".*-[a-f0-9]{16}" \) | xargs -J % cp -v % $dest_dir || exit $?
-(cd $dest_dir && tar -czvf ${tar_file} "*") || exit $?
+(cd $dest_dir && tar -czvf ../${tar_file} `find . -perm +0111 -type f`) || exit $?
 rm -Rfv $dest_dir || exit $?
 echo Wrote build/$tar_file
