@@ -262,9 +262,11 @@ ${value_unwrap}\
                 }
             }
             if !found {
-                err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                        Vec::new() + &self.gp + &[${comma_sep_fields(optional_prop_names)}]
-                                                    ));
+                err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                          {let mut v = Vec::new();
+                                                                   v.extend(self.gp.iter().map(|v|*v));
+                                                                   v.extend([${comma_sep_fields(optional_prop_names)}].iter().map(|v|*v));
+                                                                   v } ));
             }
         }
     }
