@@ -344,14 +344,12 @@ if dry_run {
 <%
     allow_optionals_fn = lambda s: is_schema_with_optionals(schema_markers(s, c, transitive=False))
 
-    def flatten_schema_fields(schema, res, init_fn_map, fields, cur=list(), init_call=None):
+    def flatten_schema_fields(schema, res, fields, cur=list()):
         if len(cur) == 0:
-            init_call = ''
             cur = list()
 
         opt_access = '.as_mut().unwrap()'
         allow_optionals = allow_optionals_fn(schema)
-        parent_init_call = init_call
         if not allow_optionals:
             opt_access = ''
         for fn, f in schema.fields.iteritems():
@@ -359,38 +357,20 @@ if dry_run {
             fields.add(fn)
             if isinstance(f, SchemaEntry):
                 cur[-1][0] = mangle_ident(fn)
-                res.append((init_call, schema, f, list(cur)))
+                res.append((schema, f, list(cur)))
             else:
-                if allow_optionals:
-                    init_fn_name = 'request_%s_init' % '_'.join(mangle_ident(t[1]) for t in cur)
-                    init_call = init_fn_name + '(&mut request);'
-                    struct_field = 'request.' + '.'.join('%s%s' % (mangle_ident(t[1]), opt_access) for t in cur[:-1])
-                    if len(cur) > 1:
-                        struct_field += '.'
-                    struct_field += mangle_ident(cur[-1][1])
-                    init_fn =  "fn %s(request: &mut api::%s) {\n" % (init_fn_name, request_prop_type)
-                    if parent_init_call:
-                        pcall = parent_init_call[:parent_init_call.index('(')] + "(request)"
-                        init_fn += "    %s;\n" % pcall
-                    init_fn += "    if %s.is_none() {\n" % struct_field
-                    init_fn += "        %s = Some(Default::default());\n" % struct_field
-                    init_fn += "    }\n"
-                    init_fn += "}\n"
-                               
-                    init_fn_map[init_fn_name] = init_fn
-                # end handle init
-                flatten_schema_fields(f, res, init_fn_map, fields, cur, init_call)
+                flatten_schema_fields(f, res, fields, cur)
             cur.pop()
         # endfor
     # end utility
 
     schema_fields = list()
-    init_fn_map = dict()
     fields = set()
-    flatten_schema_fields(request_cli_schema, schema_fields, init_fn_map, fields)
+    flatten_schema_fields(request_cli_schema, schema_fields, fields)
 %>\
-let mut ${request_prop_name} = api::${request_prop_type}::default();
 let mut field_cursor = FieldCursor::default();
+let mut object = json::value::Value::Object(Default::default());
+
 for kvarg in ${opt_values(KEY_VALUE_ARG)} {
     let last_errc = err.issues.len();
     let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -405,60 +385,25 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
         }
         continue;
     }
-    % for name in sorted(init_fn_map.keys()):
-${init_fn_map[name] | indent_by(4)}
-    % endfor
-    match &temp_cursor.to_string()[..] {
-    % for init_call, schema, fe, f in schema_fields:
+   
+    let field_type = 
+        match &temp_cursor.to_string()[..] {
+    % for schema, fe, f in schema_fields:
 <%
-    ptype = actual_json_type(f[-1][1], fe.actual_property.type)
-    value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
     pname = FIELD_SEP.join(mangle_subcommand(t[1]) for t in f)
-
-    allow_optionals = True
-    opt_prefix = 'Some('
-    opt_suffix = ')'
-    struct_field = 'request.' + '.'.join(t[0] for t in f)
-
-    opt_init = 'if ' + struct_field + '.is_none() {\n'
-    opt_init += '   ' + struct_field + ' = Some(Default::default());\n'
-    opt_init += '}\n'
-
-    opt_access = '.as_mut().unwrap()'
-    if not allow_optionals_fn(schema):
-        opt_prefix = opt_suffix = opt_access = opt_init = ''
+    ptype = actual_json_type(f[-1][1], fe.actual_property.type)
 %>\
-        "${pname}" => {
-            % if init_call:
-                ${init_call}
-            % endif
-        % if fe.container_type == CTYPE_POD:
-                ${struct_field} = ${opt_prefix}\
-        % elif fe.container_type == CTYPE_ARRAY:
-                ${opt_init | indent_all_but_first_by(4)}\
-                ${struct_field}${opt_access}.push(\
-        % elif fe.container_type == CTYPE_MAP:
-                ${opt_init | indent_all_but_first_by(4)}\
-let (key, value) = parse_kv_arg(${value_unwrap}, err, true);
-                ${struct_field}${opt_access}.insert(key.to_string(), \
-        % endif # container type handling
-        % if ptype != 'string':
-arg_from_str(${value_unwrap}, err, "${pname}", "${ptype}")\
-        % else:
-${value_unwrap}.to_string()\
-        % endif
-        % if fe.container_type == CTYPE_POD:
-${opt_suffix}\
-        % else:
-)\
-        % endif
-;
-            },
-        % endfor # each nested field
-        _ => {
-            let suggestion = FieldCursor::did_you_mean(key, &${field_vec(sorted(fields))});
-            err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-        }
+            "${pname}" => Some("${ptype}"),
+            % endfor # each nested field
+            _ => {
+                let suggestion = FieldCursor::did_you_mean(key, &${field_vec(sorted(fields))});
+                err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                None
+            }
+        };
+    if let Some(field_type) = field_type {
+        temp_cursor.set_json_value(&mut object, value.unwrap(), field_type);
     }
 }
+let mut ${request_prop_name}: api::${request_prop_type} = json::value::from_value(object).unwrap();
 </%def>

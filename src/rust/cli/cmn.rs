@@ -199,6 +199,10 @@ impl FieldCursor {
         }
     }
 
+    pub fn set_json_value(&self, object: &mut json::value::Value, value: &str, value_type: &str) {
+        
+    }
+
     pub fn num_fields(&self) -> usize {
         self.0.len()
     }
