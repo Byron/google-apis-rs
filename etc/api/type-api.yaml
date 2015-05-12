@@ -25,6 +25,4 @@ cargo:
   keywords: [protocol, web, api]
   dependencies:
     - url = "*"
-    - serde = ">= 0.3.0"
-    - serde_macros = "*"
     - json-tools = ">= 0.3.0"

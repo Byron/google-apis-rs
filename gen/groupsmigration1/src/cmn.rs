@@ -668,12 +668,14 @@ impl<'a, A> ResumableUploadHelper<'a, A>
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None
             }
-            match self.client.post(self.url)
-                .header(range_header)
-                .header(ContentType(self.media_type.clone()))
-                .header(UserAgent(self.user_agent.to_string()))
-                .body(&mut section_reader)
-                .send() {
+            // workaround https://github.com/rust-lang/rust/issues/22252
+            let res = self.client.post(self.url)
+                                 .header(range_header)
+                                 .header(ContentType(self.media_type.clone()))
+                                 .header(UserAgent(self.user_agent.to_string()))
+                                 .body(&mut section_reader)
+                                 .send();
+            match res {
                 Ok(mut res) => {
                     if res.status == StatusCode::PermanentRedirect  {
                         continue

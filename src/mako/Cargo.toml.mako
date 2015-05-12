@@ -23,12 +23,26 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = ">= 0.4.0"
 mime = "*"
-yup-oauth2 = "*"
+
+serde = ">= 0.3.0"
+serde_macros = "*"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
+
+# Needed for latest fix in macros !
+[dependencies.hyper]
+version = ">= 0.4.0"
+git = "https://github.com/hyperium/hyper"
+rev = "871f37a5605d433e5699ed2f16631001d86d7805"
+
+# to adapt to hyper changes ... 
+[dependencies.yup-oauth2]
+version = "*"
+git = "https://github.com/Byron/yup-oauth2"
+rev = "94d5b7c2cac02ad67da8504504364b3081a9a866"
+
 % if make.depends_on_suffix is not None:
 
 <% api_name = util.library_name() %>\
