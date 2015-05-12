@@ -32,6 +32,7 @@ Each episode sums up one major step in project development:
 
 * [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
 * [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
+* [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
 
 # Build Instructions
 
