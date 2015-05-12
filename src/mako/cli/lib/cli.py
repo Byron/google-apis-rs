@@ -59,6 +59,22 @@ JSON_TYPE_RND_MAP = {'boolean': lambda: str(bool(randint(0, 1))).lower(),
                      'int64' : lambda: randint(-101, -1),
                      'string': lambda: '%s' % choice(util.words).lower()}
 
+JSON_TYPE_TO_ENUM_MAP = {'boolean' : 'Boolean',
+                         'integer' : 'Int',
+                         'number'  : 'Float',
+                         'uint32'  : 'Int',
+                         'double'  : 'Float',
+                         'float'   : 'Float',
+                         'int32'   : 'Int',
+                         'any'     : 'String', # TODO: Figure out how to handle it. It's 'interface' in Go ...
+                         'int64'   : 'Int',
+                         'uint64'  : 'Uint',
+                         'string'  : 'String'}
+
+CTYPE_TO_ENUM_MAP = {CTYPE_POD:   'Pod',
+                     CTYPE_ARRAY: 'Vec',
+                     CTYPE_MAP:   'Map'}
+
 JSON_TYPE_VALUE_MAP = {'boolean': 'false',
                        'integer' : '-0',
                        'uint32' : '0',

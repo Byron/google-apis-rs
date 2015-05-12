@@ -17,6 +17,33 @@ use std::default::Default;
 
 const FIELD_SEP: char = '.';
 
+
+pub enum ComplexType {
+    Pod,
+    Vec,
+    Map,
+}
+
+    // Null,
+    // Bool(bool),
+    // I64(i64),
+    // U64(u64),
+    // F64(f64),
+    // String(String),
+
+pub enum JsonType {
+    Boolean,
+    Int,
+    Uint,
+    Float,
+    String,
+}
+
+pub struct JsonTypeInfo {
+    pub jtype: JsonType,
+    pub ctype: ComplexType,
+}
+
 // Based on @erickt user comment. Thanks for the idea !
 // Remove all keys whose values are null from given value (changed in place)
 pub fn remove_json_null_values(value: &mut json::value::Value) {
@@ -199,8 +226,27 @@ impl FieldCursor {
         }
     }
 
-    pub fn set_json_value(&self, object: &mut json::value::Value, value: &str, value_type: &str) {
-        
+    pub fn set_json_value(&self, object: &mut json::value::Value, value: &str, 
+                                                                  type_info: JsonTypeInfo) {
+        assert!(self.0.len() > 0);
+
+        for field in &self.0[..self.0.len()-1] {
+            object = match *object {
+                json::value::Value::Object(ref mut mapping) => {
+                    mapping.entry(field.to_owned()).or_insert(
+                                                json::value::Value::Object(Default::default())
+                                                    )
+                },
+                _ => panic!("We don't expect non-object Values here ...")
+            }
+        }
+
+        match *object {
+            json::value::Value::Object(ref mut mapping) => {
+
+            }
+            _ => unreachable!()
+        }
     }
 
     pub fn num_fields(&self) -> usize {

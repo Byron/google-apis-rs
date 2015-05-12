@@ -8,7 +8,8 @@
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
-                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields)
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP, 
+                     CTYPE_TO_ENUM_MAP)
 
     v_arg = '<%s>' % VALUE_ARG
     SOPT = 'self.opt'
@@ -32,7 +33,7 @@
 %>\
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -386,14 +387,16 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
         continue;
     }
    
-    let field_type = 
+    let type_info = 
         match &temp_cursor.to_string()[..] {
     % for schema, fe, f in schema_fields:
 <%
     pname = FIELD_SEP.join(mangle_subcommand(t[1]) for t in f)
     ptype = actual_json_type(f[-1][1], fe.actual_property.type)
+    jtype = 'JsonType::' + JSON_TYPE_TO_ENUM_MAP[ptype]
+    ctype = 'ComplexType::' + CTYPE_TO_ENUM_MAP[fe.container_type]
 %>\
-            "${pname}" => Some("${ptype}"),
+            "${pname}" => Some(JsonTypeInfo { jtype: ${jtype}, ctype: ${ctype} }),
             % endfor # each nested field
             _ => {
                 let suggestion = FieldCursor::did_you_mean(key, &${field_vec(sorted(fields))});
@@ -401,8 +404,8 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
                 None
             }
         };
-    if let Some(field_type) = field_type {
-        temp_cursor.set_json_value(&mut object, value.unwrap(), field_type);
+    if let Some(type_info) = type_info {
+        temp_cursor.set_json_value(&mut object, value.unwrap(), type_info);
     }
 }
 let mut ${request_prop_name}: api::${request_prop_type} = json::value::from_value(object).unwrap();
