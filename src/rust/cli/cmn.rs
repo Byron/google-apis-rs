@@ -226,25 +226,61 @@ impl FieldCursor {
         }
     }
 
-    pub fn set_json_value(&self, object: &mut json::value::Value, value: &str, 
-                                                                  type_info: JsonTypeInfo) {
+    pub fn set_json_value(&self, object: &mut json::value::Value, 
+                                 value: &str, type_info: JsonTypeInfo,
+                                 err: &mut InvalidOptionsError) {
         assert!(self.0.len() > 0);
 
-        for field in &self.0[..self.0.len()-1] {
-            object = match *object {
-                json::value::Value::Object(ref mut mapping) => {
-                    mapping.entry(field.to_owned()).or_insert(
-                                                json::value::Value::Object(Default::default())
-                                                    )
-                },
-                _ => panic!("We don't expect non-object Values here ...")
+        fn recursive_descent<'v>(keys: &[String], object: &'v mut json::value::Value) 
+                                                            -> &'v mut json::value::Value {
+            let next = 
+                match *object {
+                    json::value::Value::Object(ref mut mapping) => {
+                        mapping.entry(keys[0].to_owned()).or_insert(
+                                                    json::value::Value::Object(Default::default())
+                                                        )
+                    },
+                    _ => panic!("We don't expect non-object Values here ...")
+                };
+            if keys.len() > 1 {
+                recursive_descent(&keys[1..], next)
+            } else {
+                next
             }
         }
 
-        match *object {
+        match *recursive_descent(&self.0, object) {
             json::value::Value::Object(ref mut mapping) => {
+                let field = &self.0[self.0.len()-1];
+                let to_jval = 
+                    |jtype: JsonType, err: &mut InvalidOptionsError| 
+                                                                        -> json::value::Value {
+                        match jtype {
+                            JsonType::Boolean => 
+                                    json::value::Value::Bool(arg_from_str(value, err, &field, "boolean")),
+                            JsonType::Int => 
+                                    json::value::Value::I64(arg_from_str(value, err, &field, "int")),
+                            JsonType::Uint => 
+                                    json::value::Value::U64(arg_from_str(value, err, &field, "uint")),
+                            JsonType::Float => 
+                                    json::value::Value::F64(arg_from_str(value, err, &field, "float")),
+                            JsonType::String => 
+                                    json::value::Value::String(value.to_owned()),
+                        }
+                    };
 
-            }
+                match type_info.ctype {
+                    ComplexType::Pod => {
+                        mapping.entry(field.to_owned()).or_insert(to_jval(type_info.jtype, err));
+                    },
+                    ComplexType::Vec => {
+
+                    },
+                    ComplexType::Map => {
+                        let (key, value) = parse_kv_arg(value, err, true);
+                    }
+                }
+            },
             _ => unreachable!()
         }
     }
@@ -316,15 +352,15 @@ pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
 }
 
 
-pub fn arg_from_str<T>(arg: &str, err: &mut InvalidOptionsError, 
-                                  arg_name: &'static str, 
-                                  arg_type: &'static str) -> T
+pub fn arg_from_str<'a, T>(arg: &str, err: &mut InvalidOptionsError, 
+                                  arg_name: &'a str, 
+                                  arg_type: &'a str) -> T
                                                         where   T: FromStr + Default,
                                                              <T as FromStr>::Err: fmt::Display {
     match FromStr::from_str(arg) {
         Err(perr) => {
             err.issues.push(
-                CLIError::ParseError(arg_name, arg_type, arg.to_string(), format!("{}", perr))
+                CLIError::ParseError(arg_name.to_owned(), arg_type.to_owned(), arg.to_string(), format!("{}", perr))
             );
             Default::default()
         },
@@ -495,7 +531,7 @@ impl fmt::Display for FieldError {
 #[derive(Debug)]
 pub enum CLIError {
     Configuration(ConfigurationError),
-    ParseError(&'static str, &'static str, String, String),
+    ParseError(String, String, String, String),
     UnknownParameter(String, Vec<&'static str>),
     InvalidUploadProtocol(String, Vec<String>),
     InvalidKeyValueSyntax(String, bool),
@@ -513,7 +549,7 @@ impl fmt::Display for CLIError {
             CLIError::Field(ref err) => write!(f, "Field -> {}", err),
             CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names) 
                 => writeln!(f, "'{}' is not a valid upload protocol. Choose from one of {}.", proto_name, valid_names.connect(", ")),
-            CLIError::ParseError(arg_name, type_name, ref value, ref err_desc) 
+            CLIError::ParseError(ref arg_name, ref type_name, ref value, ref err_desc) 
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}.",
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name, ref possible_values) => {

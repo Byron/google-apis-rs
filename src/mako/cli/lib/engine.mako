@@ -405,7 +405,7 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
             }
         };
     if let Some(type_info) = type_info {
-        temp_cursor.set_json_value(&mut object, value.unwrap(), type_info);
+        temp_cursor.set_json_value(&mut object, value.unwrap(), type_info, err);
     }
 }
 let mut ${request_prop_name}: api::${request_prop_type} = json::value::from_value(object).unwrap();
