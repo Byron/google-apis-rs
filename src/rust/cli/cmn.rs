@@ -1,5 +1,6 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
 use serde::json;
+use serde::json::value::Value;
 use mime::Mime;
 use clap::{App, SubCommand};
 use strsim;
@@ -46,9 +47,9 @@ pub struct JsonTypeInfo {
 
 // Based on @erickt user comment. Thanks for the idea !
 // Remove all keys whose values are null from given value (changed in place)
-pub fn remove_json_null_values(value: &mut json::value::Value) {
+pub fn remove_json_null_values(value: &mut Value) {
     match *value {
-        json::value::Value::Object(ref mut map) => {
+        Value::Object(ref mut map) => {
             let mut for_removal = Vec::new();
 
             for (key, mut value) in map.iter_mut() {
@@ -226,58 +227,68 @@ impl FieldCursor {
         }
     }
 
-    pub fn set_json_value(&self, object: &mut json::value::Value, 
+    pub fn set_json_value(&self, mut object: &mut Value, 
                                  value: &str, type_info: JsonTypeInfo,
                                  err: &mut InvalidOptionsError) {
         assert!(self.0.len() > 0);
 
-        fn recursive_descent<'v>(keys: &[String], object: &'v mut json::value::Value) 
-                                                            -> &'v mut json::value::Value {
-            let next = 
-                match *object {
-                    json::value::Value::Object(ref mut mapping) => {
-                        mapping.entry(keys[0].to_owned()).or_insert(
-                                                    json::value::Value::Object(Default::default())
+        for field in &self.0[..self.0.len()-1] {
+            let tmp = object;
+            object = 
+                match *tmp {
+                    Value::Object(ref mut mapping) => {
+                        mapping.entry(field.to_owned()).or_insert(
+                                                    Value::Object(Default::default())
                                                         )
                     },
                     _ => panic!("We don't expect non-object Values here ...")
                 };
-            if keys.len() > 1 {
-                recursive_descent(&keys[1..], next)
-            } else {
-                next
-            }
         }
 
-        match *recursive_descent(&self.0, object) {
-            json::value::Value::Object(ref mut mapping) => {
+        match *object {
+            Value::Object(ref mut mapping) => {
                 let field = &self.0[self.0.len()-1];
                 let to_jval = 
-                    |jtype: JsonType, err: &mut InvalidOptionsError| 
-                                                                        -> json::value::Value {
+                    |value: &str, jtype: JsonType, err: &mut InvalidOptionsError| 
+                                                                        -> Value {
                         match jtype {
                             JsonType::Boolean => 
-                                    json::value::Value::Bool(arg_from_str(value, err, &field, "boolean")),
+                                    Value::Bool(arg_from_str(value, err, &field, "boolean")),
                             JsonType::Int => 
-                                    json::value::Value::I64(arg_from_str(value, err, &field, "int")),
+                                    Value::I64(arg_from_str(value, err, &field, "int")),
                             JsonType::Uint => 
-                                    json::value::Value::U64(arg_from_str(value, err, &field, "uint")),
+                                    Value::U64(arg_from_str(value, err, &field, "uint")),
                             JsonType::Float => 
-                                    json::value::Value::F64(arg_from_str(value, err, &field, "float")),
+                                    Value::F64(arg_from_str(value, err, &field, "float")),
                             JsonType::String => 
-                                    json::value::Value::String(value.to_owned()),
+                                    Value::String(value.to_owned()),
                         }
                     };
 
                 match type_info.ctype {
                     ComplexType::Pod => {
-                        mapping.entry(field.to_owned()).or_insert(to_jval(type_info.jtype, err));
+                        mapping.entry(field.to_owned()).or_insert(to_jval(value, type_info.jtype, err));
                     },
                     ComplexType::Vec => {
-
+                        match *mapping.entry(field.to_owned())
+                                      .or_insert(Value::Array(Default::default())) {
+                            Value::Array(ref mut values) => values.push(to_jval(value, type_info.jtype, err)),
+                            _ => unreachable!()
+                        }
                     },
                     ComplexType::Map => {
                         let (key, value) = parse_kv_arg(value, err, true);
+                        let jval = to_jval(value.unwrap_or(""), type_info.jtype, err);
+
+                        match *mapping.entry(field.to_owned())
+                                      .or_insert(Value::Object(Default::default())) {
+                            Value::Object(ref mut map) => {
+                                if map.insert(key.to_owned(), jval).is_some() {
+                                    err.issues.push(CLIError::Field(FieldError::Duplicate(self.to_string())));
+                                }
+                            }
+                            _ => unreachable!()
+                        }
                     }
                 }
             },
@@ -495,6 +506,7 @@ pub enum FieldError {
     PopOnEmpty(String),
     TrailingFieldSep(String),
     Unknown(String, Option<String>, Option<String>),
+    Duplicate(String),
     Empty,
 }
 
@@ -521,6 +533,8 @@ impl fmt::Display for FieldError {
                     };
                 writeln!(f, "Field '{}' does not exist.{}", field, suffix)
             },
+            FieldError::Duplicate(ref cursor) 
+                => writeln!(f, "Value at '{}' was already set", cursor),
             FieldError::Empty
                 => writeln!(f, "Field names must not be empty."),
         }
