@@ -122,6 +122,14 @@ impl ToString for  FieldCursor {
     }
 }
 
+impl From<&'static str> for FieldCursor {
+    fn from(value: &'static str) -> FieldCursor {
+        let mut res = FieldCursor::default();
+        res.set(value).unwrap();
+        res
+    }
+}
+
 impl FieldCursor {
     pub fn set(&mut self, value: &str) -> Result<(), CLIError> {
         if value.len() == 0 {
@@ -229,7 +237,8 @@ impl FieldCursor {
 
     pub fn set_json_value(&self, mut object: &mut Value, 
                                  value: &str, type_info: JsonTypeInfo,
-                                 err: &mut InvalidOptionsError) {
+                                 err: &mut InvalidOptionsError, 
+                                 orig_cursor: &FieldCursor) {
         assert!(self.0.len() > 0);
 
         for field in &self.0[..self.0.len()-1] {
@@ -267,7 +276,9 @@ impl FieldCursor {
 
                 match type_info.ctype {
                     ComplexType::Pod => {
-                        mapping.entry(field.to_owned()).or_insert(to_jval(value, type_info.jtype, err));
+                        if mapping.insert(field.to_owned(), to_jval(value, type_info.jtype, err)).is_some() {
+                            err.issues.push(CLIError::Field(FieldError::Duplicate(orig_cursor.to_string())));
+                        }
                     },
                     ComplexType::Vec => {
                         match *mapping.entry(field.to_owned())
@@ -282,9 +293,9 @@ impl FieldCursor {
 
                         match *mapping.entry(field.to_owned())
                                       .or_insert(Value::Object(Default::default())) {
-                            Value::Object(ref mut map) => {
-                                if map.insert(key.to_owned(), jval).is_some() {
-                                    err.issues.push(CLIError::Field(FieldError::Duplicate(self.to_string())));
+                            Value::Object(ref mut value_map) => {
+                                if value_map.insert(key.to_owned(), jval).is_some() {
+                                    err.issues.push(CLIError::Field(FieldError::Duplicate(orig_cursor.to_string())));
                                 }
                             }
                             _ => unreachable!()

@@ -392,11 +392,12 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
     % for schema, fe, f in schema_fields:
 <%
     pname = FIELD_SEP.join(mangle_subcommand(t[1]) for t in f)
+    sname = FIELD_SEP.join(t[1] for t in f)
     ptype = actual_json_type(f[-1][1], fe.actual_property.type)
     jtype = 'JsonType::' + JSON_TYPE_TO_ENUM_MAP[ptype]
     ctype = 'ComplexType::' + CTYPE_TO_ENUM_MAP[fe.container_type]
 %>\
-            "${pname}" => Some(JsonTypeInfo { jtype: ${jtype}, ctype: ${ctype} }),
+            "${pname}" => Some(("${sname}", JsonTypeInfo { jtype: ${jtype}, ctype: ${ctype} })),
             % endfor # each nested field
             _ => {
                 let suggestion = FieldCursor::did_you_mean(key, &${field_vec(sorted(fields))});
@@ -404,8 +405,8 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
                 None
             }
         };
-    if let Some(type_info) = type_info {
-        temp_cursor.set_json_value(&mut object, value.unwrap(), type_info, err);
+    if let Some((field_cursor_str, type_info)) = type_info {
+        FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
     }
 }
 let mut ${request_prop_name}: api::${request_prop_type} = json::value::from_value(object).unwrap();
