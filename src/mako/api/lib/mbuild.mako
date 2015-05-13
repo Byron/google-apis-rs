@@ -618,16 +618,16 @@ else {
         ## Hanlde URI Tempates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-            <%
-                replace_init = ': Option<&str> = None'
-                replace_assign = 'Some(value)'
-                url_replace_arg = 'replace_with.expect("to find substitution value in params")'
-                if URL_ENCODE in special_cases:  
-                    replace_init = ' = String::new()'
-                    replace_assign = 'value.to_string()'
-                    url_replace_arg = '&replace_with'
-                # end handle url encoding
-            %>\
+<%
+    replace_init = ': Option<&str> = None'
+    replace_assign = 'Some(value)'
+    url_replace_arg = 'replace_with.expect("to find substitution value in params")'
+    if URL_ENCODE in special_cases:  
+        replace_init = ' = String::new()'
+        replace_assign = 'value.to_string()'
+        url_replace_arg = '&replace_with'
+    # end handle url encoding
+%>\
             let mut replace_with${replace_init};
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -645,12 +645,9 @@ else {
         ## Remove all used parameters
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(${len(replacements)});
-            for param_name in [${', '.join('"%s"' % r[1] for r in replacements)}].iter() {
-                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
-                    if name == param_name {
-                        indices_for_removal.push(params.len() - index - 1);
-                        break;
-                    }
+            for param_name in [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
                 }
             }
             for &index in indices_for_removal.iter() {
