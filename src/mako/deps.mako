@@ -132,7 +132,12 @@ ${api_clean}:
 % endfor
 % endfor
 
+% if agsuffix not in ["-api", "-cli"]:
 clean-all${agsuffix}: ${space_join(1)} docs-clean${agsuffix}
+% else:
+clean-all${agsuffix}: ${space_join(1)}
+% endif
+
 cargo${agsuffix}: ${space_join(2)}
 publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
