@@ -23,7 +23,7 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = ">= 0.4.0"
+hyper = ">= 0.5.0"
 mime = "*"
 yup-oauth2 = "*"
 % for dep in cargo.get('dependencies', list()):
