@@ -27,9 +27,5 @@ cargo:
   is_executable: YES
   dependencies:
     - strsim = "*"
-    - clap = "*"
-    - |
-      [dependencies.yup-hyper-mock]
-        version = "*"
-        git = "https://github.com/Byron/yup-hyper-mock"
-        rev = "ee56de4dead136b3ca5a3eda6ca7057f9074e261"
+    - yup-hyper-mock = ">=1.0.0"
+    - clap = ">= 0.9.1"
