@@ -30,4 +30,4 @@ cargo:
     - yup-hyper-mock = "*"
     - serde = ">= 0.3.0"
     - serde_macros = "*"
-    - clap = "*"
+    - clap = ">= 0.9.1"

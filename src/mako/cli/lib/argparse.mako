@@ -272,7 +272,8 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
                         (_        , &Some(f)) => f,
                          _                    => unreachable!(),
                  };
-            let mut arg = Arg::with_name(arg_name_str);
+            let mut arg = Arg::with_name(arg_name_str)
+                              .empty_values(false);
             if let &Some(short_flag) = flag {
                 arg = arg.short(short_flag);
             }
