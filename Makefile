@@ -1,4 +1,4 @@
-.PHONY: clean help deps regen-apis license ubuntu-build
+.PHONY: help deps regen-apis license ubuntu-build wheezy-build clean
 .SUFFIXES:
 
 VENV = .virtualenv/virtualenv.py
@@ -86,6 +86,6 @@ wheezy-build:
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
-clean: clean-all-api clean-all-cli
+clean: clean-all-api clean-all-cli docs-all-clean
 	-rm -Rf $(VENV_DIR)
 	-rm $(API_DEPS) $(CLI_DEPS)
