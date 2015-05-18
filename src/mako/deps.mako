@@ -132,12 +132,7 @@ ${api_clean}:
 % endfor
 % endfor
 
-% if agsuffix not in ["-api", "-cli"]:
-clean-all${agsuffix}: ${space_join(1)} docs-clean${agsuffix}
-% else:
 clean-all${agsuffix}: ${space_join(1)}
-% endif
-
 cargo${agsuffix}: ${space_join(2)}
 publish${agsuffix}: | gen-all${agsuffix} ${space_join(4)}
 gen-all${agsuffix}: ${space_join(0)}
@@ -164,6 +159,7 @@ docs${agsuffix}: ${' '.join(central_api_index(util.library_to_crate_name(a[0])) 
 
 help${agsuffix}:
 	$(info gen-all${agsuffix}       -   make all ${make.target_name})
+	$(info docs${agsuffix}          -   make all ${make.target_name} documentation)
 	$(info clean-all${agsuffix}     -   delete all generated ${make.target_name})
 	$(info cargo${agsuffix}         -   run cargo on all ${make.target_name}, use ARGS="args ..." to specify cargo arguments)
 	$(info publish${agsuffix}       -   run cargo publish on all ${make.target_name} and remember successful ones with marker files)
