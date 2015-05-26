@@ -46,6 +46,8 @@ To generate the APIs yourself, you will need to meet the following prerequisites
  * As [*mako*][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
 * **an internet connection and wget**
  * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
+* **Rust beta/nightly**
+ * Due to the reliance on unstable dependencies, a beta or nightly build of the Rust toolchain is required. [Multirust][multirust] is recommended to support multiple toolchains on a per-project basis.
 
 ## Using Make
 
@@ -230,3 +232,4 @@ The license of everything not explicitly under a different license are licensed 
 [playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
 [playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
 [milestones]: https://github.com/Byron/google-apis-rs/milestones
+[multirust]: https://github.com/brson/multirust
