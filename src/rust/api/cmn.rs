@@ -288,7 +288,7 @@ impl Display for Error {
                 writeln!(f, "The media size {} exceeds the maximum allowed upload size of {}"
                          , resource_size, max_size),
             Error::MissingAPIKey => {
-                writeln!(f, "The application's API key was not found in the configuration").ok();
+                (writeln!(f, "The application's API key was not found in the configuration")).ok();
                 writeln!(f, "It is used as there are no Scopes defined for this method.")
             },
             Error::BadRequest(ref err) => {
@@ -422,8 +422,8 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
-                                               headers, LINE_ENDING).unwrap();
+                (write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING, 
+                                                headers, LINE_ENDING)).unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
                 self.current_part = Some((c, reader));
             }
@@ -492,7 +492,7 @@ pub struct Chunk {
 
 impl fmt::Display for Chunk {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{}-{}", self.first, self.last).ok();
+        (write!(fmt, "{}-{}", self.first, self.last)).ok();
         Ok(())
     }
 }
@@ -547,7 +547,7 @@ impl HeaderFormat for ContentRange {
             Some(ref c) => try!(c.fmt(fmt)),
             None => try!(fmt.write_str("*"))
         }
-        write!(fmt, "/{}", self.total_length).ok();
+        (write!(fmt, "/{}", self.total_length)).ok();
         Ok(())
     }
 }
@@ -699,5 +699,29 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 }
             }
         }
+    }
+}
+
+use serde::json::value::Value;
+// Copy of src/rust/cli/cmn.rs
+// TODO(ST): Allow sharing common code between program types
+pub fn remove_json_null_values(value: &mut Value) {
+    match *value {
+        Value::Object(ref mut map) => {
+            let mut for_removal = Vec::new();
+
+            for (key, mut value) in map.iter_mut() {
+                if value.is_null() {
+                    for_removal.push(key.clone());
+                } else {
+                    remove_json_null_values(&mut value);
+                }
+            }
+
+            for key in &for_removal {
+                map.remove(key);
+            }
+        }
+        _ => {}
     }
 }

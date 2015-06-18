@@ -16,6 +16,7 @@ homepage = "${documentationLink}"
 documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
+build = "src/build.rs"
 
 % if cargo.get('is_executable', False):
 [[bin]]
@@ -26,16 +27,14 @@ name = "${util.program_name()}"
 hyper = ">= 0.5.0"
 mime = "*"
 serde = ">= 0.3.0"
-serde_macros = "*"
+yup-oauth2 = "*"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
 
-# to adapt to hyper changes ... 
-[dependencies.yup-oauth2]
-version = "*"
-git = "https://github.com/Byron/yup-oauth2"
-rev = "598f5ed496077e9edca36ff95e2ab352c5b22d0f"
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
 
 % if make.depends_on_suffix is not None:
 
