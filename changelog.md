@@ -1,3 +1,12 @@
+<a name="cli-v0.3.0:cli-v0.1.7"></a>
+## cli-v0.3.0:cli-v0.1.7 (2015-06-19)
+
+This release allows both API and CLI to be built on stable (verified with 
+*rustc 1.0.0 (a59de37e9 2015-05-13) (built 2015-05-14)*).
+
+The CLI additionally builds against the latest [clap-rs][clap], which 
+brings color support next to other improvements.
+
 <a name="cli-v0.2.0"></a>
 
 ## cli-v0.2.0 (2015-05-10)
