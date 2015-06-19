@@ -595,8 +595,8 @@ impl Header for RangeResponseHeader {
 
     fn parse_header(raw: &[Vec<u8>]) -> Option<Self> {
         if raw.len() > 0 {
-            let v = raw[0];
-            if let Ok(s) = std::str::from_utf8(&v) {
+            let v = &raw[0];
+            if let Ok(s) = std::str::from_utf8(v) {
                 const PREFIX: &'static str = "bytes ";
                 if s.starts_with(PREFIX) {
                     if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
