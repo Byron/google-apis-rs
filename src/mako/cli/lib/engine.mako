@@ -387,7 +387,9 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
         continue;
     }
    
-    let type_info = 
+    ## This type-annotation is not required in nightly (or newer rustc)
+    ## TODO(ST): try to remove it once there is a newer stable
+    let type_info: Option<(&'static str, JsonTypeInfo)> = 
         match &temp_cursor.to_string()[..] {
     % for schema, fe, f in schema_fields:
 <%
