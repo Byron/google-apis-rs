@@ -55,15 +55,13 @@ ${struct};
     markers = schema_markers(s, c, transitive=True)
     # We always need Serialization support, as others might want to serialize the response, even though we will 
     # only deserialize it.
-    traits = ['Clone', 'Debug', 'Serialize']
+    # And since we don't know what others want to do, we implement Deserialize as well by default ... 
+    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
         traits.insert(0, 'Default')
     
-    if RESPONSE_MARKER_TRAIT in markers:
-        traits.append('Deserialize')
-
     nt_markers = schema_markers(s, c, transitive=False)
     allow_optionals = is_schema_with_optionals(nt_markers)
     

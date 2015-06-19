@@ -18,13 +18,15 @@ make:
     - source: README.md
     - source: ../LICENSE.md
     - source: ../Cargo.toml
+    - source: lib.rs.in
+      output_dir: src
     - source: lib.rs
       output_dir: src
+    - source: build.rs
+      output_dir: src
 cargo:
-  build_version: "0.1.7"
+  build_version: "0.1.8"
+  build_script: src/build.rs
   keywords: [protocol, web, api]
   dependencies:
     - url = "*"
-    - serde = ">= 0.3.0"
-    - serde_macros = "*"
-    - json-tools = ">= 0.3.0"

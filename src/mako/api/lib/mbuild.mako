@@ -483,9 +483,6 @@ match result {
         % if URL_ENCODE in special_cases:
         use url::percent_encoding::{percent_encode, FORM_URLENCODED_ENCODE_SET};
         % endif
-        % if request_value:
-        use json_tools::{TokenReader, Lexer, BufferType, TokenType, FilterTypedKeyValuePairs, IteratorExt};
-        % endif
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -618,16 +615,16 @@ else {
         ## Hanlde URI Tempates
         % if replacements:
         for &(find_this, param_name) in [${', '.join('("%s", "%s")' % r for r in replacements)}].iter() {
-            <%
-                replace_init = ': Option<&str> = None'
-                replace_assign = 'Some(value)'
-                url_replace_arg = 'replace_with.expect("to find substitution value in params")'
-                if URL_ENCODE in special_cases:  
-                    replace_init = ' = String::new()'
-                    replace_assign = 'value.to_string()'
-                    url_replace_arg = '&replace_with'
-                # end handle url encoding
-            %>\
+<%
+    replace_init = ': Option<&str> = None'
+    replace_assign = 'Some(value)'
+    url_replace_arg = 'replace_with.expect("to find substitution value in params")'
+    if URL_ENCODE in special_cases:  
+        replace_init = ' = String::new()'
+        replace_assign = 'value.to_string()'
+        url_replace_arg = '&replace_with'
+    # end handle url encoding
+%>\
             let mut replace_with${replace_init};
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -645,12 +642,9 @@ else {
         ## Remove all used parameters
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(${len(replacements)});
-            for param_name in [${', '.join('"%s"' % r[1] for r in replacements)}].iter() {
-                for (index, &(ref name, _)) in params.iter().rev().enumerate() {
-                    if name == param_name {
-                        indices_for_removal.push(params.len() - index - 1);
-                        break;
-                    }
+            for param_name in [${', '.join(reversed(['"%s"' % r[1] for r in replacements]))}].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
                 }
             }
             for &index in indices_for_removal.iter() {
@@ -668,13 +662,11 @@ else {
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader = 
             {
-                let json_cache = json::to_string(&self.${property(REQUEST_VALUE_PROPERTY_NAME)}).unwrap();
-                let mut mem_dst = io::Cursor::new(Vec::with_capacity(json_cache.len()));
-                io::copy(&mut Lexer::new(json_cache.bytes(), BufferType::Span)
-                                        .filter_key_value_by_type(TokenType::Null)
-                                        .reader(Some(&json_cache)), &mut mem_dst).unwrap();
-                mem_dst.seek(io::SeekFrom::Start(0)).unwrap();
-                mem_dst
+                let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)});
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
             };
         let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
         request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();

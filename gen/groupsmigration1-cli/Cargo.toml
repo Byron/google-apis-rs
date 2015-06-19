@@ -17,14 +17,30 @@ keywords = ["groupsmigration", "google", "cli"]
 name = "groupsmigration1"
 
 [dependencies]
-hyper = ">= 0.4.0"
 mime = "*"
-yup-oauth2 = "*"
-strsim = "*"
-yup-hyper-mock = "*"
+
 serde = ">= 0.3.0"
 serde_macros = "*"
+strsim = "*"
 clap = "*"
+[dependencies.yup-hyper-mock]
+  version = "*"
+  git = "https://github.com/Byron/yup-hyper-mock"
+  rev = "ee56de4dead136b3ca5a3eda6ca7057f9074e261"
+
+
+# Needed for latest fix in macros !
+[dependencies.hyper]
+version = ">= 0.4.0"
+git = "https://github.com/hyperium/hyper"
+rev = "871f37a5605d433e5699ed2f16631001d86d7805"
+
+# to adapt to hyper changes ... 
+[dependencies.yup-oauth2]
+version = "*"
+git = "https://github.com/Byron/yup-oauth2"
+rev = "94d5b7c2cac02ad67da8504504364b3081a9a866"
+
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"

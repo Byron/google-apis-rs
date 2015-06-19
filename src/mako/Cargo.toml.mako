@@ -16,6 +16,9 @@ homepage = "${documentationLink}"
 documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
+% if cargo.get('build_script'):
+build = "${cargo.build_script}"
+% endif
 
 % if cargo.get('is_executable', False):
 [[bin]]
@@ -23,12 +26,19 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = ">= 0.5.0"
-mime = "*"
+hyper = ">= 0.5.2"
+## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 % if make.depends_on_suffix is not None:
 
 <% api_name = util.library_name() %>\
