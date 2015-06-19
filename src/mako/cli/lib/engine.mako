@@ -323,7 +323,7 @@ if dry_run {
             % if mc.response_schema:
             let mut value = json::value::to_value(&output_schema);
             remove_json_null_values(&mut value);
-            serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+            json::to_writer_pretty(&mut ostream, &value).unwrap();
             % endif
             % if track_download_flag:
             } else {
