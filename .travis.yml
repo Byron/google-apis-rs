@@ -1,4 +1,6 @@
 language: rust
+rust:
+- stable
 script:
   - make docs-all gen-all-cli cargo-api ARGS=test
 env:
