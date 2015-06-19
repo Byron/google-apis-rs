@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec![]);
@@ -298,7 +298,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "storage-data-location" => Some(("storageDataLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "model-type" => Some(("modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -446,7 +446,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec![]);
@@ -530,7 +530,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "output" => Some(("output", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {

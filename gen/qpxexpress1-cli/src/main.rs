@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "request.refundable" => Some(("request.refundable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "request.passengers.kind" => Some(("request.passengers.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

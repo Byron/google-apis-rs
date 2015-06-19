@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec![]);
@@ -149,7 +149,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "time" => Some(("time", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {

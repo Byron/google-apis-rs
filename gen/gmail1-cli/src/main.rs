@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -325,7 +325,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -427,7 +427,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -645,7 +645,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -887,7 +887,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -980,7 +980,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1228,7 +1228,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1341,7 +1341,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1515,7 +1515,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "remove-label-ids" => Some(("removeLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "add-label-ids" => Some(("addLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1601,7 +1601,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1976,7 +1976,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "remove-label-ids" => Some(("removeLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "add-label-ids" => Some(("addLabelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),

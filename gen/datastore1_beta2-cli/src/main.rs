@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec![]);
@@ -149,7 +149,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "isolation-level" => Some(("isolationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -234,7 +234,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "ignore-read-only" => Some(("ignoreReadOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -322,7 +322,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -408,7 +408,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -493,7 +493,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "query.filter.composite-filter.operator" => Some(("query.filter.compositeFilter.operator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.operator" => Some(("query.filter.propertyFilter.operator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

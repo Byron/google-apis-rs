@@ -162,7 +162,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -322,7 +322,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -424,7 +424,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "achievement-type" => Some(("achievementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "steps-to-unlock" => Some(("stepsToUnlock", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -679,7 +679,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -853,7 +853,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -969,7 +969,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "score-order" => Some(("scoreOrder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

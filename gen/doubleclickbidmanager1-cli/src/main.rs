@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ids" => Some(("filterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -149,7 +149,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "line-items" => Some(("lineItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dry-run" => Some(("dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -233,7 +233,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule.end-time-ms" => Some(("schedule.endTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -478,7 +478,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "report-data-end-time-ms" => Some(("reportDataEndTimeMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timezone-code" => Some(("timezoneCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

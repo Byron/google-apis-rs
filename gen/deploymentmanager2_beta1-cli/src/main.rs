@@ -169,7 +169,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "target-config" => Some(("targetConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "manifest" => Some(("manifest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

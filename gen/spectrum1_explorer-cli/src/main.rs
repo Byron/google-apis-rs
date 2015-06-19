@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -198,7 +198,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -325,7 +325,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -424,7 +424,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -523,7 +523,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -645,7 +645,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

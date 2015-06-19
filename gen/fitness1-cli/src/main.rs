@@ -65,7 +65,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -272,7 +272,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "min-start-time-ns" => Some(("minStartTimeNs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-page-token" => Some(("nextPageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -522,7 +522,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -620,7 +620,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-stream-name" => Some(("dataStreamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -830,7 +830,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "modified-time-millis" => Some(("modifiedTimeMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end-time-millis" => Some(("endTimeMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),

@@ -388,7 +388,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 continue;
             }
            
-            let type_info = 
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "link-type" => Some(("linkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-date" => Some(("startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
