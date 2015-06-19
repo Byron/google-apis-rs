@@ -24,9 +24,9 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = ">= 0.5.0"
+hyper = ">= 0.5.2"
 mime = "*"
-serde = ">= 0.3.0"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 % for dep in cargo.get('dependencies', list()):
 ${dep}

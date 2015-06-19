@@ -19,7 +19,6 @@
 <%util:gen_info source="${self.uri}" />\
 </%block>
 
-#[macro_use]
 extern crate hyper;
 extern crate serde;
 extern crate yup_oauth2 as oauth2;
