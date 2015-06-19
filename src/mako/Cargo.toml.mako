@@ -16,7 +16,9 @@ homepage = "${documentationLink}"
 documentation = "${cargo.doc_base_url}/${to_extern_crate_name(util.crate_name())}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
-build = "src/build.rs"
+% if cargo.get('build_script'):
+build = "${cargo.build_script}"
+% endif
 
 % if cargo.get('is_executable', False):
 [[bin]]

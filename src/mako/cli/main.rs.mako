@@ -12,7 +12,6 @@
 <%block filter="rust_comment">\
 <%util:gen_info source="${self.uri}" />\
 </%block>
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -34,18 +33,19 @@ mod cmn;
 ${engine.new(c)}\
 
 fn main() {
+    let mut exit_status = 0i32;
     ${argparse.new(c) | indent_all_but_first_by(1)}\
     let matches = app.get_matches();
 
     let debug = matches.is_present("${DEBUG_FLAG}");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -61,4 +61,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

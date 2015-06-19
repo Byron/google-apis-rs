@@ -26,6 +26,7 @@ make:
       output_dir: src
 cargo:
   build_version: "0.1.7"
+  build_script: src/build.rs
   keywords: [protocol, web, api]
   dependencies:
     - url = "*"
