@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -98,8 +99,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _groups_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Groups::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -114,97 +116,48 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "allow-external-members" => {
-                        request.allow_external_members = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-post-message" => {
-                        request.who_can_post_message = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-language" => {
-                        request.primary_language = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-view-membership" => {
-                        request.who_can_view_membership = Some(value.unwrap_or("").to_string());
-                    },
-                "default-message-deny-notification-text" => {
-                        request.default_message_deny_notification_text = Some(value.unwrap_or("").to_string());
-                    },
-                "include-in-global-address-list" => {
-                        request.include_in_global_address_list = Some(value.unwrap_or("").to_string());
-                    },
-                "archive-only" => {
-                        request.archive_only = Some(value.unwrap_or("").to_string());
-                    },
-                "is-archived" => {
-                        request.is_archived = Some(value.unwrap_or("").to_string());
-                    },
-                "members-can-post-as-the-group" => {
-                        request.members_can_post_as_the_group = Some(value.unwrap_or("").to_string());
-                    },
-                "allow-web-posting" => {
-                        request.allow_web_posting = Some(value.unwrap_or("").to_string());
-                    },
-                "email" => {
-                        request.email = Some(value.unwrap_or("").to_string());
-                    },
-                "message-moderation-level" => {
-                        request.message_moderation_level = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "reply-to" => {
-                        request.reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-reply-to" => {
-                        request.custom_reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "send-message-deny-notification" => {
-                        request.send_message_deny_notification = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-contact-owner" => {
-                        request.who_can_contact_owner = Some(value.unwrap_or("").to_string());
-                    },
-                "message-display-font" => {
-                        request.message_display_font = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-leave-group" => {
-                        request.who_can_leave_group = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-join" => {
-                        request.who_can_join = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-invite" => {
-                        request.who_can_invite = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "spam-moderation-level" => {
-                        request.spam_moderation_level = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-view-group" => {
-                        request.who_can_view_group = Some(value.unwrap_or("").to_string());
-                    },
-                "show-in-group-directory" => {
-                        request.show_in_group_directory = Some(value.unwrap_or("").to_string());
-                    },
-                "max-message-bytes" => {
-                        request.max_message_bytes = Some(arg_from_str(value.unwrap_or("-0"), err, "max-message-bytes", "integer"));
-                    },
-                "allow-google-communication" => {
-                        request.allow_google_communication = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "allow-external-members" => Some(("allowExternalMembers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-post-message" => Some(("whoCanPostMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-language" => Some(("primaryLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-view-membership" => Some(("whoCanViewMembership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-message-deny-notification-text" => Some(("defaultMessageDenyNotificationText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-in-global-address-list" => Some(("includeInGlobalAddressList", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "archive-only" => Some(("archiveOnly", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-archived" => Some(("isArchived", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "members-can-post-as-the-group" => Some(("membersCanPostAsTheGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "allow-web-posting" => Some(("allowWebPosting", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-moderation-level" => Some(("messageModerationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reply-to" => Some(("replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-reply-to" => Some(("customReplyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "send-message-deny-notification" => Some(("sendMessageDenyNotification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-contact-owner" => Some(("whoCanContactOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-display-font" => Some(("messageDisplayFont", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-leave-group" => Some(("whoCanLeaveGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-join" => Some(("whoCanJoin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-invite" => Some(("whoCanInvite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spam-moderation-level" => Some(("spamModerationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-view-group" => Some(("whoCanViewGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "show-in-group-directory" => Some(("showInGroupDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-message-bytes" => Some(("maxMessageBytes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "allow-google-communication" => Some(("allowGoogleCommunication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Groups = json::value::from_value(object).unwrap();
         let mut call = self.hub.groups().patch(request, opt.value_of("group-unique-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -219,9 +172,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -246,7 +201,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -256,8 +211,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _groups_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Groups::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -272,97 +228,48 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "allow-external-members" => {
-                        request.allow_external_members = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-post-message" => {
-                        request.who_can_post_message = Some(value.unwrap_or("").to_string());
-                    },
-                "primary-language" => {
-                        request.primary_language = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-view-membership" => {
-                        request.who_can_view_membership = Some(value.unwrap_or("").to_string());
-                    },
-                "default-message-deny-notification-text" => {
-                        request.default_message_deny_notification_text = Some(value.unwrap_or("").to_string());
-                    },
-                "include-in-global-address-list" => {
-                        request.include_in_global_address_list = Some(value.unwrap_or("").to_string());
-                    },
-                "archive-only" => {
-                        request.archive_only = Some(value.unwrap_or("").to_string());
-                    },
-                "is-archived" => {
-                        request.is_archived = Some(value.unwrap_or("").to_string());
-                    },
-                "members-can-post-as-the-group" => {
-                        request.members_can_post_as_the_group = Some(value.unwrap_or("").to_string());
-                    },
-                "allow-web-posting" => {
-                        request.allow_web_posting = Some(value.unwrap_or("").to_string());
-                    },
-                "email" => {
-                        request.email = Some(value.unwrap_or("").to_string());
-                    },
-                "message-moderation-level" => {
-                        request.message_moderation_level = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "reply-to" => {
-                        request.reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-reply-to" => {
-                        request.custom_reply_to = Some(value.unwrap_or("").to_string());
-                    },
-                "send-message-deny-notification" => {
-                        request.send_message_deny_notification = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-contact-owner" => {
-                        request.who_can_contact_owner = Some(value.unwrap_or("").to_string());
-                    },
-                "message-display-font" => {
-                        request.message_display_font = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-leave-group" => {
-                        request.who_can_leave_group = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-join" => {
-                        request.who_can_join = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-invite" => {
-                        request.who_can_invite = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "spam-moderation-level" => {
-                        request.spam_moderation_level = Some(value.unwrap_or("").to_string());
-                    },
-                "who-can-view-group" => {
-                        request.who_can_view_group = Some(value.unwrap_or("").to_string());
-                    },
-                "show-in-group-directory" => {
-                        request.show_in_group_directory = Some(value.unwrap_or("").to_string());
-                    },
-                "max-message-bytes" => {
-                        request.max_message_bytes = Some(arg_from_str(value.unwrap_or("-0"), err, "max-message-bytes", "integer"));
-                    },
-                "allow-google-communication" => {
-                        request.allow_google_communication = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "allow-external-members" => Some(("allowExternalMembers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-post-message" => Some(("whoCanPostMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "primary-language" => Some(("primaryLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-view-membership" => Some(("whoCanViewMembership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-message-deny-notification-text" => Some(("defaultMessageDenyNotificationText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-in-global-address-list" => Some(("includeInGlobalAddressList", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "archive-only" => Some(("archiveOnly", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-archived" => Some(("isArchived", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "members-can-post-as-the-group" => Some(("membersCanPostAsTheGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "allow-web-posting" => Some(("allowWebPosting", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-moderation-level" => Some(("messageModerationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reply-to" => Some(("replyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-reply-to" => Some(("customReplyTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "send-message-deny-notification" => Some(("sendMessageDenyNotification", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-contact-owner" => Some(("whoCanContactOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-display-font" => Some(("messageDisplayFont", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-leave-group" => Some(("whoCanLeaveGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-join" => Some(("whoCanJoin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-invite" => Some(("whoCanInvite", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "spam-moderation-level" => Some(("spamModerationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "who-can-view-group" => Some(("whoCanViewGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "show-in-group-directory" => Some(("showInGroupDirectory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-message-bytes" => Some(("maxMessageBytes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "allow-google-communication" => Some(("allowGoogleCommunication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-external-members", "allow-google-communication", "allow-web-posting", "archive-only", "custom-reply-to", "default-message-deny-notification-text", "description", "email", "include-in-global-address-list", "is-archived", "kind", "max-message-bytes", "members-can-post-as-the-group", "message-display-font", "message-moderation-level", "name", "primary-language", "reply-to", "send-message-deny-notification", "show-in-group-directory", "spam-moderation-level", "who-can-contact-owner", "who-can-invite", "who-can-join", "who-can-leave-group", "who-can-post-message", "who-can-view-group", "who-can-view-membership"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Groups = json::value::from_value(object).unwrap();
         let mut call = self.hub.groups().update(request, opt.value_of("group-unique-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -377,9 +284,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -404,7 +313,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -513,6 +422,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("groups", "methods: 'get', 'patch' and 'update'", vec![
             ("get",  
@@ -599,7 +509,7 @@ fn main() {
     
     let mut app = App::new("groupssettings1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20140428")
+           .version("0.3.0+20140428")
            .about("Lets you manage permission levels and related settings of a group.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupssettings1_cli")
            .arg(Arg::with_name("url")
@@ -640,7 +550,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -668,12 +579,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -689,4 +600,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

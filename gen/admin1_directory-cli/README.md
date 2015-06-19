@@ -13,9 +13,18 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 Everything else about the *directory* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/directory/).
 
+# Downloads
+
+You can download the pre-compiled 64bit binaries for the following platforms:
+
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.0/ubuntu/admin1-directory.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.0/osx/admin1-directory.tar.gz)
+
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory-cli).
+
 # Usage
 
-This documentation was generated from the *directory* API at revision *20150314*. The CLI is at version *0.2.0*.
+This documentation was generated from the *directory* API at revision *20150314*. The CLI is at version *0.3.0*.
 
 ```bash
 admin1-directory [options]

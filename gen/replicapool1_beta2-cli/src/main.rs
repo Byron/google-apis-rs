@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_abandon_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManagersAbandonInstancesRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,19 +64,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "instances" => {
-                        if request.instances.is_none() {
-                           request.instances = Some(Default::default());
-                        }
-                                        request.instances.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManagersAbandonInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().abandon_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -91,9 +93,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -118,7 +122,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -141,9 +145,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -168,7 +174,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -178,8 +184,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_delete_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManagersDeleteInstancesRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -194,19 +201,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "instances" => {
-                        if request.instances.is_none() {
-                           request.instances = Some(Default::default());
-                        }
-                                        request.instances.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManagersDeleteInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().delete_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -221,9 +230,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -248,7 +259,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -271,9 +282,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -298,7 +311,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -308,8 +321,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManager::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -324,55 +338,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "target-size" => {
-                        request.target_size = Some(arg_from_str(value.unwrap_or("-0"), err, "target-size", "integer"));
-                    },
-                "group" => {
-                        request.group = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "target-pools" => {
-                        if request.target_pools.is_none() {
-                           request.target_pools = Some(Default::default());
-                        }
-                                        request.target_pools.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "base-instance-name" => {
-                        request.base_instance_name = Some(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "instance-template" => {
-                        request.instance_template = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-timestamp" => {
-                        request.creation_timestamp = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "current-size" => {
-                        request.current_size = Some(arg_from_str(value.unwrap_or("-0"), err, "current-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["base-instance-name", "creation-timestamp", "current-size", "description", "fingerprint", "group", "id", "instance-template", "kind", "name", "self-link", "target-pools", "target-size"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "target-size" => Some(("targetSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "group" => Some(("group", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-pools" => Some(("targetPools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-instance-name" => Some(("baseInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-template" => Some(("instanceTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-size" => Some(("currentSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-instance-name", "creation-timestamp", "current-size", "description", "fingerprint", "group", "id", "instance-template", "kind", "name", "self-link", "target-pools", "target-size"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManager = json::value::from_value(object).unwrap();
         let size: i32 = arg_from_str(&opt.value_of("size").unwrap_or(""), err, "<size>", "integer");
         let mut call = self.hub.instance_group_managers().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), size);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
@@ -388,9 +380,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -415,7 +409,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -447,9 +441,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["filter", "page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -474,7 +470,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -484,8 +480,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_recreate_instances(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManagersRecreateInstancesRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -500,19 +497,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "instances" => {
-                        if request.instances.is_none() {
-                           request.instances = Some(Default::default());
-                        }
-                                        request.instances.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "instances" => Some(("instances", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instances"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManagersRecreateInstancesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().recreate_instances(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -527,9 +526,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -554,7 +555,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -578,9 +579,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -605,7 +608,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -615,8 +618,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_set_instance_template(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManagersSetInstanceTemplateRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -631,16 +635,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "instance-template" => {
-                        request.instance_template = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-template"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "instance-template" => Some(("instanceTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-template"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManagersSetInstanceTemplateRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().set_instance_template(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -655,9 +664,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -682,7 +693,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -692,8 +703,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instance_group_managers_set_target_pools(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstanceGroupManagersSetTargetPoolsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -708,22 +720,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "target-pools" => {
-                        if request.target_pools.is_none() {
-                           request.target_pools = Some(Default::default());
-                        }
-                                        request.target_pools.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "fingerprint" => {
-                        request.fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["fingerprint", "target-pools"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "target-pools" => Some(("targetPools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["fingerprint", "target-pools"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstanceGroupManagersSetTargetPoolsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instance_group_managers().set_target_pools(request, opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""), opt.value_of("instance-group-manager").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -738,9 +750,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -765,7 +779,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -788,9 +802,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -815,7 +831,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -847,9 +863,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["filter", "page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -874,7 +892,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1018,6 +1036,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("instance-group-managers", "methods: 'abandon-instances', 'delete', 'delete-instances', 'get', 'insert', 'list', 'recreate-instances', 'resize', 'set-instance-template' and 'set-target-pools'", vec![
             ("abandon-instances",  
@@ -1467,7 +1486,7 @@ fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150223")
+           .version("0.3.0+20150223")
            .about("The Google Compute Engine Instance Group Manager API provides groups of homogenous Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -1508,7 +1527,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1536,12 +1556,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1557,4 +1577,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

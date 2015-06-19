@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -111,9 +112,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -138,7 +141,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -148,8 +151,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _projects_zones_clusters_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CreateClusterRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -164,113 +168,40 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_cluster_init(request: &mut api::CreateClusterRequest) {
-                if request.cluster.is_none() {
-                    request.cluster = Some(Default::default());
-                }
-            }
-            
-            fn request_cluster_master_auth_init(request: &mut api::CreateClusterRequest) {
-                request_cluster_init(request);
-                if request.cluster.as_mut().unwrap().master_auth.is_none() {
-                    request.cluster.as_mut().unwrap().master_auth = Some(Default::default());
-                }
-            }
-            
-            fn request_cluster_node_config_init(request: &mut api::CreateClusterRequest) {
-                request_cluster_init(request);
-                if request.cluster.as_mut().unwrap().node_config.is_none() {
-                    request.cluster.as_mut().unwrap().node_config = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "cluster.status" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().status = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.container-ipv4-cidr" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().container_ipv4_cidr = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.description" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.zone" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().zone = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.num-nodes" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().num_nodes = Some(arg_from_str(value.unwrap_or("-0"), err, "cluster.num-nodes", "integer"));
-                    },
-                "cluster.node-routing-prefix-size" => {
-                        request_cluster_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_routing_prefix_size = Some(arg_from_str(value.unwrap_or("-0"), err, "cluster.node-routing-prefix-size", "integer"));
-                    },
-                "cluster.master-auth.bearer-token" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().bearer_token = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.master-auth.password" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.master-auth.user" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().master_auth.as_mut().unwrap().user = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.cluster-api-version" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().cluster_api_version = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.network" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().network = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.endpoint" => {
-                        request_cluster_master_auth_init(&mut request);
-                        request.cluster.as_mut().unwrap().endpoint = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.node-config.machine-type" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_config.as_mut().unwrap().machine_type = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.node-config.source-image" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().node_config.as_mut().unwrap().source_image = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.status-message" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().status_message = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.services-ipv4-cidr" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().services_ipv4_cidr = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.creation-timestamp" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().creation_timestamp = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.enable-cloud-logging" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().enable_cloud_logging = Some(arg_from_str(value.unwrap_or("false"), err, "cluster.enable-cloud-logging", "boolean"));
-                    },
-                "cluster.self-link" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "cluster.name" => {
-                        request_cluster_node_config_init(&mut request);
-                        request.cluster.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["bearer-token", "cluster", "cluster-api-version", "container-ipv4-cidr", "creation-timestamp", "description", "enable-cloud-logging", "endpoint", "machine-type", "master-auth", "name", "network", "node-config", "node-routing-prefix-size", "num-nodes", "password", "self-link", "services-ipv4-cidr", "source-image", "status", "status-message", "user", "zone"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "cluster.status" => Some(("cluster.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.container-ipv4-cidr" => Some(("cluster.containerIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.description" => Some(("cluster.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.num-nodes" => Some(("cluster.numNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.node-routing-prefix-size" => Some(("cluster.nodeRoutingPrefixSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.bearer-token" => Some(("cluster.masterAuth.bearerToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.user" => Some(("cluster.masterAuth.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.cluster-api-version" => Some(("cluster.clusterApiVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.node-config.source-image" => Some(("cluster.nodeConfig.sourceImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.creation-timestamp" => Some(("cluster.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.enable-cloud-logging" => Some(("cluster.enableCloudLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bearer-token", "cluster", "cluster-api-version", "container-ipv4-cidr", "creation-timestamp", "description", "enable-cloud-logging", "endpoint", "machine-type", "master-auth", "name", "network", "node-config", "node-routing-prefix-size", "num-nodes", "password", "self-link", "services-ipv4-cidr", "source-image", "status", "status-message", "user", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CreateClusterRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().zones_clusters_create(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("zone-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -285,9 +216,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -312,7 +245,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -335,9 +268,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -362,7 +297,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -385,9 +320,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -412,7 +349,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -435,9 +372,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -462,7 +401,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -485,9 +424,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -512,7 +453,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -535,9 +476,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -562,7 +505,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -585,9 +528,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -609,7 +554,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -736,6 +681,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("projects", "methods: 'clusters-list', 'operations-list', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-list', 'zones-operations-get', 'zones-operations-list' and 'zones-tokens-get'", vec![
             ("clusters-list",  
@@ -1029,7 +975,7 @@ fn main() {
     
     let mut app = App::new("container1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150420")
+           .version("0.3.0+20150420")
            .about("The Google Container Engine API is used for building and managing container based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_beta1_cli")
            .arg(Arg::with_name("url")
@@ -1070,7 +1016,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1098,12 +1045,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1119,4 +1066,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

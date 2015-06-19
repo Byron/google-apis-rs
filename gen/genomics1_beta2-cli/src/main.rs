@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotation_sets_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AnnotationSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,31 +64,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "source-uri" => {
-                        request.source_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-uri" => Some(("sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AnnotationSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotation_sets().create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -103,9 +98,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -130,7 +127,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -153,9 +150,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -196,9 +195,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -223,7 +224,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -233,8 +234,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotation_sets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AnnotationSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -249,31 +251,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "source-uri" => {
-                        request.source_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-uri" => Some(("sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AnnotationSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotation_sets().patch(request, opt.value_of("annotation-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -288,9 +285,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -315,7 +314,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -325,8 +324,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotation_sets_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchAnnotationSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -341,37 +341,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                "dataset-ids" => {
-                        if request.dataset_ids.is_none() {
-                           request.dataset_ids = Some(Default::default());
-                        }
-                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "types" => {
-                        if request.types.is_none() {
-                           request.types = Some(Default::default());
-                        }
-                                        request.types.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token", "reference-set-id", "types"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "types" => Some(("types", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token", "reference-set-id", "types"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchAnnotationSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotation_sets().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -386,9 +375,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -413,7 +404,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -423,8 +414,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotation_sets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AnnotationSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -439,31 +431,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "source-uri" => {
-                        request.source_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-uri" => Some(("sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id", "name", "reference-set-id", "source-uri", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AnnotationSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotation_sets().update(request, opt.value_of("annotation-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -478,9 +465,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -505,7 +494,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -515,8 +504,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotations_batch_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::BatchCreateAnnotationsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -531,13 +521,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::BatchCreateAnnotationsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotations().batch_create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -552,9 +549,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -579,7 +578,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -589,8 +588,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotations_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Annotation::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -605,112 +605,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_position_init(request: &mut api::Annotation) {
-                if request.position.is_none() {
-                    request.position = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
-                request_transcript_init(request);
-                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
-                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_init(request: &mut api::Annotation) {
-                if request.transcript.is_none() {
-                    request.transcript = Some(Default::default());
-                }
-            }
-            
-            fn request_variant_init(request: &mut api::Annotation) {
-                if request.variant.is_none() {
-                    request.variant = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.start" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.end" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.gene-id" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.effect" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.transcript-ids" => {
-                        request_variant_init(&mut request);
-                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
-                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
-                        }
-                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "variant.alternate-bases" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.clinical-significance" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.type" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.gene-id" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "annotation-set-id" => {
-                        request_variant_init(&mut request);
-                        request.annotation_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.start" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reference-id" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.end" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reverse-strand" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
-                    },
-                "position.reference-name" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_position_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_position_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.clinical-significance" => Some(("variant.clinicalSignificance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.type" => Some(("variant.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.gene-id" => Some(("variant.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.start" => Some(("position.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reference-id" => Some(("position.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.end" => Some(("position.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reverse-strand" => Some(("position.reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "position.reference-name" => Some(("position.referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Annotation = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotations().create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -725,9 +651,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -752,7 +680,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -775,9 +703,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -818,9 +748,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -845,7 +777,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -855,8 +787,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotations_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Annotation::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -871,112 +804,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_position_init(request: &mut api::Annotation) {
-                if request.position.is_none() {
-                    request.position = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
-                request_transcript_init(request);
-                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
-                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_init(request: &mut api::Annotation) {
-                if request.transcript.is_none() {
-                    request.transcript = Some(Default::default());
-                }
-            }
-            
-            fn request_variant_init(request: &mut api::Annotation) {
-                if request.variant.is_none() {
-                    request.variant = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.start" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.end" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.gene-id" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.effect" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.transcript-ids" => {
-                        request_variant_init(&mut request);
-                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
-                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
-                        }
-                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "variant.alternate-bases" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.clinical-significance" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.type" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.gene-id" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "annotation-set-id" => {
-                        request_variant_init(&mut request);
-                        request.annotation_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.start" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reference-id" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.end" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reverse-strand" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
-                    },
-                "position.reference-name" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_position_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_position_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.clinical-significance" => Some(("variant.clinicalSignificance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.type" => Some(("variant.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.gene-id" => Some(("variant.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.start" => Some(("position.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reference-id" => Some(("position.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.end" => Some(("position.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reverse-strand" => Some(("position.reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "position.reference-name" => Some(("position.referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Annotation = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotations().patch(request, opt.value_of("annotation-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -991,9 +850,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1018,7 +879,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1028,8 +889,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotations_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchAnnotationsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1044,49 +906,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_range_init(request: &mut api::SearchAnnotationsRequest) {
-                if request.range.is_none() {
-                    request.range = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "range.start" => {
-                        request_range_init(&mut request);
-                        request.range.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "range.reference-id" => {
-                        request_range_init(&mut request);
-                        request.range.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
-                    },
-                "range.end" => {
-                        request_range_init(&mut request);
-                        request.range.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "range.reference-name" => {
-                        request_range_init(&mut request);
-                        request.range.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "annotation-set-ids" => {
-                        request_range_init(&mut request);
-                        if request.annotation_set_ids.is_none() {
-                           request.annotation_set_ids = Some(Default::default());
-                        }
-                                        request.annotation_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request_range_init(&mut request);
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation-set-ids", "end", "page-size", "page-token", "range", "reference-id", "reference-name", "start"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "range.start" => Some(("range.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "range.reference-id" => Some(("range.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "range.end" => Some(("range.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "range.reference-name" => Some(("range.referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotation-set-ids" => Some(("annotationSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation-set-ids", "end", "page-size", "page-token", "range", "reference-id", "reference-name", "start"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchAnnotationsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotations().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1101,9 +941,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1128,7 +970,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1138,8 +980,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _annotations_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Annotation::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1154,112 +997,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_position_init(request: &mut api::Annotation) {
-                if request.position.is_none() {
-                    request.position = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_coding_sequence_init(request: &mut api::Annotation) {
-                request_transcript_init(request);
-                if request.transcript.as_mut().unwrap().coding_sequence.is_none() {
-                    request.transcript.as_mut().unwrap().coding_sequence = Some(Default::default());
-                }
-            }
-            
-            fn request_transcript_init(request: &mut api::Annotation) {
-                if request.transcript.is_none() {
-                    request.transcript = Some(Default::default());
-                }
-            }
-            
-            fn request_variant_init(request: &mut api::Annotation) {
-                if request.variant.is_none() {
-                    request.variant = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.start" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.coding-sequence.end" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().coding_sequence.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "transcript.gene-id" => {
-                        request_transcript_coding_sequence_init(&mut request);
-                        request.transcript.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.effect" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().effect = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.transcript-ids" => {
-                        request_variant_init(&mut request);
-                        if request.variant.as_mut().unwrap().transcript_ids.is_none() {
-                           request.variant.as_mut().unwrap().transcript_ids = Some(Default::default());
-                        }
-                                        request.variant.as_mut().unwrap().transcript_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "variant.alternate-bases" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().alternate_bases = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.clinical-significance" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().clinical_significance = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.type" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "variant.gene-id" => {
-                        request_variant_init(&mut request);
-                        request.variant.as_mut().unwrap().gene_id = Some(value.unwrap_or("").to_string());
-                    },
-                "annotation-set-id" => {
-                        request_variant_init(&mut request);
-                        request.annotation_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.start" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().start = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reference-id" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.end" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().end = Some(value.unwrap_or("").to_string());
-                    },
-                "position.reverse-strand" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reverse_strand = Some(arg_from_str(value.unwrap_or("false"), err, "position.reverse-strand", "boolean"));
-                    },
-                "position.reference-name" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_position_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_position_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.clinical-significance" => Some(("variant.clinicalSignificance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.type" => Some(("variant.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant.gene-id" => Some(("variant.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.start" => Some(("position.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reference-id" => Some(("position.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.end" => Some(("position.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.reverse-strand" => Some(("position.reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "position.reference-name" => Some(("position.referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "position", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Annotation = json::value::from_value(object).unwrap();
         let mut call = self.hub.annotations().update(request, opt.value_of("annotation-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1274,9 +1043,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1301,7 +1072,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1311,8 +1082,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _callsets_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CallSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1327,31 +1099,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "sample-id" => {
-                        request.sample_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                           request.variant_set_ids = Some(Default::default());
-                        }
-                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "sample-id" => Some(("sampleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CallSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.callsets().create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1366,9 +1132,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1393,7 +1161,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1416,9 +1184,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1459,9 +1229,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1486,7 +1258,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1496,8 +1268,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _callsets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CallSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1512,31 +1285,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "sample-id" => {
-                        request.sample_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                           request.variant_set_ids = Some(Default::default());
-                        }
-                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "sample-id" => Some(("sampleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CallSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.callsets().patch(request, opt.value_of("call-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1551,9 +1318,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1578,7 +1347,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1588,8 +1357,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _callsets_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchCallSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1604,28 +1374,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                           request.variant_set_ids = Some(Default::default());
-                        }
-                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "page-size", "page-token", "variant-set-ids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "page-size", "page-token", "variant-set-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchCallSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.callsets().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1640,9 +1406,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1667,7 +1435,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1677,8 +1445,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _callsets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CallSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1693,31 +1462,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "sample-id" => {
-                        request.sample_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                           request.variant_set_ids = Some(Default::default());
-                        }
-                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "sample-id" => Some(("sampleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["created", "id", "name", "sample-id", "variant-set-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CallSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.callsets().update(request, opt.value_of("call-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1732,9 +1495,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1759,7 +1524,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1769,8 +1534,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1785,25 +1551,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "is-public" => {
-                        request.is_public = Some(arg_from_str(value.unwrap_or("false"), err, "is-public", "boolean"));
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "is-public" => Some(("isPublic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1818,9 +1583,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1845,7 +1612,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1868,9 +1635,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1911,9 +1680,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1938,7 +1709,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1970,9 +1741,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "project-number", "page-size"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "project-number", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1997,7 +1770,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2007,8 +1780,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2023,25 +1797,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "is-public" => {
-                        request.is_public = Some(arg_from_str(value.unwrap_or("false"), err, "is-public", "boolean"));
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "is-public" => Some(("isPublic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().patch(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2056,9 +1829,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2083,7 +1858,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2106,9 +1881,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2133,7 +1910,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2143,8 +1920,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2159,25 +1937,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "is-public" => {
-                        request.is_public = Some(arg_from_str(value.unwrap_or("false"), err, "is-public", "boolean"));
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "is-public" => Some(("isPublic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "is-public", "name", "project-number"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().update(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2192,9 +1969,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2219,7 +1998,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2229,8 +2008,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _experimental_jobs_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ExperimentalCreateJobRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2245,37 +2025,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "paired-source-uris" => {
-                        if request.paired_source_uris.is_none() {
-                           request.paired_source_uris = Some(Default::default());
-                        }
-                                        request.paired_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "align" => {
-                        request.align = Some(arg_from_str(value.unwrap_or("false"), err, "align", "boolean"));
-                    },
-                "call-variants" => {
-                        request.call_variants = Some(arg_from_str(value.unwrap_or("false"), err, "call-variants", "boolean"));
-                    },
-                "source-uris" => {
-                        if request.source_uris.is_none() {
-                           request.source_uris = Some(Default::default());
-                        }
-                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "gcs-output-path" => {
-                        request.gcs_output_path = Some(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["align", "call-variants", "gcs-output-path", "paired-source-uris", "project-number", "source-uris"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "paired-source-uris" => Some(("pairedSourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "align" => Some(("align", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "call-variants" => Some(("callVariants", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "gcs-output-path" => Some(("gcsOutputPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["align", "call-variants", "gcs-output-path", "paired-source-uris", "project-number", "source-uris"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ExperimentalCreateJobRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.experimental().jobs_create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2290,9 +2059,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2317,7 +2088,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2340,9 +2111,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2383,9 +2156,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2410,7 +2185,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2420,8 +2195,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchJobsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2436,34 +2212,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        if request.status.is_none() {
-                           request.status = Some(Default::default());
-                        }
-                                        request.status.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "created-after" => {
-                        request.created_after = Some(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "created-before" => {
-                        request.created_before = Some(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["created-after", "created-before", "page-size", "page-token", "project-number", "status"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "created-after" => Some(("createdAfter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created-before" => Some(("createdBefore", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["created-after", "created-before", "page-size", "page-token", "project-number", "status"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchJobsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.jobs().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2478,9 +2246,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2505,7 +2275,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2515,8 +2285,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_align(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AlignReadGroupSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2531,115 +2302,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_interleaved_fastq_source_init(request: &mut api::AlignReadGroupSetsRequest) {
-                if request.interleaved_fastq_source.is_none() {
-                    request.interleaved_fastq_source = Some(Default::default());
-                }
-            }
-            
-            fn request_interleaved_fastq_source_metadata_init(request: &mut api::AlignReadGroupSetsRequest) {
-                request_interleaved_fastq_source_init(request);
-                if request.interleaved_fastq_source.as_mut().unwrap().metadata.is_none() {
-                    request.interleaved_fastq_source.as_mut().unwrap().metadata = Some(Default::default());
-                }
-            }
-            
-            fn request_paired_fastq_source_init(request: &mut api::AlignReadGroupSetsRequest) {
-                if request.paired_fastq_source.is_none() {
-                    request.paired_fastq_source = Some(Default::default());
-                }
-            }
-            
-            fn request_paired_fastq_source_metadata_init(request: &mut api::AlignReadGroupSetsRequest) {
-                request_paired_fastq_source_init(request);
-                if request.paired_fastq_source.as_mut().unwrap().metadata.is_none() {
-                    request.paired_fastq_source.as_mut().unwrap().metadata = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "interleaved-fastq-source.source-uris" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        if request.interleaved_fastq_source.as_mut().unwrap().source_uris.is_none() {
-                           request.interleaved_fastq_source.as_mut().unwrap().source_uris = Some(Default::default());
-                        }
-                                        request.interleaved_fastq_source.as_mut().unwrap().source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "interleaved-fastq-source.metadata.read-group-name" => {
-                        request_interleaved_fastq_source_metadata_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().read_group_name = Some(value.unwrap_or("").to_string());
-                    },
-                "interleaved-fastq-source.metadata.sample-name" => {
-                        request_interleaved_fastq_source_metadata_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().sample_name = Some(value.unwrap_or("").to_string());
-                    },
-                "interleaved-fastq-source.metadata.library-name" => {
-                        request_interleaved_fastq_source_metadata_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().library_name = Some(value.unwrap_or("").to_string());
-                    },
-                "interleaved-fastq-source.metadata.platform-name" => {
-                        request_interleaved_fastq_source_metadata_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_name = Some(value.unwrap_or("").to_string());
-                    },
-                "interleaved-fastq-source.metadata.platform-unit" => {
-                        request_interleaved_fastq_source_metadata_init(&mut request);
-                        request.interleaved_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_unit = Some(value.unwrap_or("").to_string());
-                    },
-                "bam-source-uris" => {
-                        request_interleaved_fastq_source_init(&mut request);
-                        if request.bam_source_uris.is_none() {
-                           request.bam_source_uris = Some(Default::default());
-                        }
-                                        request.bam_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.second-source-uris" => {
-                        request_paired_fastq_source_init(&mut request);
-                        if request.paired_fastq_source.as_mut().unwrap().second_source_uris.is_none() {
-                           request.paired_fastq_source.as_mut().unwrap().second_source_uris = Some(Default::default());
-                        }
-                                        request.paired_fastq_source.as_mut().unwrap().second_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.metadata.read-group-name" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().read_group_name = Some(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.metadata.sample-name" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().sample_name = Some(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.metadata.library-name" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().library_name = Some(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.metadata.platform-name" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_name = Some(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.metadata.platform-unit" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        request.paired_fastq_source.as_mut().unwrap().metadata.as_mut().unwrap().platform_unit = Some(value.unwrap_or("").to_string());
-                    },
-                "paired-fastq-source.first-source-uris" => {
-                        request_paired_fastq_source_metadata_init(&mut request);
-                        if request.paired_fastq_source.as_mut().unwrap().first_source_uris.is_none() {
-                           request.paired_fastq_source.as_mut().unwrap().first_source_uris = Some(Default::default());
-                        }
-                                        request.paired_fastq_source.as_mut().unwrap().first_source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "read-group-set-id" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.read_group_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request_paired_fastq_source_init(&mut request);
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["bam-source-uris", "dataset-id", "first-source-uris", "interleaved-fastq-source", "library-name", "metadata", "paired-fastq-source", "platform-name", "platform-unit", "read-group-name", "read-group-set-id", "sample-name", "second-source-uris", "source-uris"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "interleaved-fastq-source.source-uris" => Some(("interleavedFastqSource.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "interleaved-fastq-source.metadata.read-group-name" => Some(("interleavedFastqSource.metadata.readGroupName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interleaved-fastq-source.metadata.sample-name" => Some(("interleavedFastqSource.metadata.sampleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interleaved-fastq-source.metadata.library-name" => Some(("interleavedFastqSource.metadata.libraryName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interleaved-fastq-source.metadata.platform-name" => Some(("interleavedFastqSource.metadata.platformName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interleaved-fastq-source.metadata.platform-unit" => Some(("interleavedFastqSource.metadata.platformUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bam-source-uris" => Some(("bamSourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "paired-fastq-source.second-source-uris" => Some(("pairedFastqSource.secondSourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "paired-fastq-source.metadata.read-group-name" => Some(("pairedFastqSource.metadata.readGroupName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paired-fastq-source.metadata.sample-name" => Some(("pairedFastqSource.metadata.sampleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paired-fastq-source.metadata.library-name" => Some(("pairedFastqSource.metadata.libraryName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paired-fastq-source.metadata.platform-name" => Some(("pairedFastqSource.metadata.platformName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paired-fastq-source.metadata.platform-unit" => Some(("pairedFastqSource.metadata.platformUnit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paired-fastq-source.first-source-uris" => Some(("pairedFastqSource.firstSourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-group-set-id" => Some(("readGroupSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bam-source-uris", "dataset-id", "first-source-uris", "interleaved-fastq-source", "library-name", "metadata", "paired-fastq-source", "platform-name", "platform-unit", "read-group-name", "read-group-set-id", "sample-name", "second-source-uris", "source-uris"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AlignReadGroupSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().align(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2654,9 +2346,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2681,7 +2375,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2691,8 +2385,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_call(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CallReadGroupSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2707,25 +2402,23 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "source-uris" => {
-                        if request.source_uris.is_none() {
-                           request.source_uris = Some(Default::default());
-                        }
-                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "read-group-set-id" => {
-                        request.read_group_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "read-group-set-id", "source-uris"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-group-set-id" => Some(("readGroupSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "read-group-set-id", "source-uris"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CallReadGroupSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().call(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2740,9 +2433,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2767,7 +2462,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2808,9 +2503,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-size", "range-start", "range-end", "range-reference-name", "page-token", "target-bucket-width"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "range-start", "range-end", "range-reference-name", "page-token", "target-bucket-width"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2835,7 +2532,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2858,9 +2555,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2888,8 +2587,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_export(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ExportReadGroupSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2904,31 +2604,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "export-uri" => {
-                        request.export_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-names" => {
-                        if request.reference_names.is_none() {
-                           request.reference_names = Some(Default::default());
-                        }
-                                        request.reference_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "read-group-set-ids" => {
-                        if request.read_group_set_ids.is_none() {
-                           request.read_group_set_ids = Some(Default::default());
-                        }
-                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["export-uri", "project-number", "read-group-set-ids", "reference-names"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "export-uri" => Some(("exportUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-names" => Some(("referenceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-group-set-ids" => Some(("readGroupSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["export-uri", "project-number", "read-group-set-ids", "reference-names"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ExportReadGroupSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().export(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2943,9 +2636,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2970,7 +2665,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2993,9 +2688,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3020,7 +2717,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3030,8 +2727,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_import(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ImportReadGroupSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3046,28 +2744,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "source-uris" => {
-                        if request.source_uris.is_none() {
-                           request.source_uris = Some(Default::default());
-                        }
-                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "partition-strategy" => {
-                        request.partition_strategy = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "partition-strategy", "reference-set-id", "source-uris"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "partition-strategy" => Some(("partitionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "partition-strategy", "reference-set-id", "source-uris"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ImportReadGroupSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().import(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3082,9 +2776,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3109,7 +2805,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3119,8 +2815,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ReadGroupSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3135,28 +2832,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "filename" => {
-                        request.filename = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "filename", "id", "name", "reference-set-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "filename", "id", "name", "reference-set-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ReadGroupSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().patch(request, opt.value_of("read-group-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3171,9 +2865,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3198,7 +2894,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3208,8 +2904,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchReadGroupSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3224,28 +2921,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-ids" => {
-                        if request.dataset_ids.is_none() {
-                           request.dataset_ids = Some(Default::default());
-                        }
-                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchReadGroupSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3260,9 +2953,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3287,7 +2982,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3297,8 +2992,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _readgroupsets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ReadGroupSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3313,28 +3009,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "filename" => {
-                        request.filename = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "filename", "id", "name", "reference-set-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "filename" => Some(("filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "filename", "id", "name", "reference-set-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ReadGroupSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.readgroupsets().update(request, opt.value_of("read-group-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3349,9 +3042,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3376,7 +3071,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3386,8 +3081,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _reads_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchReadsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3402,40 +3098,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "read-group-set-ids" => {
-                        if request.read_group_set_ids.is_none() {
-                           request.read_group_set_ids = Some(Default::default());
-                        }
-                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "read-group-ids" => {
-                        if request.read_group_ids.is_none() {
-                           request.read_group_ids = Some(Default::default());
-                        }
-                                        request.read_group_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                "start" => {
-                        request.start = Some(value.unwrap_or("").to_string());
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-name" => {
-                        request.reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "end" => {
-                        request.end = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["end", "page-size", "page-token", "read-group-ids", "read-group-set-ids", "reference-name", "start"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "read-group-set-ids" => Some(("readGroupSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "read-group-ids" => Some(("readGroupIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["end", "page-size", "page-token", "read-group-ids", "read-group-set-ids", "reference-name", "start"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchReadsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.reads().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3450,9 +3133,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3477,7 +3162,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3512,9 +3197,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start", "end", "page-size", "page-token"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start", "end", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3539,7 +3226,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3562,9 +3249,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3589,7 +3278,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3599,8 +3288,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _references_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchReferencesRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3615,34 +3305,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "md5checksums" => {
-                        if request.md5checksums.is_none() {
-                           request.md5checksums = Some(Default::default());
-                        }
-                                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-set-id" => {
-                        request.reference_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "accessions" => {
-                        if request.accessions.is_none() {
-                           request.accessions = Some(Default::default());
-                        }
-                                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accessions", "md5checksums", "page-size", "page-token", "reference-set-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "md5checksums" => Some(("md5checksums", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accessions" => Some(("accessions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accessions", "md5checksums", "page-size", "page-token", "reference-set-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchReferencesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.references().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3657,9 +3338,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3684,7 +3367,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3707,9 +3390,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3734,7 +3419,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3744,8 +3429,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _referencesets_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchReferenceSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3760,34 +3446,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "md5checksums" => {
-                        if request.md5checksums.is_none() {
-                           request.md5checksums = Some(Default::default());
-                        }
-                                        request.md5checksums.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "assembly-id" => {
-                        request.assembly_id = Some(value.unwrap_or("").to_string());
-                    },
-                "accessions" => {
-                        if request.accessions.is_none() {
-                           request.accessions = Some(Default::default());
-                        }
-                                        request.accessions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["accessions", "assembly-id", "md5checksums", "page-size", "page-token"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "md5checksums" => Some(("md5checksums", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "assembly-id" => Some(("assemblyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "accessions" => Some(("accessions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accessions", "assembly-id", "md5checksums", "page-size", "page-token"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchReferenceSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.referencesets().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3802,9 +3479,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3829,7 +3508,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3839,8 +3518,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _streaming_readstore_streamreads(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::StreamReadsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3855,28 +3535,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "read-group-set-ids" => {
-                        if request.read_group_set_ids.is_none() {
-                           request.read_group_set_ids = Some(Default::default());
-                        }
-                                        request.read_group_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "end" => {
-                        request.end = Some(value.unwrap_or("").to_string());
-                    },
-                "start" => {
-                        request.start = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-name" => {
-                        request.reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["end", "read-group-set-ids", "reference-name", "start"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "read-group-set-ids" => Some(("readGroupSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["end", "read-group-set-ids", "reference-name", "start"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::StreamReadsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.streaming_readstore().streamreads(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3891,9 +3567,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3915,7 +3593,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3925,8 +3603,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variants_create(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Variant::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3941,55 +3620,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "variant-set-id" => {
-                        request.variant_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "end" => {
-                        request.end = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-bases" => {
-                        request.reference_bases = Some(value.unwrap_or("").to_string());
-                    },
-                "filter" => {
-                        if request.filter.is_none() {
-                           request.filter = Some(Default::default());
-                        }
-                                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "start" => {
-                        request.start = Some(value.unwrap_or("").to_string());
-                    },
-                "names" => {
-                        if request.names.is_none() {
-                           request.names = Some(Default::default());
-                        }
-                                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "alternate-bases" => {
-                        if request.alternate_bases.is_none() {
-                           request.alternate_bases = Some(Default::default());
-                        }
-                                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "reference-name" => {
-                        request.reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "quality" => {
-                        request.quality = Some(arg_from_str(value.unwrap_or("0.0"), err, "quality", "number"));
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Variant = json::value::from_value(object).unwrap();
         let mut call = self.hub.variants().create(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4004,9 +3659,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4031,7 +3688,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4054,9 +3711,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4097,9 +3756,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4124,7 +3785,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4134,8 +3795,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variants_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchVariantsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4150,46 +3812,29 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "end" => {
-                        request.end = Some(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                "start" => {
-                        request.start = Some(value.unwrap_or("").to_string());
-                    },
-                "max-calls" => {
-                        request.max_calls = Some(arg_from_str(value.unwrap_or("-0"), err, "max-calls", "integer"));
-                    },
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "call-set-ids" => {
-                        if request.call_set_ids.is_none() {
-                           request.call_set_ids = Some(Default::default());
-                        }
-                                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "variant-name" => {
-                        request.variant_name = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-name" => {
-                        request.reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "variant-set-ids" => {
-                        if request.variant_set_ids.is_none() {
-                           request.variant_set_ids = Some(Default::default());
-                        }
-                                        request.variant_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["call-set-ids", "end", "max-calls", "page-size", "page-token", "reference-name", "start", "variant-name", "variant-set-ids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-calls" => Some(("maxCalls", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "variant-name" => Some(("variantName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variant-set-ids" => Some(("variantSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-set-ids", "end", "max-calls", "page-size", "page-token", "reference-name", "start", "variant-name", "variant-set-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchVariantsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variants().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4204,9 +3849,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4231,7 +3878,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4241,8 +3888,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variants_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Variant::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4257,55 +3905,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "variant-set-id" => {
-                        request.variant_set_id = Some(value.unwrap_or("").to_string());
-                    },
-                "end" => {
-                        request.end = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "reference-bases" => {
-                        request.reference_bases = Some(value.unwrap_or("").to_string());
-                    },
-                "filter" => {
-                        if request.filter.is_none() {
-                           request.filter = Some(Default::default());
-                        }
-                                        request.filter.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "start" => {
-                        request.start = Some(value.unwrap_or("").to_string());
-                    },
-                "names" => {
-                        if request.names.is_none() {
-                           request.names = Some(Default::default());
-                        }
-                                        request.names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "alternate-bases" => {
-                        if request.alternate_bases.is_none() {
-                           request.alternate_bases = Some(Default::default());
-                        }
-                                        request.alternate_bases.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "reference-name" => {
-                        request.reference_name = Some(value.unwrap_or("").to_string());
-                    },
-                "quality" => {
-                        request.quality = Some(arg_from_str(value.unwrap_or("0.0"), err, "quality", "number"));
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Variant = json::value::from_value(object).unwrap();
         let mut call = self.hub.variants().update(request, opt.value_of("variant-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4320,9 +3944,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4347,7 +3973,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4370,9 +3996,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4400,8 +4028,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_export(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ExportVariantSetRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4416,31 +4045,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "bigquery-dataset" => {
-                        request.bigquery_dataset = Some(value.unwrap_or("").to_string());
-                    },
-                "format" => {
-                        request.format = Some(value.unwrap_or("").to_string());
-                    },
-                "call-set-ids" => {
-                        if request.call_set_ids.is_none() {
-                           request.call_set_ids = Some(Default::default());
-                        }
-                                        request.call_set_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "project-number" => {
-                        request.project_number = Some(value.unwrap_or("").to_string());
-                    },
-                "bigquery-table" => {
-                        request.bigquery_table = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-dataset", "bigquery-table", "call-set-ids", "format", "project-number"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "bigquery-dataset" => Some(("bigqueryDataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table" => Some(("bigqueryTable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-dataset", "bigquery-table", "call-set-ids", "format", "project-number"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ExportVariantSetRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().export(request, opt.value_of("variant-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4455,9 +4078,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4482,7 +4107,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4505,9 +4130,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4532,7 +4159,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4542,8 +4169,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_import_variants(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ImportVariantsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4558,22 +4186,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "source-uris" => {
-                        if request.source_uris.is_none() {
-                           request.source_uris = Some(Default::default());
-                        }
-                                        request.source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "format" => {
-                        request.format = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["format", "source-uris"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["format", "source-uris"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ImportVariantsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().import_variants(request, opt.value_of("variant-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4588,9 +4216,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4615,7 +4245,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4625,8 +4255,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_merge_variants(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::MergeVariantsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4641,13 +4272,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::MergeVariantsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().merge_variants(request, opt.value_of("variant-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4662,9 +4300,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4692,8 +4332,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::VariantSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4708,19 +4349,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::VariantSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().patch(request, opt.value_of("variant-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4735,9 +4379,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4762,7 +4408,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4772,8 +4418,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_search(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SearchVariantSetsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4788,25 +4435,23 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "page-token" => {
-                        request.page_token = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-ids" => {
-                        if request.dataset_ids.is_none() {
-                           request.dataset_ids = Some(Default::default());
-                        }
-                                        request.dataset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "page-size" => {
-                        request.page_size = Some(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "page-size", "page-token"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "page-size", "page-token"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SearchVariantSetsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().search(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4821,9 +4466,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4848,7 +4495,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4858,8 +4505,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _variantsets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::VariantSet::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4874,19 +4522,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-id" => {
-                        request.dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::VariantSet = json::value::from_value(object).unwrap();
         let mut call = self.hub.variantsets().update(request, opt.value_of("variant-set-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4901,9 +4552,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4928,7 +4581,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5304,6 +4957,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("annotation-sets", "methods: 'create', 'delete', 'get', 'patch', 'search' and 'update'", vec![
             ("create",  
@@ -6745,7 +6399,7 @@ fn main() {
     
     let mut app = App::new("genomics1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150326")
+           .version("0.3.0+20150326")
            .about("Provides access to Genomics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -6786,7 +6440,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -6814,12 +6469,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -6835,4 +6490,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

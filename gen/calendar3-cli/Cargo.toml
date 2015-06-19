@@ -4,7 +4,7 @@
 [package]
 
 name = "google-calendar3-cli"
-version = "0.2.0+20150326"
+version = "0.3.0+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3-cli"
@@ -17,14 +17,18 @@ keywords = ["calendar", "google", "cli"]
 name = "calendar3"
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
-yup-hyper-mock = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-clap = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 
 [dependencies.google-calendar3]
 path = "../calendar3"

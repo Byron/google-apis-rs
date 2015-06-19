@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -98,8 +99,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customers_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Customer::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -114,78 +116,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_postal_address_init(request: &mut api::Customer) {
-                if request.postal_address.is_none() {
-                    request.postal_address = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "customer-domain" => {
-                        request.customer_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "alternate-email" => {
-                        request.alternate_email = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-ui-url" => {
-                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
-                    },
-                "phone-number" => {
-                        request.phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.kind" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.organization-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().organization_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.country-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().country_code = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.locality" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.region" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line2" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line2 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line3" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line3 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.contact-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().contact_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line1" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line1 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.postal-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "customer-id" => {
-                        request_postal_address_init(&mut request);
-                        request.customer_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "customer-domain" => Some(("customerDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-email" => Some(("alternateEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phone-number" => Some(("phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.kind" => Some(("postalAddress.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.organization-name" => Some(("postalAddress.organizationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.country-code" => Some(("postalAddress.countryCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.locality" => Some(("postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.region" => Some(("postalAddress.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line2" => Some(("postalAddress.addressLine2", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line3" => Some(("postalAddress.addressLine3", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.contact-name" => Some(("postalAddress.contactName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line1" => Some(("postalAddress.addressLine1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.postal-code" => Some(("postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Customer = json::value::from_value(object).unwrap();
         let mut call = self.hub.customers().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -203,9 +163,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["customer-auth-token"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["customer-auth-token"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -230,7 +192,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -240,8 +202,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customers_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Customer::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -256,78 +219,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_postal_address_init(request: &mut api::Customer) {
-                if request.postal_address.is_none() {
-                    request.postal_address = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "customer-domain" => {
-                        request.customer_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "alternate-email" => {
-                        request.alternate_email = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-ui-url" => {
-                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
-                    },
-                "phone-number" => {
-                        request.phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.kind" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.organization-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().organization_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.country-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().country_code = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.locality" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.region" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line2" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line2 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line3" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line3 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.contact-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().contact_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line1" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line1 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.postal-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "customer-id" => {
-                        request_postal_address_init(&mut request);
-                        request.customer_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "customer-domain" => Some(("customerDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-email" => Some(("alternateEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phone-number" => Some(("phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.kind" => Some(("postalAddress.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.organization-name" => Some(("postalAddress.organizationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.country-code" => Some(("postalAddress.countryCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.locality" => Some(("postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.region" => Some(("postalAddress.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line2" => Some(("postalAddress.addressLine2", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line3" => Some(("postalAddress.addressLine3", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.contact-name" => Some(("postalAddress.contactName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line1" => Some(("postalAddress.addressLine1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.postal-code" => Some(("postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Customer = json::value::from_value(object).unwrap();
         let mut call = self.hub.customers().patch(request, opt.value_of("customer-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -342,9 +263,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -369,7 +292,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -379,8 +302,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customers_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Customer::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -395,78 +319,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_postal_address_init(request: &mut api::Customer) {
-                if request.postal_address.is_none() {
-                    request.postal_address = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "customer-domain" => {
-                        request.customer_domain = Some(value.unwrap_or("").to_string());
-                    },
-                "alternate-email" => {
-                        request.alternate_email = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "resource-ui-url" => {
-                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
-                    },
-                "phone-number" => {
-                        request.phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.kind" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.organization-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().organization_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.country-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().country_code = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.locality" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.region" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line2" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line2 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line3" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line3 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.contact-name" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().contact_name = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.address-line1" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().address_line1 = Some(value.unwrap_or("").to_string());
-                    },
-                "postal-address.postal-code" => {
-                        request_postal_address_init(&mut request);
-                        request.postal_address.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "customer-id" => {
-                        request_postal_address_init(&mut request);
-                        request.customer_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "customer-domain" => Some(("customerDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-email" => Some(("alternateEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phone-number" => Some(("phoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.kind" => Some(("postalAddress.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.organization-name" => Some(("postalAddress.organizationName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.country-code" => Some(("postalAddress.countryCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.locality" => Some(("postalAddress.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.region" => Some(("postalAddress.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line2" => Some(("postalAddress.addressLine2", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line3" => Some(("postalAddress.addressLine3", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.contact-name" => Some(("postalAddress.contactName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.address-line1" => Some(("postalAddress.addressLine1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "postal-address.postal-code" => Some(("postalAddress.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line1", "address-line2", "address-line3", "alternate-email", "contact-name", "country-code", "customer-domain", "customer-id", "kind", "locality", "organization-name", "phone-number", "postal-address", "postal-code", "region", "resource-ui-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Customer = json::value::from_value(object).unwrap();
         let mut call = self.hub.customers().update(request, opt.value_of("customer-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -481,9 +363,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -508,7 +392,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -531,9 +415,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -558,7 +444,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -568,8 +454,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _subscriptions_change_plan(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ChangePlanRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -584,45 +471,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_seats_init(request: &mut api::ChangePlanRequest) {
-                if request.seats.is_none() {
-                    request.seats = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "plan-name" => {
-                        request.plan_name = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "seats.kind" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "seats.number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.number-of-seats", "integer"));
-                    },
-                "seats.maximum-number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().maximum_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.maximum-number-of-seats", "integer"));
-                    },
-                "seats.licensed-number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().licensed_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.licensed-number-of-seats", "integer"));
-                    },
-                "purchase-order-id" => {
-                        request_seats_init(&mut request);
-                        request.purchase_order_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats", "plan-name", "purchase-order-id", "seats"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "plan-name" => Some(("planName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seats.kind" => Some(("seats.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seats.number-of-seats" => Some(("seats.numberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "seats.maximum-number-of-seats" => Some(("seats.maximumNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "seats.licensed-number-of-seats" => Some(("seats.licensedNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats", "plan-name", "purchase-order-id", "seats"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ChangePlanRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.subscriptions().change_plan(request, opt.value_of("customer-id").unwrap_or(""), opt.value_of("subscription-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -637,9 +506,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -664,7 +535,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -674,8 +545,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _subscriptions_change_renewal_settings(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::RenewalSettings::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -690,19 +562,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "renewal-type" => {
-                        request.renewal_type = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "renewal-type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "renewal-type" => Some(("renewalType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "renewal-type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::RenewalSettings = json::value::from_value(object).unwrap();
         let mut call = self.hub.subscriptions().change_renewal_settings(request, opt.value_of("customer-id").unwrap_or(""), opt.value_of("subscription-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -717,9 +592,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -744,7 +621,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -754,8 +631,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _subscriptions_change_seats(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Seats::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -770,25 +648,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "number-of-seats" => {
-                        request.number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "number-of-seats", "integer"));
-                    },
-                "maximum-number-of-seats" => {
-                        request.maximum_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "maximum-number-of-seats", "integer"));
-                    },
-                "licensed-number-of-seats" => {
-                        request.licensed_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "licensed-number-of-seats", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "number-of-seats" => Some(("numberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "maximum-number-of-seats" => Some(("maximumNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "licensed-number-of-seats" => Some(("licensedNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "licensed-number-of-seats", "maximum-number-of-seats", "number-of-seats"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Seats = json::value::from_value(object).unwrap();
         let mut call = self.hub.subscriptions().change_seats(request, opt.value_of("customer-id").unwrap_or(""), opt.value_of("subscription-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -803,9 +680,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -830,7 +709,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -853,9 +732,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -896,9 +777,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -923,7 +806,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -933,8 +816,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _subscriptions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Subscription::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -949,142 +833,43 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_plan_commitment_interval_init(request: &mut api::Subscription) {
-                request_plan_init(request);
-                if request.plan.as_mut().unwrap().commitment_interval.is_none() {
-                    request.plan.as_mut().unwrap().commitment_interval = Some(Default::default());
-                }
-            }
-            
-            fn request_plan_init(request: &mut api::Subscription) {
-                if request.plan.is_none() {
-                    request.plan = Some(Default::default());
-                }
-            }
-            
-            fn request_renewal_settings_init(request: &mut api::Subscription) {
-                if request.renewal_settings.is_none() {
-                    request.renewal_settings = Some(Default::default());
-                }
-            }
-            
-            fn request_seats_init(request: &mut api::Subscription) {
-                if request.seats.is_none() {
-                    request.seats = Some(Default::default());
-                }
-            }
-            
-            fn request_transfer_info_init(request: &mut api::Subscription) {
-                if request.transfer_info.is_none() {
-                    request.transfer_info = Some(Default::default());
-                }
-            }
-            
-            fn request_trial_settings_init(request: &mut api::Subscription) {
-                if request.trial_settings.is_none() {
-                    request.trial_settings = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "renewal-settings.kind" => {
-                        request_renewal_settings_init(&mut request);
-                        request.renewal_settings.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "renewal-settings.renewal-type" => {
-                        request_renewal_settings_init(&mut request);
-                        request.renewal_settings.as_mut().unwrap().renewal_type = Some(value.unwrap_or("").to_string());
-                    },
-                "sku-id" => {
-                        request_renewal_settings_init(&mut request);
-                        request.sku_id = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_renewal_settings_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "trial-settings.trial-end-time" => {
-                        request_trial_settings_init(&mut request);
-                        request.trial_settings.as_mut().unwrap().trial_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "trial-settings.is-in-trial" => {
-                        request_trial_settings_init(&mut request);
-                        request.trial_settings.as_mut().unwrap().is_in_trial = Some(arg_from_str(value.unwrap_or("false"), err, "trial-settings.is-in-trial", "boolean"));
-                    },
-                "transfer-info.transferability-expiration-time" => {
-                        request_transfer_info_init(&mut request);
-                        request.transfer_info.as_mut().unwrap().transferability_expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "transfer-info.minimum-transferable-seats" => {
-                        request_transfer_info_init(&mut request);
-                        request.transfer_info.as_mut().unwrap().minimum_transferable_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "transfer-info.minimum-transferable-seats", "integer"));
-                    },
-                "resource-ui-url" => {
-                        request_transfer_info_init(&mut request);
-                        request.resource_ui_url = Some(value.unwrap_or("").to_string());
-                    },
-                "seats.kind" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "seats.number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.number-of-seats", "integer"));
-                    },
-                "seats.maximum-number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().maximum_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.maximum-number-of-seats", "integer"));
-                    },
-                "seats.licensed-number-of-seats" => {
-                        request_seats_init(&mut request);
-                        request.seats.as_mut().unwrap().licensed_number_of_seats = Some(arg_from_str(value.unwrap_or("-0"), err, "seats.licensed-number-of-seats", "integer"));
-                    },
-                "creation-time" => {
-                        request_seats_init(&mut request);
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "status" => {
-                        request_seats_init(&mut request);
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "plan.plan-name" => {
-                        request_plan_init(&mut request);
-                        request.plan.as_mut().unwrap().plan_name = Some(value.unwrap_or("").to_string());
-                    },
-                "plan.commitment-interval.end-time" => {
-                        request_plan_commitment_interval_init(&mut request);
-                        request.plan.as_mut().unwrap().commitment_interval.as_mut().unwrap().end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "plan.commitment-interval.start-time" => {
-                        request_plan_commitment_interval_init(&mut request);
-                        request.plan.as_mut().unwrap().commitment_interval.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "plan.is-commitment-plan" => {
-                        request_plan_commitment_interval_init(&mut request);
-                        request.plan.as_mut().unwrap().is_commitment_plan = Some(arg_from_str(value.unwrap_or("false"), err, "plan.is-commitment-plan", "boolean"));
-                    },
-                "purchase-order-id" => {
-                        request_plan_init(&mut request);
-                        request.purchase_order_id = Some(value.unwrap_or("").to_string());
-                    },
-                "subscription-id" => {
-                        request_plan_init(&mut request);
-                        request.subscription_id = Some(value.unwrap_or("").to_string());
-                    },
-                "billing-method" => {
-                        request_plan_init(&mut request);
-                        request.billing_method = Some(value.unwrap_or("").to_string());
-                    },
-                "customer-id" => {
-                        request_plan_init(&mut request);
-                        request.customer_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-id", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "renewal-settings.kind" => Some(("renewalSettings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "renewal-settings.renewal-type" => Some(("renewalSettings.renewalType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sku-id" => Some(("skuId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trial-settings.trial-end-time" => Some(("trialSettings.trialEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trial-settings.is-in-trial" => Some(("trialSettings.isInTrial", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transfer-info.transferability-expiration-time" => Some(("transferInfo.transferabilityExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-info.minimum-transferable-seats" => Some(("transferInfo.minimumTransferableSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seats.kind" => Some(("seats.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seats.number-of-seats" => Some(("seats.numberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "seats.maximum-number-of-seats" => Some(("seats.maximumNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "seats.licensed-number-of-seats" => Some(("seats.licensedNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan.plan-name" => Some(("plan.planName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan.commitment-interval.end-time" => Some(("plan.commitmentInterval.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan.commitment-interval.start-time" => Some(("plan.commitmentInterval.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "plan.is-commitment-plan" => Some(("plan.isCommitmentPlan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "purchase-order-id" => Some(("purchaseOrderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription-id" => Some(("subscriptionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billing-method" => Some(("billingMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-id", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Subscription = json::value::from_value(object).unwrap();
         let mut call = self.hub.subscriptions().insert(request, opt.value_of("customer-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1102,9 +887,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["customer-auth-token"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["customer-auth-token"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1129,7 +916,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1167,9 +954,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["customer-auth-token", "page-token", "customer-id", "max-results", "customer-name-prefix"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["customer-auth-token", "page-token", "customer-id", "max-results", "customer-name-prefix"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1194,7 +983,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1217,9 +1006,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1244,7 +1035,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1267,9 +1058,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1294,7 +1087,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1444,6 +1237,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("customers", "methods: 'get', 'insert', 'patch' and 'update'", vec![
             ("get",  
@@ -1841,7 +1635,7 @@ fn main() {
     
     let mut app = App::new("reseller1-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20141112")
+           .version("0.3.0+20141112")
            .about("Lets you create and manage your customers and their subscriptions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli")
            .arg(Arg::with_name("url")
@@ -1882,7 +1676,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1910,12 +1705,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1931,4 +1726,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

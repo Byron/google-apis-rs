@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2-cli"
-version = "0.2.0+20150401"
+version = "0.3.0+20150401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli"
@@ -17,14 +17,18 @@ keywords = ["cloudmonitoring", "google", "cli"]
 name = "cloudmonitoring2-beta2"
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
-yup-hyper-mock = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-clap = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 
 [dependencies.google-cloudmonitoring2_beta2]
 path = "../cloudmonitoring2_beta2"

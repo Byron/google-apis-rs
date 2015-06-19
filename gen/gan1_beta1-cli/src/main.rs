@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -64,9 +63,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["advertiser-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -132,9 +133,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["relationship-status", "min-seven-day-epc", "advertiser-category", "max-results", "page-token", "min-ninety-day-epc", "min-payout-rank"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["relationship-status", "min-seven-day-epc", "advertiser-category", "max-results", "page-token", "min-ninety-day-epc", "min-payout-rank"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -156,7 +159,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -185,9 +188,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["advertiser", "projection"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["advertiser", "projection"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -209,7 +214,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -280,9 +285,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "sku", "modify-date-max", "type", "link-id", "event-date-min", "member-id", "product-category", "order-id", "page-token", "advertiser-id", "max-results", "charge-type", "modify-date-min", "event-date-max", "publisher-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "sku", "modify-date-max", "type", "link-id", "event-date-min", "member-id", "product-category", "order-id", "page-token", "advertiser-id", "max-results", "charge-type", "modify-date-min", "event-date-max", "publisher-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -304,7 +311,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -327,9 +334,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -351,7 +360,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -361,8 +370,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Link::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -377,192 +387,54 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_epc_ninety_day_average_init(request: &mut api::Link) {
-                if request.epc_ninety_day_average.is_none() {
-                    request.epc_ninety_day_average = Some(Default::default());
-                }
-            }
-            
-            fn request_epc_seven_day_average_init(request: &mut api::Link) {
-                if request.epc_seven_day_average.is_none() {
-                    request.epc_seven_day_average = Some(Default::default());
-                }
-            }
-            
-            fn request_special_offers_free_shipping_min_init(request: &mut api::Link) {
-                request_special_offers_init(request);
-                if request.special_offers.as_mut().unwrap().free_shipping_min.is_none() {
-                    request.special_offers.as_mut().unwrap().free_shipping_min = Some(Default::default());
-                }
-            }
-            
-            fn request_special_offers_init(request: &mut api::Link) {
-                if request.special_offers.is_none() {
-                    request.special_offers = Some(Default::default());
-                }
-            }
-            
-            fn request_special_offers_percent_off_min_init(request: &mut api::Link) {
-                request_special_offers_init(request);
-                if request.special_offers.as_mut().unwrap().percent_off_min.is_none() {
-                    request.special_offers.as_mut().unwrap().percent_off_min = Some(Default::default());
-                }
-            }
-            
-            fn request_special_offers_price_cut_init(request: &mut api::Link) {
-                request_special_offers_init(request);
-                if request.special_offers.as_mut().unwrap().price_cut.is_none() {
-                    request.special_offers.as_mut().unwrap().price_cut = Some(Default::default());
-                }
-            }
-            
-            fn request_special_offers_price_cut_min_init(request: &mut api::Link) {
-                request_special_offers_init(request);
-                if request.special_offers.as_mut().unwrap().price_cut_min.is_none() {
-                    request.special_offers.as_mut().unwrap().price_cut_min = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "link-type" => {
-                        request.link_type = Some(value.unwrap_or("").to_string());
-                    },
-                "start-date" => {
-                        request.start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "end-date" => {
-                        request.end_date = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "special-offers.price-cut.amount" => {
-                        request_special_offers_price_cut_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut.amount", "number"));
-                    },
-                "special-offers.price-cut.currency-code" => {
-                        request_special_offers_price_cut_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "special-offers.price-cut-min.amount" => {
-                        request_special_offers_price_cut_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.price-cut-min.amount", "number"));
-                    },
-                "special-offers.price-cut-min.currency-code" => {
-                        request_special_offers_price_cut_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().price_cut_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "special-offers.free-shipping" => {
-                        request_special_offers_price_cut_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping = Some(arg_from_str(value.unwrap_or("false"), err, "special-offers.free-shipping", "boolean"));
-                    },
-                "special-offers.promotion-codes" => {
-                        request_special_offers_price_cut_min_init(&mut request);
-                        if request.special_offers.as_mut().unwrap().promotion_codes.is_none() {
-                           request.special_offers.as_mut().unwrap().promotion_codes = Some(Default::default());
-                        }
-                                        request.special_offers.as_mut().unwrap().promotion_codes.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "special-offers.percent-off" => {
-                        request_special_offers_price_cut_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off", "number"));
-                    },
-                "special-offers.percent-off-min.amount" => {
-                        request_special_offers_percent_off_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.percent-off-min.amount", "number"));
-                    },
-                "special-offers.percent-off-min.currency-code" => {
-                        request_special_offers_percent_off_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().percent_off_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "special-offers.free-gift" => {
-                        request_special_offers_percent_off_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_gift = Some(arg_from_str(value.unwrap_or("false"), err, "special-offers.free-gift", "boolean"));
-                    },
-                "special-offers.free-shipping-min.amount" => {
-                        request_special_offers_free_shipping_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping_min.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "special-offers.free-shipping-min.amount", "number"));
-                    },
-                "special-offers.free-shipping-min.currency-code" => {
-                        request_special_offers_free_shipping_min_init(&mut request);
-                        request.special_offers.as_mut().unwrap().free_shipping_min.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "epc-seven-day-average.amount" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.epc_seven_day_average.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "epc-seven-day-average.amount", "number"));
-                    },
-                "epc-seven-day-average.currency-code" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.epc_seven_day_average.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "create-date" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.create_date = Some(value.unwrap_or("").to_string());
-                    },
-                "image-alt-text" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.image_alt_text = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "advertiser-id" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.advertiser_id = Some(value.unwrap_or("").to_string());
-                    },
-                "is-active" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.is_active = Some(arg_from_str(value.unwrap_or("false"), err, "is-active", "boolean"));
-                    },
-                "promotion-type" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.promotion_type = Some(value.unwrap_or("").to_string());
-                    },
-                "duration" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.duration = Some(value.unwrap_or("").to_string());
-                    },
-                "authorship" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.authorship = Some(value.unwrap_or("").to_string());
-                    },
-                "impression-tracking-url" => {
-                        request_epc_seven_day_average_init(&mut request);
-                        request.impression_tracking_url = Some(value.unwrap_or("").to_string());
-                    },
-                "epc-ninety-day-average.amount" => {
-                        request_epc_ninety_day_average_init(&mut request);
-                        request.epc_ninety_day_average.as_mut().unwrap().amount = Some(arg_from_str(value.unwrap_or("0.0"), err, "epc-ninety-day-average.amount", "number"));
-                    },
-                "epc-ninety-day-average.currency-code" => {
-                        request_epc_ninety_day_average_init(&mut request);
-                        request.epc_ninety_day_average.as_mut().unwrap().currency_code = Some(value.unwrap_or("").to_string());
-                    },
-                "availability" => {
-                        request_epc_ninety_day_average_init(&mut request);
-                        request.availability = Some(value.unwrap_or("").to_string());
-                    },
-                "click-tracking-url" => {
-                        request_epc_ninety_day_average_init(&mut request);
-                        request.click_tracking_url = Some(value.unwrap_or("").to_string());
-                    },
-                "destination-url" => {
-                        request_epc_ninety_day_average_init(&mut request);
-                        request.destination_url = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "amount", "authorship", "availability", "click-tracking-url", "create-date", "currency-code", "description", "destination-url", "duration", "end-date", "epc-ninety-day-average", "epc-seven-day-average", "free-gift", "free-shipping", "free-shipping-min", "id", "image-alt-text", "impression-tracking-url", "is-active", "kind", "link-type", "name", "percent-off", "percent-off-min", "price-cut", "price-cut-min", "promotion-codes", "promotion-type", "special-offers", "start-date"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "link-type" => Some(("linkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-date" => Some(("startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-date" => Some(("endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "special-offers.price-cut.amount" => Some(("specialOffers.priceCut.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "special-offers.price-cut.currency-code" => Some(("specialOffers.priceCut.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "special-offers.price-cut-min.amount" => Some(("specialOffers.priceCutMin.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "special-offers.price-cut-min.currency-code" => Some(("specialOffers.priceCutMin.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "special-offers.free-shipping" => Some(("specialOffers.freeShipping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "special-offers.promotion-codes" => Some(("specialOffers.promotionCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "special-offers.percent-off" => Some(("specialOffers.percentOff", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "special-offers.percent-off-min.amount" => Some(("specialOffers.percentOffMin.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "special-offers.percent-off-min.currency-code" => Some(("specialOffers.percentOffMin.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "special-offers.free-gift" => Some(("specialOffers.freeGift", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "special-offers.free-shipping-min.amount" => Some(("specialOffers.freeShippingMin.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "special-offers.free-shipping-min.currency-code" => Some(("specialOffers.freeShippingMin.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "epc-seven-day-average.amount" => Some(("epcSevenDayAverage.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "epc-seven-day-average.currency-code" => Some(("epcSevenDayAverage.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-date" => Some(("createDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "image-alt-text" => Some(("imageAltText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-active" => Some(("isActive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "promotion-type" => Some(("promotionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "authorship" => Some(("authorship", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "impression-tracking-url" => Some(("impressionTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "epc-ninety-day-average.amount" => Some(("epcNinetyDayAverage.amount", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "epc-ninety-day-average.currency-code" => Some(("epcNinetyDayAverage.currencyCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "click-tracking-url" => Some(("clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination-url" => Some(("destinationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advertiser-id", "amount", "authorship", "availability", "click-tracking-url", "create-date", "currency-code", "description", "destination-url", "duration", "end-date", "epc-ninety-day-average", "epc-seven-day-average", "free-gift", "free-shipping", "free-shipping-min", "id", "image-alt-text", "impression-tracking-url", "is-active", "kind", "link-type", "name", "percent-off", "percent-off-min", "price-cut", "price-cut-min", "promotion-codes", "promotion-type", "special-offers", "start-date"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Link = json::value::from_value(object).unwrap();
         let mut call = self.hub.links().insert(request, opt.value_of("role").unwrap_or(""), opt.value_of("role-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -577,9 +449,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -601,7 +475,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -663,9 +537,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-date-min", "link-type", "relationship-status", "search-text", "create-date-max", "create-date-min", "asset-size", "start-date-max", "advertiser-id", "page-token", "max-results", "promotion-type", "authorship"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-date-min", "link-type", "relationship-status", "search-text", "create-date-max", "create-date-min", "asset-size", "start-date-max", "advertiser-id", "page-token", "max-results", "promotion-type", "authorship"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -687,7 +563,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -713,9 +589,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["publisher-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["publisher-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -737,7 +615,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -781,9 +659,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["publisher-category", "relationship-status", "min-seven-day-epc", "min-ninety-day-epc", "page-token", "max-results", "min-payout-rank"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["publisher-category", "relationship-status", "min-seven-day-epc", "min-ninety-day-epc", "page-token", "max-results", "min-payout-rank"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -805,7 +685,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -861,9 +741,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "advertiser-id", "link-id", "max-results", "order-id", "start-index", "event-type", "calculate-totals", "publisher-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "start-date", "end-date", "advertiser-id", "link-id", "max-results", "order-id", "start-index", "event-type", "calculate-totals", "publisher-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -885,7 +767,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1055,6 +937,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("advertisers", "methods: 'get' and 'list'", vec![
             ("get",  
@@ -1370,7 +1253,7 @@ fn main() {
     
     let mut app = App::new("gan1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20130205")
+           .version("0.3.0+20130205")
            .about("Lets you have programmatic access to your Google Affiliate Network data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gan1_beta1_cli")
            .arg(Arg::with_name("folder")
@@ -1406,7 +1289,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1434,12 +1318,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1455,4 +1339,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

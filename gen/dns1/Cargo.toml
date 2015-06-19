@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dns1"
-version = "0.1.7+20150218"
+version = "0.1.8+20150218"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dns (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dns1"
@@ -12,13 +12,17 @@ homepage = "https://developers.google.com/cloud-dns"
 documentation = "http://byron.github.io/google-apis-rs/google_dns1"
 license = "MIT"
 keywords = ["dns", "google", "protocol", "web", "api"]
+build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 url = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-json-tools = ">= 0.3.0"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

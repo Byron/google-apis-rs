@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-deploymentmanager2_beta1` library allows access to all features of the *Google deploymentmanager* service.
 
-This documentation was generated from *deploymentmanager* crate version *0.1.7+20150415*, where *20150415* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
+This documentation was generated from *deploymentmanager* crate version *0.1.8+20150415*, where *20150415* is the exact revision of the *deploymentmanager:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *deploymentmanager* *v2_beta1* API can be found at the
 [official documentation site](https://developers.google.com/deployment-manager/).

@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _mail_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::MailItem::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,43 +64,29 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "is-trash" => {
-                        request.is_trash = Some(arg_from_str(value.unwrap_or("false"), err, "is-trash", "boolean"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "labels" => {
-                        if request.labels.is_none() {
-                           request.labels = Some(Default::default());
-                        }
-                                        request.labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "is-draft" => {
-                        request.is_draft = Some(arg_from_str(value.unwrap_or("false"), err, "is-draft", "boolean"));
-                    },
-                "is-inbox" => {
-                        request.is_inbox = Some(arg_from_str(value.unwrap_or("false"), err, "is-inbox", "boolean"));
-                    },
-                "is-sent" => {
-                        request.is_sent = Some(arg_from_str(value.unwrap_or("false"), err, "is-sent", "boolean"));
-                    },
-                "is-starred" => {
-                        request.is_starred = Some(arg_from_str(value.unwrap_or("false"), err, "is-starred", "boolean"));
-                    },
-                "is-unread" => {
-                        request.is_unread = Some(arg_from_str(value.unwrap_or("false"), err, "is-unread", "boolean"));
-                    },
-                "is-deleted" => {
-                        request.is_deleted = Some(arg_from_str(value.unwrap_or("false"), err, "is-deleted", "boolean"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["is-deleted", "is-draft", "is-inbox", "is-sent", "is-starred", "is-trash", "is-unread", "kind", "labels"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "is-trash" => Some(("isTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "is-draft" => Some(("isDraft", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-inbox" => Some(("isInbox", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-sent" => Some(("isSent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-starred" => Some(("isStarred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-unread" => Some(("isUnread", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-deleted" => Some(("isDeleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["is-deleted", "is-draft", "is-inbox", "is-sent", "is-starred", "is-trash", "is-unread", "kind", "labels"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::MailItem = json::value::from_value(object).unwrap();
         let mut call = self.hub.mail().insert(request, opt.value_of("user-key").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -115,9 +101,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -242,6 +230,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("mail", "methods: 'insert'", vec![
@@ -279,7 +268,7 @@ fn main() {
     
     let mut app = App::new("admin2-email-migration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150303")
+           .version("0.3.0+20150303")
            .about("Email Migration API lets you migrate emails of users to Google backends.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin2_email_migration_cli")
            .arg(Arg::with_name("url")
@@ -320,7 +309,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -359,12 +349,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -380,4 +370,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

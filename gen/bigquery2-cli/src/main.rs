@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -64,9 +63,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["delete-contents"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["delete-contents"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -107,9 +108,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -134,7 +137,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -144,8 +147,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -160,61 +164,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_dataset_reference_init(request: &mut api::Dataset) {
-                if request.dataset_reference.is_none() {
-                    request.dataset_reference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.project-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.dataset-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "default-table-expiration-ms" => {
-                        request_dataset_reference_init(&mut request);
-                        request.default_table_expiration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_dataset_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_dataset_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_dataset_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.project-id" => Some(("datasetReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.dataset-id" => Some(("datasetReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().insert(request, opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -229,9 +203,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -256,7 +232,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -288,9 +264,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "all", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "all", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -315,7 +293,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -325,8 +303,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -341,61 +320,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_dataset_reference_init(request: &mut api::Dataset) {
-                if request.dataset_reference.is_none() {
-                    request.dataset_reference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.project-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.dataset-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "default-table-expiration-ms" => {
-                        request_dataset_reference_init(&mut request);
-                        request.default_table_expiration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_dataset_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_dataset_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_dataset_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.project-id" => Some(("datasetReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.dataset-id" => Some(("datasetReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().patch(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -410,9 +359,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -437,7 +388,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -447,8 +398,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Dataset::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -463,61 +415,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_dataset_reference_init(request: &mut api::Dataset) {
-                if request.dataset_reference.is_none() {
-                    request.dataset_reference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.project-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "dataset-reference.dataset-id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.dataset_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "default-table-expiration-ms" => {
-                        request_dataset_reference_init(&mut request);
-                        request.default_table_expiration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_dataset_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_dataset_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request_dataset_reference_init(&mut request);
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_dataset_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_dataset_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.project-id" => Some(("datasetReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-reference.dataset-id" => Some(("datasetReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Dataset = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().update(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -532,9 +454,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -559,7 +483,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -582,9 +506,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -609,7 +535,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -644,9 +570,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["timeout-ms", "page-token", "start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["timeout-ms", "page-token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -671,7 +599,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -681,8 +609,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Job::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -697,476 +626,98 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_configuration_copy_destination_table_init(request: &mut api::Job) {
-                request_configuration_copy_init(request);
-                if request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.is_none() {
-                    request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_copy_init(request: &mut api::Job) {
-                request_configuration_init(request);
-                if request.configuration.as_mut().unwrap().copy.is_none() {
-                    request.configuration.as_mut().unwrap().copy = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_copy_source_table_init(request: &mut api::Job) {
-                request_configuration_copy_init(request);
-                if request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.is_none() {
-                    request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_extract_init(request: &mut api::Job) {
-                request_configuration_init(request);
-                if request.configuration.as_mut().unwrap().extract.is_none() {
-                    request.configuration.as_mut().unwrap().extract = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_extract_source_table_init(request: &mut api::Job) {
-                request_configuration_extract_init(request);
-                if request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.is_none() {
-                    request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_init(request: &mut api::Job) {
-                if request.configuration.is_none() {
-                    request.configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_link_destination_table_init(request: &mut api::Job) {
-                request_configuration_link_init(request);
-                if request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.is_none() {
-                    request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_link_init(request: &mut api::Job) {
-                request_configuration_init(request);
-                if request.configuration.as_mut().unwrap().link.is_none() {
-                    request.configuration.as_mut().unwrap().link = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_load_destination_table_init(request: &mut api::Job) {
-                request_configuration_load_init(request);
-                if request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.is_none() {
-                    request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_load_init(request: &mut api::Job) {
-                request_configuration_init(request);
-                if request.configuration.as_mut().unwrap().load.is_none() {
-                    request.configuration.as_mut().unwrap().load = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_query_default_dataset_init(request: &mut api::Job) {
-                request_configuration_query_init(request);
-                if request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.is_none() {
-                    request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_query_destination_table_init(request: &mut api::Job) {
-                request_configuration_query_init(request);
-                if request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.is_none() {
-                    request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table = Some(Default::default());
-                }
-            }
-            
-            fn request_configuration_query_init(request: &mut api::Job) {
-                request_configuration_init(request);
-                if request.configuration.as_mut().unwrap().query.is_none() {
-                    request.configuration.as_mut().unwrap().query = Some(Default::default());
-                }
-            }
-            
-            fn request_job_reference_init(request: &mut api::Job) {
-                if request.job_reference.is_none() {
-                    request.job_reference = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_extract_init(request: &mut api::Job) {
-                request_statistics_init(request);
-                if request.statistics.as_mut().unwrap().extract.is_none() {
-                    request.statistics.as_mut().unwrap().extract = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_init(request: &mut api::Job) {
-                if request.statistics.is_none() {
-                    request.statistics = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_load_init(request: &mut api::Job) {
-                request_statistics_init(request);
-                if request.statistics.as_mut().unwrap().load.is_none() {
-                    request.statistics.as_mut().unwrap().load = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_query_init(request: &mut api::Job) {
-                request_statistics_init(request);
-                if request.statistics.as_mut().unwrap().query.is_none() {
-                    request.statistics.as_mut().unwrap().query = Some(Default::default());
-                }
-            }
-            
-            fn request_status_error_result_init(request: &mut api::Job) {
-                request_status_init(request);
-                if request.status.as_mut().unwrap().error_result.is_none() {
-                    request.status.as_mut().unwrap().error_result = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Job) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.state" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().state = Some(value.unwrap_or("").to_string());
-                    },
-                "status.error-result.debug-info" => {
-                        request_status_error_result_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().debug_info = Some(value.unwrap_or("").to_string());
-                    },
-                "status.error-result.message" => {
-                        request_status_error_result_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().message = Some(value.unwrap_or("").to_string());
-                    },
-                "status.error-result.reason" => {
-                        request_status_error_result_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().reason = Some(value.unwrap_or("").to_string());
-                    },
-                "status.error-result.location" => {
-                        request_status_error_result_init(&mut request);
-                        request.status.as_mut().unwrap().error_result.as_mut().unwrap().location = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.load.output-rows" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().output_rows = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.load.input-files" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().input_files = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.load.input-file-bytes" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().input_file_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.load.output-bytes" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().load.as_mut().unwrap().output_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.creation-time" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.total-bytes-processed" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().total_bytes_processed = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.start-time" => {
-                        request_statistics_load_init(&mut request);
-                        request.statistics.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.query.cache-hit" => {
-                        request_statistics_query_init(&mut request);
-                        request.statistics.as_mut().unwrap().query.as_mut().unwrap().cache_hit = Some(arg_from_str(value.unwrap_or("false"), err, "statistics.query.cache-hit", "boolean"));
-                    },
-                "statistics.query.total-bytes-processed" => {
-                        request_statistics_query_init(&mut request);
-                        request.statistics.as_mut().unwrap().query.as_mut().unwrap().total_bytes_processed = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.end-time" => {
-                        request_statistics_query_init(&mut request);
-                        request.statistics.as_mut().unwrap().end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.extract.destination-uri-file-counts" => {
-                        request_statistics_extract_init(&mut request);
-                        if request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts.is_none() {
-                           request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts = Some(Default::default());
-                        }
-                                        request.statistics.as_mut().unwrap().extract.as_mut().unwrap().destination_uri_file_counts.as_mut().unwrap().push(arg_from_str(value.unwrap_or("-0"), err, "statistics.extract.destination-uri-file-counts", "int64"));
-                    },
-                "job-reference.project-id" => {
-                        request_job_reference_init(&mut request);
-                        request.job_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "job-reference.job-id" => {
-                        request_job_reference_init(&mut request);
-                        request.job_reference.as_mut().unwrap().job_id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_job_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "user-email" => {
-                        request_job_reference_init(&mut request);
-                        request.user_email = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.encoding" => {
-                        request_configuration_load_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().encoding = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.skip-leading-rows" => {
-                        request_configuration_load_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().skip_leading_rows = Some(arg_from_str(value.unwrap_or("-0"), err, "configuration.load.skip-leading-rows", "integer"));
-                    },
-                "configuration.load.quote" => {
-                        request_configuration_load_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().quote = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.source-format" => {
-                        request_configuration_load_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_format = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.destination-table.project-id" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.destination-table.table-id" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.destination-table.dataset-id" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.max-bad-records" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().max_bad_records = Some(arg_from_str(value.unwrap_or("-0"), err, "configuration.load.max-bad-records", "integer"));
-                    },
-                "configuration.load.allow-jagged-rows" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().allow_jagged_rows = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-jagged-rows", "boolean"));
-                    },
-                "configuration.load.write-disposition" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.source-uris" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        if request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris.is_none() {
-                           request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris = Some(Default::default());
-                        }
-                                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().source_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.field-delimiter" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().field_delimiter = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.create-disposition" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.schema-inline-format" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().schema_inline_format = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.schema-inline" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().schema_inline = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.allow-quoted-newlines" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().allow_quoted_newlines = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.allow-quoted-newlines", "boolean"));
-                    },
-                "configuration.load.projection-fields" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        if request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields.is_none() {
-                           request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields = Some(Default::default());
-                        }
-                                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().projection_fields.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "configuration.load.ignore-unknown-values" => {
-                        request_configuration_load_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().load.as_mut().unwrap().ignore_unknown_values = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.load.ignore-unknown-values", "boolean"));
-                    },
-                "configuration.dry-run" => {
-                        request_configuration_load_init(&mut request);
-                        request.configuration.as_mut().unwrap().dry_run = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.dry-run", "boolean"));
-                    },
-                "configuration.link.create-disposition" => {
-                        request_configuration_link_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.link.write-disposition" => {
-                        request_configuration_link_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.link.destination-table.project-id" => {
-                        request_configuration_link_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.link.destination-table.table-id" => {
-                        request_configuration_link_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.link.destination-table.dataset-id" => {
-                        request_configuration_link_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.link.source-uri" => {
-                        request_configuration_link_destination_table_init(&mut request);
-                        if request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri.is_none() {
-                           request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri = Some(Default::default());
-                        }
-                                        request.configuration.as_mut().unwrap().link.as_mut().unwrap().source_uri.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.flatten-results" => {
-                        request_configuration_query_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().flatten_results = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.flatten-results", "boolean"));
-                    },
-                "configuration.query.use-query-cache" => {
-                        request_configuration_query_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().use_query_cache = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.use-query-cache", "boolean"));
-                    },
-                "configuration.query.default-dataset.project-id" => {
-                        request_configuration_query_default_dataset_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.default-dataset.dataset-id" => {
-                        request_configuration_query_default_dataset_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().default_dataset.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.destination-table.project-id" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.destination-table.table-id" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.destination-table.dataset-id" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.priority" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().priority = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.write-disposition" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.allow-large-results" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().allow_large_results = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.allow-large-results", "boolean"));
-                    },
-                "configuration.query.create-disposition" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.query" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.query.preserve-nulls" => {
-                        request_configuration_query_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().query.as_mut().unwrap().preserve_nulls = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.query.preserve-nulls", "boolean"));
-                    },
-                "configuration.copy.create-disposition" => {
-                        request_configuration_copy_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().create_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.write-disposition" => {
-                        request_configuration_copy_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().write_disposition = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.destination-table.project-id" => {
-                        request_configuration_copy_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.destination-table.table-id" => {
-                        request_configuration_copy_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.destination-table.dataset-id" => {
-                        request_configuration_copy_destination_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().destination_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.source-table.project-id" => {
-                        request_configuration_copy_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.source-table.table-id" => {
-                        request_configuration_copy_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.copy.source-table.dataset-id" => {
-                        request_configuration_copy_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().copy.as_mut().unwrap().source_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.destination-uri" => {
-                        request_configuration_extract_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.compression" => {
-                        request_configuration_extract_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().compression = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.field-delimiter" => {
-                        request_configuration_extract_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().field_delimiter = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.destination-format" => {
-                        request_configuration_extract_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_format = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.print-header" => {
-                        request_configuration_extract_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().print_header = Some(arg_from_str(value.unwrap_or("false"), err, "configuration.extract.print-header", "boolean"));
-                    },
-                "configuration.extract.destination-uris" => {
-                        request_configuration_extract_init(&mut request);
-                        if request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris.is_none() {
-                           request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris = Some(Default::default());
-                        }
-                                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().destination_uris.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.source-table.project-id" => {
-                        request_configuration_extract_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.source-table.table-id" => {
-                        request_configuration_extract_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "configuration.extract.source-table.dataset-id" => {
-                        request_configuration_extract_source_table_init(&mut request);
-                        request.configuration.as_mut().unwrap().extract.as_mut().unwrap().source_table.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_configuration_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_configuration_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "debug-info", "default-dataset", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "etag", "extract", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "link", "load", "location", "max-bad-records", "message", "output-bytes", "output-rows", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uri", "source-uris", "start-time", "state", "statistics", "status", "table-id", "total-bytes-processed", "use-query-cache", "user-email", "write-disposition"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.error-result.debug-info" => Some(("status.errorResult.debugInfo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.error-result.message" => Some(("status.errorResult.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.error-result.reason" => Some(("status.errorResult.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.error-result.location" => Some(("status.errorResult.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.load.output-rows" => Some(("statistics.load.outputRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.load.input-files" => Some(("statistics.load.inputFiles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.load.input-file-bytes" => Some(("statistics.load.inputFileBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.load.output-bytes" => Some(("statistics.load.outputBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.creation-time" => Some(("statistics.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.total-bytes-processed" => Some(("statistics.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.start-time" => Some(("statistics.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.cache-hit" => Some(("statistics.query.cacheHit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "statistics.query.total-bytes-processed" => Some(("statistics.query.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.end-time" => Some(("statistics.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "job-reference.project-id" => Some(("jobReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job-reference.job-id" => Some(("jobReference.jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-email" => Some(("user_email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.encoding" => Some(("configuration.load.encoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.skip-leading-rows" => Some(("configuration.load.skipLeadingRows", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "configuration.load.quote" => Some(("configuration.load.quote", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.source-format" => Some(("configuration.load.sourceFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.destination-table.project-id" => Some(("configuration.load.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.destination-table.table-id" => Some(("configuration.load.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.destination-table.dataset-id" => Some(("configuration.load.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.max-bad-records" => Some(("configuration.load.maxBadRecords", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "configuration.load.allow-jagged-rows" => Some(("configuration.load.allowJaggedRows", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.load.write-disposition" => Some(("configuration.load.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.source-uris" => Some(("configuration.load.sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.load.field-delimiter" => Some(("configuration.load.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.create-disposition" => Some(("configuration.load.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.schema-inline-format" => Some(("configuration.load.schemaInlineFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.schema-inline" => Some(("configuration.load.schemaInline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.load.allow-quoted-newlines" => Some(("configuration.load.allowQuotedNewlines", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.load.projection-fields" => Some(("configuration.load.projectionFields", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.load.ignore-unknown-values" => Some(("configuration.load.ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.dry-run" => Some(("configuration.dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.link.create-disposition" => Some(("configuration.link.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.link.write-disposition" => Some(("configuration.link.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.link.destination-table.project-id" => Some(("configuration.link.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.link.destination-table.table-id" => Some(("configuration.link.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.link.destination-table.dataset-id" => Some(("configuration.link.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.link.source-uri" => Some(("configuration.link.sourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.query.flatten-results" => Some(("configuration.query.flattenResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.query.use-query-cache" => Some(("configuration.query.useQueryCache", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.query.default-dataset.project-id" => Some(("configuration.query.defaultDataset.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.default-dataset.dataset-id" => Some(("configuration.query.defaultDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.destination-table.project-id" => Some(("configuration.query.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.destination-table.table-id" => Some(("configuration.query.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.destination-table.dataset-id" => Some(("configuration.query.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.priority" => Some(("configuration.query.priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.write-disposition" => Some(("configuration.query.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.allow-large-results" => Some(("configuration.query.allowLargeResults", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.query.create-disposition" => Some(("configuration.query.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.query" => Some(("configuration.query.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.query.preserve-nulls" => Some(("configuration.query.preserveNulls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.copy.create-disposition" => Some(("configuration.copy.createDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.write-disposition" => Some(("configuration.copy.writeDisposition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.project-id" => Some(("configuration.copy.destinationTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.table-id" => Some(("configuration.copy.destinationTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.destination-table.dataset-id" => Some(("configuration.copy.destinationTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.project-id" => Some(("configuration.copy.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.table-id" => Some(("configuration.copy.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.copy.source-table.dataset-id" => Some(("configuration.copy.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-uri" => Some(("configuration.extract.destinationUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.compression" => Some(("configuration.extract.compression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.field-delimiter" => Some(("configuration.extract.fieldDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-format" => Some(("configuration.extract.destinationFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.print-header" => Some(("configuration.extract.printHeader", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "configuration.extract.destination-uris" => Some(("configuration.extract.destinationUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "configuration.extract.source-table.project-id" => Some(("configuration.extract.sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.source-table.table-id" => Some(("configuration.extract.sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "configuration.extract.source-table.dataset-id" => Some(("configuration.extract.sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "debug-info", "default-dataset", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "etag", "extract", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "link", "load", "location", "max-bad-records", "message", "output-bytes", "output-rows", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uri", "source-uris", "start-time", "state", "statistics", "status", "table-id", "total-bytes-processed", "use-query-cache", "user-email", "write-disposition"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Job = json::value::from_value(object).unwrap();
         let mut call = self.hub.jobs().insert(request, opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1181,9 +732,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1212,7 +765,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1250,9 +803,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "all-users", "max-results", "projection", "state-filter"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "all-users", "max-results", "projection", "state-filter"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1277,7 +832,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1287,8 +842,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_query(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::QueryRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1303,51 +859,29 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_default_dataset_init(request: &mut api::QueryRequest) {
-                if request.default_dataset.is_none() {
-                    request.default_dataset = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "timeout-ms" => {
-                        request.timeout_ms = Some(arg_from_str(value.unwrap_or("-0"), err, "timeout-ms", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "dry-run" => {
-                        request.dry_run = Some(arg_from_str(value.unwrap_or("false"), err, "dry-run", "boolean"));
-                    },
-                "use-query-cache" => {
-                        request.use_query_cache = Some(arg_from_str(value.unwrap_or("false"), err, "use-query-cache", "boolean"));
-                    },
-                "default-dataset.project-id" => {
-                        request_default_dataset_init(&mut request);
-                        request.default_dataset.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "default-dataset.dataset-id" => {
-                        request_default_dataset_init(&mut request);
-                        request.default_dataset.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "max-results" => {
-                        request_default_dataset_init(&mut request);
-                        request.max_results = Some(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                    },
-                "query" => {
-                        request_default_dataset_init(&mut request);
-                        request.query = Some(value.unwrap_or("").to_string());
-                    },
-                "preserve-nulls" => {
-                        request_default_dataset_init(&mut request);
-                        request.preserve_nulls = Some(arg_from_str(value.unwrap_or("false"), err, "preserve-nulls", "boolean"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "default-dataset", "dry-run", "kind", "max-results", "preserve-nulls", "project-id", "query", "timeout-ms", "use-query-cache"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "timeout-ms" => Some(("timeoutMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dry-run" => Some(("dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "use-query-cache" => Some(("useQueryCache", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "default-dataset.project-id" => Some(("defaultDataset.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-dataset.dataset-id" => Some(("defaultDataset.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-results" => Some(("maxResults", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query" => Some(("query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "preserve-nulls" => Some(("preserveNulls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-id", "default-dataset", "dry-run", "kind", "max-results", "preserve-nulls", "project-id", "query", "timeout-ms", "use-query-cache"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::QueryRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.jobs().query(request, opt.value_of("project-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1362,9 +896,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1389,7 +925,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1418,9 +954,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1445,7 +983,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1455,8 +993,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _tabledata_insert_all(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::TableDataInsertAllRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1471,22 +1010,23 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "ignore-unknown-values" => {
-                        request.ignore_unknown_values = Some(arg_from_str(value.unwrap_or("false"), err, "ignore-unknown-values", "boolean"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "skip-invalid-rows" => {
-                        request.skip_invalid_rows = Some(arg_from_str(value.unwrap_or("false"), err, "skip-invalid-rows", "boolean"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-unknown-values", "kind", "skip-invalid-rows"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "ignore-unknown-values" => Some(("ignoreUnknownValues", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "skip-invalid-rows" => Some(("skipInvalidRows", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-unknown-values", "kind", "skip-invalid-rows"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::TableDataInsertAllRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.tabledata().insert_all(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""), opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1501,9 +1041,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1528,7 +1070,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1560,9 +1102,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1587,7 +1131,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1610,9 +1154,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1653,9 +1199,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1680,7 +1228,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1690,8 +1238,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _tables_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1706,85 +1255,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_table_reference_init(request: &mut api::Table) {
-                if request.table_reference.is_none() {
-                    request.table_reference = Some(Default::default());
-                }
-            }
-            
-            fn request_view_init(request: &mut api::Table) {
-                if request.view.is_none() {
-                    request.view = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.project-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.table-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.dataset-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "num-rows" => {
-                        request_table_reference_init(&mut request);
-                        request.num_rows = Some(value.unwrap_or("").to_string());
-                    },
-                "num-bytes" => {
-                        request_table_reference_init(&mut request);
-                        request.num_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_table_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_table_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "expiration-time" => {
-                        request_table_reference_init(&mut request);
-                        request.expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_table_reference_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_table_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_table_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "view.query" => {
-                        request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.dataset-id" => Some(("tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-bytes" => Some(("numBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.tables().insert(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1799,9 +1299,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1826,7 +1328,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1855,9 +1357,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1882,7 +1386,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1892,8 +1396,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _tables_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1908,85 +1413,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_table_reference_init(request: &mut api::Table) {
-                if request.table_reference.is_none() {
-                    request.table_reference = Some(Default::default());
-                }
-            }
-            
-            fn request_view_init(request: &mut api::Table) {
-                if request.view.is_none() {
-                    request.view = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.project-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.table-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.dataset-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "num-rows" => {
-                        request_table_reference_init(&mut request);
-                        request.num_rows = Some(value.unwrap_or("").to_string());
-                    },
-                "num-bytes" => {
-                        request_table_reference_init(&mut request);
-                        request.num_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_table_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_table_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "expiration-time" => {
-                        request_table_reference_init(&mut request);
-                        request.expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_table_reference_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_table_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_table_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "view.query" => {
-                        request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.dataset-id" => Some(("tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-bytes" => Some(("numBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.tables().patch(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""), opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2001,9 +1457,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2028,7 +1486,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2038,8 +1496,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _tables_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2054,85 +1513,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_table_reference_init(request: &mut api::Table) {
-                if request.table_reference.is_none() {
-                    request.table_reference = Some(Default::default());
-                }
-            }
-            
-            fn request_view_init(request: &mut api::Table) {
-                if request.view.is_none() {
-                    request.view = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "last-modified-time" => {
-                        request.last_modified_time = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "creation-time" => {
-                        request.creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.project-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().project_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.table-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "table-reference.dataset-id" => {
-                        request_table_reference_init(&mut request);
-                        request.table_reference.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "num-rows" => {
-                        request_table_reference_init(&mut request);
-                        request.num_rows = Some(value.unwrap_or("").to_string());
-                    },
-                "num-bytes" => {
-                        request_table_reference_init(&mut request);
-                        request.num_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_table_reference_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "friendly-name" => {
-                        request_table_reference_init(&mut request);
-                        request.friendly_name = Some(value.unwrap_or("").to_string());
-                    },
-                "expiration-time" => {
-                        request_table_reference_init(&mut request);
-                        request.expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_table_reference_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_table_reference_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_table_reference_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "view.query" => {
-                        request_view_init(&mut request);
-                        request.view.as_mut().unwrap().query = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.project-id" => Some(("tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.table-id" => Some(("tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-reference.dataset-id" => Some(("tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-rows" => Some(("numRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-bytes" => Some(("numBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-time" => Some(("expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "view.query" => Some(("view.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "description", "etag", "expiration-time", "friendly-name", "id", "kind", "last-modified-time", "num-bytes", "num-rows", "project-id", "query", "self-link", "table-id", "table-reference", "type", "view"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.tables().update(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("dataset-id").unwrap_or(""), opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2147,9 +1557,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2174,7 +1586,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2366,6 +1778,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("datasets", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
@@ -2989,7 +2402,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150326")
+           .version("0.3.0+20150326")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")
@@ -3030,7 +2443,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -3069,12 +2483,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -3090,4 +2504,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

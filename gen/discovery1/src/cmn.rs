@@ -471,20 +471,53 @@ impl<'a> Read for MultiPartReader<'a> {
     }
 }
 
-header!(
-    #[doc="The `X-Upload-Content-Type` header."]
-    (XUploadContentType, "X-Upload-Content-Type") => [Mime]
+// The following macro invocation needs to be expanded, as `include!`
+// doens't support external macros
+// header!{
+//     #[doc="The `X-Upload-Content-Type` header."]
+//     (XUploadContentType, "X-Upload-Content-Type") => [Mime]
 
-    xupload_content_type {
-        test_header!(
-            test1,
-            vec![b"text/plain"],
-            Some(HeaderField(
-                vec![Mime(TopLevel::Text, SubLevel::Plain, Vec::new())]
-                )));
+//     xupload_content_type {
+//         test_header!(
+//             test1,
+//             vec![b"text/plain"],
+//             Some(HeaderField(
+//                 vec![Mime(TopLevel::Text, SubLevel::Plain, Vec::new())]
+//                 )));
 
+//     }
+// }
+
+/// The `X-Upload-Content-Type` header.
+///
+/// Generated via rustc --pretty expanded -Z unstable-options, and manually 
+/// processed to be more readable.
+#[derive(PartialEq, Debug, Clone)]
+pub struct XUploadContentType(pub Mime);
+
+impl ::std::ops::Deref for XUploadContentType {
+    type Target = Mime;
+    fn deref<'a>(&'a self) -> &'a Mime { &self.0 }
+}
+impl ::std::ops::DerefMut for XUploadContentType {
+    fn deref_mut<'a>(&'a mut self) -> &'a mut Mime { &mut self.0 }
+}
+impl Header for XUploadContentType {
+    fn header_name() -> &'static str { "X-Upload-Content-Type" }
+    fn parse_header(raw: &[Vec<u8>]) -> Option<Self> {
+        hyper::header::parsing::from_one_raw_str(raw).map(XUploadContentType)
     }
-);
+}
+impl HeaderFormat for XUploadContentType {
+    fn fmt_header(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        Display::fmt(&**self, f)
+    }
+}
+impl Display for XUploadContentType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Display::fmt(&**self, f)
+    }
+}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct Chunk {
@@ -536,7 +569,7 @@ impl Header for ContentRange {
     }
 
     /// We are not parsable, as parsing is done by the `Range` header
-    fn parse_header(_: &[Vec<u8>]) -> Option<ContentRange> {
+    fn parse_header(_: &[Vec<u8>]) -> Option<Self> {
         None
     }
 }
@@ -562,8 +595,9 @@ impl Header for RangeResponseHeader {
         "Range"
     }
 
-    fn parse_header(raw: &[Vec<u8>]) -> Option<RangeResponseHeader> {
-        if let [ref v] = raw {
+    fn parse_header(raw: &[Vec<u8>]) -> Option<Self> {
+        if raw.len() > 0 {
+            let v = &raw[0];
             if let Ok(s) = std::str::from_utf8(v) {
                 const PREFIX: &'static str = "bytes ";
                 if s.starts_with(PREFIX) {
@@ -704,12 +738,11 @@ impl<'a, A> ResumableUploadHelper<'a, A>
     }
 }
 
-use serde::json::value::Value;
 // Copy of src/rust/cli/cmn.rs
 // TODO(ST): Allow sharing common code between program types
-pub fn remove_json_null_values(value: &mut Value) {
+pub fn remove_json_null_values(value: &mut serde::json::value::Value) {
     match *value {
-        Value::Object(ref mut map) => {
+        serde::json::value::Value::Object(ref mut map) => {
             let mut for_removal = Vec::new();
 
             for (key, mut value) in map.iter_mut() {

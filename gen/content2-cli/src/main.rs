@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -98,8 +99,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountsCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -114,13 +116,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountsCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -135,9 +144,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -162,7 +173,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -185,9 +196,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -228,9 +241,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -255,7 +270,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -265,8 +280,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Account::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -281,34 +297,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "reviews-url" => {
-                        request.reviews_url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "adult-content" => {
-                        request.adult_content = Some(arg_from_str(value.unwrap_or("false"), err, "adult-content", "boolean"));
-                    },
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "seller-id" => {
-                        request.seller_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "reviews-url" => Some(("reviewsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adult-content" => Some(("adultContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller-id" => Some(("sellerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Account = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().insert(request, opt.value_of("merchant-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -323,9 +332,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -350,7 +361,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -379,9 +390,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -406,7 +419,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -416,8 +429,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Account::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -432,34 +446,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "reviews-url" => {
-                        request.reviews_url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "adult-content" => {
-                        request.adult_content = Some(arg_from_str(value.unwrap_or("false"), err, "adult-content", "boolean"));
-                    },
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "seller-id" => {
-                        request.seller_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "reviews-url" => Some(("reviewsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adult-content" => Some(("adultContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller-id" => Some(("sellerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Account = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().patch(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -474,9 +481,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -501,7 +510,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -511,8 +520,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Account::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -527,34 +537,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "reviews-url" => {
-                        request.reviews_url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "adult-content" => {
-                        request.adult_content = Some(arg_from_str(value.unwrap_or("false"), err, "adult-content", "boolean"));
-                    },
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "seller-id" => {
-                        request.seller_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "reviews-url" => Some(("reviewsUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adult-content" => Some(("adultContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller-id" => Some(("sellerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adult-content", "id", "kind", "name", "reviews-url", "seller-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Account = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().update(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -569,9 +572,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -596,7 +601,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -606,8 +611,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accountshipping_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountshippingCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -622,13 +628,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountshippingCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.accountshipping().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -646,9 +659,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -673,7 +688,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -696,9 +711,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -723,7 +740,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -752,9 +769,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -779,7 +798,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -789,8 +808,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accountshipping_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountShipping::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -805,19 +825,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountShipping = json::value::from_value(object).unwrap();
         let mut call = self.hub.accountshipping().patch(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -835,9 +858,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -862,7 +887,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -872,8 +897,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accountshipping_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountShipping::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -888,19 +914,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountShipping = json::value::from_value(object).unwrap();
         let mut call = self.hub.accountshipping().update(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -918,9 +947,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -945,7 +976,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -955,8 +986,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accountstatuses_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountstatusesCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -971,13 +1003,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountstatusesCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.accountstatuses().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -992,9 +1031,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1019,7 +1060,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1042,9 +1083,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1069,7 +1112,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1098,9 +1141,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1125,7 +1170,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1135,8 +1180,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounttax_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccounttaxCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1151,13 +1197,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccounttaxCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounttax().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1175,9 +1228,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1202,7 +1257,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1225,9 +1280,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1252,7 +1309,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1281,9 +1338,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1308,7 +1367,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1318,8 +1377,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounttax_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountTax::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1334,19 +1394,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountTax = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounttax().patch(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1364,9 +1427,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1391,7 +1456,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1401,8 +1466,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounttax_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountTax::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1417,19 +1483,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountTax = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounttax().update(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1447,9 +1516,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1474,7 +1545,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1484,8 +1555,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datafeeds_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::DatafeedsCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1500,13 +1572,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::DatafeedsCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datafeeds().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1521,9 +1600,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1548,7 +1629,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1571,9 +1652,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1614,9 +1697,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1641,7 +1726,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1651,8 +1736,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datafeeds_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Datafeed::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1667,100 +1753,39 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_fetch_schedule_init(request: &mut api::Datafeed) {
-                if request.fetch_schedule.is_none() {
-                    request.fetch_schedule = Some(Default::default());
-                }
-            }
-            
-            fn request_format_init(request: &mut api::Datafeed) {
-                if request.format.is_none() {
-                    request.format = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-type" => {
-                        request.content_type = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-language" => {
-                        request.content_language = Some(value.unwrap_or("").to_string());
-                    },
-                "format.file-encoding" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
-                    },
-                "format.quoting-mode" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
-                    },
-                "format.column-delimiter" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.username" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.hour" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
-                    },
-                "fetch-schedule.fetch-url" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.weekday" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.time-zone" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.password" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.day-of-month" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
-                    },
-                "target-country" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.target_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target-country", "int64"));
-                    },
-                "file-name" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "intended-destinations" => {
-                        request_fetch_schedule_init(&mut request);
-                        if request.intended_destinations.is_none() {
-                           request.intended_destinations = Some(Default::default());
-                        }
-                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "attribute-language" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.attribute_language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.file-encoding" => Some(("format.fileEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.quoting-mode" => Some(("format.quotingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.column-delimiter" => Some(("format.columnDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Datafeed = json::value::from_value(object).unwrap();
         let mut call = self.hub.datafeeds().insert(request, opt.value_of("merchant-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1775,9 +1800,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1802,7 +1829,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1831,9 +1858,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1858,7 +1887,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1868,8 +1897,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datafeeds_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Datafeed::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1884,100 +1914,39 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_fetch_schedule_init(request: &mut api::Datafeed) {
-                if request.fetch_schedule.is_none() {
-                    request.fetch_schedule = Some(Default::default());
-                }
-            }
-            
-            fn request_format_init(request: &mut api::Datafeed) {
-                if request.format.is_none() {
-                    request.format = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-type" => {
-                        request.content_type = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-language" => {
-                        request.content_language = Some(value.unwrap_or("").to_string());
-                    },
-                "format.file-encoding" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
-                    },
-                "format.quoting-mode" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
-                    },
-                "format.column-delimiter" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.username" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.hour" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
-                    },
-                "fetch-schedule.fetch-url" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.weekday" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.time-zone" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.password" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.day-of-month" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
-                    },
-                "target-country" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.target_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target-country", "int64"));
-                    },
-                "file-name" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "intended-destinations" => {
-                        request_fetch_schedule_init(&mut request);
-                        if request.intended_destinations.is_none() {
-                           request.intended_destinations = Some(Default::default());
-                        }
-                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "attribute-language" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.attribute_language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.file-encoding" => Some(("format.fileEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.quoting-mode" => Some(("format.quotingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.column-delimiter" => Some(("format.columnDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Datafeed = json::value::from_value(object).unwrap();
         let mut call = self.hub.datafeeds().patch(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("datafeed-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1992,9 +1961,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2019,7 +1990,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2029,8 +2000,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datafeeds_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Datafeed::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2045,100 +2017,39 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_fetch_schedule_init(request: &mut api::Datafeed) {
-                if request.fetch_schedule.is_none() {
-                    request.fetch_schedule = Some(Default::default());
-                }
-            }
-            
-            fn request_format_init(request: &mut api::Datafeed) {
-                if request.format.is_none() {
-                    request.format = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-type" => {
-                        request.content_type = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-language" => {
-                        request.content_language = Some(value.unwrap_or("").to_string());
-                    },
-                "format.file-encoding" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().file_encoding = Some(value.unwrap_or("").to_string());
-                    },
-                "format.quoting-mode" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().quoting_mode = Some(value.unwrap_or("").to_string());
-                    },
-                "format.column-delimiter" => {
-                        request_format_init(&mut request);
-                        request.format.as_mut().unwrap().column_delimiter = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.username" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.hour" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().hour = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.hour", "integer"));
-                    },
-                "fetch-schedule.fetch-url" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().fetch_url = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.weekday" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().weekday = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.time-zone" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().time_zone = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.password" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "fetch-schedule.day-of-month" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.fetch_schedule.as_mut().unwrap().day_of_month = Some(arg_from_str(value.unwrap_or("-0"), err, "fetch-schedule.day-of-month", "integer"));
-                    },
-                "target-country" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.target_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target-country", "int64"));
-                    },
-                "file-name" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "intended-destinations" => {
-                        request_fetch_schedule_init(&mut request);
-                        if request.intended_destinations.is_none() {
-                           request.intended_destinations = Some(Default::default());
-                        }
-                                        request.intended_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "attribute-language" => {
-                        request_fetch_schedule_init(&mut request);
-                        request.attribute_language = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-type" => Some(("contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.file-encoding" => Some(("format.fileEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.quoting-mode" => Some(("format.quotingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format.column-delimiter" => Some(("format.columnDelimiter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.username" => Some(("fetchSchedule.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.hour" => Some(("fetchSchedule.hour", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "fetch-schedule.fetch-url" => Some(("fetchSchedule.fetchUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.weekday" => Some(("fetchSchedule.weekday", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.time-zone" => Some(("fetchSchedule.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.password" => Some(("fetchSchedule.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fetch-schedule.day-of-month" => Some(("fetchSchedule.dayOfMonth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "file-name" => Some(("fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intended-destinations" => Some(("intendedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribute-language" => Some(("attributeLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribute-language", "column-delimiter", "content-language", "content-type", "day-of-month", "fetch-schedule", "fetch-url", "file-encoding", "file-name", "format", "hour", "id", "intended-destinations", "kind", "name", "password", "quoting-mode", "target-country", "time-zone", "username", "weekday"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Datafeed = json::value::from_value(object).unwrap();
         let mut call = self.hub.datafeeds().update(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("datafeed-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2153,9 +2064,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2180,7 +2093,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2190,8 +2103,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datafeedstatuses_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::DatafeedstatusesCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2206,13 +2120,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::DatafeedstatusesCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datafeedstatuses().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2227,9 +2148,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2254,7 +2177,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2277,9 +2200,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2304,7 +2229,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2333,9 +2258,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2360,7 +2287,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2370,8 +2297,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _inventory_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InventoryCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2386,13 +2314,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InventoryCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.inventory().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2407,9 +2342,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2434,7 +2371,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2444,8 +2381,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _inventory_set(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InventorySetRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2460,52 +2398,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_price_init(request: &mut api::InventorySetRequest) {
-                if request.price.is_none() {
-                    request.price = Some(Default::default());
-                }
-            }
-            
-            fn request_sale_price_init(request: &mut api::InventorySetRequest) {
-                if request.sale_price.is_none() {
-                    request.sale_price = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "sale-price-effective-date" => {
-                        request.sale_price_effective_date = Some(value.unwrap_or("").to_string());
-                    },
-                "price.currency" => {
-                        request_price_init(&mut request);
-                        request.price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "price.value" => {
-                        request_price_init(&mut request);
-                        request.price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "sale-price.currency" => {
-                        request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "sale-price.value" => {
-                        request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "availability" => {
-                        request_sale_price_init(&mut request);
-                        request.availability = Some(value.unwrap_or("").to_string());
-                    },
-                "quantity" => {
-                        request_sale_price_init(&mut request);
-                        request.quantity = Some(arg_from_str(value.unwrap_or("-0"), err, "quantity", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["availability", "currency", "price", "quantity", "sale-price", "sale-price-effective-date", "value"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "sale-price-effective-date" => Some(("salePriceEffectiveDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "price.currency" => Some(("price.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "price.value" => Some(("price.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["availability", "currency", "price", "quantity", "sale-price", "sale-price-effective-date", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InventorySetRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.inventory().set(request, opt.value_of("merchant-id").unwrap_or(""), opt.value_of("store-code").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2520,9 +2433,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2547,7 +2462,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2557,8 +2472,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _products_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ProductsCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2573,13 +2489,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ProductsCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.products().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2597,9 +2520,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2624,7 +2549,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2650,9 +2575,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2693,9 +2620,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2720,7 +2649,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2730,8 +2659,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _products_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Product::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2746,372 +2676,94 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_installment_amount_init(request: &mut api::Product) {
-                request_installment_init(request);
-                if request.installment.as_mut().unwrap().amount.is_none() {
-                    request.installment.as_mut().unwrap().amount = Some(Default::default());
-                }
-            }
-            
-            fn request_installment_init(request: &mut api::Product) {
-                if request.installment.is_none() {
-                    request.installment = Some(Default::default());
-                }
-            }
-            
-            fn request_loyalty_points_init(request: &mut api::Product) {
-                if request.loyalty_points.is_none() {
-                    request.loyalty_points = Some(Default::default());
-                }
-            }
-            
-            fn request_price_init(request: &mut api::Product) {
-                if request.price.is_none() {
-                    request.price = Some(Default::default());
-                }
-            }
-            
-            fn request_sale_price_init(request: &mut api::Product) {
-                if request.sale_price.is_none() {
-                    request.sale_price = Some(Default::default());
-                }
-            }
-            
-            fn request_shipping_height_init(request: &mut api::Product) {
-                if request.shipping_height.is_none() {
-                    request.shipping_height = Some(Default::default());
-                }
-            }
-            
-            fn request_shipping_length_init(request: &mut api::Product) {
-                if request.shipping_length.is_none() {
-                    request.shipping_length = Some(Default::default());
-                }
-            }
-            
-            fn request_shipping_weight_init(request: &mut api::Product) {
-                if request.shipping_weight.is_none() {
-                    request.shipping_weight = Some(Default::default());
-                }
-            }
-            
-            fn request_shipping_width_init(request: &mut api::Product) {
-                if request.shipping_width.is_none() {
-                    request.shipping_width = Some(Default::default());
-                }
-            }
-            
-            fn request_unit_pricing_base_measure_init(request: &mut api::Product) {
-                if request.unit_pricing_base_measure.is_none() {
-                    request.unit_pricing_base_measure = Some(Default::default());
-                }
-            }
-            
-            fn request_unit_pricing_measure_init(request: &mut api::Product) {
-                if request.unit_pricing_measure.is_none() {
-                    request.unit_pricing_measure = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "display-ads-title" => {
-                        request.display_ads_title = Some(value.unwrap_or("").to_string());
-                    },
-                "color" => {
-                        request.color = Some(value.unwrap_or("").to_string());
-                    },
-                "additional-image-links" => {
-                        if request.additional_image_links.is_none() {
-                           request.additional_image_links = Some(Default::default());
-                        }
-                                        request.additional_image_links.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "adwords-labels" => {
-                        if request.adwords_labels.is_none() {
-                           request.adwords_labels = Some(Default::default());
-                        }
-                                        request.adwords_labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "item-group-id" => {
-                        request.item_group_id = Some(value.unwrap_or("").to_string());
-                    },
-                "gtin" => {
-                        request.gtin = Some(value.unwrap_or("").to_string());
-                    },
-                "expiration-date" => {
-                        request.expiration_date = Some(value.unwrap_or("").to_string());
-                    },
-                "google-product-category" => {
-                        request.google_product_category = Some(value.unwrap_or("").to_string());
-                    },
-                "multipack" => {
-                        request.multipack = Some(value.unwrap_or("").to_string());
-                    },
-                "display-ads-id" => {
-                        request.display_ads_id = Some(value.unwrap_or("").to_string());
-                    },
-                "display-ads-value" => {
-                        request.display_ads_value = Some(arg_from_str(value.unwrap_or("0.0"), err, "display-ads-value", "number"));
-                    },
-                "availability" => {
-                        request.availability = Some(value.unwrap_or("").to_string());
-                    },
-                "adwords-grouping" => {
-                        request.adwords_grouping = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "target-country" => {
-                        request.target_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target-country", "int64"));
-                    },
-                "size-type" => {
-                        request.size_type = Some(value.unwrap_or("").to_string());
-                    },
-                "offer-id" => {
-                        request.offer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "pattern" => {
-                        request.pattern = Some(value.unwrap_or("").to_string());
-                    },
-                "unit-pricing-measure.value" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.unit_pricing_measure.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "unit-pricing-measure.value", "number"));
-                    },
-                "unit-pricing-measure.unit" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.unit_pricing_measure.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "validated-destinations" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        if request.validated_destinations.is_none() {
-                           request.validated_destinations = Some(Default::default());
-                        }
-                                        request.validated_destinations.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "online-only" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.online_only = Some(arg_from_str(value.unwrap_or("false"), err, "online-only", "boolean"));
-                    },
-                "is-bundle" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.is_bundle = Some(arg_from_str(value.unwrap_or("false"), err, "is-bundle", "boolean"));
-                    },
-                "mobile-link" => {
-                        request_unit_pricing_measure_init(&mut request);
-                        request.mobile_link = Some(value.unwrap_or("").to_string());
-                    },
-                "price.currency" => {
-                        request_price_init(&mut request);
-                        request.price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "price.value" => {
-                        request_price_init(&mut request);
-                        request.price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "channel" => {
-                        request_price_init(&mut request);
-                        request.channel = Some(value.unwrap_or("").to_string());
-                    },
-                "loyalty-points.ratio" => {
-                        request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().ratio = Some(arg_from_str(value.unwrap_or("0.0"), err, "loyalty-points.ratio", "number"));
-                    },
-                "loyalty-points.name" => {
-                        request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "loyalty-points.points-value" => {
-                        request_loyalty_points_init(&mut request);
-                        request.loyalty_points.as_mut().unwrap().points_value = Some(value.unwrap_or("").to_string());
-                    },
-                "shipping-height.value" => {
-                        request_shipping_height_init(&mut request);
-                        request.shipping_height.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-height.value", "number"));
-                    },
-                "shipping-height.unit" => {
-                        request_shipping_height_init(&mut request);
-                        request.shipping_height.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "content-language" => {
-                        request_shipping_height_init(&mut request);
-                        request.content_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mpn" => {
-                        request_shipping_height_init(&mut request);
-                        request.mpn = Some(value.unwrap_or("").to_string());
-                    },
-                "sale-price-effective-date" => {
-                        request_shipping_height_init(&mut request);
-                        request.sale_price_effective_date = Some(value.unwrap_or("").to_string());
-                    },
-                "brand" => {
-                        request_shipping_height_init(&mut request);
-                        request.brand = Some(value.unwrap_or("").to_string());
-                    },
-                "material" => {
-                        request_shipping_height_init(&mut request);
-                        request.material = Some(value.unwrap_or("").to_string());
-                    },
-                "availability-date" => {
-                        request_shipping_height_init(&mut request);
-                        request.availability_date = Some(value.unwrap_or("").to_string());
-                    },
-                "shipping-length.value" => {
-                        request_shipping_length_init(&mut request);
-                        request.shipping_length.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-length.value", "number"));
-                    },
-                "shipping-length.unit" => {
-                        request_shipping_length_init(&mut request);
-                        request.shipping_length.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "link" => {
-                        request_shipping_length_init(&mut request);
-                        request.link = Some(value.unwrap_or("").to_string());
-                    },
-                "adult" => {
-                        request_shipping_length_init(&mut request);
-                        request.adult = Some(arg_from_str(value.unwrap_or("false"), err, "adult", "boolean"));
-                    },
-                "display-ads-link" => {
-                        request_shipping_length_init(&mut request);
-                        request.display_ads_link = Some(value.unwrap_or("").to_string());
-                    },
-                "energy-efficiency-class" => {
-                        request_shipping_length_init(&mut request);
-                        request.energy_efficiency_class = Some(value.unwrap_or("").to_string());
-                    },
-                "size-system" => {
-                        request_shipping_length_init(&mut request);
-                        request.size_system = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-label4" => {
-                        request_shipping_length_init(&mut request);
-                        request.custom_label4 = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-label3" => {
-                        request_shipping_length_init(&mut request);
-                        request.custom_label3 = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-label2" => {
-                        request_shipping_length_init(&mut request);
-                        request.custom_label2 = Some(value.unwrap_or("").to_string());
-                    },
-                "condition" => {
-                        request_shipping_length_init(&mut request);
-                        request.condition = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-label0" => {
-                        request_shipping_length_init(&mut request);
-                        request.custom_label0 = Some(value.unwrap_or("").to_string());
-                    },
-                "shipping-label" => {
-                        request_shipping_length_init(&mut request);
-                        request.shipping_label = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_shipping_length_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "unit-pricing-base-measure.value" => {
-                        request_unit_pricing_base_measure_init(&mut request);
-                        request.unit_pricing_base_measure.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "unit-pricing-base-measure.unit" => {
-                        request_unit_pricing_base_measure_init(&mut request);
-                        request.unit_pricing_base_measure.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "installment.amount.currency" => {
-                        request_installment_amount_init(&mut request);
-                        request.installment.as_mut().unwrap().amount.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "installment.amount.value" => {
-                        request_installment_amount_init(&mut request);
-                        request.installment.as_mut().unwrap().amount.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "installment.months" => {
-                        request_installment_amount_init(&mut request);
-                        request.installment.as_mut().unwrap().months = Some(value.unwrap_or("").to_string());
-                    },
-                "sizes" => {
-                        request_installment_init(&mut request);
-                        if request.sizes.is_none() {
-                           request.sizes = Some(Default::default());
-                        }
-                                        request.sizes.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "gender" => {
-                        request_installment_init(&mut request);
-                        request.gender = Some(value.unwrap_or("").to_string());
-                    },
-                "shipping-width.value" => {
-                        request_shipping_width_init(&mut request);
-                        request.shipping_width.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-width.value", "number"));
-                    },
-                "shipping-width.unit" => {
-                        request_shipping_width_init(&mut request);
-                        request.shipping_width.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "shipping-weight.value" => {
-                        request_shipping_weight_init(&mut request);
-                        request.shipping_weight.as_mut().unwrap().value = Some(arg_from_str(value.unwrap_or("0.0"), err, "shipping-weight.value", "number"));
-                    },
-                "shipping-weight.unit" => {
-                        request_shipping_weight_init(&mut request);
-                        request.shipping_weight.as_mut().unwrap().unit = Some(value.unwrap_or("").to_string());
-                    },
-                "identifier-exists" => {
-                        request_shipping_weight_init(&mut request);
-                        request.identifier_exists = Some(arg_from_str(value.unwrap_or("false"), err, "identifier-exists", "boolean"));
-                    },
-                "image-link" => {
-                        request_shipping_weight_init(&mut request);
-                        request.image_link = Some(value.unwrap_or("").to_string());
-                    },
-                "sale-price.currency" => {
-                        request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "sale-price.value" => {
-                        request_sale_price_init(&mut request);
-                        request.sale_price.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "product-type" => {
-                        request_sale_price_init(&mut request);
-                        request.product_type = Some(value.unwrap_or("").to_string());
-                    },
-                "display-ads-similar-ids" => {
-                        request_sale_price_init(&mut request);
-                        if request.display_ads_similar_ids.is_none() {
-                           request.display_ads_similar_ids = Some(Default::default());
-                        }
-                                        request.display_ads_similar_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "custom-label1" => {
-                        request_sale_price_init(&mut request);
-                        request.custom_label1 = Some(value.unwrap_or("").to_string());
-                    },
-                "age-group" => {
-                        request_sale_price_init(&mut request);
-                        request.age_group = Some(value.unwrap_or("").to_string());
-                    },
-                "adwords-redirect" => {
-                        request_sale_price_init(&mut request);
-                        request.adwords_redirect = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "ratio", "sale-price", "sale-price-effective-date", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "display-ads-title" => Some(("displayAdsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color" => Some(("color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "additional-image-links" => Some(("additionalImageLinks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "adwords-labels" => Some(("adwordsLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "item-group-id" => Some(("itemGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expiration-date" => Some(("expirationDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "google-product-category" => Some(("googleProductCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "multipack" => Some(("multipack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-ads-id" => Some(("displayAdsId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-ads-value" => Some(("displayAdsValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adwords-grouping" => Some(("adwordsGrouping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-country" => Some(("targetCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "size-type" => Some(("sizeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "offer-id" => Some(("offerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pattern" => Some(("pattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unit-pricing-measure.value" => Some(("unitPricingMeasure.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "unit-pricing-measure.unit" => Some(("unitPricingMeasure.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validated-destinations" => Some(("validatedDestinations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "online-only" => Some(("onlineOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "is-bundle" => Some(("isBundle", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "mobile-link" => Some(("mobileLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "price.currency" => Some(("price.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "price.value" => Some(("price.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "channel" => Some(("channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "loyalty-points.ratio" => Some(("loyaltyPoints.ratio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "loyalty-points.name" => Some(("loyaltyPoints.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "loyalty-points.points-value" => Some(("loyaltyPoints.pointsValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipping-height.value" => Some(("shippingHeight.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "shipping-height.unit" => Some(("shippingHeight.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-language" => Some(("contentLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mpn" => Some(("mpn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sale-price-effective-date" => Some(("salePriceEffectiveDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "brand" => Some(("brand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "material" => Some(("material", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "availability-date" => Some(("availabilityDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipping-length.value" => Some(("shippingLength.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "shipping-length.unit" => Some(("shippingLength.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "link" => Some(("link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adult" => Some(("adult", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "display-ads-link" => Some(("displayAdsLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "energy-efficiency-class" => Some(("energyEfficiencyClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "size-system" => Some(("sizeSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label4" => Some(("customLabel4", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label3" => Some(("customLabel3", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label2" => Some(("customLabel2", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label0" => Some(("customLabel0", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipping-label" => Some(("shippingLabel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unit-pricing-base-measure.value" => Some(("unitPricingBaseMeasure.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unit-pricing-base-measure.unit" => Some(("unitPricingBaseMeasure.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installment.amount.currency" => Some(("installment.amount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installment.amount.value" => Some(("installment.amount.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "installment.months" => Some(("installment.months", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sizes" => Some(("sizes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "gender" => Some(("gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipping-width.value" => Some(("shippingWidth.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "shipping-width.unit" => Some(("shippingWidth.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "shipping-weight.value" => Some(("shippingWeight.value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "shipping-weight.unit" => Some(("shippingWeight.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "identifier-exists" => Some(("identifierExists", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "image-link" => Some(("imageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-type" => Some(("productType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-ads-similar-ids" => Some(("displayAdsSimilarIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-label1" => Some(("customLabel1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "adwords-redirect" => Some(("adwordsRedirect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-image-links", "adult", "adwords-grouping", "adwords-labels", "adwords-redirect", "age-group", "amount", "availability", "availability-date", "brand", "channel", "color", "condition", "content-language", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "description", "display-ads-id", "display-ads-link", "display-ads-similar-ids", "display-ads-title", "display-ads-value", "energy-efficiency-class", "expiration-date", "gender", "google-product-category", "gtin", "id", "identifier-exists", "image-link", "installment", "is-bundle", "item-group-id", "kind", "link", "loyalty-points", "material", "mobile-link", "months", "mpn", "multipack", "name", "offer-id", "online-only", "pattern", "points-value", "price", "product-type", "ratio", "sale-price", "sale-price-effective-date", "shipping-height", "shipping-label", "shipping-length", "shipping-weight", "shipping-width", "size-system", "size-type", "sizes", "target-country", "title", "unit", "unit-pricing-base-measure", "unit-pricing-measure", "validated-destinations", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Product = json::value::from_value(object).unwrap();
         let mut call = self.hub.products().insert(request, opt.value_of("merchant-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3129,9 +2781,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["dry-run"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["dry-run"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3156,7 +2810,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3185,9 +2839,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3212,7 +2868,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3222,8 +2878,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _productstatuses_custombatch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ProductstatusesCustomBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3238,13 +2895,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ProductstatusesCustomBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.productstatuses().custombatch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3259,9 +2923,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3286,7 +2952,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3309,9 +2975,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3336,7 +3004,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3365,9 +3033,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3392,7 +3062,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3679,6 +3349,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("accounts", "methods: 'authinfo', 'custombatch', 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("authinfo",  
@@ -4787,7 +4458,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150421")
+           .version("0.3.0+20150421")
            .about("Manage product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")
@@ -4828,7 +4499,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -4856,12 +4528,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -4877,4 +4549,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

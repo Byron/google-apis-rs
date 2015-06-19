@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-translate2` library allows access to all features of the *Google translate* service.
 
-This documentation was generated from *translate* crate version *0.1.7+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
+This documentation was generated from *translate* crate version *0.1.8+20141123*, where *20141123* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *translate* *v2* API can be found at the
 [official documentation site](https://developers.google.com/translate/v2/using_rest).

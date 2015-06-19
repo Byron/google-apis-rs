@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storage1"
-version = "0.1.7+20150326"
+version = "0.1.8+20150326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storage1"
@@ -12,13 +12,17 @@ homepage = "https://developers.google.com/storage/docs/json_api/"
 documentation = "http://byron.github.io/google-apis-rs/google_storage1"
 license = "MIT"
 keywords = ["storage", "google", "protocol", "web", "api"]
+build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 url = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-json-tools = ">= 0.3.0"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

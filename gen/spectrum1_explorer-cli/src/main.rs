@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_get_spectrum(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsGetSpectrumRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,341 +64,72 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_antenna_init(request: &mut api::PawsGetSpectrumRequest) {
-                if request.antenna.is_none() {
-                    request.antenna = Some(Default::default());
-                }
-            }
-            
-            fn request_device_desc_init(request: &mut api::PawsGetSpectrumRequest) {
-                if request.device_desc.is_none() {
-                    request.device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::PawsGetSpectrumRequest) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_center_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_location_point_init(request);
-                if request.location.as_mut().unwrap().point.as_mut().unwrap().center.is_none() {
-                    request.location.as_mut().unwrap().point.as_mut().unwrap().center = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_location_init(request);
-                if request.location.as_mut().unwrap().point.is_none() {
-                    request.location.as_mut().unwrap().point = Some(Default::default());
-                }
-            }
-            
-            fn request_master_device_desc_init(request: &mut api::PawsGetSpectrumRequest) {
-                if request.master_device_desc.is_none() {
-                    request.master_device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_init(request: &mut api::PawsGetSpectrumRequest) {
-                if request.owner.is_none() {
-                    request.owner = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_adr_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_email_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().email.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_init(request);
-                if request.owner.as_mut().unwrap().operator.is_none() {
-                    request.owner.as_mut().unwrap().operator = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_org_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().org.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_tel_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_adr_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_email_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().email.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.is_none() {
-                    request.owner.as_mut().unwrap().owner = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_org_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().org.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_tel_init(request: &mut api::PawsGetSpectrumRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "device-desc.etsi-en-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.serial-number" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-technology-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-tvbd-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-category" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.ruleset-ids" => {
-                        request_device_desc_init(&mut request);
-                        if request.device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-emissions-class" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.manufacturer-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.model-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "version" => {
-                        request_device_desc_init(&mut request);
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-type" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_type = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-uncertainty" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_uncertainty = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height-uncertainty", "number"));
-                    },
-                "antenna.height" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height", "number"));
-                    },
-                "request-type" => {
-                        request_antenna_init(&mut request);
-                        request.request_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-type" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.fcc-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.serial-number" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-technology-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.fcc-tvbd-device-type" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-category" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.ruleset-ids" => {
-                        request_master_device_desc_init(&mut request);
-                        if request.master_device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.master_device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.master_device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-emissions-class" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.manufacturer-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.model-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "location.confidence" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().confidence = Some(arg_from_str(value.unwrap_or("-0"), err, "location.confidence", "integer"));
-                    },
-                "location.point.semi-minor-axis" => {
-                        request_location_point_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_minor_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-minor-axis", "number"));
-                    },
-                "location.point.center.latitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.latitude", "number"));
-                    },
-                "location.point.center.longitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.longitude", "number"));
-                    },
-                "location.point.semi-major-axis" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_major_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-major-axis", "number"));
-                    },
-                "location.point.orientation" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().orientation = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.orientation", "number"));
-                    },
-                "owner.operator.org.text" => {
-                        request_owner_operator_org_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.tel.uri" => {
-                        request_owner_operator_tel_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.email.text" => {
-                        request_owner_operator_email_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.fn" => {
-                        request_owner_operator_email_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.code" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.locality" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.country" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.region" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.pobox" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.street" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.org.text" => {
-                        request_owner_owner_org_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.tel.uri" => {
-                        request_owner_owner_tel_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.email.text" => {
-                        request_owner_owner_email_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.fn" => {
-                        request_owner_owner_email_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.code" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.locality" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.country" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.region" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.pobox" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.street" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_owner_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "request-type", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-category" => Some(("masterDeviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "master-device-desc.etsi-en-device-emissions-class" => Some(("masterDeviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.manufacturer-id" => Some(("masterDeviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.model-id" => Some(("masterDeviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.email.text" => Some(("owner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.fn" => Some(("owner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.email.text" => Some(("owner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.fn" => Some(("owner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "request-type", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsGetSpectrumRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().get_spectrum(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -413,9 +144,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -437,7 +170,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -447,8 +180,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_get_spectrum_batch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsGetSpectrumBatchRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -463,297 +197,66 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_antenna_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                if request.antenna.is_none() {
-                    request.antenna = Some(Default::default());
-                }
-            }
-            
-            fn request_device_desc_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                if request.device_desc.is_none() {
-                    request.device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_master_device_desc_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                if request.master_device_desc.is_none() {
-                    request.master_device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                if request.owner.is_none() {
-                    request.owner = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_adr_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_email_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().email.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_init(request);
-                if request.owner.as_mut().unwrap().operator.is_none() {
-                    request.owner.as_mut().unwrap().operator = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_org_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().org.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_operator_tel_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_operator_init(request);
-                if request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel.is_none() {
-                    request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_adr_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_email_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().email.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.is_none() {
-                    request.owner.as_mut().unwrap().owner = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_org_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().org.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_owner_owner_tel_init(request: &mut api::PawsGetSpectrumBatchRequest) {
-                request_owner_owner_init(request);
-                if request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel.is_none() {
-                    request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "device-desc.etsi-en-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.serial-number" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-technology-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-tvbd-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-category" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.ruleset-ids" => {
-                        request_device_desc_init(&mut request);
-                        if request.device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-emissions-class" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.manufacturer-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.model-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "version" => {
-                        request_device_desc_init(&mut request);
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-type" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_type = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-uncertainty" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_uncertainty = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height-uncertainty", "number"));
-                    },
-                "antenna.height" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height", "number"));
-                    },
-                "request-type" => {
-                        request_antenna_init(&mut request);
-                        request.request_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-type" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.fcc-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.serial-number" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-technology-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.fcc-tvbd-device-type" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-category" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.ruleset-ids" => {
-                        request_master_device_desc_init(&mut request);
-                        if request.master_device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.master_device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.master_device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.etsi-en-device-emissions-class" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.manufacturer-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "master-device-desc.model-id" => {
-                        request_master_device_desc_init(&mut request);
-                        request.master_device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.org.text" => {
-                        request_owner_operator_org_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.tel.uri" => {
-                        request_owner_operator_tel_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.email.text" => {
-                        request_owner_operator_email_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.fn" => {
-                        request_owner_operator_email_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.code" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.locality" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.country" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.region" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.pobox" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.operator.adr.street" => {
-                        request_owner_operator_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.org.text" => {
-                        request_owner_owner_org_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.tel.uri" => {
-                        request_owner_owner_tel_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.email.text" => {
-                        request_owner_owner_email_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.fn" => {
-                        request_owner_owner_email_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.code" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.locality" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.country" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.region" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.pobox" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "owner.owner.adr.street" => {
-                        request_owner_owner_adr_init(&mut request);
-                        request.owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_owner_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "code", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "locality", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "owner", "pobox", "region", "request-type", "ruleset-ids", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "request-type" => Some(("requestType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-type" => Some(("masterDeviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-id" => Some(("masterDeviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.serial-number" => Some(("masterDeviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-technology-id" => Some(("masterDeviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.fcc-tvbd-device-type" => Some(("masterDeviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.etsi-en-device-category" => Some(("masterDeviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.ruleset-ids" => Some(("masterDeviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "master-device-desc.etsi-en-device-emissions-class" => Some(("masterDeviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.manufacturer-id" => Some(("masterDeviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-device-desc.model-id" => Some(("masterDeviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.org.text" => Some(("owner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.tel.uri" => Some(("owner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.email.text" => Some(("owner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.fn" => Some(("owner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.code" => Some(("owner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.locality" => Some(("owner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.country" => Some(("owner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.region" => Some(("owner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.pobox" => Some(("owner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.operator.adr.street" => Some(("owner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.org.text" => Some(("owner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.tel.uri" => Some(("owner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.email.text" => Some(("owner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.fn" => Some(("owner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.code" => Some(("owner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.locality" => Some(("owner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.country" => Some(("owner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.region" => Some(("owner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.pobox" => Some(("owner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "owner.owner.adr.street" => Some(("owner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "code", "country", "device-desc", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "locality", "manufacturer-id", "master-device-desc", "model-id", "operator", "org", "owner", "pobox", "region", "request-type", "ruleset-ids", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsGetSpectrumBatchRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().get_spectrum_batch(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -768,9 +271,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -792,7 +297,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -802,8 +307,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_init(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsInitRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -818,114 +324,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_device_desc_init(request: &mut api::PawsInitRequest) {
-                if request.device_desc.is_none() {
-                    request.device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::PawsInitRequest) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_center_init(request: &mut api::PawsInitRequest) {
-                request_location_point_init(request);
-                if request.location.as_mut().unwrap().point.as_mut().unwrap().center.is_none() {
-                    request.location.as_mut().unwrap().point.as_mut().unwrap().center = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_init(request: &mut api::PawsInitRequest) {
-                request_location_init(request);
-                if request.location.as_mut().unwrap().point.is_none() {
-                    request.location.as_mut().unwrap().point = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "device-desc.etsi-en-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.serial-number" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-technology-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-tvbd-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-category" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.ruleset-ids" => {
-                        request_device_desc_init(&mut request);
-                        if request.device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-emissions-class" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.manufacturer-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.model-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_device_desc_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "location.confidence" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().confidence = Some(arg_from_str(value.unwrap_or("-0"), err, "location.confidence", "integer"));
-                    },
-                "location.point.semi-minor-axis" => {
-                        request_location_point_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_minor_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-minor-axis", "number"));
-                    },
-                "location.point.center.latitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.latitude", "number"));
-                    },
-                "location.point.center.longitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.longitude", "number"));
-                    },
-                "location.point.semi-major-axis" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_major_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-major-axis", "number"));
-                    },
-                "location.point.orientation" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().orientation = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.orientation", "number"));
-                    },
-                "version" => {
-                        request_location_init(&mut request);
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsInitRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().init(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -940,9 +370,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -964,7 +396,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -974,8 +406,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_notify_spectrum_use(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsNotifySpectrumUseRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -990,114 +423,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_device_desc_init(request: &mut api::PawsNotifySpectrumUseRequest) {
-                if request.device_desc.is_none() {
-                    request.device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::PawsNotifySpectrumUseRequest) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_center_init(request: &mut api::PawsNotifySpectrumUseRequest) {
-                request_location_point_init(request);
-                if request.location.as_mut().unwrap().point.as_mut().unwrap().center.is_none() {
-                    request.location.as_mut().unwrap().point.as_mut().unwrap().center = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_init(request: &mut api::PawsNotifySpectrumUseRequest) {
-                request_location_init(request);
-                if request.location.as_mut().unwrap().point.is_none() {
-                    request.location.as_mut().unwrap().point = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "device-desc.etsi-en-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.serial-number" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-technology-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-tvbd-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-category" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.ruleset-ids" => {
-                        request_device_desc_init(&mut request);
-                        if request.device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-emissions-class" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.manufacturer-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.model-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_device_desc_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "location.confidence" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().confidence = Some(arg_from_str(value.unwrap_or("-0"), err, "location.confidence", "integer"));
-                    },
-                "location.point.semi-minor-axis" => {
-                        request_location_point_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_minor_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-minor-axis", "number"));
-                    },
-                "location.point.center.latitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.latitude", "number"));
-                    },
-                "location.point.center.longitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.longitude", "number"));
-                    },
-                "location.point.semi-major-axis" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_major_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-major-axis", "number"));
-                    },
-                "location.point.orientation" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().orientation = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.orientation", "number"));
-                    },
-                "version" => {
-                        request_location_init(&mut request);
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["center", "confidence", "device-desc", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "latitude", "location", "longitude", "manufacturer-id", "model-id", "orientation", "point", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "type", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsNotifySpectrumUseRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().notify_spectrum_use(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1112,9 +469,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1136,7 +495,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1146,8 +505,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_register(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsRegisterRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1162,288 +522,61 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_antenna_init(request: &mut api::PawsRegisterRequest) {
-                if request.antenna.is_none() {
-                    request.antenna = Some(Default::default());
-                }
-            }
-            
-            fn request_device_desc_init(request: &mut api::PawsRegisterRequest) {
-                if request.device_desc.is_none() {
-                    request.device_desc = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_init(request: &mut api::PawsRegisterRequest) {
-                if request.device_owner.is_none() {
-                    request.device_owner = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_operator_adr_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_operator_init(request);
-                if request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.is_none() {
-                    request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_operator_email_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_operator_init(request);
-                if request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().email.is_none() {
-                    request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_operator_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_init(request);
-                if request.device_owner.as_mut().unwrap().operator.is_none() {
-                    request.device_owner.as_mut().unwrap().operator = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_operator_org_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_operator_init(request);
-                if request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().org.is_none() {
-                    request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_operator_tel_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_operator_init(request);
-                if request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().tel.is_none() {
-                    request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_owner_adr_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_owner_init(request);
-                if request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.is_none() {
-                    request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_owner_email_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_owner_init(request);
-                if request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().email.is_none() {
-                    request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().email = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_owner_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_init(request);
-                if request.device_owner.as_mut().unwrap().owner.is_none() {
-                    request.device_owner.as_mut().unwrap().owner = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_owner_org_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_owner_init(request);
-                if request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().org.is_none() {
-                    request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().org = Some(Default::default());
-                }
-            }
-            
-            fn request_device_owner_owner_tel_init(request: &mut api::PawsRegisterRequest) {
-                request_device_owner_owner_init(request);
-                if request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().tel.is_none() {
-                    request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().tel = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::PawsRegisterRequest) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_center_init(request: &mut api::PawsRegisterRequest) {
-                request_location_point_init(request);
-                if request.location.as_mut().unwrap().point.as_mut().unwrap().center.is_none() {
-                    request.location.as_mut().unwrap().point.as_mut().unwrap().center = Some(Default::default());
-                }
-            }
-            
-            fn request_location_point_init(request: &mut api::PawsRegisterRequest) {
-                request_location_init(request);
-                if request.location.as_mut().unwrap().point.is_none() {
-                    request.location.as_mut().unwrap().point = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "device-desc.etsi-en-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.serial-number" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-technology-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_technology_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.fcc-tvbd-device-type" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().fcc_tvbd_device_type = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-category" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_category = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.ruleset-ids" => {
-                        request_device_desc_init(&mut request);
-                        if request.device_desc.as_mut().unwrap().ruleset_ids.is_none() {
-                           request.device_desc.as_mut().unwrap().ruleset_ids = Some(Default::default());
-                        }
-                                        request.device_desc.as_mut().unwrap().ruleset_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "device-desc.etsi-en-device-emissions-class" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().etsi_en_device_emissions_class = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.manufacturer-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().manufacturer_id = Some(value.unwrap_or("").to_string());
-                    },
-                "device-desc.model-id" => {
-                        request_device_desc_init(&mut request);
-                        request.device_desc.as_mut().unwrap().model_id = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-type" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_type = Some(value.unwrap_or("").to_string());
-                    },
-                "antenna.height-uncertainty" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height_uncertainty = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height-uncertainty", "number"));
-                    },
-                "antenna.height" => {
-                        request_antenna_init(&mut request);
-                        request.antenna.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("0.0"), err, "antenna.height", "number"));
-                    },
-                "device-owner.operator.org.text" => {
-                        request_device_owner_operator_org_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.tel.uri" => {
-                        request_device_owner_operator_tel_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.email.text" => {
-                        request_device_owner_operator_email_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.fn" => {
-                        request_device_owner_operator_email_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.code" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.locality" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.country" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.region" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.pobox" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.operator.adr.street" => {
-                        request_device_owner_operator_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().operator.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.org.text" => {
-                        request_device_owner_owner_org_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().org.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.tel.uri" => {
-                        request_device_owner_owner_tel_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().tel.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.email.text" => {
-                        request_device_owner_owner_email_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().email.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.fn" => {
-                        request_device_owner_owner_email_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().fn_ = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.code" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().code = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.locality" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().locality = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.country" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.region" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().region = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.pobox" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().pobox = Some(value.unwrap_or("").to_string());
-                    },
-                "device-owner.owner.adr.street" => {
-                        request_device_owner_owner_adr_init(&mut request);
-                        request.device_owner.as_mut().unwrap().owner.as_mut().unwrap().adr.as_mut().unwrap().street = Some(value.unwrap_or("").to_string());
-                    },
-                "version" => {
-                        request_device_owner_init(&mut request);
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                "location.confidence" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().confidence = Some(arg_from_str(value.unwrap_or("-0"), err, "location.confidence", "integer"));
-                    },
-                "location.point.semi-minor-axis" => {
-                        request_location_point_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_minor_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-minor-axis", "number"));
-                    },
-                "location.point.center.latitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.latitude", "number"));
-                    },
-                "location.point.center.longitude" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().center.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.center.longitude", "number"));
-                    },
-                "location.point.semi-major-axis" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().semi_major_axis = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.semi-major-axis", "number"));
-                    },
-                "location.point.orientation" => {
-                        request_location_point_center_init(&mut request);
-                        request.location.as_mut().unwrap().point.as_mut().unwrap().orientation = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.point.orientation", "number"));
-                    },
-                "type" => {
-                        request_location_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "device-owner", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "device-desc.etsi-en-device-type" => Some(("deviceDesc.etsiEnDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-id" => Some(("deviceDesc.fccId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.serial-number" => Some(("deviceDesc.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-technology-id" => Some(("deviceDesc.etsiEnTechnologyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.fcc-tvbd-device-type" => Some(("deviceDesc.fccTvbdDeviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.etsi-en-device-category" => Some(("deviceDesc.etsiEnDeviceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.ruleset-ids" => Some(("deviceDesc.rulesetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "device-desc.etsi-en-device-emissions-class" => Some(("deviceDesc.etsiEnDeviceEmissionsClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.manufacturer-id" => Some(("deviceDesc.manufacturerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-desc.model-id" => Some(("deviceDesc.modelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-type" => Some(("antenna.heightType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "antenna.height-uncertainty" => Some(("antenna.heightUncertainty", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "antenna.height" => Some(("antenna.height", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "device-owner.operator.org.text" => Some(("deviceOwner.operator.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.tel.uri" => Some(("deviceOwner.operator.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.email.text" => Some(("deviceOwner.operator.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.fn" => Some(("deviceOwner.operator.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.code" => Some(("deviceOwner.operator.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.locality" => Some(("deviceOwner.operator.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.country" => Some(("deviceOwner.operator.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.region" => Some(("deviceOwner.operator.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.pobox" => Some(("deviceOwner.operator.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.operator.adr.street" => Some(("deviceOwner.operator.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.org.text" => Some(("deviceOwner.owner.org.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.tel.uri" => Some(("deviceOwner.owner.tel.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.email.text" => Some(("deviceOwner.owner.email.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.fn" => Some(("deviceOwner.owner.fn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.code" => Some(("deviceOwner.owner.adr.code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.locality" => Some(("deviceOwner.owner.adr.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.country" => Some(("deviceOwner.owner.adr.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.region" => Some(("deviceOwner.owner.adr.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.pobox" => Some(("deviceOwner.owner.adr.pobox", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner.owner.adr.street" => Some(("deviceOwner.owner.adr.street", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.confidence" => Some(("location.confidence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "location.point.semi-minor-axis" => Some(("location.point.semiMinorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.latitude" => Some(("location.point.center.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.center.longitude" => Some(("location.point.center.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.semi-major-axis" => Some(("location.point.semiMajorAxis", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.point.orientation" => Some(("location.point.orientation", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["adr", "antenna", "center", "code", "confidence", "country", "device-desc", "device-owner", "email", "etsi-en-device-category", "etsi-en-device-emissions-class", "etsi-en-device-type", "etsi-en-technology-id", "fcc-id", "fcc-tvbd-device-type", "fn", "height", "height-type", "height-uncertainty", "latitude", "locality", "location", "longitude", "manufacturer-id", "model-id", "operator", "org", "orientation", "owner", "pobox", "point", "region", "ruleset-ids", "semi-major-axis", "semi-minor-axis", "serial-number", "street", "tel", "text", "type", "uri", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsRegisterRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().register(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1458,9 +591,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1482,7 +617,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1492,8 +627,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _paws_verify_device(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PawsVerifyDeviceRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1508,19 +644,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "version" => {
-                        request.version = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["type", "version"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["type", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PawsVerifyDeviceRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.paws().verify_device(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1535,9 +674,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1559,7 +700,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1677,6 +818,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("paws", "methods: 'get-spectrum', 'get-spectrum-batch', 'init', 'notify-spectrum-use', 'register' and 'verify-device'", vec![
             ("get-spectrum",  
@@ -1817,7 +959,7 @@ fn main() {
     
     let mut app = App::new("spectrum1-explorer")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150112")
+           .version("0.3.0+20150112")
            .about("API for spectrum-management functions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli")
            .arg(Arg::with_name("folder")
@@ -1853,7 +995,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1881,12 +1024,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1902,4 +1045,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

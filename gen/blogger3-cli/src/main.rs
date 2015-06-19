@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -64,9 +63,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-posts"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-posts"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -91,7 +92,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -120,9 +121,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-posts", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-posts", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -147,7 +150,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -173,9 +176,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -200,7 +205,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -235,9 +240,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "fetch-user-info", "role", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "fetch-user-info", "role", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -262,7 +269,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -285,9 +292,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -312,7 +321,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -335,9 +344,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -381,9 +392,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -408,7 +421,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -452,9 +465,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -479,7 +494,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -520,9 +535,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "start-date", "end-date", "max-results", "page-token", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -547,7 +564,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -570,9 +587,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -597,7 +616,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -620,9 +639,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -647,7 +668,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -673,9 +694,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["range"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["range"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -700,7 +723,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -723,9 +746,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -769,9 +794,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -796,7 +823,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -806,8 +833,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _pages_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -822,89 +850,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Page) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Page) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Page) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_author_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_author_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_blog_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_blog_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_blog_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Page = json::value::from_value(object).unwrap();
         let mut call = self.hub.pages().insert(request, opt.value_of("blog-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -922,9 +896,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["is-draft"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["is-draft"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -949,7 +925,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -987,9 +963,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "page-token", "fetch-bodies", "max-results", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "page-token", "fetch-bodies", "max-results", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1014,7 +992,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1024,8 +1002,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _pages_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1040,89 +1019,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Page) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Page) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Page) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_author_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_author_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_blog_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_blog_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_blog_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Page = json::value::from_value(object).unwrap();
         let mut call = self.hub.pages().patch(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1143,9 +1068,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["revert", "publish"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["revert", "publish"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1170,7 +1097,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1193,9 +1120,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1220,7 +1149,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1243,9 +1172,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1270,7 +1201,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1280,8 +1211,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _pages_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Page::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1296,89 +1228,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Page) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Page) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Page) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_author_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_author_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_blog_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_blog_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_blog_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "display-name", "etag", "id", "image", "kind", "published", "self-link", "status", "title", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Page = json::value::from_value(object).unwrap();
         let mut call = self.hub.pages().update(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("page-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1399,9 +1277,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["revert", "publish"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["revert", "publish"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1426,7 +1306,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1452,9 +1332,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-comments"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-comments"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1479,7 +1361,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1529,9 +1411,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1556,7 +1440,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1579,9 +1463,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1634,9 +1520,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["fetch-body", "max-comments", "fetch-images", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fetch-body", "max-comments", "fetch-images", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1661,7 +1549,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1690,9 +1578,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-comments", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-comments", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1717,7 +1607,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1727,8 +1617,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _posts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1743,143 +1634,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Post) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Post) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Post) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::Post) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_replies_init(request: &mut api::Post) {
-                if request.replies.is_none() {
-                    request.replies = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "title-link" => {
-                        request.title_link = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "reader-comments" => {
-                        request_author_init(&mut request);
-                        request.reader_comments = Some(value.unwrap_or("").to_string());
-                    },
-                "labels" => {
-                        request_author_init(&mut request);
-                        if request.labels.is_none() {
-                           request.labels = Some(Default::default());
-                        }
-                                        request.labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "custom-meta-data" => {
-                        request_author_init(&mut request);
-                        request.custom_meta_data = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_author_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "location.lat" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lat", "number"));
-                    },
-                "location.lng" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lng", "number"));
-                    },
-                "location.span" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().span = Some(value.unwrap_or("").to_string());
-                    },
-                "location.name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.total-items" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().total_items = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.self-link" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_replies_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_replies_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replies_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_replies_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title-link" => Some(("titleLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reader-comments" => Some(("readerComments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-meta-data" => Some(("customMetaData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.lat" => Some(("location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.lng" => Some(("location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.span" => Some(("location.span", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.name" => Some(("location.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.total-items" => Some(("replies.totalItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.self-link" => Some(("replies.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Post = json::value::from_value(object).unwrap();
         let mut call = self.hub.posts().insert(request, opt.value_of("blog-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1903,9 +1696,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["fetch-images", "is-draft", "fetch-body"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fetch-images", "is-draft", "fetch-body"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1930,7 +1725,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1983,9 +1778,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "fetch-images", "view"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["status", "start-date", "end-date", "labels", "max-results", "page-token", "order-by", "fetch-bodies", "fetch-images", "view"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2010,7 +1807,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2020,8 +1817,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _posts_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2036,143 +1834,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Post) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Post) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Post) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::Post) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_replies_init(request: &mut api::Post) {
-                if request.replies.is_none() {
-                    request.replies = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "title-link" => {
-                        request.title_link = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "reader-comments" => {
-                        request_author_init(&mut request);
-                        request.reader_comments = Some(value.unwrap_or("").to_string());
-                    },
-                "labels" => {
-                        request_author_init(&mut request);
-                        if request.labels.is_none() {
-                           request.labels = Some(Default::default());
-                        }
-                                        request.labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "custom-meta-data" => {
-                        request_author_init(&mut request);
-                        request.custom_meta_data = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_author_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "location.lat" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lat", "number"));
-                    },
-                "location.lng" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lng", "number"));
-                    },
-                "location.span" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().span = Some(value.unwrap_or("").to_string());
-                    },
-                "location.name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.total-items" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().total_items = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.self-link" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_replies_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_replies_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replies_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_replies_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title-link" => Some(("titleLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reader-comments" => Some(("readerComments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-meta-data" => Some(("customMetaData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.lat" => Some(("location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.lng" => Some(("location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.span" => Some(("location.span", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.name" => Some(("location.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.total-items" => Some(("replies.totalItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.self-link" => Some(("replies.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Post = json::value::from_value(object).unwrap();
         let mut call = self.hub.posts().patch(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2202,9 +1902,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-comments", "revert", "fetch-images", "publish", "fetch-body"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-comments", "revert", "fetch-images", "publish", "fetch-body"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2229,7 +1931,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2255,9 +1957,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["publish-date"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["publish-date"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2282,7 +1986,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2305,9 +2009,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2332,7 +2038,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2361,9 +2067,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["order-by", "fetch-bodies"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "fetch-bodies"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2388,7 +2096,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2398,8 +2106,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _posts_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Post::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2414,143 +2123,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_author_image_init(request: &mut api::Post) {
-                request_author_init(request);
-                if request.author.as_mut().unwrap().image.is_none() {
-                    request.author.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_author_init(request: &mut api::Post) {
-                if request.author.is_none() {
-                    request.author = Some(Default::default());
-                }
-            }
-            
-            fn request_blog_init(request: &mut api::Post) {
-                if request.blog.is_none() {
-                    request.blog = Some(Default::default());
-                }
-            }
-            
-            fn request_location_init(request: &mut api::Post) {
-                if request.location.is_none() {
-                    request.location = Some(Default::default());
-                }
-            }
-            
-            fn request_replies_init(request: &mut api::Post) {
-                if request.replies.is_none() {
-                    request.replies = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "content" => {
-                        request.content = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "title-link" => {
-                        request.title_link = Some(value.unwrap_or("").to_string());
-                    },
-                "author.url" => {
-                        request_author_init(&mut request);
-                        request.author.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.image.url" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().image.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "author.display-name" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "author.id" => {
-                        request_author_image_init(&mut request);
-                        request.author.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "url" => {
-                        request_author_init(&mut request);
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "reader-comments" => {
-                        request_author_init(&mut request);
-                        request.reader_comments = Some(value.unwrap_or("").to_string());
-                    },
-                "labels" => {
-                        request_author_init(&mut request);
-                        if request.labels.is_none() {
-                           request.labels = Some(Default::default());
-                        }
-                                        request.labels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "custom-meta-data" => {
-                        request_author_init(&mut request);
-                        request.custom_meta_data = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_author_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "blog.id" => {
-                        request_blog_init(&mut request);
-                        request.blog.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_blog_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "location.lat" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lat", "number"));
-                    },
-                "location.lng" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "location.lng", "number"));
-                    },
-                "location.span" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().span = Some(value.unwrap_or("").to_string());
-                    },
-                "location.name" => {
-                        request_location_init(&mut request);
-                        request.location.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.total-items" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().total_items = Some(value.unwrap_or("").to_string());
-                    },
-                "replies.self-link" => {
-                        request_replies_init(&mut request);
-                        request.replies.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_replies_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_replies_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replies_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "published" => {
-                        request_replies_init(&mut request);
-                        request.published = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content" => Some(("content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title-link" => Some(("titleLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.url" => Some(("author.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.image.url" => Some(("author.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.display-name" => Some(("author.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "author.id" => Some(("author.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reader-comments" => Some(("readerComments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-meta-data" => Some(("customMetaData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blog.id" => Some(("blog.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.lat" => Some(("location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.lng" => Some(("location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "location.span" => Some(("location.span", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location.name" => Some(("location.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.total-items" => Some(("replies.totalItems", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replies.self-link" => Some(("replies.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author", "blog", "content", "custom-meta-data", "display-name", "etag", "id", "image", "kind", "labels", "lat", "lng", "location", "name", "published", "reader-comments", "replies", "self-link", "span", "status", "title", "title-link", "total-items", "updated", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Post = json::value::from_value(object).unwrap();
         let mut call = self.hub.posts().update(request, opt.value_of("blog-id").unwrap_or(""), opt.value_of("post-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2580,9 +2191,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["max-comments", "revert", "fetch-images", "publish", "fetch-body"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["max-comments", "revert", "fetch-images", "publish", "fetch-body"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2607,7 +2220,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2630,9 +2243,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2657,7 +2272,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2912,6 +2527,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("blog-user-infos", "methods: 'get'", vec![
             ("get",  
@@ -3859,7 +3475,7 @@ fn main() {
     
     let mut app = App::new("blogger3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150422")
+           .version("0.3.0+20150422")
            .about("API for access to the data within Blogger.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_blogger3_cli")
            .arg(Arg::with_name("url")
@@ -3900,7 +3516,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -3928,12 +3545,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -3949,4 +3566,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

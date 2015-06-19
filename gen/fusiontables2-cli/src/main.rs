@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -104,9 +105,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -131,7 +134,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -141,8 +144,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _column_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Column::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -157,70 +161,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_base_column_init(request: &mut api::Column) {
-                if request.base_column.is_none() {
-                    request.base_column = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "graph-predicate" => {
-                        request.graph_predicate = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "valid-values" => {
-                        if request.valid_values.is_none() {
-                           request.valid_values = Some(Default::default());
-                        }
-                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "base-column.table-index" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
-                    },
-                "base-column.column-id" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
-                    },
-                "name" => {
-                        request_base_column_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json" => {
-                        request_base_column_init(&mut request);
-                        request.column_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "format-pattern" => {
-                        request_base_column_init(&mut request);
-                        request.format_pattern = Some(value.unwrap_or("").to_string());
-                    },
-                "column-json-schema" => {
-                        request_base_column_init(&mut request);
-                        request.column_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_base_column_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "validate-data" => {
-                        request_base_column_init(&mut request);
-                        request.validate_data = Some(arg_from_str(value.unwrap_or("false"), err, "validate-data", "boolean"));
-                    },
-                "column-id" => {
-                        request_base_column_init(&mut request);
-                        request.column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "column-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Column = json::value::from_value(object).unwrap();
         let mut call = self.hub.column().insert(request, opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -235,9 +202,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -262,7 +231,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -291,9 +260,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -318,7 +289,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -328,8 +299,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _column_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Column::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -344,70 +316,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_base_column_init(request: &mut api::Column) {
-                if request.base_column.is_none() {
-                    request.base_column = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "graph-predicate" => {
-                        request.graph_predicate = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "valid-values" => {
-                        if request.valid_values.is_none() {
-                           request.valid_values = Some(Default::default());
-                        }
-                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "base-column.table-index" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
-                    },
-                "base-column.column-id" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
-                    },
-                "name" => {
-                        request_base_column_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json" => {
-                        request_base_column_init(&mut request);
-                        request.column_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "format-pattern" => {
-                        request_base_column_init(&mut request);
-                        request.format_pattern = Some(value.unwrap_or("").to_string());
-                    },
-                "column-json-schema" => {
-                        request_base_column_init(&mut request);
-                        request.column_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_base_column_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "validate-data" => {
-                        request_base_column_init(&mut request);
-                        request.validate_data = Some(arg_from_str(value.unwrap_or("false"), err, "validate-data", "boolean"));
-                    },
-                "column-id" => {
-                        request_base_column_init(&mut request);
-                        request.column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "column-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Column = json::value::from_value(object).unwrap();
         let mut call = self.hub.column().patch(request, opt.value_of("table-id").unwrap_or(""), opt.value_of("column-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -422,9 +357,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -449,7 +386,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -459,8 +396,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _column_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Column::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -475,70 +413,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_base_column_init(request: &mut api::Column) {
-                if request.base_column.is_none() {
-                    request.base_column = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "graph-predicate" => {
-                        request.graph_predicate = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "valid-values" => {
-                        if request.valid_values.is_none() {
-                           request.valid_values = Some(Default::default());
-                        }
-                                        request.valid_values.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "base-column.table-index" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().table_index = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.table-index", "integer"));
-                    },
-                "base-column.column-id" => {
-                        request_base_column_init(&mut request);
-                        request.base_column.as_mut().unwrap().column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "base-column.column-id", "integer"));
-                    },
-                "name" => {
-                        request_base_column_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json" => {
-                        request_base_column_init(&mut request);
-                        request.column_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "format-pattern" => {
-                        request_base_column_init(&mut request);
-                        request.format_pattern = Some(value.unwrap_or("").to_string());
-                    },
-                "column-json-schema" => {
-                        request_base_column_init(&mut request);
-                        request.column_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_base_column_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "validate-data" => {
-                        request_base_column_init(&mut request);
-                        request.validate_data = Some(arg_from_str(value.unwrap_or("false"), err, "validate-data", "boolean"));
-                    },
-                "column-id" => {
-                        request_base_column_init(&mut request);
-                        request.column_id = Some(arg_from_str(value.unwrap_or("-0"), err, "column-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "graph-predicate" => Some(("graphPredicate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "valid-values" => Some(("validValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "base-column.table-index" => Some(("baseColumn.tableIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "base-column.column-id" => Some(("baseColumn.columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json" => Some(("columnPropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-pattern" => Some(("formatPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-json-schema" => Some(("columnJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validate-data" => Some(("validateData", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "column-id" => Some(("columnId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["base-column", "column-id", "column-json-schema", "column-properties-json", "description", "format-pattern", "graph-predicate", "kind", "name", "table-index", "type", "valid-values", "validate-data"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Column = json::value::from_value(object).unwrap();
         let mut call = self.hub.column().update(request, opt.value_of("table-id").unwrap_or(""), opt.value_of("column-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -553,9 +454,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -580,7 +483,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -613,9 +516,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["typed", "hdrs"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["typed", "hdrs"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -641,7 +546,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     if !download_mode {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -677,9 +582,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["typed", "hdrs"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["typed", "hdrs"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -705,7 +612,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     if !download_mode {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
                     }
@@ -732,9 +639,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -776,9 +685,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -803,7 +714,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -813,8 +724,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _style_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::StyleSetting::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -829,263 +741,57 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_marker_options_icon_styler_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
-                request_marker_options_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_init(request: &mut api::StyleSetting) {
-                if request.marker_options.is_none() {
-                    request.marker_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_fill_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_init(request: &mut api::StyleSetting) {
-                if request.polygon_options.is_none() {
-                    request.polygon_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_weight_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_init(request: &mut api::StyleSetting) {
-                if request.polyline_options.is_none() {
-                    request.polyline_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_color_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_weight_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
-                    },
-                "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
-                    },
-                "marker-options.icon-styler.column-name" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-styler.kind" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-name" => {
-                        request_marker_options_icon_styler_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_marker_options_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_marker_options_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
-                    },
-                "polygon-options.stroke-opacity" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-opacity" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
-                    },
-                "polyline-options.stroke-weight" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-opacity" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "style-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.style_id = Some(arg_from_str(value.unwrap_or("-0"), err, "style-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::StyleSetting = json::value::from_value(object).unwrap();
         let mut call = self.hub.style().insert(request, opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1100,9 +806,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1127,7 +835,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1156,9 +864,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1183,7 +893,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1193,8 +903,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _style_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::StyleSetting::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1209,263 +920,57 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_marker_options_icon_styler_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
-                request_marker_options_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_init(request: &mut api::StyleSetting) {
-                if request.marker_options.is_none() {
-                    request.marker_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_fill_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_init(request: &mut api::StyleSetting) {
-                if request.polygon_options.is_none() {
-                    request.polygon_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_weight_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_init(request: &mut api::StyleSetting) {
-                if request.polyline_options.is_none() {
-                    request.polyline_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_color_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_weight_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
-                    },
-                "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
-                    },
-                "marker-options.icon-styler.column-name" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-styler.kind" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-name" => {
-                        request_marker_options_icon_styler_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_marker_options_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_marker_options_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
-                    },
-                "polygon-options.stroke-opacity" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-opacity" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
-                    },
-                "polyline-options.stroke-weight" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-opacity" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "style-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.style_id = Some(arg_from_str(value.unwrap_or("-0"), err, "style-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::StyleSetting = json::value::from_value(object).unwrap();
         let style_id: i32 = arg_from_str(&opt.value_of("style-id").unwrap_or(""), err, "<style-id>", "integer");
         let mut call = self.hub.style().patch(request, opt.value_of("table-id").unwrap_or(""), style_id);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
@@ -1481,9 +986,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1508,7 +1015,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1518,8 +1025,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _style_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::StyleSetting::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1534,263 +1042,57 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_marker_options_icon_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_marker_options_icon_styler_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_icon_styler_init(request: &mut api::StyleSetting) {
-                request_marker_options_init(request);
-                if request.marker_options.as_mut().unwrap().icon_styler.is_none() {
-                    request.marker_options.as_mut().unwrap().icon_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_marker_options_init(request: &mut api::StyleSetting) {
-                if request.marker_options.is_none() {
-                    request.marker_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_fill_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_fill_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().fill_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().fill_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_init(request: &mut api::StyleSetting) {
-                if request.polygon_options.is_none() {
-                    request.polygon_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_color_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polygon_options_stroke_weight_styler_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polygon_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polygon_options_init(request);
-                if request.polygon_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polygon_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_init(request: &mut api::StyleSetting) {
-                if request.polyline_options.is_none() {
-                    request.polyline_options = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_color_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_color_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_color_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_color_styler = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_gradient_init(request: &mut api::StyleSetting) {
-                request_polyline_options_stroke_weight_styler_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient = Some(Default::default());
-                }
-            }
-            
-            fn request_polyline_options_stroke_weight_styler_init(request: &mut api::StyleSetting) {
-                request_polyline_options_init(request);
-                if request.polyline_options.as_mut().unwrap().stroke_weight_styler.is_none() {
-                    request.polyline_options.as_mut().unwrap().stroke_weight_styler = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "marker-options.icon-styler.gradient.max" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.max", "number"));
-                    },
-                "marker-options.icon-styler.gradient.min" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "marker-options.icon-styler.gradient.min", "number"));
-                    },
-                "marker-options.icon-styler.column-name" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-styler.kind" => {
-                        request_marker_options_icon_styler_gradient_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "marker-options.icon-name" => {
-                        request_marker_options_icon_styler_init(&mut request);
-                        request.marker_options.as_mut().unwrap().icon_name = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_marker_options_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_marker_options_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.gradient.max" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-color-styler.gradient.min" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-color-styler.column-name" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color-styler.kind" => {
-                        request_polygon_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polygon-options.stroke-weight", "integer"));
-                    },
-                "polygon-options.stroke-opacity" => {
-                        request_polygon_options_stroke_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-opacity", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.max" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.gradient.min" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polygon-options.stroke-weight-styler.column-name" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-weight-styler.kind" => {
-                        request_polygon_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.gradient.max" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.max", "number"));
-                    },
-                "polygon-options.fill-color-styler.gradient.min" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-color-styler.gradient.min", "number"));
-                    },
-                "polygon-options.fill-color-styler.column-name" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color-styler.kind" => {
-                        request_polygon_options_fill_color_styler_gradient_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.stroke-color" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polygon-options.fill-opacity" => {
-                        request_polygon_options_fill_color_styler_init(&mut request);
-                        request.polygon_options.as_mut().unwrap().fill_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polygon-options.fill-opacity", "number"));
-                    },
-                "polyline-options.stroke-weight" => {
-                        request_polyline_options_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight = Some(arg_from_str(value.unwrap_or("-0"), err, "polyline-options.stroke-weight", "integer"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.max" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.gradient.min" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-weight-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-weight-styler.column-name" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-weight-styler.kind" => {
-                        request_polyline_options_stroke_weight_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_weight_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-opacity" => {
-                        request_polyline_options_stroke_weight_styler_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_opacity = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-opacity", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.max" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().max = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.max", "number"));
-                    },
-                "polyline-options.stroke-color-styler.gradient.min" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().gradient.as_mut().unwrap().min = Some(arg_from_str(value.unwrap_or("0.0"), err, "polyline-options.stroke-color-styler.gradient.min", "number"));
-                    },
-                "polyline-options.stroke-color-styler.column-name" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().column_name = Some(value.unwrap_or("").to_string());
-                    },
-                "polyline-options.stroke-color-styler.kind" => {
-                        request_polyline_options_stroke_color_styler_gradient_init(&mut request);
-                        request.polyline_options.as_mut().unwrap().stroke_color_styler.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "style-id" => {
-                        request_polyline_options_init(&mut request);
-                        request.style_id = Some(arg_from_str(value.unwrap_or("-0"), err, "style-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "marker-options.icon-styler.gradient.max" => Some(("markerOptions.iconStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.gradient.min" => Some(("markerOptions.iconStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.column-name" => Some(("markerOptions.iconStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-styler.kind" => Some(("markerOptions.iconStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "marker-options.icon-name" => Some(("markerOptions.iconName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.max" => Some(("polygonOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.gradient.min" => Some(("polygonOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.column-name" => Some(("polygonOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color-styler.kind" => Some(("polygonOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight" => Some(("polygonOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-opacity" => Some(("polygonOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.max" => Some(("polygonOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.gradient.min" => Some(("polygonOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.column-name" => Some(("polygonOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-weight-styler.kind" => Some(("polygonOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.max" => Some(("polygonOptions.fillColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.gradient.min" => Some(("polygonOptions.fillColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.column-name" => Some(("polygonOptions.fillColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color-styler.kind" => Some(("polygonOptions.fillColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-color" => Some(("polygonOptions.fillColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.stroke-color" => Some(("polygonOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polygon-options.fill-opacity" => Some(("polygonOptions.fillOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight" => Some(("polylineOptions.strokeWeight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.max" => Some(("polylineOptions.strokeWeightStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.gradient.min" => Some(("polylineOptions.strokeWeightStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.column-name" => Some(("polylineOptions.strokeWeightStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-weight-styler.kind" => Some(("polylineOptions.strokeWeightStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color" => Some(("polylineOptions.strokeColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-opacity" => Some(("polylineOptions.strokeOpacity", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.max" => Some(("polylineOptions.strokeColorStyler.gradient.max", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.gradient.min" => Some(("polylineOptions.strokeColorStyler.gradient.min", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.column-name" => Some(("polylineOptions.strokeColorStyler.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "polyline-options.stroke-color-styler.kind" => Some(("polylineOptions.strokeColorStyler.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "style-id" => Some(("styleId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["column-name", "fill-color", "fill-color-styler", "fill-opacity", "gradient", "icon-name", "icon-styler", "kind", "marker-options", "max", "min", "name", "polygon-options", "polyline-options", "stroke-color", "stroke-color-styler", "stroke-opacity", "stroke-weight", "stroke-weight-styler", "style-id", "table-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::StyleSetting = json::value::from_value(object).unwrap();
         let style_id: i32 = arg_from_str(&opt.value_of("style-id").unwrap_or(""), err, "<style-id>", "integer");
         let mut call = self.hub.style().update(request, opt.value_of("table-id").unwrap_or(""), style_id);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
@@ -1806,9 +1108,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1833,7 +1137,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1859,9 +1163,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["copy-presentation"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["copy-presentation"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1886,7 +1192,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1909,9 +1215,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1952,9 +1260,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1979,7 +1289,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2017,9 +1327,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["encoding", "end-line", "start-line", "delimiter", "is-strict"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["encoding", "end-line", "start-line", "delimiter", "is-strict"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2048,7 +1360,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2077,9 +1389,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["delimiter", "encoding"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["delimiter", "encoding"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2108,7 +1422,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2118,8 +1432,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _table_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2134,52 +1449,32 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "table-properties-json-schema" => {
-                        request.table_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution" => {
-                        request.attribution = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json-schema" => {
-                        request.column_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "is-exportable" => {
-                        request.is_exportable = Some(arg_from_str(value.unwrap_or("false"), err, "is-exportable", "boolean"));
-                    },
-                "base-table-ids" => {
-                        if request.base_table_ids.is_none() {
-                           request.base_table_ids = Some(Default::default());
-                        }
-                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-properties-json" => {
-                        request.table_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution-link" => {
-                        request.attribution_link = Some(value.unwrap_or("").to_string());
-                    },
-                "sql" => {
-                        request.sql = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.table().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2194,9 +1489,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2221,7 +1518,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2250,9 +1547,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2277,7 +1576,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2287,8 +1586,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _table_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2303,52 +1603,32 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "table-properties-json-schema" => {
-                        request.table_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution" => {
-                        request.attribution = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json-schema" => {
-                        request.column_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "is-exportable" => {
-                        request.is_exportable = Some(arg_from_str(value.unwrap_or("false"), err, "is-exportable", "boolean"));
-                    },
-                "base-table-ids" => {
-                        if request.base_table_ids.is_none() {
-                           request.base_table_ids = Some(Default::default());
-                        }
-                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-properties-json" => {
-                        request.table_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution-link" => {
-                        request.attribution_link = Some(value.unwrap_or("").to_string());
-                    },
-                "sql" => {
-                        request.sql = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.table().patch(request, opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2366,9 +1646,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["replace-view-definition"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["replace-view-definition"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2393,7 +1675,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2431,9 +1713,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["encoding", "end-line", "start-line", "delimiter", "is-strict"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["encoding", "end-line", "start-line", "delimiter", "is-strict"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2462,7 +1746,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2472,8 +1756,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _table_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Table::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2488,52 +1773,32 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "table-properties-json-schema" => {
-                        request.table_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution" => {
-                        request.attribution = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "column-properties-json-schema" => {
-                        request.column_properties_json_schema = Some(value.unwrap_or("").to_string());
-                    },
-                "is-exportable" => {
-                        request.is_exportable = Some(arg_from_str(value.unwrap_or("false"), err, "is-exportable", "boolean"));
-                    },
-                "base-table-ids" => {
-                        if request.base_table_ids.is_none() {
-                           request.base_table_ids = Some(Default::default());
-                        }
-                                        request.base_table_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-properties-json" => {
-                        request.table_properties_json = Some(value.unwrap_or("").to_string());
-                    },
-                "attribution-link" => {
-                        request.attribution_link = Some(value.unwrap_or("").to_string());
-                    },
-                "sql" => {
-                        request.sql = Some(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "table-properties-json-schema" => Some(("tablePropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution" => Some(("attribution", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "column-properties-json-schema" => Some(("columnPropertiesJsonSchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-exportable" => Some(("isExportable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "base-table-ids" => Some(("baseTableIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-properties-json" => Some(("tablePropertiesJson", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attribution-link" => Some(("attributionLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attribution", "attribution-link", "base-table-ids", "column-properties-json-schema", "description", "is-exportable", "kind", "name", "sql", "table-id", "table-properties-json", "table-properties-json-schema"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Table = json::value::from_value(object).unwrap();
         let mut call = self.hub.table().update(request, opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2551,9 +1816,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["replace-view-definition"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["replace-view-definition"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2578,7 +1845,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2601,9 +1868,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2644,9 +1913,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2671,7 +1942,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2703,9 +1974,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2730,7 +2003,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2754,9 +2027,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2798,9 +2073,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2825,7 +2102,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2835,8 +2112,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _template_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Template::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2851,34 +2129,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "body" => {
-                        request.body = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "automatic-column-names" => {
-                        if request.automatic_column_names.is_none() {
-                           request.automatic_column_names = Some(Default::default());
-                        }
-                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "template-id" => {
-                        request.template_id = Some(arg_from_str(value.unwrap_or("-0"), err, "template-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Template = json::value::from_value(object).unwrap();
         let mut call = self.hub.template().insert(request, opt.value_of("table-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2893,9 +2163,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2920,7 +2192,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2949,9 +2221,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2976,7 +2250,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2986,8 +2260,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _template_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Template::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3002,34 +2277,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "body" => {
-                        request.body = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "automatic-column-names" => {
-                        if request.automatic_column_names.is_none() {
-                           request.automatic_column_names = Some(Default::default());
-                        }
-                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "template-id" => {
-                        request.template_id = Some(arg_from_str(value.unwrap_or("-0"), err, "template-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Template = json::value::from_value(object).unwrap();
         let template_id: i32 = arg_from_str(&opt.value_of("template-id").unwrap_or(""), err, "<template-id>", "integer");
         let mut call = self.hub.template().patch(request, opt.value_of("table-id").unwrap_or(""), template_id);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
@@ -3045,9 +2312,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3072,7 +2341,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3082,8 +2351,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _template_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Template::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3098,34 +2368,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "body" => {
-                        request.body = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "automatic-column-names" => {
-                        if request.automatic_column_names.is_none() {
-                           request.automatic_column_names = Some(Default::default());
-                        }
-                                        request.automatic_column_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "table-id" => {
-                        request.table_id = Some(value.unwrap_or("").to_string());
-                    },
-                "template-id" => {
-                        request.template_id = Some(arg_from_str(value.unwrap_or("-0"), err, "template-id", "integer"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "body" => Some(("body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-column-names" => Some(("automaticColumnNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "template-id" => Some(("templateId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["automatic-column-names", "body", "kind", "name", "table-id", "template-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Template = json::value::from_value(object).unwrap();
         let template_id: i32 = arg_from_str(&opt.value_of("template-id").unwrap_or(""), err, "<template-id>", "integer");
         let mut call = self.hub.template().update(request, opt.value_of("table-id").unwrap_or(""), template_id);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
@@ -3141,9 +2403,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3168,7 +2432,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3407,6 +2671,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("column", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
@@ -4309,7 +3574,7 @@ fn main() {
     
     let mut app = App::new("fusiontables2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150326")
+           .version("0.3.0+20150326")
            .about("API for working with Fusion Tables data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fusiontables2_cli")
            .arg(Arg::with_name("url")
@@ -4350,7 +3615,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -4389,12 +3655,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -4410,4 +3676,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

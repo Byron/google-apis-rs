@@ -4,7 +4,7 @@
 [package]
 
 name = "google-discovery1-cli"
-version = "0.2.0+00000000"
+version = "0.3.0+00000000"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1-cli"
@@ -17,19 +17,17 @@ keywords = ["discovery", "google", "cli"]
 name = "discovery1"
 
 [dependencies]
-hyper = ">= 0.5.0"
-mime = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
+yup-oauth2 = "*"
 strsim = "*"
 yup-hyper-mock = ">=1.0.0"
 clap = ">= 0.9.1"
 
-# to adapt to hyper changes ... 
-[dependencies.yup-oauth2]
-version = "*"
-git = "https://github.com/Byron/yup-oauth2"
-rev = "598f5ed496077e9edca36ff95e2ab352c5b22d0f"
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
 
 
 [dependencies.google-discovery1]

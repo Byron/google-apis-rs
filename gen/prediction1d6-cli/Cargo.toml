@@ -4,7 +4,7 @@
 [package]
 
 name = "google-prediction1d6-cli"
-version = "0.2.0+20140522"
+version = "0.3.0+20140522"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with prediction (protocol v1.6)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6-cli"
@@ -17,14 +17,18 @@ keywords = ["prediction", "google", "cli"]
 name = "prediction1d6"
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
-yup-hyper-mock = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-clap = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 
 [dependencies.google-prediction1d6]
 path = "../prediction1d6"

@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -117,9 +118,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -144,7 +147,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -179,9 +182,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["order-by", "page-token", "language", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -206,7 +211,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -229,9 +234,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -256,7 +263,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -288,9 +295,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "sort-order", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "sort-order", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -315,7 +324,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -325,8 +334,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _moments_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Moment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -341,534 +351,144 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_object_init(request: &mut api::Moment) {
-                if request.object.is_none() {
-                    request.object = Some(Default::default());
-                }
-            }
-            
-            fn request_result_init(request: &mut api::Moment) {
-                if request.result.is_none() {
-                    request.result = Some(Default::default());
-                }
-            }
-            
-            fn request_target_init(request: &mut api::Moment) {
-                if request.target.is_none() {
-                    request.target = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "start-date" => {
-                        request.start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "target.start-date" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "target.end-date" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
-                    },
-                "target.text" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "target.image" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
-                    },
-                "target.birth-date" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
-                    },
-                "target.date-published" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
-                    },
-                "target.address-locality" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
-                    },
-                "target.additional-name" => {
-                        request_target_init(&mut request);
-                        if request.target.as_mut().unwrap().additional_name.is_none() {
-                           request.target.as_mut().unwrap().additional_name = Some(Default::default());
-                        }
-                                        request.target.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "target.worst-rating" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "target.duration" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
-                    },
-                "target.thumbnail-url" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
-                    },
-                "target.id" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "target.post-office-box-number" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
-                    },
-                "target.caption" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
-                    },
-                "target.best-rating" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "target.address-country" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "target.address-country", "int64"));
-                    },
-                "target.width" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
-                    },
-                "target.street-address" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
-                    },
-                "target.latitude" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "target.latitude", "number"));
-                    },
-                "target.embed-url" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
-                    },
-                "target.type" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "target.date-modified" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
-                    },
-                "target.content-size" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
-                    },
-                "target.content-url" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
-                    },
-                "target.description" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "target.family-name" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
-                    },
-                "target.date-created" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
-                    },
-                "target.postal-code" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "target.attendee-count" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "target.attendee-count", "integer"));
-                    },
-                "target.height" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
-                    },
-                "target.ticker-symbol" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
-                    },
-                "target.player-type" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
-                    },
-                "target.kind" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "target.name" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "target.url" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "target.gender" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
-                    },
-                "target.longitude" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "target.longitude", "number"));
-                    },
-                "target.address-region" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
-                    },
-                "target.rating-value" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
-                    },
-                "target.given-name" => {
-                        request_target_init(&mut request);
-                        request.target.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
-                    },
-                "object.start-date" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "object.end-date" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
-                    },
-                "object.text" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "object.image" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
-                    },
-                "object.birth-date" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
-                    },
-                "object.date-published" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
-                    },
-                "object.address-locality" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
-                    },
-                "object.additional-name" => {
-                        request_object_init(&mut request);
-                        if request.object.as_mut().unwrap().additional_name.is_none() {
-                           request.object.as_mut().unwrap().additional_name = Some(Default::default());
-                        }
-                                        request.object.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "object.worst-rating" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "object.duration" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
-                    },
-                "object.thumbnail-url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
-                    },
-                "object.id" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "object.post-office-box-number" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
-                    },
-                "object.caption" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
-                    },
-                "object.best-rating" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "object.address-country" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "object.address-country", "int64"));
-                    },
-                "object.width" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
-                    },
-                "object.street-address" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
-                    },
-                "object.latitude" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "object.latitude", "number"));
-                    },
-                "object.embed-url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
-                    },
-                "object.type" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "object.date-modified" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
-                    },
-                "object.content-size" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
-                    },
-                "object.content-url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
-                    },
-                "object.description" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "object.family-name" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
-                    },
-                "object.date-created" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
-                    },
-                "object.postal-code" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "object.attendee-count" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "object.attendee-count", "integer"));
-                    },
-                "object.height" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
-                    },
-                "object.ticker-symbol" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
-                    },
-                "object.player-type" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
-                    },
-                "object.kind" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "object.name" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "object.url" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "object.gender" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
-                    },
-                "object.longitude" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "object.longitude", "number"));
-                    },
-                "object.address-region" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
-                    },
-                "object.rating-value" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
-                    },
-                "object.given-name" => {
-                        request_object_init(&mut request);
-                        request.object.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
-                    },
-                "result.start-date" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "result.end-date" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().end_date = Some(value.unwrap_or("").to_string());
-                    },
-                "result.text" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "result.image" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().image = Some(value.unwrap_or("").to_string());
-                    },
-                "result.birth-date" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().birth_date = Some(value.unwrap_or("").to_string());
-                    },
-                "result.date-published" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_published = Some(value.unwrap_or("").to_string());
-                    },
-                "result.address-locality" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_locality = Some(value.unwrap_or("").to_string());
-                    },
-                "result.additional-name" => {
-                        request_result_init(&mut request);
-                        if request.result.as_mut().unwrap().additional_name.is_none() {
-                           request.result.as_mut().unwrap().additional_name = Some(Default::default());
-                        }
-                                        request.result.as_mut().unwrap().additional_name.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "result.worst-rating" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().worst_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "result.duration" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
-                    },
-                "result.thumbnail-url" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().thumbnail_url = Some(value.unwrap_or("").to_string());
-                    },
-                "result.id" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "result.post-office-box-number" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().post_office_box_number = Some(value.unwrap_or("").to_string());
-                    },
-                "result.caption" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
-                    },
-                "result.best-rating" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().best_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "result.address-country" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_country = Some(arg_from_str(value.unwrap_or("-0"), err, "result.address-country", "int64"));
-                    },
-                "result.width" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().width = Some(value.unwrap_or("").to_string());
-                    },
-                "result.street-address" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().street_address = Some(value.unwrap_or("").to_string());
-                    },
-                "result.latitude" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "result.latitude", "number"));
-                    },
-                "result.embed-url" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().embed_url = Some(value.unwrap_or("").to_string());
-                    },
-                "result.type" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "result.date-modified" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_modified = Some(value.unwrap_or("").to_string());
-                    },
-                "result.content-size" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().content_size = Some(value.unwrap_or("").to_string());
-                    },
-                "result.content-url" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().content_url = Some(value.unwrap_or("").to_string());
-                    },
-                "result.description" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "result.family-name" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().family_name = Some(value.unwrap_or("").to_string());
-                    },
-                "result.date-created" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().date_created = Some(value.unwrap_or("").to_string());
-                    },
-                "result.postal-code" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().postal_code = Some(value.unwrap_or("").to_string());
-                    },
-                "result.attendee-count" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().attendee_count = Some(arg_from_str(value.unwrap_or("-0"), err, "result.attendee-count", "integer"));
-                    },
-                "result.height" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().height = Some(value.unwrap_or("").to_string());
-                    },
-                "result.ticker-symbol" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().ticker_symbol = Some(value.unwrap_or("").to_string());
-                    },
-                "result.player-type" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().player_type = Some(value.unwrap_or("").to_string());
-                    },
-                "result.kind" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "result.name" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "result.url" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "result.gender" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().gender = Some(value.unwrap_or("").to_string());
-                    },
-                "result.longitude" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "result.longitude", "number"));
-                    },
-                "result.address-region" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().address_region = Some(value.unwrap_or("").to_string());
-                    },
-                "result.rating-value" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().rating_value = Some(value.unwrap_or("").to_string());
-                    },
-                "result.given-name" => {
-                        request_result_init(&mut request);
-                        request.result.as_mut().unwrap().given_name = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_result_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_result_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-name", "address-country", "address-locality", "address-region", "attendee-count", "best-rating", "birth-date", "caption", "content-size", "content-url", "date-created", "date-modified", "date-published", "description", "duration", "embed-url", "end-date", "family-name", "gender", "given-name", "height", "id", "image", "kind", "latitude", "longitude", "name", "object", "player-type", "post-office-box-number", "postal-code", "rating-value", "result", "start-date", "street-address", "target", "text", "thumbnail-url", "ticker-symbol", "type", "url", "width", "worst-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "start-date" => Some(("startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.start-date" => Some(("target.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.end-date" => Some(("target.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.text" => Some(("target.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.image" => Some(("target.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.birth-date" => Some(("target.birthDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.date-published" => Some(("target.datePublished", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.address-locality" => Some(("target.addressLocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.additional-name" => Some(("target.additionalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "target.worst-rating" => Some(("target.worstRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.duration" => Some(("target.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.thumbnail-url" => Some(("target.thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.id" => Some(("target.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.post-office-box-number" => Some(("target.postOfficeBoxNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.caption" => Some(("target.caption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.best-rating" => Some(("target.bestRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.address-country" => Some(("target.addressCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "target.width" => Some(("target.width", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.street-address" => Some(("target.streetAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.latitude" => Some(("target.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "target.embed-url" => Some(("target.embedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.type" => Some(("target.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.date-modified" => Some(("target.dateModified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.content-size" => Some(("target.contentSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.content-url" => Some(("target.contentUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.description" => Some(("target.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.family-name" => Some(("target.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.date-created" => Some(("target.dateCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.postal-code" => Some(("target.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.attendee-count" => Some(("target.attendeeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "target.height" => Some(("target.height", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.ticker-symbol" => Some(("target.tickerSymbol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.player-type" => Some(("target.playerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.kind" => Some(("target.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.name" => Some(("target.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.url" => Some(("target.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.gender" => Some(("target.gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.longitude" => Some(("target.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "target.address-region" => Some(("target.addressRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.rating-value" => Some(("target.ratingValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target.given-name" => Some(("target.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.start-date" => Some(("object.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.end-date" => Some(("object.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.text" => Some(("object.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.image" => Some(("object.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.birth-date" => Some(("object.birthDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.date-published" => Some(("object.datePublished", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.address-locality" => Some(("object.addressLocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.additional-name" => Some(("object.additionalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "object.worst-rating" => Some(("object.worstRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.duration" => Some(("object.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.thumbnail-url" => Some(("object.thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.id" => Some(("object.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.post-office-box-number" => Some(("object.postOfficeBoxNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.caption" => Some(("object.caption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.best-rating" => Some(("object.bestRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.address-country" => Some(("object.addressCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "object.width" => Some(("object.width", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.street-address" => Some(("object.streetAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.latitude" => Some(("object.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "object.embed-url" => Some(("object.embedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.type" => Some(("object.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.date-modified" => Some(("object.dateModified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.content-size" => Some(("object.contentSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.content-url" => Some(("object.contentUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.description" => Some(("object.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.family-name" => Some(("object.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.date-created" => Some(("object.dateCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.postal-code" => Some(("object.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.attendee-count" => Some(("object.attendeeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "object.height" => Some(("object.height", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.ticker-symbol" => Some(("object.tickerSymbol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.player-type" => Some(("object.playerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.kind" => Some(("object.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.name" => Some(("object.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.url" => Some(("object.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.gender" => Some(("object.gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.longitude" => Some(("object.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "object.address-region" => Some(("object.addressRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.rating-value" => Some(("object.ratingValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.given-name" => Some(("object.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.start-date" => Some(("result.startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.end-date" => Some(("result.endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.text" => Some(("result.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.image" => Some(("result.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.birth-date" => Some(("result.birthDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.date-published" => Some(("result.datePublished", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.address-locality" => Some(("result.addressLocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.additional-name" => Some(("result.additionalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "result.worst-rating" => Some(("result.worstRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.duration" => Some(("result.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.thumbnail-url" => Some(("result.thumbnailUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.id" => Some(("result.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.post-office-box-number" => Some(("result.postOfficeBoxNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.caption" => Some(("result.caption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.best-rating" => Some(("result.bestRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.address-country" => Some(("result.addressCountry", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "result.width" => Some(("result.width", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.street-address" => Some(("result.streetAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.latitude" => Some(("result.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "result.embed-url" => Some(("result.embedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.type" => Some(("result.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.date-modified" => Some(("result.dateModified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.content-size" => Some(("result.contentSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.content-url" => Some(("result.contentUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.description" => Some(("result.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.family-name" => Some(("result.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.date-created" => Some(("result.dateCreated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.postal-code" => Some(("result.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.attendee-count" => Some(("result.attendeeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "result.height" => Some(("result.height", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.ticker-symbol" => Some(("result.tickerSymbol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.player-type" => Some(("result.playerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.kind" => Some(("result.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.name" => Some(("result.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.url" => Some(("result.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.gender" => Some(("result.gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.longitude" => Some(("result.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "result.address-region" => Some(("result.addressRegion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.rating-value" => Some(("result.ratingValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "result.given-name" => Some(("result.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-name", "address-country", "address-locality", "address-region", "attendee-count", "best-rating", "birth-date", "caption", "content-size", "content-url", "date-created", "date-modified", "date-published", "description", "duration", "embed-url", "end-date", "family-name", "gender", "given-name", "height", "id", "image", "kind", "latitude", "longitude", "name", "object", "player-type", "post-office-box-number", "postal-code", "rating-value", "result", "start-date", "street-address", "target", "text", "thumbnail-url", "ticker-symbol", "type", "url", "width", "worst-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Moment = json::value::from_value(object).unwrap();
         let mut call = self.hub.moments().insert(request, opt.value_of("user-id").unwrap_or(""), opt.value_of("collection").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -886,9 +506,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["debug"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["debug"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -913,7 +535,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -948,9 +570,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "type", "max-results", "target-url"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "type", "max-results", "target-url"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -975,7 +599,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -998,9 +622,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1041,9 +667,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1068,7 +696,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1100,9 +728,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["order-by", "page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["order-by", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1127,7 +757,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1156,9 +786,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1183,7 +815,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1215,9 +847,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "language", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1242,7 +876,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1402,6 +1036,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("activities", "methods: 'get', 'list' and 'search'", vec![
             ("get",  
@@ -1713,7 +1348,7 @@ fn main() {
     
     let mut app = App::new("plus1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150303")
+           .version("0.3.0+20150303")
            .about("The Google+ API enables developers to build on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plus1_cli")
            .arg(Arg::with_name("url")
@@ -1754,7 +1389,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1782,12 +1418,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1803,4 +1439,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

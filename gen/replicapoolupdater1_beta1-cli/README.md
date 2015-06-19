@@ -13,9 +13,18 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 Everything else about the *replicapoolupdater* API can be found at the
 [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
 
+# Downloads
+
+You can download the pre-compiled 64bit binaries for the following platforms:
+
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.0/ubuntu/replicapoolupdater1-beta1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.0/osx/replicapoolupdater1-beta1.tar.gz)
+
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/replicapoolupdater1_beta1-cli).
+
 # Usage
 
-This documentation was generated from the *replicapoolupdater* API at revision *20150326*. The CLI is at version *0.2.0*.
+This documentation was generated from the *replicapoolupdater* API at revision *20150326*. The CLI is at version *0.3.0*.
 
 ```bash
 replicapoolupdater1-beta1 [options]

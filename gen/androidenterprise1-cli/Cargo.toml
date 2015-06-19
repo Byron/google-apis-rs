@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidenterprise1-cli"
-version = "0.2.0+20150309"
+version = "0.3.0+20150309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli"
@@ -16,14 +16,18 @@ keywords = ["androidenterprise", "google", "cli"]
 name = "androidenterprise1"
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
-yup-hyper-mock = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-clap = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 
 [dependencies.google-androidenterprise1]
 path = "../androidenterprise1"

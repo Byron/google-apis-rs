@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -111,9 +112,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -138,7 +141,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -148,8 +151,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Job::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -164,93 +168,34 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_state_custom_fields_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().custom_fields.is_none() {
-                    request.state.as_mut().unwrap().custom_fields = Some(Default::default());
-                }
-            }
-            
-            fn request_state_init(request: &mut api::Job) {
-                if request.state.is_none() {
-                    request.state = Some(Default::default());
-                }
-            }
-            
-            fn request_state_location_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().location.is_none() {
-                    request.state.as_mut().unwrap().location = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "state.kind" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-name" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_name = Some(value.unwrap_or("").to_string());
-                    },
-                "state.title" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "state.note" => {
-                        request_state_init(&mut request);
-                        if request.state.as_mut().unwrap().note.is_none() {
-                           request.state.as_mut().unwrap().note = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().note.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.assignee" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().assignee = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-phone-number" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.lat" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lat", "number"));
-                    },
-                "state.location.kind" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.address-line" => {
-                        request_state_location_init(&mut request);
-                        if request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.is_none() {
-                           request.state.as_mut().unwrap().location.as_mut().unwrap().address_line = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.location.lng" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lng", "number"));
-                    },
-                "state.progress" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().progress = Some(value.unwrap_or("").to_string());
-                    },
-                "state.custom-fields.kind" => {
-                        request_state_custom_fields_init(&mut request);
-                        request.state.as_mut().unwrap().custom_fields.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.kind" => Some(("state.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-name" => Some(("state.customerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.title" => Some(("state.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.note" => Some(("state.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.assignee" => Some(("state.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-phone-number" => Some(("state.customerPhoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.lat" => Some(("state.location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.location.kind" => Some(("state.location.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.address-line" => Some(("state.location.addressLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.location.lng" => Some(("state.location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.progress" => Some(("state.progress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.custom-fields.kind" => Some(("state.customFields.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Job = json::value::from_value(object).unwrap();
         let lat: f64 = arg_from_str(&opt.value_of("lat").unwrap_or(""), err, "<lat>", "number");
         let lng: f64 = arg_from_str(&opt.value_of("lng").unwrap_or(""), err, "<lng>", "number");
         let mut call = self.hub.jobs().insert(request, opt.value_of("team-id").unwrap_or(""), opt.value_of("address").unwrap_or(""), lat, lng, opt.value_of("title").unwrap_or(""));
@@ -282,9 +227,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["note", "custom-field", "customer-phone-number", "customer-name", "assignee"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["note", "custom-field", "customer-phone-number", "customer-name", "assignee"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -309,7 +256,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -341,9 +288,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results", "min-modified-timestamp-ms"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results", "min-modified-timestamp-ms"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -368,7 +317,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -378,8 +327,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Job::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -394,93 +344,34 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_state_custom_fields_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().custom_fields.is_none() {
-                    request.state.as_mut().unwrap().custom_fields = Some(Default::default());
-                }
-            }
-            
-            fn request_state_init(request: &mut api::Job) {
-                if request.state.is_none() {
-                    request.state = Some(Default::default());
-                }
-            }
-            
-            fn request_state_location_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().location.is_none() {
-                    request.state.as_mut().unwrap().location = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "state.kind" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-name" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_name = Some(value.unwrap_or("").to_string());
-                    },
-                "state.title" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "state.note" => {
-                        request_state_init(&mut request);
-                        if request.state.as_mut().unwrap().note.is_none() {
-                           request.state.as_mut().unwrap().note = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().note.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.assignee" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().assignee = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-phone-number" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.lat" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lat", "number"));
-                    },
-                "state.location.kind" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.address-line" => {
-                        request_state_location_init(&mut request);
-                        if request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.is_none() {
-                           request.state.as_mut().unwrap().location.as_mut().unwrap().address_line = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.location.lng" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lng", "number"));
-                    },
-                "state.progress" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().progress = Some(value.unwrap_or("").to_string());
-                    },
-                "state.custom-fields.kind" => {
-                        request_state_custom_fields_init(&mut request);
-                        request.state.as_mut().unwrap().custom_fields.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.kind" => Some(("state.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-name" => Some(("state.customerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.title" => Some(("state.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.note" => Some(("state.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.assignee" => Some(("state.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-phone-number" => Some(("state.customerPhoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.lat" => Some(("state.location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.location.kind" => Some(("state.location.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.address-line" => Some(("state.location.addressLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.location.lng" => Some(("state.location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.progress" => Some(("state.progress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.custom-fields.kind" => Some(("state.customFields.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Job = json::value::from_value(object).unwrap();
         let mut call = self.hub.jobs().patch(request, opt.value_of("team-id").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -525,9 +416,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["customer-name", "title", "note", "assignee", "customer-phone-number", "address", "lat", "progress", "lng", "custom-field"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["customer-name", "title", "note", "assignee", "customer-phone-number", "address", "lat", "progress", "lng", "custom-field"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -552,7 +445,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -562,8 +455,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _jobs_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Job::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -578,93 +472,34 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_state_custom_fields_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().custom_fields.is_none() {
-                    request.state.as_mut().unwrap().custom_fields = Some(Default::default());
-                }
-            }
-            
-            fn request_state_init(request: &mut api::Job) {
-                if request.state.is_none() {
-                    request.state = Some(Default::default());
-                }
-            }
-            
-            fn request_state_location_init(request: &mut api::Job) {
-                request_state_init(request);
-                if request.state.as_mut().unwrap().location.is_none() {
-                    request.state.as_mut().unwrap().location = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "state.kind" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-name" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_name = Some(value.unwrap_or("").to_string());
-                    },
-                "state.title" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "state.note" => {
-                        request_state_init(&mut request);
-                        if request.state.as_mut().unwrap().note.is_none() {
-                           request.state.as_mut().unwrap().note = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().note.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.assignee" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().assignee = Some(value.unwrap_or("").to_string());
-                    },
-                "state.customer-phone-number" => {
-                        request_state_init(&mut request);
-                        request.state.as_mut().unwrap().customer_phone_number = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.lat" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lat = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lat", "number"));
-                    },
-                "state.location.kind" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "state.location.address-line" => {
-                        request_state_location_init(&mut request);
-                        if request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.is_none() {
-                           request.state.as_mut().unwrap().location.as_mut().unwrap().address_line = Some(Default::default());
-                        }
-                                        request.state.as_mut().unwrap().location.as_mut().unwrap().address_line.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "state.location.lng" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().location.as_mut().unwrap().lng = Some(arg_from_str(value.unwrap_or("0.0"), err, "state.location.lng", "number"));
-                    },
-                "state.progress" => {
-                        request_state_location_init(&mut request);
-                        request.state.as_mut().unwrap().progress = Some(value.unwrap_or("").to_string());
-                    },
-                "state.custom-fields.kind" => {
-                        request_state_custom_fields_init(&mut request);
-                        request.state.as_mut().unwrap().custom_fields.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.kind" => Some(("state.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-name" => Some(("state.customerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.title" => Some(("state.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.note" => Some(("state.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.assignee" => Some(("state.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.customer-phone-number" => Some(("state.customerPhoneNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.lat" => Some(("state.location.lat", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.location.kind" => Some(("state.location.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.location.address-line" => Some(("state.location.addressLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "state.location.lng" => Some(("state.location.lng", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "state.progress" => Some(("state.progress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.custom-fields.kind" => Some(("state.customFields.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-line", "assignee", "custom-fields", "customer-name", "customer-phone-number", "id", "kind", "lat", "lng", "location", "note", "progress", "state", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Job = json::value::from_value(object).unwrap();
         let mut call = self.hub.jobs().update(request, opt.value_of("team-id").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -709,9 +544,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["customer-name", "title", "note", "assignee", "customer-phone-number", "address", "lat", "progress", "lng", "custom-field"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["customer-name", "title", "note", "assignee", "customer-phone-number", "address", "lat", "progress", "lng", "custom-field"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -736,7 +573,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -765,9 +602,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -792,7 +631,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -815,9 +654,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -842,7 +683,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -852,8 +693,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _schedule_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Schedule::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -868,28 +710,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "duration" => {
-                        request.duration = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "all-day" => {
-                        request.all_day = Some(arg_from_str(value.unwrap_or("false"), err, "all-day", "boolean"));
-                    },
-                "start-time" => {
-                        request.start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time" => {
-                        request.end_time = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["all-day", "duration", "end-time", "kind", "start-time"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "all-day" => Some(("allDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-day", "duration", "end-time", "kind", "start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Schedule = json::value::from_value(object).unwrap();
         let mut call = self.hub.schedule().patch(request, opt.value_of("team-id").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -916,9 +755,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["duration", "all-day", "end-time", "start-time"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["duration", "all-day", "end-time", "start-time"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -943,7 +784,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -953,8 +794,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _schedule_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Schedule::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -969,28 +811,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "duration" => {
-                        request.duration = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "all-day" => {
-                        request.all_day = Some(arg_from_str(value.unwrap_or("false"), err, "all-day", "boolean"));
-                    },
-                "start-time" => {
-                        request.start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time" => {
-                        request.end_time = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["all-day", "duration", "end-time", "kind", "start-time"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "all-day" => Some(("allDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-day", "duration", "end-time", "kind", "start-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Schedule = json::value::from_value(object).unwrap();
         let mut call = self.hub.schedule().update(request, opt.value_of("team-id").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1017,9 +856,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["duration", "all-day", "end-time", "start-time"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["duration", "all-day", "end-time", "start-time"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1044,7 +885,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1076,9 +917,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["admin", "worker", "dispatcher"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["admin", "worker", "dispatcher"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1103,7 +946,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1126,9 +969,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1153,7 +998,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1329,6 +1174,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("custom-field-def", "methods: 'list'", vec![
             ("list",  
@@ -1712,7 +1558,7 @@ fn main() {
     
     let mut app = App::new("coordinate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20141215")
+           .version("0.3.0+20141215")
            .about("Lets you view and manage jobs in a Coordinate team.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_coordinate1_cli")
            .arg(Arg::with_name("url")
@@ -1753,7 +1599,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1781,12 +1628,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1802,4 +1649,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -85,9 +84,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["sort", "max-results", "dimensions", "start-index", "sampling-level", "filters", "output", "segment"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "sampling-level", "filters", "output", "segment"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -112,7 +113,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -153,9 +154,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["sort", "max-results", "dimensions", "start-index", "sampling-level", "filters"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sort", "max-results", "dimensions", "start-index", "sampling-level", "filters"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -180,7 +183,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -215,9 +218,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["sort", "max-results", "dimensions", "filters"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sort", "max-results", "dimensions", "filters"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -242,7 +247,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -271,9 +276,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -298,7 +305,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -321,9 +328,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -351,8 +360,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_account_user_links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -367,157 +377,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().account_user_links_insert(request, opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -532,9 +430,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -559,7 +459,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -588,9 +488,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -615,7 +517,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -625,8 +527,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_account_user_links_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -641,157 +544,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().account_user_links_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -806,9 +597,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -833,7 +626,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -862,9 +655,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -889,7 +684,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -918,9 +713,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -945,7 +742,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -968,9 +765,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -995,7 +794,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1005,8 +804,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_dimensions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomDimension::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1021,63 +821,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomDimension) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomDimension = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_dimensions_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1092,9 +862,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1119,7 +891,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1148,9 +920,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1175,7 +949,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1185,8 +959,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_dimensions_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomDimension::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1201,63 +976,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomDimension) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomDimension = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_dimensions_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-dimension-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1275,9 +1020,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["ignore-custom-data-source-links"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ignore-custom-data-source-links"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1302,7 +1049,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1312,8 +1059,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_dimensions_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomDimension::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1328,63 +1076,33 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomDimension) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomDimension = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_dimensions_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-dimension-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1402,9 +1120,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["ignore-custom-data-source-links"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ignore-custom-data-source-links"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1429,7 +1149,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1452,9 +1172,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1479,7 +1201,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1489,8 +1211,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_metrics_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomMetric::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1505,73 +1228,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomMetric) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "max-value" => {
-                        request.max_value = Some(value.unwrap_or("").to_string());
-                    },
-                "min-value" => {
-                        request.min_value = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomMetric = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_metrics_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1586,9 +1272,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1613,7 +1301,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1642,9 +1330,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1669,7 +1359,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1679,8 +1369,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_metrics_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomMetric::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1695,73 +1386,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomMetric) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "max-value" => {
-                        request.max_value = Some(value.unwrap_or("").to_string());
-                    },
-                "min-value" => {
-                        request.min_value = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomMetric = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_metrics_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-metric-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1779,9 +1433,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["ignore-custom-data-source-links"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ignore-custom-data-source-links"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1806,7 +1462,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1816,8 +1472,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_custom_metrics_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomMetric::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1832,73 +1489,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::CustomMetric) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "index" => {
-                        request.index = Some(arg_from_str(value.unwrap_or("-0"), err, "index", "integer"));
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "max-value" => {
-                        request.max_value = Some(value.unwrap_or("").to_string());
-                    },
-                "min-value" => {
-                        request.min_value = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "scope" => {
-                        request.scope = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-value" => Some(("max_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "min-value" => Some(("min_value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "created", "href", "id", "index", "kind", "max-value", "min-value", "name", "parent-link", "scope", "self-link", "type", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomMetric = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().custom_metrics_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-metric-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1916,9 +1536,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["ignore-custom-data-source-links"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ignore-custom-data-source-links"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1943,7 +1565,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1966,9 +1588,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2009,9 +1633,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2036,7 +1662,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2046,8 +1672,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_experiments_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Experiment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2062,107 +1689,48 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::Experiment) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "traffic-coverage" => {
-                        request.traffic_coverage = Some(arg_from_str(value.unwrap_or("0.0"), err, "traffic-coverage", "number"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "optimization-type" => {
-                        request.optimization_type = Some(value.unwrap_or("").to_string());
-                    },
-                "objective-metric" => {
-                        request.objective_metric = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "equal-weighting" => {
-                        request.equal_weighting = Some(arg_from_str(value.unwrap_or("false"), err, "equal-weighting", "boolean"));
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet" => {
-                        request.snippet = Some(value.unwrap_or("").to_string());
-                    },
-                "editable-in-ga-ui" => {
-                        request.editable_in_ga_ui = Some(arg_from_str(value.unwrap_or("false"), err, "editable-in-ga-ui", "boolean"));
-                    },
-                "rewrite-variation-urls-as-original" => {
-                        request.rewrite_variation_urls_as_original = Some(arg_from_str(value.unwrap_or("false"), err, "rewrite-variation-urls-as-original", "boolean"));
-                    },
-                "serving-framework" => {
-                        request.serving_framework = Some(value.unwrap_or("").to_string());
-                    },
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-confidence-level" => {
-                        request.winner_confidence_level = Some(arg_from_str(value.unwrap_or("0.0"), err, "winner-confidence-level", "number"));
-                    },
-                "start-time" => {
-                        request.start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-found" => {
-                        request.winner_found = Some(arg_from_str(value.unwrap_or("false"), err, "winner-found", "boolean"));
-                    },
-                "reason-experiment-ended" => {
-                        request.reason_experiment_ended = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "minimum-experiment-length-in-days" => {
-                        request.minimum_experiment_length_in_days = Some(arg_from_str(value.unwrap_or("-0"), err, "minimum-experiment-length-in-days", "integer"));
-                    },
-                "profile-id" => {
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time" => {
-                        request_parent_link_init(&mut request);
-                        request.end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Experiment = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().experiments_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2177,9 +1745,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2204,7 +1774,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2233,9 +1803,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2260,7 +1832,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2270,8 +1842,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_experiments_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Experiment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2286,107 +1859,48 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::Experiment) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "traffic-coverage" => {
-                        request.traffic_coverage = Some(arg_from_str(value.unwrap_or("0.0"), err, "traffic-coverage", "number"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "optimization-type" => {
-                        request.optimization_type = Some(value.unwrap_or("").to_string());
-                    },
-                "objective-metric" => {
-                        request.objective_metric = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "equal-weighting" => {
-                        request.equal_weighting = Some(arg_from_str(value.unwrap_or("false"), err, "equal-weighting", "boolean"));
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet" => {
-                        request.snippet = Some(value.unwrap_or("").to_string());
-                    },
-                "editable-in-ga-ui" => {
-                        request.editable_in_ga_ui = Some(arg_from_str(value.unwrap_or("false"), err, "editable-in-ga-ui", "boolean"));
-                    },
-                "rewrite-variation-urls-as-original" => {
-                        request.rewrite_variation_urls_as_original = Some(arg_from_str(value.unwrap_or("false"), err, "rewrite-variation-urls-as-original", "boolean"));
-                    },
-                "serving-framework" => {
-                        request.serving_framework = Some(value.unwrap_or("").to_string());
-                    },
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-confidence-level" => {
-                        request.winner_confidence_level = Some(arg_from_str(value.unwrap_or("0.0"), err, "winner-confidence-level", "number"));
-                    },
-                "start-time" => {
-                        request.start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-found" => {
-                        request.winner_found = Some(arg_from_str(value.unwrap_or("false"), err, "winner-found", "boolean"));
-                    },
-                "reason-experiment-ended" => {
-                        request.reason_experiment_ended = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "minimum-experiment-length-in-days" => {
-                        request.minimum_experiment_length_in_days = Some(arg_from_str(value.unwrap_or("-0"), err, "minimum-experiment-length-in-days", "integer"));
-                    },
-                "profile-id" => {
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time" => {
-                        request_parent_link_init(&mut request);
-                        request.end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Experiment = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().experiments_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("experiment-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2401,9 +1915,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2428,7 +1944,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2438,8 +1954,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_experiments_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Experiment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2454,107 +1971,48 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_parent_link_init(request: &mut api::Experiment) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "traffic-coverage" => {
-                        request.traffic_coverage = Some(arg_from_str(value.unwrap_or("0.0"), err, "traffic-coverage", "number"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "optimization-type" => {
-                        request.optimization_type = Some(value.unwrap_or("").to_string());
-                    },
-                "objective-metric" => {
-                        request.objective_metric = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "equal-weighting" => {
-                        request.equal_weighting = Some(arg_from_str(value.unwrap_or("false"), err, "equal-weighting", "boolean"));
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet" => {
-                        request.snippet = Some(value.unwrap_or("").to_string());
-                    },
-                "editable-in-ga-ui" => {
-                        request.editable_in_ga_ui = Some(arg_from_str(value.unwrap_or("false"), err, "editable-in-ga-ui", "boolean"));
-                    },
-                "rewrite-variation-urls-as-original" => {
-                        request.rewrite_variation_urls_as_original = Some(arg_from_str(value.unwrap_or("false"), err, "rewrite-variation-urls-as-original", "boolean"));
-                    },
-                "serving-framework" => {
-                        request.serving_framework = Some(value.unwrap_or("").to_string());
-                    },
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "description" => {
-                        request.description = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-confidence-level" => {
-                        request.winner_confidence_level = Some(arg_from_str(value.unwrap_or("0.0"), err, "winner-confidence-level", "number"));
-                    },
-                "start-time" => {
-                        request.start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "winner-found" => {
-                        request.winner_found = Some(arg_from_str(value.unwrap_or("false"), err, "winner-found", "boolean"));
-                    },
-                "reason-experiment-ended" => {
-                        request.reason_experiment_ended = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "minimum-experiment-length-in-days" => {
-                        request.minimum_experiment_length_in_days = Some(arg_from_str(value.unwrap_or("-0"), err, "minimum-experiment-length-in-days", "integer"));
-                    },
-                "profile-id" => {
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "end-time" => {
-                        request_parent_link_init(&mut request);
-                        request.end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "traffic-coverage" => Some(("trafficCoverage", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "optimization-type" => Some(("optimizationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "objective-metric" => Some(("objectiveMetric", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "equal-weighting" => Some(("equalWeighting", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet" => Some(("snippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "editable-in-ga-ui" => Some(("editableInGaUi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "rewrite-variation-urls-as-original" => Some(("rewriteVariationUrlsAsOriginal", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "serving-framework" => Some(("servingFramework", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-confidence-level" => Some(("winnerConfidenceLevel", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "winner-found" => Some(("winnerFound", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "reason-experiment-ended" => Some(("reasonExperimentEnded", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "minimum-experiment-length-in-days" => Some(("minimumExperimentLengthInDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "created", "description", "editable-in-ga-ui", "end-time", "equal-weighting", "href", "id", "internal-web-property-id", "kind", "minimum-experiment-length-in-days", "name", "objective-metric", "optimization-type", "parent-link", "profile-id", "reason-experiment-ended", "rewrite-variation-urls-as-original", "self-link", "serving-framework", "snippet", "start-time", "status", "traffic-coverage", "type", "updated", "web-property-id", "winner-confidence-level", "winner-found"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Experiment = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().experiments_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("experiment-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2569,9 +2027,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2596,7 +2056,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2619,9 +2079,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2646,7 +2108,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2669,9 +2131,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2696,7 +2160,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2706,8 +2170,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_filters_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Filter::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2722,196 +2187,56 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_advanced_details_init(request: &mut api::Filter) {
-                if request.advanced_details.is_none() {
-                    request.advanced_details = Some(Default::default());
-                }
-            }
-            
-            fn request_exclude_details_init(request: &mut api::Filter) {
-                if request.exclude_details.is_none() {
-                    request.exclude_details = Some(Default::default());
-                }
-            }
-            
-            fn request_include_details_init(request: &mut api::Filter) {
-                if request.include_details.is_none() {
-                    request.include_details = Some(Default::default());
-                }
-            }
-            
-            fn request_lowercase_details_init(request: &mut api::Filter) {
-                if request.lowercase_details.is_none() {
-                    request.lowercase_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Filter) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_search_and_replace_details_init(request: &mut api::Filter) {
-                if request.search_and_replace_details.is_none() {
-                    request.search_and_replace_details = Some(Default::default());
-                }
-            }
-            
-            fn request_uppercase_details_init(request: &mut api::Filter) {
-                if request.uppercase_details.is_none() {
-                    request.uppercase_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "uppercase-details.field" => {
-                        request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_uppercase_details_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.override-output-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
-                    },
-                "advanced-details.field-a-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
-                    },
-                "advanced-details.output-constructor" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-b-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
-                    },
-                "advanced-details.case-sensitive" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
-                    },
-                "advanced-details.field-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.output-to-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
-                    },
-                "lowercase-details.field" => {
-                        request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.case-sensitive" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
-                    },
-                "search-and-replace-details.search-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.replace-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.field" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.case-sensitive" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
-                    },
-                "exclude-details.kind" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.match-type" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.expression-value" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.field" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.case-sensitive" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
-                    },
-                "include-details.kind" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.match-type" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.expression-value" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.field" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Filter = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().filters_insert(request, opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2926,9 +2251,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2953,7 +2280,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2982,9 +2309,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3009,7 +2338,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3019,8 +2348,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_filters_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Filter::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3035,196 +2365,56 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_advanced_details_init(request: &mut api::Filter) {
-                if request.advanced_details.is_none() {
-                    request.advanced_details = Some(Default::default());
-                }
-            }
-            
-            fn request_exclude_details_init(request: &mut api::Filter) {
-                if request.exclude_details.is_none() {
-                    request.exclude_details = Some(Default::default());
-                }
-            }
-            
-            fn request_include_details_init(request: &mut api::Filter) {
-                if request.include_details.is_none() {
-                    request.include_details = Some(Default::default());
-                }
-            }
-            
-            fn request_lowercase_details_init(request: &mut api::Filter) {
-                if request.lowercase_details.is_none() {
-                    request.lowercase_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Filter) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_search_and_replace_details_init(request: &mut api::Filter) {
-                if request.search_and_replace_details.is_none() {
-                    request.search_and_replace_details = Some(Default::default());
-                }
-            }
-            
-            fn request_uppercase_details_init(request: &mut api::Filter) {
-                if request.uppercase_details.is_none() {
-                    request.uppercase_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "uppercase-details.field" => {
-                        request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_uppercase_details_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.override-output-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
-                    },
-                "advanced-details.field-a-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
-                    },
-                "advanced-details.output-constructor" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-b-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
-                    },
-                "advanced-details.case-sensitive" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
-                    },
-                "advanced-details.field-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.output-to-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
-                    },
-                "lowercase-details.field" => {
-                        request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.case-sensitive" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
-                    },
-                "search-and-replace-details.search-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.replace-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.field" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.case-sensitive" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
-                    },
-                "exclude-details.kind" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.match-type" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.expression-value" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.field" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.case-sensitive" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
-                    },
-                "include-details.kind" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.match-type" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.expression-value" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.field" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Filter = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().filters_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("filter-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3239,9 +2429,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3266,7 +2458,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3276,8 +2468,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_filters_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Filter::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3292,196 +2485,56 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_advanced_details_init(request: &mut api::Filter) {
-                if request.advanced_details.is_none() {
-                    request.advanced_details = Some(Default::default());
-                }
-            }
-            
-            fn request_exclude_details_init(request: &mut api::Filter) {
-                if request.exclude_details.is_none() {
-                    request.exclude_details = Some(Default::default());
-                }
-            }
-            
-            fn request_include_details_init(request: &mut api::Filter) {
-                if request.include_details.is_none() {
-                    request.include_details = Some(Default::default());
-                }
-            }
-            
-            fn request_lowercase_details_init(request: &mut api::Filter) {
-                if request.lowercase_details.is_none() {
-                    request.lowercase_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Filter) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_search_and_replace_details_init(request: &mut api::Filter) {
-                if request.search_and_replace_details.is_none() {
-                    request.search_and_replace_details = Some(Default::default());
-                }
-            }
-            
-            fn request_uppercase_details_init(request: &mut api::Filter) {
-                if request.uppercase_details.is_none() {
-                    request.uppercase_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "uppercase-details.field" => {
-                        request_uppercase_details_init(&mut request);
-                        request.uppercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request_uppercase_details_init(&mut request);
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.override-output-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().override_output_field = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.override-output-field", "boolean"));
-                    },
-                "advanced-details.field-a-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-a-required", "boolean"));
-                    },
-                "advanced-details.output-constructor" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_constructor = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-b-required" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b_required = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.field-b-required", "boolean"));
-                    },
-                "advanced-details.case-sensitive" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "advanced-details.case-sensitive", "boolean"));
-                    },
-                "advanced-details.field-b" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_b = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.field-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().field_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.extract-a" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().extract_a = Some(value.unwrap_or("").to_string());
-                    },
-                "advanced-details.output-to-field" => {
-                        request_advanced_details_init(&mut request);
-                        request.advanced_details.as_mut().unwrap().output_to_field = Some(value.unwrap_or("").to_string());
-                    },
-                "lowercase-details.field" => {
-                        request_lowercase_details_init(&mut request);
-                        request.lowercase_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.case-sensitive" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "search-and-replace-details.case-sensitive", "boolean"));
-                    },
-                "search-and-replace-details.search-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().search_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.replace-string" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().replace_string = Some(value.unwrap_or("").to_string());
-                    },
-                "search-and-replace-details.field" => {
-                        request_search_and_replace_details_init(&mut request);
-                        request.search_and_replace_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.case-sensitive" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "exclude-details.case-sensitive", "boolean"));
-                    },
-                "exclude-details.kind" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.match-type" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.expression-value" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-details.field" => {
-                        request_exclude_details_init(&mut request);
-                        request.exclude_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.case-sensitive" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "include-details.case-sensitive", "boolean"));
-                    },
-                "include-details.kind" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.match-type" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.expression-value" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().expression_value = Some(value.unwrap_or("").to_string());
-                    },
-                "include-details.field" => {
-                        request_include_details_init(&mut request);
-                        request.include_details.as_mut().unwrap().field = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Filter = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().filters_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("filter-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3496,9 +2549,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3523,7 +2578,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3546,9 +2601,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3573,7 +2630,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3583,8 +2640,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_goals_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Goal::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3599,138 +2657,44 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_event_details_init(request: &mut api::Goal) {
-                if request.event_details.is_none() {
-                    request.event_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Goal) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_url_destination_details_init(request: &mut api::Goal) {
-                if request.url_destination_details.is_none() {
-                    request.url_destination_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_num_pages_details_init(request: &mut api::Goal) {
-                if request.visit_num_pages_details.is_none() {
-                    request.visit_num_pages_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_time_on_site_details_init(request: &mut api::Goal) {
-                if request.visit_time_on_site_details.is_none() {
-                    request.visit_time_on_site_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-type" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-value" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.url" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.case-sensitive" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
-                    },
-                "url-destination-details.match-type" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.first-step-required" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
-                    },
-                "kind" => {
-                        request_url_destination_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "value" => {
-                        request_url_destination_details_init(&mut request);
-                        request.value = Some(arg_from_str(value.unwrap_or("0.0"), err, "value", "number"));
-                    },
-                "visit-num-pages-details.comparison-type" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-num-pages-details.comparison-value" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "event-details.use-event-value" => {
-                        request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
-                    },
-                "web-property-id" => {
-                        request_event_details_init(&mut request);
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request_event_details_init(&mut request);
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "profile-id" => {
-                        request_event_details_init(&mut request);
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Goal = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().goals_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3745,9 +2709,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3772,7 +2738,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3801,9 +2767,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3828,7 +2796,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3838,8 +2806,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_goals_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Goal::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3854,138 +2823,44 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_event_details_init(request: &mut api::Goal) {
-                if request.event_details.is_none() {
-                    request.event_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Goal) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_url_destination_details_init(request: &mut api::Goal) {
-                if request.url_destination_details.is_none() {
-                    request.url_destination_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_num_pages_details_init(request: &mut api::Goal) {
-                if request.visit_num_pages_details.is_none() {
-                    request.visit_num_pages_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_time_on_site_details_init(request: &mut api::Goal) {
-                if request.visit_time_on_site_details.is_none() {
-                    request.visit_time_on_site_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-type" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-value" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.url" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.case-sensitive" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
-                    },
-                "url-destination-details.match-type" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.first-step-required" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
-                    },
-                "kind" => {
-                        request_url_destination_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "value" => {
-                        request_url_destination_details_init(&mut request);
-                        request.value = Some(arg_from_str(value.unwrap_or("0.0"), err, "value", "number"));
-                    },
-                "visit-num-pages-details.comparison-type" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-num-pages-details.comparison-value" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "event-details.use-event-value" => {
-                        request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
-                    },
-                "web-property-id" => {
-                        request_event_details_init(&mut request);
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request_event_details_init(&mut request);
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "profile-id" => {
-                        request_event_details_init(&mut request);
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Goal = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().goals_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("goal-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4000,9 +2875,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4027,7 +2904,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4037,8 +2914,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_goals_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Goal::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4053,138 +2931,44 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_event_details_init(request: &mut api::Goal) {
-                if request.event_details.is_none() {
-                    request.event_details = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Goal) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_url_destination_details_init(request: &mut api::Goal) {
-                if request.url_destination_details.is_none() {
-                    request.url_destination_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_num_pages_details_init(request: &mut api::Goal) {
-                if request.visit_num_pages_details.is_none() {
-                    request.visit_num_pages_details = Some(Default::default());
-                }
-            }
-            
-            fn request_visit_time_on_site_details_init(request: &mut api::Goal) {
-                if request.visit_time_on_site_details.is_none() {
-                    request.visit_time_on_site_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-type" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-time-on-site-details.comparison-value" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.visit_time_on_site_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_visit_time_on_site_details_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.url" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.case-sensitive" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().case_sensitive = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.case-sensitive", "boolean"));
-                    },
-                "url-destination-details.match-type" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().match_type = Some(value.unwrap_or("").to_string());
-                    },
-                "url-destination-details.first-step-required" => {
-                        request_url_destination_details_init(&mut request);
-                        request.url_destination_details.as_mut().unwrap().first_step_required = Some(arg_from_str(value.unwrap_or("false"), err, "url-destination-details.first-step-required", "boolean"));
-                    },
-                "kind" => {
-                        request_url_destination_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "value" => {
-                        request_url_destination_details_init(&mut request);
-                        request.value = Some(arg_from_str(value.unwrap_or("0.0"), err, "value", "number"));
-                    },
-                "visit-num-pages-details.comparison-type" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_type = Some(value.unwrap_or("").to_string());
-                    },
-                "visit-num-pages-details.comparison-value" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.visit_num_pages_details.as_mut().unwrap().comparison_value = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request_visit_num_pages_details_init(&mut request);
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "event-details.use-event-value" => {
-                        request_event_details_init(&mut request);
-                        request.event_details.as_mut().unwrap().use_event_value = Some(arg_from_str(value.unwrap_or("false"), err, "event-details.use-event-value", "boolean"));
-                    },
-                "web-property-id" => {
-                        request_event_details_init(&mut request);
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "active" => {
-                        request_event_details_init(&mut request);
-                        request.active = Some(arg_from_str(value.unwrap_or("false"), err, "active", "boolean"));
-                    },
-                "profile-id" => {
-                        request_event_details_init(&mut request);
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request_parent_link_init(&mut request);
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_parent_link_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_parent_link_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-type" => Some(("visitTimeOnSiteDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-time-on-site-details.comparison-value" => Some(("visitTimeOnSiteDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.url" => Some(("urlDestinationDetails.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.case-sensitive" => Some(("urlDestinationDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "url-destination-details.match-type" => Some(("urlDestinationDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-destination-details.first-step-required" => Some(("urlDestinationDetails.firstStepRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "value" => Some(("value", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-type" => Some(("visitNumPagesDetails.comparisonType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visit-num-pages-details.comparison-value" => Some(("visitNumPagesDetails.comparisonValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-details.use-event-value" => Some(("eventDetails.useEventValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "active" => Some(("active", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "active", "case-sensitive", "comparison-type", "comparison-value", "created", "event-details", "first-step-required", "href", "id", "internal-web-property-id", "kind", "match-type", "name", "parent-link", "profile-id", "self-link", "type", "updated", "url", "url-destination-details", "use-event-value", "value", "visit-num-pages-details", "visit-time-on-site-details", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Goal = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().goals_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("goal-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4199,9 +2983,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4226,7 +3012,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4249,9 +3035,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4292,9 +3080,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4319,7 +3109,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4329,8 +3119,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profile_filter_links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ProfileFilterLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4345,87 +3136,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_filter_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.filter_ref.is_none() {
-                    request.filter_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.profile_ref.is_none() {
-                    request.profile_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "rank" => {
-                        request.rank = Some(arg_from_str(value.unwrap_or("-0"), err, "rank", "integer"));
-                    },
-                "filter-ref.kind" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.href" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.name" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.account-id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.kind" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.name" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.internal-web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.href" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.account-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_profile_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_profile_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ProfileFilterLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profile_filter_links_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4440,9 +3180,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4467,7 +3209,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4496,9 +3238,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4523,7 +3267,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4533,8 +3277,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profile_filter_links_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ProfileFilterLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4549,87 +3294,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_filter_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.filter_ref.is_none() {
-                    request.filter_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.profile_ref.is_none() {
-                    request.profile_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "rank" => {
-                        request.rank = Some(arg_from_str(value.unwrap_or("-0"), err, "rank", "integer"));
-                    },
-                "filter-ref.kind" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.href" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.name" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.account-id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.kind" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.name" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.internal-web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.href" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.account-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_profile_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_profile_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ProfileFilterLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profile_filter_links_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4644,9 +3338,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4671,7 +3367,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4681,8 +3377,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profile_filter_links_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ProfileFilterLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4697,87 +3394,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_filter_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.filter_ref.is_none() {
-                    request.filter_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_ref_init(request: &mut api::ProfileFilterLink) {
-                if request.profile_ref.is_none() {
-                    request.profile_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "rank" => {
-                        request.rank = Some(arg_from_str(value.unwrap_or("-0"), err, "rank", "integer"));
-                    },
-                "filter-ref.kind" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.href" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.name" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "filter-ref.account-id" => {
-                        request_filter_ref_init(&mut request);
-                        request.filter_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.kind" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.name" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.internal-web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.href" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.web-property-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ref.account-id" => {
-                        request_profile_ref_init(&mut request);
-                        request.profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_profile_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_profile_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rank" => Some(("rank", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "filter-ref.kind" => Some(("filterRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.href" => Some(("filterRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.id" => Some(("filterRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.name" => Some(("filterRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter-ref.account-id" => Some(("filterRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.kind" => Some(("profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.name" => Some(("profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.internal-web-property-id" => Some(("profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.href" => Some(("profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.web-property-id" => Some(("profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.id" => Some(("profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ref.account-id" => Some(("profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "filter-ref", "href", "id", "internal-web-property-id", "kind", "name", "profile-ref", "rank", "self-link", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ProfileFilterLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profile_filter_links_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4792,9 +3438,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4819,7 +3467,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4842,9 +3490,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4872,8 +3522,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profile_user_links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4888,157 +3539,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profile_user_links_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5053,9 +3592,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5080,7 +3621,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5109,9 +3650,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5136,7 +3679,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5146,8 +3689,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profile_user_links_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5162,157 +3706,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profile_user_links_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5327,9 +3759,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5354,7 +3788,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5377,9 +3811,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5420,9 +3856,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5447,7 +3885,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5457,8 +3895,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profiles_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Profile::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5473,126 +3912,46 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Profile) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Profile) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Profile) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "currency" => {
-                        request.currency = Some(value.unwrap_or("").to_string());
-                    },
-                "e-commerce-tracking" => {
-                        request.e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "e-commerce-tracking", "boolean"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "timezone" => {
-                        request.timezone = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-category-parameters" => {
-                        request.strip_site_search_category_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-category-parameters", "boolean"));
-                    },
-                "site-search-category-parameters" => {
-                        request.site_search_category_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-query-parameters" => {
-                        request.exclude_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "enhanced-e-commerce-tracking" => {
-                        request_child_link_init(&mut request);
-                        request.enhanced_e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "enhanced-e-commerce-tracking", "boolean"));
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "default-page" => {
-                        request_permissions_init(&mut request);
-                        request.default_page = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_permissions_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.strip_site_search_query_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-query-parameters", "boolean"));
-                    },
-                "name" => {
-                        request_permissions_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_permissions_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.site_search_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "website-url" => {
-                        request_permissions_init(&mut request);
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Profile = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profiles_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5607,9 +3966,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5634,7 +3995,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5663,9 +4024,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5690,7 +4053,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5700,8 +4063,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profiles_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Profile::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5716,126 +4080,46 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Profile) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Profile) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Profile) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "currency" => {
-                        request.currency = Some(value.unwrap_or("").to_string());
-                    },
-                "e-commerce-tracking" => {
-                        request.e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "e-commerce-tracking", "boolean"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "timezone" => {
-                        request.timezone = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-category-parameters" => {
-                        request.strip_site_search_category_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-category-parameters", "boolean"));
-                    },
-                "site-search-category-parameters" => {
-                        request.site_search_category_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-query-parameters" => {
-                        request.exclude_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "enhanced-e-commerce-tracking" => {
-                        request_child_link_init(&mut request);
-                        request.enhanced_e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "enhanced-e-commerce-tracking", "boolean"));
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "default-page" => {
-                        request_permissions_init(&mut request);
-                        request.default_page = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_permissions_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.strip_site_search_query_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-query-parameters", "boolean"));
-                    },
-                "name" => {
-                        request_permissions_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_permissions_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.site_search_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "website-url" => {
-                        request_permissions_init(&mut request);
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Profile = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profiles_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5850,9 +4134,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5877,7 +4163,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5887,8 +4173,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_profiles_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Profile::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5903,126 +4190,46 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Profile) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Profile) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Profile) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "currency" => {
-                        request.currency = Some(value.unwrap_or("").to_string());
-                    },
-                "e-commerce-tracking" => {
-                        request.e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "e-commerce-tracking", "boolean"));
-                    },
-                "web-property-id" => {
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "timezone" => {
-                        request.timezone = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-category-parameters" => {
-                        request.strip_site_search_category_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-category-parameters", "boolean"));
-                    },
-                "site-search-category-parameters" => {
-                        request.site_search_category_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "type" => {
-                        request.type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "exclude-query-parameters" => {
-                        request.exclude_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "enhanced-e-commerce-tracking" => {
-                        request_child_link_init(&mut request);
-                        request.enhanced_e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "enhanced-e-commerce-tracking", "boolean"));
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "default-page" => {
-                        request_permissions_init(&mut request);
-                        request.default_page = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_permissions_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "strip-site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.strip_site_search_query_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "strip-site-search-query-parameters", "boolean"));
-                    },
-                "name" => {
-                        request_permissions_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_permissions_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "site-search-query-parameters" => {
-                        request_permissions_init(&mut request);
-                        request.site_search_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "website-url" => {
-                        request_permissions_init(&mut request);
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_parent_link_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "currency" => Some(("currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "e-commerce-tracking" => Some(("eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-category-parameters" => Some(("stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "site-search-category-parameters" => Some(("siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exclude-query-parameters" => Some(("excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enhanced-e-commerce-tracking" => Some(("enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "default-page" => Some(("defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "strip-site-search-query-parameters" => Some(("stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "site-search-query-parameters" => Some(("siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "currency", "default-page", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "internal-web-property-id", "kind", "name", "parent-link", "permissions", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Profile = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().profiles_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6037,9 +4244,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6064,7 +4273,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6093,9 +4302,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6120,7 +4331,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6143,9 +4354,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6170,7 +4383,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6180,8 +4393,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_unsampled_reports_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::UnsampledReport::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6196,103 +4410,40 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_cloud_storage_download_details_init(request: &mut api::UnsampledReport) {
-                if request.cloud_storage_download_details.is_none() {
-                    request.cloud_storage_download_details = Some(Default::default());
-                }
-            }
-            
-            fn request_drive_download_details_init(request: &mut api::UnsampledReport) {
-                if request.drive_download_details.is_none() {
-                    request.drive_download_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "cloud-storage-download-details.bucket-id" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.cloud_storage_download_details.as_mut().unwrap().bucket_id = Some(value.unwrap_or("").to_string());
-                    },
-                "cloud-storage-download-details.object-id" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.cloud_storage_download_details.as_mut().unwrap().object_id = Some(value.unwrap_or("").to_string());
-                    },
-                "download-type" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.download_type = Some(value.unwrap_or("").to_string());
-                    },
-                "dimensions" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.dimensions = Some(value.unwrap_or("").to_string());
-                    },
-                "start-date" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.start_date = Some(value.unwrap_or("").to_string());
-                    },
-                "end-date" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.end_date = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_cloud_storage_download_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "drive-download-details.document-id" => {
-                        request_drive_download_details_init(&mut request);
-                        request.drive_download_details.as_mut().unwrap().document_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-id" => {
-                        request_drive_download_details_init(&mut request);
-                        request.profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "metrics" => {
-                        request_drive_download_details_init(&mut request);
-                        request.metrics = Some(value.unwrap_or("").to_string());
-                    },
-                "filters" => {
-                        request_drive_download_details_init(&mut request);
-                        request.filters = Some(value.unwrap_or("").to_string());
-                    },
-                "web-property-id" => {
-                        request_drive_download_details_init(&mut request);
-                        request.web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "title" => {
-                        request_drive_download_details_init(&mut request);
-                        request.title = Some(value.unwrap_or("").to_string());
-                    },
-                "segment" => {
-                        request_drive_download_details_init(&mut request);
-                        request.segment = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_drive_download_details_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_drive_download_details_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_drive_download_details_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bucket-id", "cloud-storage-download-details", "created", "dimensions", "document-id", "download-type", "drive-download-details", "end-date", "filters", "id", "kind", "metrics", "object-id", "profile-id", "segment", "self-link", "start-date", "status", "title", "updated", "web-property-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-download-details.bucket-id" => Some(("cloudStorageDownloadDetails.bucketId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-storage-download-details.object-id" => Some(("cloudStorageDownloadDetails.objectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "download-type" => Some(("downloadType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions" => Some(("dimensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-date" => Some(("start-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-date" => Some(("end-date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "drive-download-details.document-id" => Some(("driveDownloadDetails.documentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-id" => Some(("profileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metrics" => Some(("metrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filters" => Some(("filters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "segment" => Some(("segment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "bucket-id", "cloud-storage-download-details", "created", "dimensions", "document-id", "download-type", "drive-download-details", "end-date", "filters", "id", "kind", "metrics", "object-id", "profile-id", "segment", "self-link", "start-date", "status", "title", "updated", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::UnsampledReport = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().unsampled_reports_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("profile-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6307,9 +4458,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6334,7 +4487,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6363,9 +4516,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6390,7 +4545,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6400,8 +4555,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_uploads_delete_upload_data(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AnalyticsDataimportDeleteUploadDataRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6416,19 +4572,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "custom-data-import-uids" => {
-                        if request.custom_data_import_uids.is_none() {
-                           request.custom_data_import_uids = Some(Default::default());
-                        }
-                                        request.custom_data_import_uids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-data-import-uids"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "custom-data-import-uids" => Some(("customDataImportUids", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-data-import-uids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AnalyticsDataimportDeleteUploadDataRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().uploads_delete_upload_data(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("custom-data-source-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6443,9 +4601,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6486,9 +4646,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6513,7 +4675,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6542,9 +4704,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6569,7 +4733,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6592,9 +4756,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6623,7 +4789,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6646,9 +4812,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6689,9 +4857,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6716,7 +4886,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6726,8 +4896,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_web_property_ad_words_links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityAdWordsLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6742,70 +4913,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_init(request: &mut api::EntityAdWordsLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ids" => {
-                        if request.profile_ids.is_none() {
-                           request.profile_ids = Some(Default::default());
-                        }
-                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_entity_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_entity_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityAdWordsLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().web_property_ad_words_links_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6820,9 +4952,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6847,7 +4981,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6876,9 +5010,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6903,7 +5039,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6913,8 +5049,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_web_property_ad_words_links_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityAdWordsLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6929,70 +5066,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_init(request: &mut api::EntityAdWordsLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ids" => {
-                        if request.profile_ids.is_none() {
-                           request.profile_ids = Some(Default::default());
-                        }
-                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_entity_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_entity_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityAdWordsLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().web_property_ad_words_links_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("web-property-ad-words-link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7007,9 +5105,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7034,7 +5134,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7044,8 +5144,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_web_property_ad_words_links_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityAdWordsLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7060,70 +5161,31 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_init(request: &mut api::EntityAdWordsLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityAdWordsLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-ids" => {
-                        if request.profile_ids.is_none() {
-                           request.profile_ids = Some(Default::default());
-                        }
-                                        request.profile_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_entity_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_entity_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-ids" => Some(("profileIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "entity", "href", "id", "internal-web-property-id", "kind", "name", "profile-ids", "self-link", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityAdWordsLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().web_property_ad_words_links_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("web-property-ad-words-link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7138,9 +5200,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7165,7 +5229,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7188,9 +5252,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7215,7 +5281,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7225,8 +5291,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_webproperties_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Webproperty::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7241,97 +5308,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Webproperty) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Webproperty) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Webproperty) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "default-profile-id" => {
-                        request.default_profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "level" => {
-                        request.level = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-count" => {
-                        request.profile_count = Some(arg_from_str(value.unwrap_or("-0"), err, "profile-count", "integer"));
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "industry-vertical" => {
-                        request_child_link_init(&mut request);
-                        request.industry_vertical = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_permissions_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_permissions_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_permissions_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Webproperty = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().webproperties_insert(request, opt.value_of("account-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7346,9 +5354,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7373,7 +5383,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7402,9 +5412,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7429,7 +5441,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7439,8 +5451,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_webproperties_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Webproperty::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7455,97 +5468,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Webproperty) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Webproperty) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Webproperty) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "default-profile-id" => {
-                        request.default_profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "level" => {
-                        request.level = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-count" => {
-                        request.profile_count = Some(arg_from_str(value.unwrap_or("-0"), err, "profile-count", "integer"));
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "industry-vertical" => {
-                        request_child_link_init(&mut request);
-                        request.industry_vertical = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_permissions_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_permissions_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_permissions_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Webproperty = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().webproperties_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7560,9 +5514,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7587,7 +5543,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7597,8 +5553,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_webproperties_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Webproperty::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7613,97 +5570,38 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_child_link_init(request: &mut api::Webproperty) {
-                if request.child_link.is_none() {
-                    request.child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_parent_link_init(request: &mut api::Webproperty) {
-                if request.parent_link.is_none() {
-                    request.parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::Webproperty) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "website-url" => {
-                        request.website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "updated" => {
-                        request.updated = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "default-profile-id" => {
-                        request.default_profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "level" => {
-                        request.level = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile-count" => {
-                        request.profile_count = Some(arg_from_str(value.unwrap_or("-0"), err, "profile-count", "integer"));
-                    },
-                "internal-web-property-id" => {
-                        request.internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.href" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "child-link.type" => {
-                        request_child_link_init(&mut request);
-                        request.child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "industry-vertical" => {
-                        request_child_link_init(&mut request);
-                        request.industry_vertical = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.href" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "parent-link.type" => {
-                        request_parent_link_init(&mut request);
-                        request.parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_permissions_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_permissions_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account-id" => {
-                        request_permissions_init(&mut request);
-                        request.account_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-count" => Some(("profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "internal-web-property-id" => Some(("internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "type", "updated", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Webproperty = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().webproperties_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7718,9 +5616,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7745,7 +5645,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7768,9 +5668,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7798,8 +5700,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_webproperty_user_links_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7814,157 +5717,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().webproperty_user_links_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -7979,9 +5770,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8006,7 +5799,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8035,9 +5828,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-index", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-index", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8062,7 +5857,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8072,8 +5867,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _management_webproperty_user_links_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::EntityUserLink::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -8088,157 +5884,45 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_entity_account_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().account_ref.is_none() {
-                    request.entity.as_mut().unwrap().account_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_init(request: &mut api::EntityUserLink) {
-                if request.entity.is_none() {
-                    request.entity = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_profile_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().profile_ref.is_none() {
-                    request.entity.as_mut().unwrap().profile_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_entity_web_property_ref_init(request: &mut api::EntityUserLink) {
-                request_entity_init(request);
-                if request.entity.as_mut().unwrap().web_property_ref.is_none() {
-                    request.entity.as_mut().unwrap().web_property_ref = Some(Default::default());
-                }
-            }
-            
-            fn request_permissions_init(request: &mut api::EntityUserLink) {
-                if request.permissions.is_none() {
-                    request.permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_user_ref_init(request: &mut api::EntityUserLink) {
-                if request.user_ref.is_none() {
-                    request.user_ref = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.kind" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.href" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.id" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.account-ref.name" => {
-                        request_entity_account_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().account_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.kind" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.name" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.internal-web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.href" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.web-property-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.profile-ref.account-id" => {
-                        request_entity_profile_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().profile_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.kind" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.name" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.internal-web-property-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.href" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "entity.web-property-ref.account-id" => {
-                        request_entity_web_property_ref_init(&mut request);
-                        request.entity.as_mut().unwrap().web_property_ref.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.kind" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.email" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().email = Some(value.unwrap_or("").to_string());
-                    },
-                "user-ref.id" => {
-                        request_user_ref_init(&mut request);
-                        request.user_ref.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_user_ref_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_user_ref_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "permissions.local" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().local.is_none() {
-                           request.permissions.as_mut().unwrap().local = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().local.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "permissions.effective" => {
-                        request_permissions_init(&mut request);
-                        if request.permissions.as_mut().unwrap().effective.is_none() {
-                           request.permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.kind" => Some(("entity.accountRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.href" => Some(("entity.accountRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.id" => Some(("entity.accountRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.account-ref.name" => Some(("entity.accountRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.kind" => Some(("entity.profileRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.name" => Some(("entity.profileRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.internal-web-property-id" => Some(("entity.profileRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.href" => Some(("entity.profileRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.web-property-id" => Some(("entity.profileRef.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.id" => Some(("entity.profileRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.profile-ref.account-id" => Some(("entity.profileRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.kind" => Some(("entity.webPropertyRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.name" => Some(("entity.webPropertyRef.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.internal-web-property-id" => Some(("entity.webPropertyRef.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.href" => Some(("entity.webPropertyRef.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.id" => Some(("entity.webPropertyRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity.web-property-ref.account-id" => Some(("entity.webPropertyRef.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.kind" => Some(("userRef.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.email" => Some(("userRef.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-ref.id" => Some(("userRef.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "permissions.local" => Some(("permissions.local", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "permissions.effective" => Some(("permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-ref", "effective", "email", "entity", "href", "id", "internal-web-property-id", "kind", "local", "name", "permissions", "profile-ref", "self-link", "user-ref", "web-property-id", "web-property-ref"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::EntityUserLink = json::value::from_value(object).unwrap();
         let mut call = self.hub.management().webproperty_user_links_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""), opt.value_of("link-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -8253,9 +5937,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8280,7 +5966,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8303,9 +5989,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8330,7 +6018,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8340,8 +6028,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _provisioning_create_account_ticket(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AccountTicket::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -8356,320 +6045,76 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_account_child_link_init(request: &mut api::AccountTicket) {
-                request_account_init(request);
-                if request.account.as_mut().unwrap().child_link.is_none() {
-                    request.account.as_mut().unwrap().child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_account_init(request: &mut api::AccountTicket) {
-                if request.account.is_none() {
-                    request.account = Some(Default::default());
-                }
-            }
-            
-            fn request_account_permissions_init(request: &mut api::AccountTicket) {
-                request_account_init(request);
-                if request.account.as_mut().unwrap().permissions.is_none() {
-                    request.account.as_mut().unwrap().permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_child_link_init(request: &mut api::AccountTicket) {
-                request_profile_init(request);
-                if request.profile.as_mut().unwrap().child_link.is_none() {
-                    request.profile.as_mut().unwrap().child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_init(request: &mut api::AccountTicket) {
-                if request.profile.is_none() {
-                    request.profile = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_parent_link_init(request: &mut api::AccountTicket) {
-                request_profile_init(request);
-                if request.profile.as_mut().unwrap().parent_link.is_none() {
-                    request.profile.as_mut().unwrap().parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_profile_permissions_init(request: &mut api::AccountTicket) {
-                request_profile_init(request);
-                if request.profile.as_mut().unwrap().permissions.is_none() {
-                    request.profile.as_mut().unwrap().permissions = Some(Default::default());
-                }
-            }
-            
-            fn request_webproperty_child_link_init(request: &mut api::AccountTicket) {
-                request_webproperty_init(request);
-                if request.webproperty.as_mut().unwrap().child_link.is_none() {
-                    request.webproperty.as_mut().unwrap().child_link = Some(Default::default());
-                }
-            }
-            
-            fn request_webproperty_init(request: &mut api::AccountTicket) {
-                if request.webproperty.is_none() {
-                    request.webproperty = Some(Default::default());
-                }
-            }
-            
-            fn request_webproperty_parent_link_init(request: &mut api::AccountTicket) {
-                request_webproperty_init(request);
-                if request.webproperty.as_mut().unwrap().parent_link.is_none() {
-                    request.webproperty.as_mut().unwrap().parent_link = Some(Default::default());
-                }
-            }
-            
-            fn request_webproperty_permissions_init(request: &mut api::AccountTicket) {
-                request_webproperty_init(request);
-                if request.webproperty.as_mut().unwrap().permissions.is_none() {
-                    request.webproperty.as_mut().unwrap().permissions = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "profile.currency" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().currency = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.e-commerce-tracking" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "profile.e-commerce-tracking", "boolean"));
-                    },
-                "profile.web-property-id" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.timezone" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().timezone = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.id" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.account-id" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.strip-site-search-category-parameters" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().strip_site_search_category_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "profile.strip-site-search-category-parameters", "boolean"));
-                    },
-                "profile.site-search-category-parameters" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().site_search_category_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.type" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.updated" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().updated = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.exclude-query-parameters" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().exclude_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.internal-web-property-id" => {
-                        request_profile_init(&mut request);
-                        request.profile.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.child-link.href" => {
-                        request_profile_child_link_init(&mut request);
-                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.child-link.type" => {
-                        request_profile_child_link_init(&mut request);
-                        request.profile.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.enhanced-e-commerce-tracking" => {
-                        request_profile_child_link_init(&mut request);
-                        request.profile.as_mut().unwrap().enhanced_e_commerce_tracking = Some(arg_from_str(value.unwrap_or("false"), err, "profile.enhanced-e-commerce-tracking", "boolean"));
-                    },
-                "profile.permissions.effective" => {
-                        request_profile_permissions_init(&mut request);
-                        if request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
-                           request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.profile.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "profile.default-page" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().default_page = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.kind" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.strip-site-search-query-parameters" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().strip_site_search_query_parameters = Some(arg_from_str(value.unwrap_or("false"), err, "profile.strip-site-search-query-parameters", "boolean"));
-                    },
-                "profile.name" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.created" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().created = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.site-search-query-parameters" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().site_search_query_parameters = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.website-url" => {
-                        request_profile_permissions_init(&mut request);
-                        request.profile.as_mut().unwrap().website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.parent-link.href" => {
-                        request_profile_parent_link_init(&mut request);
-                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.parent-link.type" => {
-                        request_profile_parent_link_init(&mut request);
-                        request.profile.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "profile.self-link" => {
-                        request_profile_parent_link_init(&mut request);
-                        request.profile.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account.kind" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "account.name" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "account.created" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().created = Some(value.unwrap_or("").to_string());
-                    },
-                "account.updated" => {
-                        request_account_init(&mut request);
-                        request.account.as_mut().unwrap().updated = Some(value.unwrap_or("").to_string());
-                    },
-                "account.child-link.href" => {
-                        request_account_child_link_init(&mut request);
-                        request.account.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "account.child-link.type" => {
-                        request_account_child_link_init(&mut request);
-                        request.account.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "account.id" => {
-                        request_account_child_link_init(&mut request);
-                        request.account.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "account.self-link" => {
-                        request_account_child_link_init(&mut request);
-                        request.account.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "account.permissions.effective" => {
-                        request_account_permissions_init(&mut request);
-                        if request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
-                           request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.account.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "webproperty.website-url" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().website_url = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.updated" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().updated = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.name" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.created" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().created = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.default-profile-id" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().default_profile_id = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.level" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().level = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.kind" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.profile-count" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().profile_count = Some(arg_from_str(value.unwrap_or("-0"), err, "webproperty.profile-count", "integer"));
-                    },
-                "webproperty.internal-web-property-id" => {
-                        request_webproperty_init(&mut request);
-                        request.webproperty.as_mut().unwrap().internal_web_property_id = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.child-link.href" => {
-                        request_webproperty_child_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.child-link.type" => {
-                        request_webproperty_child_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().child_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.industry-vertical" => {
-                        request_webproperty_child_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().industry_vertical = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.parent-link.href" => {
-                        request_webproperty_parent_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().href = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.parent-link.type" => {
-                        request_webproperty_parent_link_init(&mut request);
-                        request.webproperty.as_mut().unwrap().parent_link.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.permissions.effective" => {
-                        request_webproperty_permissions_init(&mut request);
-                        if request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective.is_none() {
-                           request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective = Some(Default::default());
-                        }
-                                        request.webproperty.as_mut().unwrap().permissions.as_mut().unwrap().effective.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "webproperty.id" => {
-                        request_webproperty_permissions_init(&mut request);
-                        request.webproperty.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.self-link" => {
-                        request_webproperty_permissions_init(&mut request);
-                        request.webproperty.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "webproperty.account-id" => {
-                        request_webproperty_permissions_init(&mut request);
-                        request.webproperty.as_mut().unwrap().account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_webproperty_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "redirect-uri" => {
-                        request_webproperty_init(&mut request);
-                        request.redirect_uri = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_webproperty_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "child-link", "created", "currency", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "profile.currency" => Some(("profile.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.e-commerce-tracking" => Some(("profile.eCommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.web-property-id" => Some(("profile.webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.timezone" => Some(("profile.timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.id" => Some(("profile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.account-id" => Some(("profile.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.strip-site-search-category-parameters" => Some(("profile.stripSiteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.site-search-category-parameters" => Some(("profile.siteSearchCategoryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.type" => Some(("profile.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.updated" => Some(("profile.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.exclude-query-parameters" => Some(("profile.excludeQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.internal-web-property-id" => Some(("profile.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.child-link.href" => Some(("profile.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.child-link.type" => Some(("profile.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.enhanced-e-commerce-tracking" => Some(("profile.enhancedECommerceTracking", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.permissions.effective" => Some(("profile.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "profile.default-page" => Some(("profile.defaultPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.kind" => Some(("profile.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.strip-site-search-query-parameters" => Some(("profile.stripSiteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "profile.name" => Some(("profile.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.created" => Some(("profile.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.site-search-query-parameters" => Some(("profile.siteSearchQueryParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.website-url" => Some(("profile.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.parent-link.href" => Some(("profile.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.parent-link.type" => Some(("profile.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile.self-link" => Some(("profile.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.kind" => Some(("account.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.name" => Some(("account.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.created" => Some(("account.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.updated" => Some(("account.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.child-link.href" => Some(("account.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.child-link.type" => Some(("account.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.id" => Some(("account.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.self-link" => Some(("account.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account.permissions.effective" => Some(("account.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "webproperty.website-url" => Some(("webproperty.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.updated" => Some(("webproperty.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.name" => Some(("webproperty.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.created" => Some(("webproperty.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.default-profile-id" => Some(("webproperty.defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.level" => Some(("webproperty.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.kind" => Some(("webproperty.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.profile-count" => Some(("webproperty.profileCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "webproperty.internal-web-property-id" => Some(("webproperty.internalWebPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.child-link.href" => Some(("webproperty.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.child-link.type" => Some(("webproperty.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.industry-vertical" => Some(("webproperty.industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.parent-link.href" => Some(("webproperty.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.parent-link.type" => Some(("webproperty.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.permissions.effective" => Some(("webproperty.permissions.effective", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "webproperty.id" => Some(("webproperty.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.self-link" => Some(("webproperty.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.account-id" => Some(("webproperty.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "child-link", "created", "currency", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AccountTicket = json::value::from_value(object).unwrap();
         let mut call = self.hub.provisioning().create_account_ticket(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -8684,9 +6129,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8711,7 +6158,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -9069,6 +6516,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("data", "methods: 'ga-get', 'mcf-get' and 'realtime-get'", vec![
@@ -11733,7 +9181,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150305")
+           .version("0.3.0+20150305")
            .about("View and manage your Google Analytics data")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")
@@ -11774,7 +9222,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -11813,12 +9262,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -11834,4 +9283,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

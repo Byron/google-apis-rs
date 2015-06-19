@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -117,9 +118,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -144,7 +147,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -167,9 +170,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -194,7 +199,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -217,9 +222,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -244,7 +251,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -254,8 +261,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _databases_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Database::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -270,37 +278,28 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "charset" => {
-                        request.charset = Some(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "collation" => {
-                        request.collation = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "charset" => Some(("charset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "collation" => Some(("collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Database = json::value::from_value(object).unwrap();
         let mut call = self.hub.databases().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -315,9 +314,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -342,7 +343,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -365,9 +366,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -392,7 +395,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -402,8 +405,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _databases_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Database::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -418,37 +422,28 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "charset" => {
-                        request.charset = Some(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "collation" => {
-                        request.collation = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "charset" => Some(("charset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "collation" => Some(("collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Database = json::value::from_value(object).unwrap();
         let mut call = self.hub.databases().patch(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""), opt.value_of("database").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -463,9 +458,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -490,7 +487,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -500,8 +497,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _databases_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Database::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -516,37 +514,28 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "charset" => {
-                        request.charset = Some(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "collation" => {
-                        request.collation = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "charset" => Some(("charset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "collation" => Some(("collation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["charset", "collation", "etag", "instance", "kind", "name", "project", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Database = json::value::from_value(object).unwrap();
         let mut call = self.hub.databases().update(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""), opt.value_of("database").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -561,9 +550,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -588,7 +579,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -611,9 +602,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -638,7 +631,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -648,8 +641,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_clone(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstancesCloneRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -664,46 +658,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_clone_context_bin_log_coordinates_init(request: &mut api::InstancesCloneRequest) {
-                request_clone_context_init(request);
-                if request.clone_context.as_mut().unwrap().bin_log_coordinates.is_none() {
-                    request.clone_context.as_mut().unwrap().bin_log_coordinates = Some(Default::default());
-                }
-            }
-            
-            fn request_clone_context_init(request: &mut api::InstancesCloneRequest) {
-                if request.clone_context.is_none() {
-                    request.clone_context = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "clone-context.bin-log-coordinates.bin-log-position" => {
-                        request_clone_context_bin_log_coordinates_init(&mut request);
-                        request.clone_context.as_mut().unwrap().bin_log_coordinates.as_mut().unwrap().bin_log_position = Some(value.unwrap_or("").to_string());
-                    },
-                "clone-context.bin-log-coordinates.kind" => {
-                        request_clone_context_bin_log_coordinates_init(&mut request);
-                        request.clone_context.as_mut().unwrap().bin_log_coordinates.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "clone-context.bin-log-coordinates.bin-log-file-name" => {
-                        request_clone_context_bin_log_coordinates_init(&mut request);
-                        request.clone_context.as_mut().unwrap().bin_log_coordinates.as_mut().unwrap().bin_log_file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "clone-context.kind" => {
-                        request_clone_context_bin_log_coordinates_init(&mut request);
-                        request.clone_context.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "clone-context.destination-instance-name" => {
-                        request_clone_context_bin_log_coordinates_init(&mut request);
-                        request.clone_context.as_mut().unwrap().destination_instance_name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["bin-log-coordinates", "bin-log-file-name", "bin-log-position", "clone-context", "destination-instance-name", "kind"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "clone-context.bin-log-coordinates.bin-log-position" => Some(("cloneContext.binLogCoordinates.binLogPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-context.bin-log-coordinates.kind" => Some(("cloneContext.binLogCoordinates.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-context.bin-log-coordinates.bin-log-file-name" => Some(("cloneContext.binLogCoordinates.binLogFileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-context.kind" => Some(("cloneContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "clone-context.destination-instance-name" => Some(("cloneContext.destinationInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bin-log-coordinates", "bin-log-file-name", "bin-log-position", "clone-context", "destination-instance-name", "kind"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstancesCloneRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().clone(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -718,9 +691,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -745,7 +720,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -768,9 +743,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -795,7 +772,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -805,8 +782,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_export(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstancesExportRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -821,63 +799,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_export_context_csv_export_options_init(request: &mut api::InstancesExportRequest) {
-                request_export_context_init(request);
-                if request.export_context.as_mut().unwrap().csv_export_options.is_none() {
-                    request.export_context.as_mut().unwrap().csv_export_options = Some(Default::default());
-                }
-            }
-            
-            fn request_export_context_init(request: &mut api::InstancesExportRequest) {
-                if request.export_context.is_none() {
-                    request.export_context = Some(Default::default());
-                }
-            }
-            
-            fn request_export_context_sql_export_options_init(request: &mut api::InstancesExportRequest) {
-                request_export_context_init(request);
-                if request.export_context.as_mut().unwrap().sql_export_options.is_none() {
-                    request.export_context.as_mut().unwrap().sql_export_options = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "export-context.kind" => {
-                        request_export_context_init(&mut request);
-                        request.export_context.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "export-context.file-type" => {
-                        request_export_context_init(&mut request);
-                        request.export_context.as_mut().unwrap().file_type = Some(value.unwrap_or("").to_string());
-                    },
-                "export-context.uri" => {
-                        request_export_context_init(&mut request);
-                        request.export_context.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "export-context.csv-export-options.select-query" => {
-                        request_export_context_csv_export_options_init(&mut request);
-                        request.export_context.as_mut().unwrap().csv_export_options.as_mut().unwrap().select_query = Some(value.unwrap_or("").to_string());
-                    },
-                "export-context.databases" => {
-                        request_export_context_csv_export_options_init(&mut request);
-                        if request.export_context.as_mut().unwrap().databases.is_none() {
-                           request.export_context.as_mut().unwrap().databases = Some(Default::default());
-                        }
-                                        request.export_context.as_mut().unwrap().databases.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "export-context.sql-export-options.tables" => {
-                        request_export_context_sql_export_options_init(&mut request);
-                        if request.export_context.as_mut().unwrap().sql_export_options.as_mut().unwrap().tables.is_none() {
-                           request.export_context.as_mut().unwrap().sql_export_options.as_mut().unwrap().tables = Some(Default::default());
-                        }
-                                        request.export_context.as_mut().unwrap().sql_export_options.as_mut().unwrap().tables.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["csv-export-options", "databases", "export-context", "file-type", "kind", "select-query", "sql-export-options", "tables", "uri"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "export-context.kind" => Some(("exportContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-context.file-type" => Some(("exportContext.fileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-context.uri" => Some(("exportContext.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-context.csv-export-options.select-query" => Some(("exportContext.csvExportOptions.selectQuery", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-context.databases" => Some(("exportContext.databases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "export-context.sql-export-options.tables" => Some(("exportContext.sqlExportOptions.tables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["csv-export-options", "databases", "export-context", "file-type", "kind", "select-query", "sql-export-options", "tables", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstancesExportRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().export(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -892,9 +833,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -919,7 +862,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -942,9 +885,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -969,7 +914,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -979,8 +924,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_import(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstancesImportRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -995,53 +941,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_import_context_csv_import_options_init(request: &mut api::InstancesImportRequest) {
-                request_import_context_init(request);
-                if request.import_context.as_mut().unwrap().csv_import_options.is_none() {
-                    request.import_context.as_mut().unwrap().csv_import_options = Some(Default::default());
-                }
-            }
-            
-            fn request_import_context_init(request: &mut api::InstancesImportRequest) {
-                if request.import_context.is_none() {
-                    request.import_context = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "import-context.file-type" => {
-                        request_import_context_init(&mut request);
-                        request.import_context.as_mut().unwrap().file_type = Some(value.unwrap_or("").to_string());
-                    },
-                "import-context.database" => {
-                        request_import_context_init(&mut request);
-                        request.import_context.as_mut().unwrap().database = Some(value.unwrap_or("").to_string());
-                    },
-                "import-context.uri" => {
-                        request_import_context_init(&mut request);
-                        request.import_context.as_mut().unwrap().uri = Some(value.unwrap_or("").to_string());
-                    },
-                "import-context.kind" => {
-                        request_import_context_init(&mut request);
-                        request.import_context.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "import-context.csv-import-options.table" => {
-                        request_import_context_csv_import_options_init(&mut request);
-                        request.import_context.as_mut().unwrap().csv_import_options.as_mut().unwrap().table = Some(value.unwrap_or("").to_string());
-                    },
-                "import-context.csv-import-options.columns" => {
-                        request_import_context_csv_import_options_init(&mut request);
-                        if request.import_context.as_mut().unwrap().csv_import_options.as_mut().unwrap().columns.is_none() {
-                           request.import_context.as_mut().unwrap().csv_import_options.as_mut().unwrap().columns = Some(Default::default());
-                        }
-                                        request.import_context.as_mut().unwrap().csv_import_options.as_mut().unwrap().columns.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["columns", "csv-import-options", "database", "file-type", "import-context", "kind", "table", "uri"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "import-context.file-type" => Some(("importContext.fileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.database" => Some(("importContext.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.uri" => Some(("importContext.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.kind" => Some(("importContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.csv-import-options.table" => Some(("importContext.csvImportOptions.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "import-context.csv-import-options.columns" => Some(("importContext.csvImportOptions.columns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["columns", "csv-import-options", "database", "file-type", "import-context", "kind", "table", "uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstancesImportRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().import(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1056,9 +975,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1083,7 +1004,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1093,8 +1014,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::DatabaseInstance::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1109,295 +1031,76 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_on_premises_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.on_premises_configuration.is_none() {
-                    request.on_premises_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.replica_configuration.is_none() {
-                    request.replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_mysql_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                request_replica_configuration_init(request);
-                if request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.is_none() {
-                    request.replica_configuration.as_mut().unwrap().mysql_replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_server_ca_cert_init(request: &mut api::DatabaseInstance) {
-                if request.server_ca_cert.is_none() {
-                    request.server_ca_cert = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_backup_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().backup_configuration.is_none() {
-                    request.settings.as_mut().unwrap().backup_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_init(request: &mut api::DatabaseInstance) {
-                if request.settings.is_none() {
-                    request.settings = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_ip_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().ip_configuration.is_none() {
-                    request.settings.as_mut().unwrap().ip_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_location_preference_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().location_preference.is_none() {
-                    request.settings.as_mut().unwrap().location_preference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "on-premises-configuration.kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "on-premises-configuration.host-port" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().host_port = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "max-disk-size" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.max_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "ipv6-address" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.ipv6_address = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert-serial-number" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert_serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.kind" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.sha1-fingerprint" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().sha1_fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.common-name" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().common_name = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.instance" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().instance = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.expiration-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.create-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().create_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.self-link" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-names" => {
-                        request_server_ca_cert_init(&mut request);
-                        if request.replica_names.is_none() {
-                           request.replica_names = Some(Default::default());
-                        }
-                                        request.replica_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "region" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.region = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.kind" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.authorized-gae-applications" => {
-                        request_settings_init(&mut request);
-                        if request.settings.as_mut().unwrap().authorized_gae_applications.is_none() {
-                           request.settings.as_mut().unwrap().authorized_gae_applications = Some(Default::default());
-                        }
-                                        request.settings.as_mut().unwrap().authorized_gae_applications.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "settings.activation-policy" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().activation_policy = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.kind" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.enabled", "boolean"));
-                    },
-                "settings.backup-configuration.start-time" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.binary-log-enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().binary_log_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.binary-log-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.ipv4-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().ipv4_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.ipv4-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.require-ssl" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().require_ssl = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.require-ssl", "boolean"));
-                    },
-                "settings.tier" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().tier = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.database-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().database_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.database-replication-enabled", "boolean"));
-                    },
-                "settings.replication-type" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().replication_type = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.crash-safe-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().crash_safe_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.crash-safe-replication-enabled", "boolean"));
-                    },
-                "settings.pricing-plan" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().pricing_plan = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.settings-version" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().settings_version = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.kind" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.zone" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().zone = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.follow-gae-application" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().follow_gae_application = Some(value.unwrap_or("").to_string());
-                    },
-                "master-instance-name" => {
-                        request_settings_init(&mut request);
-                        request.master_instance_name = Some(value.unwrap_or("").to_string());
-                    },
-                "current-disk-size" => {
-                        request_settings_init(&mut request);
-                        request.current_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "state" => {
-                        request_settings_init(&mut request);
-                        request.state = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_settings_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "service-account-email-address" => {
-                        request_settings_init(&mut request);
-                        request.service_account_email_address = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.kind" => {
-                        request_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.username" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.kind" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.connect-retry-interval" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().connect_retry_interval = Some(arg_from_str(value.unwrap_or("-0"), err, "replica-configuration.mysql-replica-configuration.connect-retry-interval", "integer"));
-                    },
-                "replica-configuration.mysql-replica-configuration.ssl-cipher" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ssl_cipher = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.ca-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ca_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().master_heartbeat_period = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.verify-server-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().verify_server_certificate = Some(arg_from_str(value.unwrap_or("false"), err, "replica-configuration.mysql-replica-configuration.verify-server-certificate", "boolean"));
-                    },
-                "replica-configuration.mysql-replica-configuration.dump-file-path" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().dump_file_path = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.password" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-key" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_key = Some(value.unwrap_or("").to_string());
-                    },
-                "database-version" => {
-                        request_replica_configuration_init(&mut request);
-                        request.database_version = Some(value.unwrap_or("").to_string());
-                    },
-                "instance-type" => {
-                        request_replica_configuration_init(&mut request);
-                        request.instance_type = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replica_configuration_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_replica_configuration_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-disk-size" => Some(("maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert-serial-number" => Some(("serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.kind" => Some(("serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.sha1-fingerprint" => Some(("serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.common-name" => Some(("serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.instance" => Some(("serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert" => Some(("serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.expiration-time" => Some(("serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.create-time" => Some(("serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.self-link" => Some(("serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.kind" => Some(("settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.authorized-gae-applications" => Some(("settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "settings.activation-policy" => Some(("settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.kind" => Some(("settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.enabled" => Some(("settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.binary-log-enabled" => Some(("settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.replication-type" => Some(("settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-instance-name" => Some(("masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-disk-size" => Some(("currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email-address" => Some(("serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.kind" => Some(("replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.kind" => Some(("replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.password" => Some(("replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-version" => Some(("databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::DatabaseInstance = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().insert(request, opt.value_of("project").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1412,9 +1115,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1439,7 +1144,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1468,9 +1173,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1495,7 +1202,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1505,8 +1212,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::DatabaseInstance::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1521,295 +1229,76 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_on_premises_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.on_premises_configuration.is_none() {
-                    request.on_premises_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.replica_configuration.is_none() {
-                    request.replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_mysql_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                request_replica_configuration_init(request);
-                if request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.is_none() {
-                    request.replica_configuration.as_mut().unwrap().mysql_replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_server_ca_cert_init(request: &mut api::DatabaseInstance) {
-                if request.server_ca_cert.is_none() {
-                    request.server_ca_cert = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_backup_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().backup_configuration.is_none() {
-                    request.settings.as_mut().unwrap().backup_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_init(request: &mut api::DatabaseInstance) {
-                if request.settings.is_none() {
-                    request.settings = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_ip_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().ip_configuration.is_none() {
-                    request.settings.as_mut().unwrap().ip_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_location_preference_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().location_preference.is_none() {
-                    request.settings.as_mut().unwrap().location_preference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "on-premises-configuration.kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "on-premises-configuration.host-port" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().host_port = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "max-disk-size" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.max_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "ipv6-address" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.ipv6_address = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert-serial-number" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert_serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.kind" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.sha1-fingerprint" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().sha1_fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.common-name" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().common_name = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.instance" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().instance = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.expiration-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.create-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().create_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.self-link" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-names" => {
-                        request_server_ca_cert_init(&mut request);
-                        if request.replica_names.is_none() {
-                           request.replica_names = Some(Default::default());
-                        }
-                                        request.replica_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "region" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.region = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.kind" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.authorized-gae-applications" => {
-                        request_settings_init(&mut request);
-                        if request.settings.as_mut().unwrap().authorized_gae_applications.is_none() {
-                           request.settings.as_mut().unwrap().authorized_gae_applications = Some(Default::default());
-                        }
-                                        request.settings.as_mut().unwrap().authorized_gae_applications.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "settings.activation-policy" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().activation_policy = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.kind" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.enabled", "boolean"));
-                    },
-                "settings.backup-configuration.start-time" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.binary-log-enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().binary_log_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.binary-log-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.ipv4-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().ipv4_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.ipv4-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.require-ssl" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().require_ssl = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.require-ssl", "boolean"));
-                    },
-                "settings.tier" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().tier = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.database-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().database_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.database-replication-enabled", "boolean"));
-                    },
-                "settings.replication-type" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().replication_type = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.crash-safe-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().crash_safe_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.crash-safe-replication-enabled", "boolean"));
-                    },
-                "settings.pricing-plan" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().pricing_plan = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.settings-version" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().settings_version = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.kind" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.zone" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().zone = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.follow-gae-application" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().follow_gae_application = Some(value.unwrap_or("").to_string());
-                    },
-                "master-instance-name" => {
-                        request_settings_init(&mut request);
-                        request.master_instance_name = Some(value.unwrap_or("").to_string());
-                    },
-                "current-disk-size" => {
-                        request_settings_init(&mut request);
-                        request.current_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "state" => {
-                        request_settings_init(&mut request);
-                        request.state = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_settings_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "service-account-email-address" => {
-                        request_settings_init(&mut request);
-                        request.service_account_email_address = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.kind" => {
-                        request_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.username" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.kind" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.connect-retry-interval" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().connect_retry_interval = Some(arg_from_str(value.unwrap_or("-0"), err, "replica-configuration.mysql-replica-configuration.connect-retry-interval", "integer"));
-                    },
-                "replica-configuration.mysql-replica-configuration.ssl-cipher" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ssl_cipher = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.ca-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ca_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().master_heartbeat_period = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.verify-server-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().verify_server_certificate = Some(arg_from_str(value.unwrap_or("false"), err, "replica-configuration.mysql-replica-configuration.verify-server-certificate", "boolean"));
-                    },
-                "replica-configuration.mysql-replica-configuration.dump-file-path" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().dump_file_path = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.password" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-key" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_key = Some(value.unwrap_or("").to_string());
-                    },
-                "database-version" => {
-                        request_replica_configuration_init(&mut request);
-                        request.database_version = Some(value.unwrap_or("").to_string());
-                    },
-                "instance-type" => {
-                        request_replica_configuration_init(&mut request);
-                        request.instance_type = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replica_configuration_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_replica_configuration_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-disk-size" => Some(("maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert-serial-number" => Some(("serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.kind" => Some(("serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.sha1-fingerprint" => Some(("serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.common-name" => Some(("serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.instance" => Some(("serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert" => Some(("serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.expiration-time" => Some(("serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.create-time" => Some(("serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.self-link" => Some(("serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.kind" => Some(("settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.authorized-gae-applications" => Some(("settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "settings.activation-policy" => Some(("settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.kind" => Some(("settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.enabled" => Some(("settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.binary-log-enabled" => Some(("settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.replication-type" => Some(("settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-instance-name" => Some(("masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-disk-size" => Some(("currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email-address" => Some(("serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.kind" => Some(("replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.kind" => Some(("replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.password" => Some(("replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-version" => Some(("databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::DatabaseInstance = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().patch(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1824,9 +1313,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1851,7 +1342,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1874,9 +1365,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1901,7 +1394,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1924,9 +1417,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1951,7 +1446,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1974,9 +1469,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2001,7 +1498,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2011,8 +1508,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_restore_backup(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InstancesRestoreBackupRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2027,27 +1525,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_restore_backup_context_init(request: &mut api::InstancesRestoreBackupRequest) {
-                if request.restore_backup_context.is_none() {
-                    request.restore_backup_context = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "restore-backup-context.kind" => {
-                        request_restore_backup_context_init(&mut request);
-                        request.restore_backup_context.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "restore-backup-context.backup-run-id" => {
-                        request_restore_backup_context_init(&mut request);
-                        request.restore_backup_context.as_mut().unwrap().backup_run_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-run-id", "kind", "restore-backup-context"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "restore-backup-context.kind" => Some(("restoreBackupContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restore-backup-context.backup-run-id" => Some(("restoreBackupContext.backupRunId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-run-id", "kind", "restore-backup-context"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InstancesRestoreBackupRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().restore_backup(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2062,9 +1555,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2089,7 +1584,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2112,9 +1607,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2139,7 +1636,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2162,9 +1659,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2189,7 +1688,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2199,8 +1698,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _instances_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::DatabaseInstance::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2215,295 +1715,76 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_on_premises_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.on_premises_configuration.is_none() {
-                    request.on_premises_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                if request.replica_configuration.is_none() {
-                    request.replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_replica_configuration_mysql_replica_configuration_init(request: &mut api::DatabaseInstance) {
-                request_replica_configuration_init(request);
-                if request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.is_none() {
-                    request.replica_configuration.as_mut().unwrap().mysql_replica_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_server_ca_cert_init(request: &mut api::DatabaseInstance) {
-                if request.server_ca_cert.is_none() {
-                    request.server_ca_cert = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_backup_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().backup_configuration.is_none() {
-                    request.settings.as_mut().unwrap().backup_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_init(request: &mut api::DatabaseInstance) {
-                if request.settings.is_none() {
-                    request.settings = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_ip_configuration_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().ip_configuration.is_none() {
-                    request.settings.as_mut().unwrap().ip_configuration = Some(Default::default());
-                }
-            }
-            
-            fn request_settings_location_preference_init(request: &mut api::DatabaseInstance) {
-                request_settings_init(request);
-                if request.settings.as_mut().unwrap().location_preference.is_none() {
-                    request.settings.as_mut().unwrap().location_preference = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "on-premises-configuration.kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "on-premises-configuration.host-port" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.on_premises_configuration.as_mut().unwrap().host_port = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "max-disk-size" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.max_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "ipv6-address" => {
-                        request_on_premises_configuration_init(&mut request);
-                        request.ipv6_address = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert-serial-number" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert_serial_number = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.kind" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.sha1-fingerprint" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().sha1_fingerprint = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.common-name" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().common_name = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.instance" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().instance = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.cert" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().cert = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.expiration-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().expiration_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.create-time" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().create_time = Some(value.unwrap_or("").to_string());
-                    },
-                "server-ca-cert.self-link" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.server_ca_cert.as_mut().unwrap().self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-names" => {
-                        request_server_ca_cert_init(&mut request);
-                        if request.replica_names.is_none() {
-                           request.replica_names = Some(Default::default());
-                        }
-                                        request.replica_names.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "region" => {
-                        request_server_ca_cert_init(&mut request);
-                        request.region = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.kind" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.authorized-gae-applications" => {
-                        request_settings_init(&mut request);
-                        if request.settings.as_mut().unwrap().authorized_gae_applications.is_none() {
-                           request.settings.as_mut().unwrap().authorized_gae_applications = Some(Default::default());
-                        }
-                                        request.settings.as_mut().unwrap().authorized_gae_applications.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "settings.activation-policy" => {
-                        request_settings_init(&mut request);
-                        request.settings.as_mut().unwrap().activation_policy = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.kind" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.enabled", "boolean"));
-                    },
-                "settings.backup-configuration.start-time" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.backup-configuration.binary-log-enabled" => {
-                        request_settings_backup_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().backup_configuration.as_mut().unwrap().binary_log_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.backup-configuration.binary-log-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.ipv4-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().ipv4_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.ipv4-enabled", "boolean"));
-                    },
-                "settings.ip-configuration.require-ssl" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().ip_configuration.as_mut().unwrap().require_ssl = Some(arg_from_str(value.unwrap_or("false"), err, "settings.ip-configuration.require-ssl", "boolean"));
-                    },
-                "settings.tier" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().tier = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.database-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().database_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.database-replication-enabled", "boolean"));
-                    },
-                "settings.replication-type" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().replication_type = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.crash-safe-replication-enabled" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().crash_safe_replication_enabled = Some(arg_from_str(value.unwrap_or("false"), err, "settings.crash-safe-replication-enabled", "boolean"));
-                    },
-                "settings.pricing-plan" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().pricing_plan = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.settings-version" => {
-                        request_settings_ip_configuration_init(&mut request);
-                        request.settings.as_mut().unwrap().settings_version = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.kind" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.zone" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().zone = Some(value.unwrap_or("").to_string());
-                    },
-                "settings.location-preference.follow-gae-application" => {
-                        request_settings_location_preference_init(&mut request);
-                        request.settings.as_mut().unwrap().location_preference.as_mut().unwrap().follow_gae_application = Some(value.unwrap_or("").to_string());
-                    },
-                "master-instance-name" => {
-                        request_settings_init(&mut request);
-                        request.master_instance_name = Some(value.unwrap_or("").to_string());
-                    },
-                "current-disk-size" => {
-                        request_settings_init(&mut request);
-                        request.current_disk_size = Some(value.unwrap_or("").to_string());
-                    },
-                "state" => {
-                        request_settings_init(&mut request);
-                        request.state = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_settings_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "service-account-email-address" => {
-                        request_settings_init(&mut request);
-                        request.service_account_email_address = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.kind" => {
-                        request_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.username" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().username = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.kind" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.connect-retry-interval" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().connect_retry_interval = Some(arg_from_str(value.unwrap_or("-0"), err, "replica-configuration.mysql-replica-configuration.connect-retry-interval", "integer"));
-                    },
-                "replica-configuration.mysql-replica-configuration.ssl-cipher" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ssl_cipher = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.ca-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().ca_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_certificate = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().master_heartbeat_period = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.verify-server-certificate" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().verify_server_certificate = Some(arg_from_str(value.unwrap_or("false"), err, "replica-configuration.mysql-replica-configuration.verify-server-certificate", "boolean"));
-                    },
-                "replica-configuration.mysql-replica-configuration.dump-file-path" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().dump_file_path = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.password" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().password = Some(value.unwrap_or("").to_string());
-                    },
-                "replica-configuration.mysql-replica-configuration.client-key" => {
-                        request_replica_configuration_mysql_replica_configuration_init(&mut request);
-                        request.replica_configuration.as_mut().unwrap().mysql_replica_configuration.as_mut().unwrap().client_key = Some(value.unwrap_or("").to_string());
-                    },
-                "database-version" => {
-                        request_replica_configuration_init(&mut request);
-                        request.database_version = Some(value.unwrap_or("").to_string());
-                    },
-                "instance-type" => {
-                        request_replica_configuration_init(&mut request);
-                        request.instance_type = Some(value.unwrap_or("").to_string());
-                    },
-                "self-link" => {
-                        request_replica_configuration_init(&mut request);
-                        request.self_link = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request_replica_configuration_init(&mut request);
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "on-premises-configuration.kind" => Some(("onPremisesConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "on-premises-configuration.host-port" => Some(("onPremisesConfiguration.hostPort", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-disk-size" => Some(("maxDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ipv6-address" => Some(("ipv6Address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert-serial-number" => Some(("serverCaCert.certSerialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.kind" => Some(("serverCaCert.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.sha1-fingerprint" => Some(("serverCaCert.sha1Fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.common-name" => Some(("serverCaCert.commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.instance" => Some(("serverCaCert.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.cert" => Some(("serverCaCert.cert", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.expiration-time" => Some(("serverCaCert.expirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.create-time" => Some(("serverCaCert.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "server-ca-cert.self-link" => Some(("serverCaCert.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-names" => Some(("replicaNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.kind" => Some(("settings.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.authorized-gae-applications" => Some(("settings.authorizedGaeApplications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "settings.activation-policy" => Some(("settings.activationPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.kind" => Some(("settings.backupConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.enabled" => Some(("settings.backupConfiguration.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.start-time" => Some(("settings.backupConfiguration.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.backup-configuration.binary-log-enabled" => Some(("settings.backupConfiguration.binaryLogEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.ipv4-enabled" => Some(("settings.ipConfiguration.ipv4Enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.ip-configuration.require-ssl" => Some(("settings.ipConfiguration.requireSsl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.tier" => Some(("settings.tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.database-replication-enabled" => Some(("settings.databaseReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.replication-type" => Some(("settings.replicationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.crash-safe-replication-enabled" => Some(("settings.crashSafeReplicationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "settings.pricing-plan" => Some(("settings.pricingPlan", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.settings-version" => Some(("settings.settingsVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.kind" => Some(("settings.locationPreference.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.zone" => Some(("settings.locationPreference.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "settings.location-preference.follow-gae-application" => Some(("settings.locationPreference.followGaeApplication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "master-instance-name" => Some(("masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "current-disk-size" => Some(("currentDiskSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account-email-address" => Some(("serviceAccountEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.kind" => Some(("replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.username" => Some(("replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.kind" => Some(("replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.connect-retry-interval" => Some(("replicaConfiguration.mysqlReplicaConfiguration.connectRetryInterval", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ssl-cipher" => Some(("replicaConfiguration.mysqlReplicaConfiguration.sslCipher", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.master-heartbeat-period" => Some(("replicaConfiguration.mysqlReplicaConfiguration.masterHeartbeatPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.verify-server-certificate" => Some(("replicaConfiguration.mysqlReplicaConfiguration.verifyServerCertificate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.dump-file-path" => Some(("replicaConfiguration.mysqlReplicaConfiguration.dumpFilePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.password" => Some(("replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "replica-configuration.mysql-replica-configuration.client-key" => Some(("replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database-version" => Some(("databaseVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-type" => Some(("instanceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-policy", "authorized-gae-applications", "backup-configuration", "binary-log-enabled", "ca-certificate", "cert", "cert-serial-number", "client-certificate", "client-key", "common-name", "connect-retry-interval", "crash-safe-replication-enabled", "create-time", "current-disk-size", "database-replication-enabled", "database-version", "dump-file-path", "enabled", "etag", "expiration-time", "follow-gae-application", "host-port", "instance", "instance-type", "ip-configuration", "ipv4-enabled", "ipv6-address", "kind", "location-preference", "master-heartbeat-period", "master-instance-name", "max-disk-size", "mysql-replica-configuration", "name", "on-premises-configuration", "password", "pricing-plan", "project", "region", "replica-configuration", "replica-names", "replication-type", "require-ssl", "self-link", "server-ca-cert", "service-account-email-address", "settings", "settings-version", "sha1-fingerprint", "ssl-cipher", "start-time", "state", "tier", "username", "verify-server-certificate", "zone"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::DatabaseInstance = json::value::from_value(object).unwrap();
         let mut call = self.hub.instances().update(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2518,9 +1799,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2545,7 +1828,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2568,9 +1851,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2595,7 +1880,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2624,9 +1909,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2651,7 +1938,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2674,9 +1961,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2701,7 +1990,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2724,9 +2013,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2751,7 +2042,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2761,8 +2052,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _ssl_certs_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::SslCertsInsertRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2777,16 +2069,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "common-name" => {
-                        request.common_name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["common-name"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "common-name" => Some(("commonName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["common-name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::SslCertsInsertRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.ssl_certs().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2801,9 +2098,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2828,7 +2127,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2851,9 +2150,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2878,7 +2179,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2901,9 +2202,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2928,7 +2231,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2951,9 +2254,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2978,7 +2283,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2988,8 +2293,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _users_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::User::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3004,34 +2310,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                "host" => {
-                        request.host = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "password" => {
-                        request.password = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "host", "instance", "kind", "name", "password", "project"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "host", "instance", "kind", "name", "password", "project"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::User = json::value::from_value(object).unwrap();
         let mut call = self.hub.users().insert(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3046,9 +2345,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3073,7 +2374,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3096,9 +2397,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3123,7 +2426,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3133,8 +2436,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _users_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::User::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3149,34 +2453,27 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "project" => {
-                        request.project = Some(value.unwrap_or("").to_string());
-                    },
-                "instance" => {
-                        request.instance = Some(value.unwrap_or("").to_string());
-                    },
-                "host" => {
-                        request.host = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "password" => {
-                        request.password = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "host", "instance", "kind", "name", "password", "project"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project" => Some(("project", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance" => Some(("instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "password" => Some(("password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "host", "instance", "kind", "name", "password", "project"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::User = json::value::from_value(object).unwrap();
         let mut call = self.hub.users().update(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""), opt.value_of("host").unwrap_or(""), opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3191,9 +2488,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3218,7 +2517,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3479,6 +2778,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("backup-runs", "methods: 'get' and 'list'", vec![
             ("get",  
@@ -4602,7 +3902,7 @@ fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150305")
+           .version("0.3.0+20150305")
            .about("API for Cloud SQL database instance management.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")
@@ -4643,7 +3943,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -4671,12 +3972,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -4692,4 +3993,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

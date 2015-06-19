@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -64,9 +63,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["projection"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["projection"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -91,7 +92,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -101,8 +102,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _url_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Url::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -117,111 +119,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_analytics_all_time_init(request: &mut api::Url) {
-                request_analytics_init(request);
-                if request.analytics.as_mut().unwrap().all_time.is_none() {
-                    request.analytics.as_mut().unwrap().all_time = Some(Default::default());
-                }
-            }
-            
-            fn request_analytics_day_init(request: &mut api::Url) {
-                request_analytics_init(request);
-                if request.analytics.as_mut().unwrap().day.is_none() {
-                    request.analytics.as_mut().unwrap().day = Some(Default::default());
-                }
-            }
-            
-            fn request_analytics_init(request: &mut api::Url) {
-                if request.analytics.is_none() {
-                    request.analytics = Some(Default::default());
-                }
-            }
-            
-            fn request_analytics_month_init(request: &mut api::Url) {
-                request_analytics_init(request);
-                if request.analytics.as_mut().unwrap().month.is_none() {
-                    request.analytics.as_mut().unwrap().month = Some(Default::default());
-                }
-            }
-            
-            fn request_analytics_two_hours_init(request: &mut api::Url) {
-                request_analytics_init(request);
-                if request.analytics.as_mut().unwrap().two_hours.is_none() {
-                    request.analytics.as_mut().unwrap().two_hours = Some(Default::default());
-                }
-            }
-            
-            fn request_analytics_week_init(request: &mut api::Url) {
-                request_analytics_init(request);
-                if request.analytics.as_mut().unwrap().week.is_none() {
-                    request.analytics.as_mut().unwrap().week = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "created" => {
-                        request.created = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.week.short-url-clicks" => {
-                        request_analytics_week_init(&mut request);
-                        request.analytics.as_mut().unwrap().week.as_mut().unwrap().short_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.week.long-url-clicks" => {
-                        request_analytics_week_init(&mut request);
-                        request.analytics.as_mut().unwrap().week.as_mut().unwrap().long_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.all-time.short-url-clicks" => {
-                        request_analytics_all_time_init(&mut request);
-                        request.analytics.as_mut().unwrap().all_time.as_mut().unwrap().short_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.all-time.long-url-clicks" => {
-                        request_analytics_all_time_init(&mut request);
-                        request.analytics.as_mut().unwrap().all_time.as_mut().unwrap().long_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.two-hours.short-url-clicks" => {
-                        request_analytics_two_hours_init(&mut request);
-                        request.analytics.as_mut().unwrap().two_hours.as_mut().unwrap().short_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.two-hours.long-url-clicks" => {
-                        request_analytics_two_hours_init(&mut request);
-                        request.analytics.as_mut().unwrap().two_hours.as_mut().unwrap().long_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.day.short-url-clicks" => {
-                        request_analytics_day_init(&mut request);
-                        request.analytics.as_mut().unwrap().day.as_mut().unwrap().short_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.day.long-url-clicks" => {
-                        request_analytics_day_init(&mut request);
-                        request.analytics.as_mut().unwrap().day.as_mut().unwrap().long_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.month.short-url-clicks" => {
-                        request_analytics_month_init(&mut request);
-                        request.analytics.as_mut().unwrap().month.as_mut().unwrap().short_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "analytics.month.long-url-clicks" => {
-                        request_analytics_month_init(&mut request);
-                        request.analytics.as_mut().unwrap().month.as_mut().unwrap().long_url_clicks = Some(value.unwrap_or("").to_string());
-                    },
-                "long-url" => {
-                        request_analytics_init(&mut request);
-                        request.long_url = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_analytics_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["all-time", "analytics", "created", "day", "id", "kind", "long-url", "long-url-clicks", "month", "short-url-clicks", "status", "two-hours", "week"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.week.short-url-clicks" => Some(("analytics.week.shortUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.week.long-url-clicks" => Some(("analytics.week.longUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.all-time.short-url-clicks" => Some(("analytics.allTime.shortUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.all-time.long-url-clicks" => Some(("analytics.allTime.longUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.two-hours.short-url-clicks" => Some(("analytics.twoHours.shortUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.two-hours.long-url-clicks" => Some(("analytics.twoHours.longUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.day.short-url-clicks" => Some(("analytics.day.shortUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.day.long-url-clicks" => Some(("analytics.day.longUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.month.short-url-clicks" => Some(("analytics.month.shortUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "analytics.month.long-url-clicks" => Some(("analytics.month.longUrlClicks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "long-url" => Some(("longUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all-time", "analytics", "created", "day", "id", "kind", "long-url", "long-url-clicks", "month", "short-url-clicks", "status", "two-hours", "week"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Url = json::value::from_value(object).unwrap();
         let mut call = self.hub.url().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -236,9 +162,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -263,7 +191,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -292,9 +220,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["start-token", "projection"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["start-token", "projection"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -319,7 +249,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -428,6 +358,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("url", "methods: 'get', 'insert' and 'list'", vec![
             ("get",  
@@ -496,7 +427,7 @@ fn main() {
     
     let mut app = App::new("urlshortener1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150319")
+           .version("0.3.0+20150319")
            .about("Lets you create, inspect, and manage goo.gl short URLs")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_urlshortener1_cli")
            .arg(Arg::with_name("url")
@@ -537,7 +468,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -565,12 +497,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -586,4 +518,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

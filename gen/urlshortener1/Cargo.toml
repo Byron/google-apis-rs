@@ -4,7 +4,7 @@
 [package]
 
 name = "google-urlshortener1"
-version = "0.1.7+20150319"
+version = "0.1.8+20150319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with urlshortener (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/urlshortener1"
@@ -12,13 +12,17 @@ homepage = "https://developers.google.com/url-shortener/v1/getting_started"
 documentation = "http://byron.github.io/google-apis-rs/google_urlshortener1"
 license = "MIT"
 keywords = ["urlshortener", "google", "protocol", "web", "api"]
+build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 url = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-json-tools = ">= 0.3.0"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

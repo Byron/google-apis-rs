@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -61,9 +60,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -88,7 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -117,9 +118,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -144,7 +147,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -167,9 +170,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -194,7 +199,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -217,9 +222,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -244,7 +251,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -270,9 +277,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["host-custom-channel-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["host-custom-channel-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -297,7 +306,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -307,8 +316,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_adunits_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AdUnit::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -323,140 +333,43 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_ads_settings_backup_option_init(request: &mut api::AdUnit) {
-                request_content_ads_settings_init(request);
-                if request.content_ads_settings.as_mut().unwrap().backup_option.is_none() {
-                    request.content_ads_settings.as_mut().unwrap().backup_option = Some(Default::default());
-                }
-            }
-            
-            fn request_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.content_ads_settings.is_none() {
-                    request.content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_colors_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().colors.is_none() {
-                    request.custom_style.as_mut().unwrap().colors = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_font_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().font.is_none() {
-                    request.custom_style.as_mut().unwrap().font = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_init(request: &mut api::AdUnit) {
-                if request.custom_style.is_none() {
-                    request.custom_style = Some(Default::default());
-                }
-            }
-            
-            fn request_mobile_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.mobile_content_ads_settings.is_none() {
-                    request.mobile_content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.type" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.color" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().color = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.url" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.type" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.size" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.scripting-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().scripting_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.type" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.markup-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().markup_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.size" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.corners" => {
-                        request_custom_style_init(&mut request);
-                        request.custom_style.as_mut().unwrap().corners = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.url" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.text" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.border" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().border = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.background" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().background = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.title" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.family" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().family = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.size" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.kind" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.type" => Some(("contentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.color" => Some(("contentAdsSettings.backupOption.color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.url" => Some(("contentAdsSettings.backupOption.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.type" => Some(("contentAdsSettings.backupOption.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.size" => Some(("contentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.scripting-language" => Some(("mobileContentAdsSettings.scriptingLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.type" => Some(("mobileContentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.markup-language" => Some(("mobileContentAdsSettings.markupLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.size" => Some(("mobileContentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.corners" => Some(("customStyle.corners", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.url" => Some(("customStyle.colors.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.text" => Some(("customStyle.colors.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.border" => Some(("customStyle.colors.border", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.background" => Some(("customStyle.colors.background", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.title" => Some(("customStyle.colors.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.family" => Some(("customStyle.font.family", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.size" => Some(("customStyle.font.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.kind" => Some(("customStyle.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AdUnit = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().adunits_insert(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -471,9 +384,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -498,7 +413,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -530,9 +445,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["include-inactive", "page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["include-inactive", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -557,7 +474,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -567,8 +484,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_adunits_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AdUnit::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -583,140 +501,43 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_ads_settings_backup_option_init(request: &mut api::AdUnit) {
-                request_content_ads_settings_init(request);
-                if request.content_ads_settings.as_mut().unwrap().backup_option.is_none() {
-                    request.content_ads_settings.as_mut().unwrap().backup_option = Some(Default::default());
-                }
-            }
-            
-            fn request_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.content_ads_settings.is_none() {
-                    request.content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_colors_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().colors.is_none() {
-                    request.custom_style.as_mut().unwrap().colors = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_font_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().font.is_none() {
-                    request.custom_style.as_mut().unwrap().font = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_init(request: &mut api::AdUnit) {
-                if request.custom_style.is_none() {
-                    request.custom_style = Some(Default::default());
-                }
-            }
-            
-            fn request_mobile_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.mobile_content_ads_settings.is_none() {
-                    request.mobile_content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.type" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.color" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().color = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.url" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.type" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.size" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.scripting-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().scripting_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.type" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.markup-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().markup_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.size" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.corners" => {
-                        request_custom_style_init(&mut request);
-                        request.custom_style.as_mut().unwrap().corners = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.url" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.text" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.border" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().border = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.background" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().background = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.title" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.family" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().family = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.size" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.kind" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.type" => Some(("contentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.color" => Some(("contentAdsSettings.backupOption.color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.url" => Some(("contentAdsSettings.backupOption.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.type" => Some(("contentAdsSettings.backupOption.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.size" => Some(("contentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.scripting-language" => Some(("mobileContentAdsSettings.scriptingLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.type" => Some(("mobileContentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.markup-language" => Some(("mobileContentAdsSettings.markupLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.size" => Some(("mobileContentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.corners" => Some(("customStyle.corners", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.url" => Some(("customStyle.colors.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.text" => Some(("customStyle.colors.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.border" => Some(("customStyle.colors.border", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.background" => Some(("customStyle.colors.background", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.title" => Some(("customStyle.colors.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.family" => Some(("customStyle.font.family", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.size" => Some(("customStyle.font.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.kind" => Some(("customStyle.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AdUnit = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().adunits_patch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("ad-unit-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -731,9 +552,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -758,7 +581,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -768,8 +591,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _accounts_adunits_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AdUnit::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -784,140 +608,43 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_ads_settings_backup_option_init(request: &mut api::AdUnit) {
-                request_content_ads_settings_init(request);
-                if request.content_ads_settings.as_mut().unwrap().backup_option.is_none() {
-                    request.content_ads_settings.as_mut().unwrap().backup_option = Some(Default::default());
-                }
-            }
-            
-            fn request_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.content_ads_settings.is_none() {
-                    request.content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_colors_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().colors.is_none() {
-                    request.custom_style.as_mut().unwrap().colors = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_font_init(request: &mut api::AdUnit) {
-                request_custom_style_init(request);
-                if request.custom_style.as_mut().unwrap().font.is_none() {
-                    request.custom_style.as_mut().unwrap().font = Some(Default::default());
-                }
-            }
-            
-            fn request_custom_style_init(request: &mut api::AdUnit) {
-                if request.custom_style.is_none() {
-                    request.custom_style = Some(Default::default());
-                }
-            }
-            
-            fn request_mobile_content_ads_settings_init(request: &mut api::AdUnit) {
-                if request.mobile_content_ads_settings.is_none() {
-                    request.mobile_content_ads_settings = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status" => {
-                        request.status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.type" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.color" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().color = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.url" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.backup-option.type" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().backup_option.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-ads-settings.size" => {
-                        request_content_ads_settings_backup_option_init(&mut request);
-                        request.content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_content_ads_settings_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.scripting-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().scripting_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.type" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.markup-language" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().markup_language = Some(value.unwrap_or("").to_string());
-                    },
-                "mobile-content-ads-settings.size" => {
-                        request_mobile_content_ads_settings_init(&mut request);
-                        request.mobile_content_ads_settings.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.corners" => {
-                        request_custom_style_init(&mut request);
-                        request.custom_style.as_mut().unwrap().corners = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.url" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.text" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().text = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.border" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().border = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.background" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().background = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.colors.title" => {
-                        request_custom_style_colors_init(&mut request);
-                        request.custom_style.as_mut().unwrap().colors.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.family" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().family = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.font.size" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().font.as_mut().unwrap().size = Some(value.unwrap_or("").to_string());
-                    },
-                "custom-style.kind" => {
-                        request_custom_style_font_init(&mut request);
-                        request.custom_style.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.type" => Some(("contentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.color" => Some(("contentAdsSettings.backupOption.color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.url" => Some(("contentAdsSettings.backupOption.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.backup-option.type" => Some(("contentAdsSettings.backupOption.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-ads-settings.size" => Some(("contentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.scripting-language" => Some(("mobileContentAdsSettings.scriptingLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.type" => Some(("mobileContentAdsSettings.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.markup-language" => Some(("mobileContentAdsSettings.markupLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mobile-content-ads-settings.size" => Some(("mobileContentAdsSettings.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.corners" => Some(("customStyle.corners", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.url" => Some(("customStyle.colors.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.text" => Some(("customStyle.colors.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.border" => Some(("customStyle.colors.border", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.background" => Some(("customStyle.colors.background", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.colors.title" => Some(("customStyle.colors.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.family" => Some(("customStyle.font.family", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.font.size" => Some(("customStyle.font.size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-style.kind" => Some(("customStyle.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background", "backup-option", "border", "code", "color", "colors", "content-ads-settings", "corners", "custom-style", "family", "font", "id", "kind", "markup-language", "mobile-content-ads-settings", "name", "scripting-language", "size", "status", "text", "title", "type", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AdUnit = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().adunits_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -932,9 +659,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -959,7 +688,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -982,9 +711,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1009,7 +740,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1032,9 +763,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1059,7 +792,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1103,9 +836,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["sort", "locale", "metric", "max-results", "filter", "start-index", "dimension"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sort", "locale", "metric", "max-results", "filter", "start-index", "dimension"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1130,7 +865,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1153,9 +888,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1180,7 +917,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1209,9 +946,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1236,7 +975,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1265,9 +1004,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["website-locale", "user-locale"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["website-locale", "user-locale"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1292,7 +1033,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1315,9 +1056,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1342,7 +1085,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1365,9 +1108,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1392,7 +1137,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1415,9 +1160,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1442,7 +1189,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1452,8 +1199,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customchannels_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomChannel::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1468,25 +1216,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomChannel = json::value::from_value(object).unwrap();
         let mut call = self.hub.customchannels().insert(request, opt.value_of("ad-client-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1501,9 +1248,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1528,7 +1277,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1557,9 +1306,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1584,7 +1335,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1594,8 +1345,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customchannels_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomChannel::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1610,25 +1362,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomChannel = json::value::from_value(object).unwrap();
         let mut call = self.hub.customchannels().patch(request, opt.value_of("ad-client-id").unwrap_or(""), opt.value_of("custom-channel-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1643,9 +1394,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1670,7 +1423,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1680,8 +1433,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _customchannels_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CustomChannel::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1696,25 +1450,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "code" => {
-                        request.code = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "name" => {
-                        request.name = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "code" => Some(("code", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "id", "kind", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CustomChannel = json::value::from_value(object).unwrap();
         let mut call = self.hub.customchannels().update(request, opt.value_of("ad-client-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1729,9 +1482,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1756,7 +1511,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1800,9 +1555,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["sort", "locale", "metric", "max-results", "filter", "start-index", "dimension"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["sort", "locale", "metric", "max-results", "filter", "start-index", "dimension"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1827,7 +1584,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1850,9 +1607,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1877,7 +1636,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1887,8 +1646,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _urlchannels_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::UrlChannel::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1903,22 +1663,23 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                "url-pattern" => {
-                        request.url_pattern = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "url-pattern"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "url-pattern" => Some(("urlPattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "url-pattern"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::UrlChannel = json::value::from_value(object).unwrap();
         let mut call = self.hub.urlchannels().insert(request, opt.value_of("ad-client-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1933,9 +1694,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1960,7 +1723,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1989,9 +1752,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "max-results"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2016,7 +1781,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2234,6 +1999,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("accounts", "methods: 'adclients-get', 'adclients-list', 'adunits-delete', 'adunits-get', 'adunits-get-ad-code', 'adunits-insert', 'adunits-list', 'adunits-patch', 'adunits-update', 'get', 'list' and 'reports-generate'", vec![
             ("adclients-get",  
@@ -2985,7 +2751,7 @@ fn main() {
     
     let mut app = App::new("adsensehost4d1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150307")
+           .version("0.3.0+20150307")
            .about("Gives AdSense Hosts access to report generation, ad code generation, and publisher management capabilities.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsensehost4d1_cli")
            .arg(Arg::with_name("url")
@@ -3026,7 +2792,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -3054,12 +2821,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -3075,4 +2842,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

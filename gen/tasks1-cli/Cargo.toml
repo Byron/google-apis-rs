@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tasks1-cli"
-version = "0.2.0+20141121"
+version = "0.3.0+20141121"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with tasks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tasks1-cli"
@@ -17,14 +17,18 @@ keywords = ["tasks", "google", "cli"]
 name = "tasks1"
 
 [dependencies]
-hyper = ">= 0.4.0"
-mime = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
-yup-hyper-mock = "*"
-serde = ">= 0.3.0"
-serde_macros = "*"
-clap = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
 
 [dependencies.google-tasks1]
 path = "../tasks1"

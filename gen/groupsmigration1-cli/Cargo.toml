@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "0.2.0+20140416"
+version = "0.3.0+20140416"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
@@ -17,29 +17,17 @@ keywords = ["groupsmigration", "google", "cli"]
 name = "groupsmigration1"
 
 [dependencies]
-mime = "*"
-
-serde = ">= 0.3.0"
-serde_macros = "*"
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
+yup-oauth2 = "*"
 strsim = "*"
-clap = "*"
-[dependencies.yup-hyper-mock]
-  version = "*"
-  git = "https://github.com/Byron/yup-hyper-mock"
-  rev = "ee56de4dead136b3ca5a3eda6ca7057f9074e261"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
 
-
-# Needed for latest fix in macros !
-[dependencies.hyper]
-version = ">= 0.4.0"
-git = "https://github.com/hyperium/hyper"
-rev = "871f37a5605d433e5699ed2f16631001d86d7805"
-
-# to adapt to hyper changes ... 
-[dependencies.yup-oauth2]
-version = "*"
-git = "https://github.com/Byron/yup-oauth2"
-rev = "94d5b7c2cac02ad67da8504504364b3081a9a866"
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
 
 
 [dependencies.google-groupsmigration1]

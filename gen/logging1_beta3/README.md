@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-logging1_beta3` library allows access to all features of the *Google logging* service.
 
-This documentation was generated from *logging* crate version *0.1.7+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
+This documentation was generated from *logging* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.Logging.html) ... 

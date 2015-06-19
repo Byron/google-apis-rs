@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-doubleclickbidmanager1` library allows access to all features of the *Google DoubleClick Bid Manager* service.
 
-This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.7+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.7*.
+This documentation was generated from *DoubleClick Bid Manager* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *doubleclickbidmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *DoubleClick Bid Manager* *v1* API can be found at the
 [official documentation site](https://developers.google.com/bid-manager/).

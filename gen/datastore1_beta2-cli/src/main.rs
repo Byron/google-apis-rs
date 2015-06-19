@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_allocate_ids(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::AllocateIdsRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,13 +64,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec![]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::AllocateIdsRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().allocate_ids(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -85,9 +92,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -112,7 +121,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -122,8 +131,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_begin_transaction(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::BeginTransactionRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -138,16 +148,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "isolation-level" => {
-                        request.isolation_level = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["isolation-level"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "isolation-level" => Some(("isolationLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["isolation-level"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::BeginTransactionRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().begin_transaction(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -162,9 +177,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -189,7 +206,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -199,8 +216,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_commit(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CommitRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -215,32 +233,24 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_mutation_init(request: &mut api::CommitRequest) {
-                if request.mutation.is_none() {
-                    request.mutation = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "ignore-read-only" => {
-                        request.ignore_read_only = Some(arg_from_str(value.unwrap_or("false"), err, "ignore-read-only", "boolean"));
-                    },
-                "transaction" => {
-                        request.transaction = Some(value.unwrap_or("").to_string());
-                    },
-                "mode" => {
-                        request.mode = Some(value.unwrap_or("").to_string());
-                    },
-                "mutation.force" => {
-                        request_mutation_init(&mut request);
-                        request.mutation.as_mut().unwrap().force = Some(arg_from_str(value.unwrap_or("false"), err, "mutation.force", "boolean"));
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["force", "ignore-read-only", "mode", "mutation", "transaction"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "ignore-read-only" => Some(("ignoreReadOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mode" => Some(("mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mutation.force" => Some(("mutation.force", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["force", "ignore-read-only", "mode", "mutation", "transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CommitRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().commit(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -255,9 +265,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -282,7 +294,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -292,8 +304,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_lookup(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::LookupRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -308,27 +321,22 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_read_options_init(request: &mut api::LookupRequest) {
-                if request.read_options.is_none() {
-                    request.read_options = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "read-options.transaction" => {
-                        request_read_options_init(&mut request);
-                        request.read_options.as_mut().unwrap().transaction = Some(value.unwrap_or("").to_string());
-                    },
-                "read-options.read-consistency" => {
-                        request_read_options_init(&mut request);
-                        request.read_options.as_mut().unwrap().read_consistency = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["read-consistency", "read-options", "transaction"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["read-consistency", "read-options", "transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::LookupRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().lookup(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -343,9 +351,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -370,7 +380,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -380,8 +390,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_rollback(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::RollbackRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -396,16 +407,21 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "transaction" => {
-                        request.transaction = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["transaction"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "transaction" => Some(("transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::RollbackRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().rollback(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -420,9 +436,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -447,7 +465,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -457,8 +475,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _datasets_run_query(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::RunQueryRequest::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -473,211 +492,46 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_gql_query_init(request: &mut api::RunQueryRequest) {
-                if request.gql_query.is_none() {
-                    request.gql_query = Some(Default::default());
-                }
-            }
-            
-            fn request_partition_id_init(request: &mut api::RunQueryRequest) {
-                if request.partition_id.is_none() {
-                    request.partition_id = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_composite_filter_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().composite_filter.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().composite_filter = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_init(request: &mut api::RunQueryRequest) {
-                request_query_init(request);
-                if request.query.as_mut().unwrap().filter.is_none() {
-                    request.query.as_mut().unwrap().filter = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_property_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().property.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().property = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_entity_value_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_value_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_entity_value_key_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_value_entity_value_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_entity_value_key_partition_id_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_value_entity_value_key_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key.as_mut().unwrap().partition_id.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key.as_mut().unwrap().partition_id = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_key_value_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_value_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value = Some(Default::default());
-                }
-            }
-            
-            fn request_query_filter_property_filter_value_key_value_partition_id_init(request: &mut api::RunQueryRequest) {
-                request_query_filter_property_filter_value_key_value_init(request);
-                if request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value.as_mut().unwrap().partition_id.is_none() {
-                    request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value.as_mut().unwrap().partition_id = Some(Default::default());
-                }
-            }
-            
-            fn request_query_init(request: &mut api::RunQueryRequest) {
-                if request.query.is_none() {
-                    request.query = Some(Default::default());
-                }
-            }
-            
-            fn request_read_options_init(request: &mut api::RunQueryRequest) {
-                if request.read_options.is_none() {
-                    request.read_options = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "query.filter.composite-filter.operator" => {
-                        request_query_filter_composite_filter_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().composite_filter.as_mut().unwrap().operator = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.operator" => {
-                        request_query_filter_property_filter_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().operator = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.property.name" => {
-                        request_query_filter_property_filter_property_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().property.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.entity-value.key.partition-id.namespace" => {
-                        request_query_filter_property_filter_value_entity_value_key_partition_id_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key.as_mut().unwrap().partition_id.as_mut().unwrap().namespace = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.entity-value.key.partition-id.dataset-id" => {
-                        request_query_filter_property_filter_value_entity_value_key_partition_id_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().entity_value.as_mut().unwrap().key.as_mut().unwrap().partition_id.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.double-value" => {
-                        request_query_filter_property_filter_value_entity_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().double_value = Some(arg_from_str(value.unwrap_or("0.0"), err, "query.filter.property-filter.value.double-value", "number"));
-                    },
-                "query.filter.property-filter.value.integer-value" => {
-                        request_query_filter_property_filter_value_entity_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().integer_value = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.meaning" => {
-                        request_query_filter_property_filter_value_entity_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().meaning = Some(arg_from_str(value.unwrap_or("-0"), err, "query.filter.property-filter.value.meaning", "integer"));
-                    },
-                "query.filter.property-filter.value.date-time-value" => {
-                        request_query_filter_property_filter_value_entity_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().date_time_value = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.key-value.partition-id.namespace" => {
-                        request_query_filter_property_filter_value_key_value_partition_id_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value.as_mut().unwrap().partition_id.as_mut().unwrap().namespace = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.key-value.partition-id.dataset-id" => {
-                        request_query_filter_property_filter_value_key_value_partition_id_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().key_value.as_mut().unwrap().partition_id.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.string-value" => {
-                        request_query_filter_property_filter_value_key_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().string_value = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.indexed" => {
-                        request_query_filter_property_filter_value_key_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().indexed = Some(arg_from_str(value.unwrap_or("false"), err, "query.filter.property-filter.value.indexed", "boolean"));
-                    },
-                "query.filter.property-filter.value.blob-value" => {
-                        request_query_filter_property_filter_value_key_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().blob_value = Some(value.unwrap_or("").to_string());
-                    },
-                "query.filter.property-filter.value.boolean-value" => {
-                        request_query_filter_property_filter_value_key_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().boolean_value = Some(arg_from_str(value.unwrap_or("false"), err, "query.filter.property-filter.value.boolean-value", "boolean"));
-                    },
-                "query.filter.property-filter.value.blob-key-value" => {
-                        request_query_filter_property_filter_value_key_value_init(&mut request);
-                        request.query.as_mut().unwrap().filter.as_mut().unwrap().property_filter.as_mut().unwrap().value.as_mut().unwrap().blob_key_value = Some(value.unwrap_or("").to_string());
-                    },
-                "query.start-cursor" => {
-                        request_query_filter_init(&mut request);
-                        request.query.as_mut().unwrap().start_cursor = Some(value.unwrap_or("").to_string());
-                    },
-                "query.end-cursor" => {
-                        request_query_filter_init(&mut request);
-                        request.query.as_mut().unwrap().end_cursor = Some(value.unwrap_or("").to_string());
-                    },
-                "query.limit" => {
-                        request_query_filter_init(&mut request);
-                        request.query.as_mut().unwrap().limit = Some(arg_from_str(value.unwrap_or("-0"), err, "query.limit", "integer"));
-                    },
-                "query.offset" => {
-                        request_query_filter_init(&mut request);
-                        request.query.as_mut().unwrap().offset = Some(arg_from_str(value.unwrap_or("-0"), err, "query.offset", "integer"));
-                    },
-                "partition-id.namespace" => {
-                        request_partition_id_init(&mut request);
-                        request.partition_id.as_mut().unwrap().namespace = Some(value.unwrap_or("").to_string());
-                    },
-                "partition-id.dataset-id" => {
-                        request_partition_id_init(&mut request);
-                        request.partition_id.as_mut().unwrap().dataset_id = Some(value.unwrap_or("").to_string());
-                    },
-                "gql-query.query-string" => {
-                        request_gql_query_init(&mut request);
-                        request.gql_query.as_mut().unwrap().query_string = Some(value.unwrap_or("").to_string());
-                    },
-                "gql-query.allow-literal" => {
-                        request_gql_query_init(&mut request);
-                        request.gql_query.as_mut().unwrap().allow_literal = Some(arg_from_str(value.unwrap_or("false"), err, "gql-query.allow-literal", "boolean"));
-                    },
-                "read-options.transaction" => {
-                        request_read_options_init(&mut request);
-                        request.read_options.as_mut().unwrap().transaction = Some(value.unwrap_or("").to_string());
-                    },
-                "read-options.read-consistency" => {
-                        request_read_options_init(&mut request);
-                        request.read_options.as_mut().unwrap().read_consistency = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literal", "blob-key-value", "blob-value", "boolean-value", "composite-filter", "dataset-id", "date-time-value", "double-value", "end-cursor", "entity-value", "filter", "gql-query", "indexed", "integer-value", "key", "key-value", "limit", "meaning", "name", "namespace", "offset", "operator", "partition-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-options", "start-cursor", "string-value", "transaction", "value"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "query.filter.composite-filter.operator" => Some(("query.filter.compositeFilter.operator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.operator" => Some(("query.filter.propertyFilter.operator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.property.name" => Some(("query.filter.propertyFilter.property.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.entity-value.key.partition-id.namespace" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.entity-value.key.partition-id.dataset-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.double-value" => Some(("query.filter.propertyFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.integer-value" => Some(("query.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.meaning" => Some(("query.filter.propertyFilter.value.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.date-time-value" => Some(("query.filter.propertyFilter.value.dateTimeValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.key-value.partition-id.namespace" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.key-value.partition-id.dataset-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.string-value" => Some(("query.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.indexed" => Some(("query.filter.propertyFilter.value.indexed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.boolean-value" => Some(("query.filter.propertyFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.blob-key-value" => Some(("query.filter.propertyFilter.value.blobKeyValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.start-cursor" => Some(("query.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.end-cursor" => Some(("query.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.limit" => Some(("query.limit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query.offset" => Some(("query.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "partition-id.namespace" => Some(("partitionId.namespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-id.dataset-id" => Some(("partitionId.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gql-query.query-string" => Some(("gqlQuery.queryString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gql-query.allow-literal" => Some(("gqlQuery.allowLiteral", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "read-options.transaction" => Some(("readOptions.transaction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "read-options.read-consistency" => Some(("readOptions.readConsistency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-literal", "blob-key-value", "blob-value", "boolean-value", "composite-filter", "dataset-id", "date-time-value", "double-value", "end-cursor", "entity-value", "filter", "gql-query", "indexed", "integer-value", "key", "key-value", "limit", "meaning", "name", "namespace", "offset", "operator", "partition-id", "property", "property-filter", "query", "query-string", "read-consistency", "read-options", "start-cursor", "string-value", "transaction", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::RunQueryRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.datasets().run_query(request, opt.value_of("dataset-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -692,9 +546,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -719,7 +575,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -837,6 +693,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let arg_data = [
         ("datasets", "methods: 'allocate-ids', 'begin-transaction', 'commit', 'lookup', 'rollback' and 'run-query'", vec![
             ("allocate-ids",  
@@ -1013,7 +870,7 @@ fn main() {
     
     let mut app = App::new("datastore1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150402")
+           .version("0.3.0+20150402")
            .about("API for accessing Google Cloud Datastore.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -1054,7 +911,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -1082,12 +940,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -1103,4 +961,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }

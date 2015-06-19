@@ -1,7 +1,6 @@
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/cli/main.rs.mako'
 // DO NOT EDIT !
-#![feature(plugin, exit_status)]
 #![allow(unused_variables, unused_imports, dead_code, unused_mut)]
 
 #[macro_use]
@@ -22,7 +21,7 @@ mod cmn;
 
 use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
-          calltype_from_str, remove_json_null_values};
+          calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
 use std::default::Default;
 use std::str::FromStr;
@@ -48,8 +47,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _activities_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Activity::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -64,552 +64,103 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_bulletin_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().bulletin.is_none() {
-                    request.content_details.as_mut().unwrap().bulletin = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_bulletin_resource_id_init(request: &mut api::Activity) {
-                request_content_details_bulletin_init(request);
-                if request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_channel_item_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().channel_item.is_none() {
-                    request.content_details.as_mut().unwrap().channel_item = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_channel_item_resource_id_init(request: &mut api::Activity) {
-                request_content_details_channel_item_init(request);
-                if request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_comment_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().comment.is_none() {
-                    request.content_details.as_mut().unwrap().comment = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_comment_resource_id_init(request: &mut api::Activity) {
-                request_content_details_comment_init(request);
-                if request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_favorite_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().favorite.is_none() {
-                    request.content_details.as_mut().unwrap().favorite = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_favorite_resource_id_init(request: &mut api::Activity) {
-                request_content_details_favorite_init(request);
-                if request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::Activity) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_like_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().like.is_none() {
-                    request.content_details.as_mut().unwrap().like = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_like_resource_id_init(request: &mut api::Activity) {
-                request_content_details_like_init(request);
-                if request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_playlist_item_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().playlist_item.is_none() {
-                    request.content_details.as_mut().unwrap().playlist_item = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_playlist_item_resource_id_init(request: &mut api::Activity) {
-                request_content_details_playlist_item_init(request);
-                if request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_promoted_item_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().promoted_item.is_none() {
-                    request.content_details.as_mut().unwrap().promoted_item = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_recommendation_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().recommendation.is_none() {
-                    request.content_details.as_mut().unwrap().recommendation = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_recommendation_resource_id_init(request: &mut api::Activity) {
-                request_content_details_recommendation_init(request);
-                if request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_recommendation_seed_resource_id_init(request: &mut api::Activity) {
-                request_content_details_recommendation_init(request);
-                if request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_social_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().social.is_none() {
-                    request.content_details.as_mut().unwrap().social = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_social_resource_id_init(request: &mut api::Activity) {
-                request_content_details_social_init(request);
-                if request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_subscription_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().subscription.is_none() {
-                    request.content_details.as_mut().unwrap().subscription = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_subscription_resource_id_init(request: &mut api::Activity) {
-                request_content_details_subscription_init(request);
-                if request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id.is_none() {
-                    request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_upload_init(request: &mut api::Activity) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().upload.is_none() {
-                    request.content_details.as_mut().unwrap().upload = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Activity) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Activity) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Activity) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Activity) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Activity) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Activity) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Activity) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "snippet.title" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.type" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.group-id" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().group_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.comment.resource-id.kind" => {
-                        request_content_details_comment_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.comment.resource-id.channel-id" => {
-                        request_content_details_comment_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.comment.resource-id.playlist-id" => {
-                        request_content_details_comment_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.comment.resource-id.video-id" => {
-                        request_content_details_comment_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().comment.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.resource-id.kind" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.resource-id.channel-id" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.resource-id.playlist-id" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.resource-id.video-id" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.playlist-id" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlist-item.playlist-item-id" => {
-                        request_content_details_playlist_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().playlist_item.as_mut().unwrap().playlist_item_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.like.resource-id.kind" => {
-                        request_content_details_like_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.like.resource-id.channel-id" => {
-                        request_content_details_like_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.like.resource-id.playlist-id" => {
-                        request_content_details_like_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.like.resource-id.video-id" => {
-                        request_content_details_like_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().like.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.cta-type" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().cta_type = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.ad-tag" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().ad_tag = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.destination-url" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().destination_url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.forecasting-url" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        if request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().forecasting_url.is_none() {
-                           request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().forecasting_url = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().forecasting_url.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.impression-url" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        if request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().impression_url.is_none() {
-                           request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().impression_url = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().impression_url.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.creative-view-url" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().creative_view_url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.video-id" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.description-text" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().description_text = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.custom-cta-button-text" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().custom_cta_button_text = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.promoted-item.click-tracking-url" => {
-                        request_content_details_promoted_item_init(&mut request);
-                        request.content_details.as_mut().unwrap().promoted_item.as_mut().unwrap().click_tracking_url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.resource-id.kind" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.resource-id.channel-id" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.resource-id.playlist-id" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.resource-id.video-id" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.image-url" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.type" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.reference-url" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().reference_url = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.social.author" => {
-                        request_content_details_social_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().social.as_mut().unwrap().author = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.favorite.resource-id.kind" => {
-                        request_content_details_favorite_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.favorite.resource-id.channel-id" => {
-                        request_content_details_favorite_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.favorite.resource-id.playlist-id" => {
-                        request_content_details_favorite_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.favorite.resource-id.video-id" => {
-                        request_content_details_favorite_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().favorite.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.upload.video-id" => {
-                        request_content_details_upload_init(&mut request);
-                        request.content_details.as_mut().unwrap().upload.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.resource-id.kind" => {
-                        request_content_details_recommendation_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.resource-id.channel-id" => {
-                        request_content_details_recommendation_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.resource-id.playlist-id" => {
-                        request_content_details_recommendation_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.resource-id.video-id" => {
-                        request_content_details_recommendation_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.reason" => {
-                        request_content_details_recommendation_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().reason = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.seed-resource-id.kind" => {
-                        request_content_details_recommendation_seed_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.seed-resource-id.channel-id" => {
-                        request_content_details_recommendation_seed_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.seed-resource-id.playlist-id" => {
-                        request_content_details_recommendation_seed_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.recommendation.seed-resource-id.video-id" => {
-                        request_content_details_recommendation_seed_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().recommendation.as_mut().unwrap().seed_resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.subscription.resource-id.kind" => {
-                        request_content_details_subscription_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.subscription.resource-id.channel-id" => {
-                        request_content_details_subscription_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.subscription.resource-id.playlist-id" => {
-                        request_content_details_subscription_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.subscription.resource-id.video-id" => {
-                        request_content_details_subscription_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().subscription.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.bulletin.resource-id.kind" => {
-                        request_content_details_bulletin_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.bulletin.resource-id.channel-id" => {
-                        request_content_details_bulletin_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.bulletin.resource-id.playlist-id" => {
-                        request_content_details_bulletin_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.bulletin.resource-id.video-id" => {
-                        request_content_details_bulletin_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().bulletin.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.channel-item.resource-id.kind" => {
-                        request_content_details_channel_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.channel-item.resource-id.channel-id" => {
-                        request_content_details_channel_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.channel-item.resource-id.playlist-id" => {
-                        request_content_details_channel_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.channel-item.resource-id.video-id" => {
-                        request_content_details_channel_item_resource_id_init(&mut request);
-                        request.content_details.as_mut().unwrap().channel_item.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_content_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_content_details_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_content_details_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-tag", "author", "bulletin", "channel-id", "channel-item", "channel-title", "click-tracking-url", "comment", "content-details", "creative-view-url", "cta-type", "custom-cta-button-text", "default", "description", "description-text", "destination-url", "etag", "favorite", "forecasting-url", "group-id", "height", "high", "id", "image-url", "impression-url", "kind", "like", "maxres", "medium", "playlist-id", "playlist-item", "playlist-item-id", "promoted-item", "published-at", "reason", "recommendation", "reference-url", "resource-id", "seed-resource-id", "snippet", "social", "standard", "subscription", "thumbnails", "title", "type", "upload", "url", "video-id", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.group-id" => Some(("snippet.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.comment.resource-id.kind" => Some(("contentDetails.comment.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.comment.resource-id.channel-id" => Some(("contentDetails.comment.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.comment.resource-id.playlist-id" => Some(("contentDetails.comment.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.comment.resource-id.video-id" => Some(("contentDetails.comment.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.resource-id.kind" => Some(("contentDetails.playlistItem.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.resource-id.channel-id" => Some(("contentDetails.playlistItem.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.resource-id.playlist-id" => Some(("contentDetails.playlistItem.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.resource-id.video-id" => Some(("contentDetails.playlistItem.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.playlist-id" => Some(("contentDetails.playlistItem.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.playlist-item.playlist-item-id" => Some(("contentDetails.playlistItem.playlistItemId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.like.resource-id.kind" => Some(("contentDetails.like.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.like.resource-id.channel-id" => Some(("contentDetails.like.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.like.resource-id.playlist-id" => Some(("contentDetails.like.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.like.resource-id.video-id" => Some(("contentDetails.like.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.cta-type" => Some(("contentDetails.promotedItem.ctaType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.ad-tag" => Some(("contentDetails.promotedItem.adTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.destination-url" => Some(("contentDetails.promotedItem.destinationUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.forecasting-url" => Some(("contentDetails.promotedItem.forecastingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.promoted-item.impression-url" => Some(("contentDetails.promotedItem.impressionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.promoted-item.creative-view-url" => Some(("contentDetails.promotedItem.creativeViewUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.video-id" => Some(("contentDetails.promotedItem.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.description-text" => Some(("contentDetails.promotedItem.descriptionText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.custom-cta-button-text" => Some(("contentDetails.promotedItem.customCtaButtonText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.promoted-item.click-tracking-url" => Some(("contentDetails.promotedItem.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.resource-id.kind" => Some(("contentDetails.social.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.resource-id.channel-id" => Some(("contentDetails.social.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.resource-id.playlist-id" => Some(("contentDetails.social.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.resource-id.video-id" => Some(("contentDetails.social.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.image-url" => Some(("contentDetails.social.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.type" => Some(("contentDetails.social.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.reference-url" => Some(("contentDetails.social.referenceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.social.author" => Some(("contentDetails.social.author", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.favorite.resource-id.kind" => Some(("contentDetails.favorite.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.favorite.resource-id.channel-id" => Some(("contentDetails.favorite.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.favorite.resource-id.playlist-id" => Some(("contentDetails.favorite.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.favorite.resource-id.video-id" => Some(("contentDetails.favorite.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.upload.video-id" => Some(("contentDetails.upload.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.resource-id.kind" => Some(("contentDetails.recommendation.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.resource-id.channel-id" => Some(("contentDetails.recommendation.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.resource-id.playlist-id" => Some(("contentDetails.recommendation.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.resource-id.video-id" => Some(("contentDetails.recommendation.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.reason" => Some(("contentDetails.recommendation.reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.seed-resource-id.kind" => Some(("contentDetails.recommendation.seedResourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.seed-resource-id.channel-id" => Some(("contentDetails.recommendation.seedResourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.seed-resource-id.playlist-id" => Some(("contentDetails.recommendation.seedResourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.recommendation.seed-resource-id.video-id" => Some(("contentDetails.recommendation.seedResourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.subscription.resource-id.kind" => Some(("contentDetails.subscription.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.subscription.resource-id.channel-id" => Some(("contentDetails.subscription.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.subscription.resource-id.playlist-id" => Some(("contentDetails.subscription.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.subscription.resource-id.video-id" => Some(("contentDetails.subscription.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bulletin.resource-id.kind" => Some(("contentDetails.bulletin.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bulletin.resource-id.channel-id" => Some(("contentDetails.bulletin.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bulletin.resource-id.playlist-id" => Some(("contentDetails.bulletin.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.bulletin.resource-id.video-id" => Some(("contentDetails.bulletin.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.channel-item.resource-id.kind" => Some(("contentDetails.channelItem.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.channel-item.resource-id.channel-id" => Some(("contentDetails.channelItem.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.channel-item.resource-id.playlist-id" => Some(("contentDetails.channelItem.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.channel-item.resource-id.video-id" => Some(("contentDetails.channelItem.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ad-tag", "author", "bulletin", "channel-id", "channel-item", "channel-title", "click-tracking-url", "comment", "content-details", "creative-view-url", "cta-type", "custom-cta-button-text", "default", "description", "description-text", "destination-url", "etag", "favorite", "forecasting-url", "group-id", "height", "high", "id", "image-url", "impression-url", "kind", "like", "maxres", "medium", "playlist-id", "playlist-item", "playlist-item-id", "promoted-item", "published-at", "reason", "recommendation", "reference-url", "resource-id", "seed-resource-id", "snippet", "social", "standard", "subscription", "thumbnails", "title", "type", "upload", "url", "video-id", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Activity = json::value::from_value(object).unwrap();
         let mut call = self.hub.activities().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -624,9 +175,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -651,7 +204,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -698,9 +251,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "published-before", "channel-id", "mine", "max-results", "region-code", "home", "published-after"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "published-before", "channel-id", "mine", "max-results", "region-code", "home", "published-after"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -725,7 +280,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -754,9 +309,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of", "debug-project-id-override"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -813,9 +370,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["tfmt", "on-behalf-of", "tlang", "debug-project-id-override"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["tfmt", "on-behalf-of", "tlang", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -851,8 +410,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _captions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Caption::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -867,83 +427,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_init(request: &mut api::Caption) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.status" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.audio-track-type" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().audio_track_type = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.name" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.is-draft" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_draft = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-draft", "boolean"));
-                    },
-                "snippet.is-auto-synced" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_auto_synced = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-auto-synced", "boolean"));
-                    },
-                "snippet.track-kind" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().track_kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.last-updated" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().last_updated = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.is-cc" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_cc = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-cc", "boolean"));
-                    },
-                "snippet.is-easy-reader" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_easy_reader = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-easy-reader", "boolean"));
-                    },
-                "snippet.is-large" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_large = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-large", "boolean"));
-                    },
-                "snippet.failure-reason" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.status" => Some(("snippet.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.audio-track-type" => Some(("snippet.audioTrackType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.language" => Some(("snippet.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.name" => Some(("snippet.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-draft" => Some(("snippet.isDraft", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-auto-synced" => Some(("snippet.isAutoSynced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.track-kind" => Some(("snippet.trackKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.last-updated" => Some(("snippet.lastUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-cc" => Some(("snippet.isCC", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-easy-reader" => Some(("snippet.isEasyReader", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-large" => Some(("snippet.isLarge", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.failure-reason" => Some(("snippet.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Caption = json::value::from_value(object).unwrap();
         let mut call = self.hub.captions().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -967,9 +480,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of", "sync", "debug-project-id-override"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -998,7 +513,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1030,9 +545,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of", "id", "debug-project-id-override"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of", "id", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1057,7 +574,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1067,8 +584,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _captions_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Caption::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1083,83 +601,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_init(request: &mut api::Caption) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.status" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.audio-track-type" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().audio_track_type = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.name" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.is-draft" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_draft = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-draft", "boolean"));
-                    },
-                "snippet.is-auto-synced" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_auto_synced = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-auto-synced", "boolean"));
-                    },
-                "snippet.track-kind" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().track_kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.last-updated" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().last_updated = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.is-cc" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_cc = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-cc", "boolean"));
-                    },
-                "snippet.is-easy-reader" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_easy_reader = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-easy-reader", "boolean"));
-                    },
-                "snippet.is-large" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_large = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-large", "boolean"));
-                    },
-                "snippet.failure-reason" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.status" => Some(("snippet.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.audio-track-type" => Some(("snippet.audioTrackType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.language" => Some(("snippet.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.name" => Some(("snippet.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-draft" => Some(("snippet.isDraft", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-auto-synced" => Some(("snippet.isAutoSynced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.track-kind" => Some(("snippet.trackKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.last-updated" => Some(("snippet.lastUpdated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-cc" => Some(("snippet.isCC", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-easy-reader" => Some(("snippet.isEasyReader", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.is-large" => Some(("snippet.isLarge", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.failure-reason" => Some(("snippet.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-track-type", "etag", "failure-reason", "id", "is-auto-synced", "is-cc", "is-draft", "is-easy-reader", "is-large", "kind", "language", "last-updated", "name", "snippet", "status", "track-kind", "video-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Caption = json::value::from_value(object).unwrap();
         let mut call = self.hub.captions().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1183,9 +654,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of", "sync", "debug-project-id-override"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1214,7 +687,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1224,8 +697,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _channel_banners_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ChannelBannerResource::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1240,22 +714,23 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "url" => {
-                        request.url = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "url"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "kind", "url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ChannelBannerResource = json::value::from_value(object).unwrap();
         let mut call = self.hub.channel_banners().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1273,9 +748,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1304,7 +781,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1330,9 +807,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1360,8 +839,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _channel_sections_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ChannelSection::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1376,112 +856,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::ChannelSection) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::ChannelSection) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::ChannelSection) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_targeting_init(request: &mut api::ChannelSection) {
-                if request.targeting.is_none() {
-                    request.targeting = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "targeting.languages" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().languages.is_none() {
-                           request.targeting.as_mut().unwrap().languages = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().languages.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "targeting.regions" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().regions.is_none() {
-                           request.targeting.as_mut().unwrap().regions = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().regions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "targeting.countries" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().countries.is_none() {
-                           request.targeting.as_mut().unwrap().countries = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().countries.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.channels" => {
-                        request_content_details_init(&mut request);
-                        if request.content_details.as_mut().unwrap().channels.is_none() {
-                           request.content_details.as_mut().unwrap().channels = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().channels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlists" => {
-                        request_content_details_init(&mut request);
-                        if request.content_details.as_mut().unwrap().playlists.is_none() {
-                           request.content_details.as_mut().unwrap().playlists = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().playlists.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.style" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().style = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.position" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().position = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.position", "integer"));
-                    },
-                "snippet.type" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "targeting.languages" => Some(("targeting.languages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.regions" => Some(("targeting.regions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.countries" => Some(("targeting.countries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.channels" => Some(("contentDetails.channels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.playlists" => Some(("contentDetails.playlists", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.style" => Some(("snippet.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.position" => Some(("snippet.position", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ChannelSection = json::value::from_value(object).unwrap();
         let mut call = self.hub.channel_sections().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1502,9 +905,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1529,7 +934,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1567,9 +972,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "channel-id", "mine", "hl", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "channel-id", "mine", "hl", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1594,7 +1001,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1604,8 +1011,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _channel_sections_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::ChannelSection::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1620,112 +1028,35 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::ChannelSection) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::ChannelSection) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::ChannelSection) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_targeting_init(request: &mut api::ChannelSection) {
-                if request.targeting.is_none() {
-                    request.targeting = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "targeting.languages" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().languages.is_none() {
-                           request.targeting.as_mut().unwrap().languages = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().languages.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "targeting.regions" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().regions.is_none() {
-                           request.targeting.as_mut().unwrap().regions = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().regions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "targeting.countries" => {
-                        request_targeting_init(&mut request);
-                        if request.targeting.as_mut().unwrap().countries.is_none() {
-                           request.targeting.as_mut().unwrap().countries = Some(Default::default());
-                        }
-                                        request.targeting.as_mut().unwrap().countries.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.channels" => {
-                        request_content_details_init(&mut request);
-                        if request.content_details.as_mut().unwrap().channels.is_none() {
-                           request.content_details.as_mut().unwrap().channels = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().channels.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.playlists" => {
-                        request_content_details_init(&mut request);
-                        if request.content_details.as_mut().unwrap().playlists.is_none() {
-                           request.content_details.as_mut().unwrap().playlists = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().playlists.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.style" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().style = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.position" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().position = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.position", "integer"));
-                    },
-                "snippet.type" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "targeting.languages" => Some(("targeting.languages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.regions" => Some(("targeting.regions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "targeting.countries" => Some(("targeting.countries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.channels" => Some(("contentDetails.channels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.playlists" => Some(("contentDetails.playlists", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.style" => Some(("snippet.style", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.position" => Some(("snippet.position", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.type" => Some(("snippet.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channels", "content-details", "countries", "default-language", "etag", "id", "kind", "languages", "localized", "playlists", "position", "regions", "snippet", "style", "targeting", "title", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::ChannelSection = json::value::from_value(object).unwrap();
         let mut call = self.hub.channel_sections().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1743,9 +1074,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1770,7 +1103,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1823,9 +1156,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["managed-by-me", "on-behalf-of-content-owner", "for-username", "mine", "max-results", "category-id", "page-token", "my-subscribers", "hl", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["managed-by-me", "on-behalf-of-content-owner", "for-username", "mine", "max-results", "category-id", "page-token", "my-subscribers", "hl", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -1850,7 +1185,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -1860,8 +1195,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _channels_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Channel::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -1876,618 +1212,116 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_audit_details_init(request: &mut api::Channel) {
-                if request.audit_details.is_none() {
-                    request.audit_details = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_channel_init(request: &mut api::Channel) {
-                request_branding_settings_init(request);
-                if request.branding_settings.as_mut().unwrap().channel.is_none() {
-                    request.branding_settings.as_mut().unwrap().channel = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_background_image_url_default_language_init(request: &mut api::Channel) {
-                request_branding_settings_image_background_image_url_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url.as_mut().unwrap().default_language.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url.as_mut().unwrap().default_language = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_background_image_url_init(request: &mut api::Channel) {
-                request_branding_settings_image_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_init(request: &mut api::Channel) {
-                request_branding_settings_init(request);
-                if request.branding_settings.as_mut().unwrap().image.is_none() {
-                    request.branding_settings.as_mut().unwrap().image = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_large_branded_banner_image_imap_script_default_language_init(request: &mut api::Channel) {
-                request_branding_settings_image_large_branded_banner_image_imap_script_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script.as_mut().unwrap().default_language.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script.as_mut().unwrap().default_language = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_large_branded_banner_image_imap_script_init(request: &mut api::Channel) {
-                request_branding_settings_image_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_large_branded_banner_image_url_default_language_init(request: &mut api::Channel) {
-                request_branding_settings_image_large_branded_banner_image_url_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url.as_mut().unwrap().default_language.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url.as_mut().unwrap().default_language = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_large_branded_banner_image_url_init(request: &mut api::Channel) {
-                request_branding_settings_image_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_small_branded_banner_image_imap_script_default_language_init(request: &mut api::Channel) {
-                request_branding_settings_image_small_branded_banner_image_imap_script_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script.as_mut().unwrap().default_language.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script.as_mut().unwrap().default_language = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_small_branded_banner_image_imap_script_init(request: &mut api::Channel) {
-                request_branding_settings_image_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_small_branded_banner_image_url_default_language_init(request: &mut api::Channel) {
-                request_branding_settings_image_small_branded_banner_image_url_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url.as_mut().unwrap().default_language.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url.as_mut().unwrap().default_language = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_image_small_branded_banner_image_url_init(request: &mut api::Channel) {
-                request_branding_settings_image_init(request);
-                if request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url.is_none() {
-                    request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_init(request: &mut api::Channel) {
-                if request.branding_settings.is_none() {
-                    request.branding_settings = Some(Default::default());
-                }
-            }
-            
-            fn request_branding_settings_watch_init(request: &mut api::Channel) {
-                request_branding_settings_init(request);
-                if request.branding_settings.as_mut().unwrap().watch.is_none() {
-                    request.branding_settings.as_mut().unwrap().watch = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::Channel) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_related_playlists_init(request: &mut api::Channel) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().related_playlists.is_none() {
-                    request.content_details.as_mut().unwrap().related_playlists = Some(Default::default());
-                }
-            }
-            
-            fn request_content_owner_details_init(request: &mut api::Channel) {
-                if request.content_owner_details.is_none() {
-                    request.content_owner_details = Some(Default::default());
-                }
-            }
-            
-            fn request_invideo_promotion_default_timing_init(request: &mut api::Channel) {
-                request_invideo_promotion_init(request);
-                if request.invideo_promotion.as_mut().unwrap().default_timing.is_none() {
-                    request.invideo_promotion.as_mut().unwrap().default_timing = Some(Default::default());
-                }
-            }
-            
-            fn request_invideo_promotion_init(request: &mut api::Channel) {
-                if request.invideo_promotion.is_none() {
-                    request.invideo_promotion = Some(Default::default());
-                }
-            }
-            
-            fn request_invideo_promotion_position_init(request: &mut api::Channel) {
-                request_invideo_promotion_init(request);
-                if request.invideo_promotion.as_mut().unwrap().position.is_none() {
-                    request.invideo_promotion.as_mut().unwrap().position = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Channel) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::Channel) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Channel) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Channel) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Channel) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Channel) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Channel) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Channel) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_init(request: &mut api::Channel) {
-                if request.statistics.is_none() {
-                    request.statistics = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Channel) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            fn request_topic_details_init(request: &mut api::Channel) {
-                if request.topic_details.is_none() {
-                    request.topic_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.is-linked" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().is_linked = Some(arg_from_str(value.unwrap_or("false"), err, "status.is-linked", "boolean"));
-                    },
-                "status.long-uploads-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().long_uploads_status = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.default-timing.offset-ms" => {
-                        request_invideo_promotion_default_timing_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().default_timing.as_mut().unwrap().offset_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.default-timing.type" => {
-                        request_invideo_promotion_default_timing_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().default_timing.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.default-timing.duration-ms" => {
-                        request_invideo_promotion_default_timing_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().default_timing.as_mut().unwrap().duration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.position.corner-position" => {
-                        request_invideo_promotion_position_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().position.as_mut().unwrap().corner_position = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.position.type" => {
-                        request_invideo_promotion_position_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().position.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "invideo-promotion.use-smart-timing" => {
-                        request_invideo_promotion_position_init(&mut request);
-                        request.invideo_promotion.as_mut().unwrap().use_smart_timing = Some(arg_from_str(value.unwrap_or("false"), err, "invideo-promotion.use-smart-timing", "boolean"));
-                    },
-                "kind" => {
-                        request_invideo_promotion_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.comment-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().comment_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.comment-count", "int64"));
-                    },
-                "statistics.subscriber-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().subscriber_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.subscriber-count", "int64"));
-                    },
-                "statistics.video-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().video_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.video-count", "int64"));
-                    },
-                "statistics.hidden-subscriber-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().hidden_subscriber_count = Some(arg_from_str(value.unwrap_or("false"), err, "statistics.hidden-subscriber-count", "boolean"));
-                    },
-                "statistics.view-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().view_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.view-count", "int64"));
-                    },
-                "content-owner-details.content-owner" => {
-                        request_content_owner_details_init(&mut request);
-                        request.content_owner_details.as_mut().unwrap().content_owner = Some(value.unwrap_or("").to_string());
-                    },
-                "content-owner-details.time-linked" => {
-                        request_content_owner_details_init(&mut request);
-                        request.content_owner_details.as_mut().unwrap().time_linked = Some(value.unwrap_or("").to_string());
-                    },
-                "topic-details.topic-ids" => {
-                        request_topic_details_init(&mut request);
-                        if request.topic_details.as_mut().unwrap().topic_ids.is_none() {
-                           request.topic_details.as_mut().unwrap().topic_ids = Some(Default::default());
-                        }
-                                        request.topic_details.as_mut().unwrap().topic_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.related-playlists.watch-later" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().related_playlists.as_mut().unwrap().watch_later = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.related-playlists.watch-history" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().related_playlists.as_mut().unwrap().watch_history = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.related-playlists.uploads" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().related_playlists.as_mut().unwrap().uploads = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.related-playlists.favorites" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().related_playlists.as_mut().unwrap().favorites = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.related-playlists.likes" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().related_playlists.as_mut().unwrap().likes = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.google-plus-user-id" => {
-                        request_content_details_related_playlists_init(&mut request);
-                        request.content_details.as_mut().unwrap().google_plus_user_id = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.large-branded-banner-image-imap-script.default" => {
-                        request_branding_settings_image_large_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script.as_mut().unwrap().default = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.large-branded-banner-image-imap-script.default-language.value" => {
-                        request_branding_settings_image_large_branded_banner_image_imap_script_default_language_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_imap_script.as_mut().unwrap().default_language.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.small-branded-banner-image-url.default" => {
-                        request_branding_settings_image_small_branded_banner_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url.as_mut().unwrap().default = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.small-branded-banner-image-url.default-language.value" => {
-                        request_branding_settings_image_small_branded_banner_image_url_default_language_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_url.as_mut().unwrap().default_language.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tv-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tv_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tv-low-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tv_low_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.large-branded-banner-image-url.default" => {
-                        request_branding_settings_image_large_branded_banner_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url.as_mut().unwrap().default = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.large-branded-banner-image-url.default-language.value" => {
-                        request_branding_settings_image_large_branded_banner_image_url_default_language_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().large_branded_banner_image_url.as_mut().unwrap().default_language.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tv-high-image-url" => {
-                        request_branding_settings_image_large_branded_banner_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tv_high_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.background-image-url.default" => {
-                        request_branding_settings_image_background_image_url_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url.as_mut().unwrap().default = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.background-image-url.default-language.value" => {
-                        request_branding_settings_image_background_image_url_default_language_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().background_image_url.as_mut().unwrap().default_language.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.small-branded-banner-image-imap-script.default" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script.as_mut().unwrap().default = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.small-branded-banner-image-imap-script.default-language.value" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_default_language_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().small_branded_banner_image_imap_script.as_mut().unwrap().default_language.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-external-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_external_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.watch-icon-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().watch_icon_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tv-medium-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tv_medium_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-mobile-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_mobile_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tablet-hd-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tablet_hd_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tablet-low-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tablet_low_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.tracking-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().tracking_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-mobile-extra-hd-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_mobile_extra_hd_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tablet-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tablet_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-mobile-low-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_mobile_low_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-mobile-medium-hd-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_mobile_medium_hd_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-tablet-extra-hd-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_tablet_extra_hd_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.image.banner-mobile-hd-image-url" => {
-                        request_branding_settings_image_small_branded_banner_image_imap_script_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().image.as_mut().unwrap().banner_mobile_hd_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.watch.text-color" => {
-                        request_branding_settings_watch_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().watch.as_mut().unwrap().text_color = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.watch.featured-playlist-id" => {
-                        request_branding_settings_watch_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().watch.as_mut().unwrap().featured_playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.watch.background-color" => {
-                        request_branding_settings_watch_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().watch.as_mut().unwrap().background_color = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.description" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.title" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.country" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.show-browse-view" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().show_browse_view = Some(arg_from_str(value.unwrap_or("false"), err, "branding-settings.channel.show-browse-view", "boolean"));
-                    },
-                "branding-settings.channel.featured-channels-title" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().featured_channels_title = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.default-language" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.unsubscribed-trailer" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().unsubscribed_trailer = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.keywords" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().keywords = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.profile-color" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().profile_color = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.default-tab" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().default_tab = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.moderate-comments" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().moderate_comments = Some(arg_from_str(value.unwrap_or("false"), err, "branding-settings.channel.moderate-comments", "boolean"));
-                    },
-                "branding-settings.channel.featured-channels-urls" => {
-                        request_branding_settings_channel_init(&mut request);
-                        if request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().featured_channels_urls.is_none() {
-                           request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().featured_channels_urls = Some(Default::default());
-                        }
-                                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().featured_channels_urls.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.tracking-analytics-account-id" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().tracking_analytics_account_id = Some(value.unwrap_or("").to_string());
-                    },
-                "branding-settings.channel.show-related-channels" => {
-                        request_branding_settings_channel_init(&mut request);
-                        request.branding_settings.as_mut().unwrap().channel.as_mut().unwrap().show_related_channels = Some(arg_from_str(value.unwrap_or("false"), err, "branding-settings.channel.show-related-channels", "boolean"));
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "snippet.title" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.country" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().country = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_thumbnails_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "audit-details.community-guidelines-good-standing" => {
-                        request_audit_details_init(&mut request);
-                        request.audit_details.as_mut().unwrap().community_guidelines_good_standing = Some(arg_from_str(value.unwrap_or("false"), err, "audit-details.community-guidelines-good-standing", "boolean"));
-                    },
-                "audit-details.content-id-claims-good-standing" => {
-                        request_audit_details_init(&mut request);
-                        request.audit_details.as_mut().unwrap().content_id_claims_good_standing = Some(arg_from_str(value.unwrap_or("false"), err, "audit-details.content-id-claims-good-standing", "boolean"));
-                    },
-                "audit-details.overall-good-standing" => {
-                        request_audit_details_init(&mut request);
-                        request.audit_details.as_mut().unwrap().overall_good_standing = Some(arg_from_str(value.unwrap_or("false"), err, "audit-details.overall-good-standing", "boolean"));
-                    },
-                "audit-details.copyright-strikes-good-standing" => {
-                        request_audit_details_init(&mut request);
-                        request.audit_details.as_mut().unwrap().copyright_strikes_good_standing = Some(arg_from_str(value.unwrap_or("false"), err, "audit-details.copyright-strikes-good-standing", "boolean"));
-                    },
-                "etag" => {
-                        request_audit_details_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_audit_details_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "corner-position", "country", "default", "default-language", "default-tab", "default-timing", "description", "duration-ms", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "google-plus-user-id", "height", "hidden-subscriber-count", "high", "id", "image", "invideo-promotion", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "maxres", "medium", "moderate-comments", "offset-ms", "overall-good-standing", "position", "privacy-status", "profile-color", "published-at", "related-playlists", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "type", "unsubscribed-trailer", "uploads", "url", "use-smart-timing", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.is-linked" => Some(("status.isLinked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.long-uploads-status" => Some(("status.longUploadsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.default-timing.offset-ms" => Some(("invideoPromotion.defaultTiming.offsetMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.default-timing.type" => Some(("invideoPromotion.defaultTiming.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.default-timing.duration-ms" => Some(("invideoPromotion.defaultTiming.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.position.corner-position" => Some(("invideoPromotion.position.cornerPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.position.type" => Some(("invideoPromotion.position.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invideo-promotion.use-smart-timing" => Some(("invideoPromotion.useSmartTiming", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.comment-count" => Some(("statistics.commentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.subscriber-count" => Some(("statistics.subscriberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.video-count" => Some(("statistics.videoCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.hidden-subscriber-count" => Some(("statistics.hiddenSubscriberCount", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "statistics.view-count" => Some(("statistics.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-owner-details.content-owner" => Some(("contentOwnerDetails.contentOwner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-owner-details.time-linked" => Some(("contentOwnerDetails.timeLinked", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-details.topic-ids" => Some(("topicDetails.topicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.related-playlists.watch-later" => Some(("contentDetails.relatedPlaylists.watchLater", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.related-playlists.watch-history" => Some(("contentDetails.relatedPlaylists.watchHistory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.related-playlists.uploads" => Some(("contentDetails.relatedPlaylists.uploads", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.related-playlists.favorites" => Some(("contentDetails.relatedPlaylists.favorites", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.related-playlists.likes" => Some(("contentDetails.relatedPlaylists.likes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.google-plus-user-id" => Some(("contentDetails.googlePlusUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.large-branded-banner-image-imap-script.default" => Some(("brandingSettings.image.largeBrandedBannerImageImapScript.default", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.large-branded-banner-image-imap-script.default-language.value" => Some(("brandingSettings.image.largeBrandedBannerImageImapScript.defaultLanguage.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.small-branded-banner-image-url.default" => Some(("brandingSettings.image.smallBrandedBannerImageUrl.default", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.small-branded-banner-image-url.default-language.value" => Some(("brandingSettings.image.smallBrandedBannerImageUrl.defaultLanguage.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tv-image-url" => Some(("brandingSettings.image.bannerTvImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tv-low-image-url" => Some(("brandingSettings.image.bannerTvLowImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.large-branded-banner-image-url.default" => Some(("brandingSettings.image.largeBrandedBannerImageUrl.default", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.large-branded-banner-image-url.default-language.value" => Some(("brandingSettings.image.largeBrandedBannerImageUrl.defaultLanguage.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tv-high-image-url" => Some(("brandingSettings.image.bannerTvHighImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.background-image-url.default" => Some(("brandingSettings.image.backgroundImageUrl.default", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.background-image-url.default-language.value" => Some(("brandingSettings.image.backgroundImageUrl.defaultLanguage.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.small-branded-banner-image-imap-script.default" => Some(("brandingSettings.image.smallBrandedBannerImageImapScript.default", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.small-branded-banner-image-imap-script.default-language.value" => Some(("brandingSettings.image.smallBrandedBannerImageImapScript.defaultLanguage.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-external-url" => Some(("brandingSettings.image.bannerExternalUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.watch-icon-image-url" => Some(("brandingSettings.image.watchIconImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tv-medium-image-url" => Some(("brandingSettings.image.bannerTvMediumImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-mobile-image-url" => Some(("brandingSettings.image.bannerMobileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tablet-hd-image-url" => Some(("brandingSettings.image.bannerTabletHdImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tablet-low-image-url" => Some(("brandingSettings.image.bannerTabletLowImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.tracking-image-url" => Some(("brandingSettings.image.trackingImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-mobile-extra-hd-image-url" => Some(("brandingSettings.image.bannerMobileExtraHdImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tablet-image-url" => Some(("brandingSettings.image.bannerTabletImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-mobile-low-image-url" => Some(("brandingSettings.image.bannerMobileLowImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-mobile-medium-hd-image-url" => Some(("brandingSettings.image.bannerMobileMediumHdImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-tablet-extra-hd-image-url" => Some(("brandingSettings.image.bannerTabletExtraHdImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-image-url" => Some(("brandingSettings.image.bannerImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.image.banner-mobile-hd-image-url" => Some(("brandingSettings.image.bannerMobileHdImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.watch.text-color" => Some(("brandingSettings.watch.textColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.watch.featured-playlist-id" => Some(("brandingSettings.watch.featuredPlaylistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.watch.background-color" => Some(("brandingSettings.watch.backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.description" => Some(("brandingSettings.channel.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.title" => Some(("brandingSettings.channel.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.country" => Some(("brandingSettings.channel.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.show-browse-view" => Some(("brandingSettings.channel.showBrowseView", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.featured-channels-title" => Some(("brandingSettings.channel.featuredChannelsTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.default-language" => Some(("brandingSettings.channel.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.unsubscribed-trailer" => Some(("brandingSettings.channel.unsubscribedTrailer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.keywords" => Some(("brandingSettings.channel.keywords", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.profile-color" => Some(("brandingSettings.channel.profileColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.default-tab" => Some(("brandingSettings.channel.defaultTab", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.moderate-comments" => Some(("brandingSettings.channel.moderateComments", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.featured-channels-urls" => Some(("brandingSettings.channel.featuredChannelsUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "branding-settings.channel.tracking-analytics-account-id" => Some(("brandingSettings.channel.trackingAnalyticsAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "branding-settings.channel.show-related-channels" => Some(("brandingSettings.channel.showRelatedChannels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.country" => Some(("snippet.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "audit-details.community-guidelines-good-standing" => Some(("auditDetails.communityGuidelinesGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audit-details.content-id-claims-good-standing" => Some(("auditDetails.contentIdClaimsGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audit-details.overall-good-standing" => Some(("auditDetails.overallGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "audit-details.copyright-strikes-good-standing" => Some(("auditDetails.copyrightStrikesGoodStanding", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audit-details", "background-color", "background-image-url", "banner-external-url", "banner-image-url", "banner-mobile-extra-hd-image-url", "banner-mobile-hd-image-url", "banner-mobile-image-url", "banner-mobile-low-image-url", "banner-mobile-medium-hd-image-url", "banner-tablet-extra-hd-image-url", "banner-tablet-hd-image-url", "banner-tablet-image-url", "banner-tablet-low-image-url", "banner-tv-high-image-url", "banner-tv-image-url", "banner-tv-low-image-url", "banner-tv-medium-image-url", "branding-settings", "channel", "comment-count", "community-guidelines-good-standing", "content-details", "content-id-claims-good-standing", "content-owner", "content-owner-details", "copyright-strikes-good-standing", "corner-position", "country", "default", "default-language", "default-tab", "default-timing", "description", "duration-ms", "etag", "favorites", "featured-channels-title", "featured-channels-urls", "featured-playlist-id", "google-plus-user-id", "height", "hidden-subscriber-count", "high", "id", "image", "invideo-promotion", "is-linked", "keywords", "kind", "large-branded-banner-image-imap-script", "large-branded-banner-image-url", "likes", "localized", "long-uploads-status", "maxres", "medium", "moderate-comments", "offset-ms", "overall-good-standing", "position", "privacy-status", "profile-color", "published-at", "related-playlists", "show-browse-view", "show-related-channels", "small-branded-banner-image-imap-script", "small-branded-banner-image-url", "snippet", "standard", "statistics", "status", "subscriber-count", "text-color", "thumbnails", "time-linked", "title", "topic-details", "topic-ids", "tracking-analytics-account-id", "tracking-image-url", "type", "unsubscribed-trailer", "uploads", "url", "use-smart-timing", "value", "video-count", "view-count", "watch", "watch-history", "watch-icon-image-url", "watch-later", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Channel = json::value::from_value(object).unwrap();
         let mut call = self.hub.channels().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2505,9 +1339,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2532,7 +1368,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2542,8 +1378,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _comment_threads_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CommentThread::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2558,148 +1395,47 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_init(request: &mut api::CommentThread) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_init(request: &mut api::CommentThread) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_snippet_author_channel_id_init(request: &mut api::CommentThread) {
-                request_snippet_top_level_comment_snippet_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_snippet_init(request: &mut api::CommentThread) {
-                request_snippet_top_level_comment_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.is-public" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_public = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-public", "boolean"));
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.can-reply" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().can_reply = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.can-reply", "boolean"));
-                    },
-                "snippet.total-reply-count" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().total_reply_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.total-reply-count", "integer"));
-                    },
-                "snippet.top-level-comment.snippet.author-channel-url" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.viewer-rating" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().viewer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-display-name" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.channel-id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.video-id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.published-at" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.like-count" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.top-level-comment.snippet.like-count", "integer"));
-                    },
-                "snippet.top-level-comment.snippet.text-original" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().text_original = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-channel-id.value" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.parent-id" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().parent_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.moderation-status" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().moderation_status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.can-rate" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().can_rate = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.top-level-comment.snippet.can-rate", "boolean"));
-                    },
-                "snippet.top-level-comment.snippet.updated-at" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().updated_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-profile-image-url" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_profile_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-googleplus-profile-url" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_googleplus_profile_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.text-display" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().text_display = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.kind" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.etag" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().etag = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.is-public" => Some(("snippet.isPublic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.can-reply" => Some(("snippet.canReply", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.total-reply-count" => Some(("snippet.totalReplyCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-url" => Some(("snippet.topLevelComment.snippet.authorChannelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.viewer-rating" => Some(("snippet.topLevelComment.snippet.viewerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-display-name" => Some(("snippet.topLevelComment.snippet.authorDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.channel-id" => Some(("snippet.topLevelComment.snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.video-id" => Some(("snippet.topLevelComment.snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.like-count" => Some(("snippet.topLevelComment.snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.updated-at" => Some(("snippet.topLevelComment.snippet.updatedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-profile-image-url" => Some(("snippet.topLevelComment.snippet.authorProfileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-googleplus-profile-url" => Some(("snippet.topLevelComment.snippet.authorGoogleplusProfileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.text-display" => Some(("snippet.topLevelComment.snippet.textDisplay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.kind" => Some(("snippet.topLevelComment.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.etag" => Some(("snippet.topLevelComment.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.id" => Some(("snippet.topLevelComment.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CommentThread = json::value::from_value(object).unwrap();
         let mut call = self.hub.comment_threads().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2717,9 +1453,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["share-on-google-plus"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["share-on-google-plus"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2744,7 +1482,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2794,9 +1532,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["all-threads-related-to-channel-id", "channel-id", "video-id", "max-results", "page-token", "search-terms", "text-format", "id", "moderation-status"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["all-threads-related-to-channel-id", "channel-id", "video-id", "max-results", "page-token", "search-terms", "text-format", "id", "moderation-status"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -2821,7 +1561,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -2831,8 +1571,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _comment_threads_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::CommentThread::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -2847,148 +1588,47 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_init(request: &mut api::CommentThread) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_init(request: &mut api::CommentThread) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_snippet_author_channel_id_init(request: &mut api::CommentThread) {
-                request_snippet_top_level_comment_snippet_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_top_level_comment_snippet_init(request: &mut api::CommentThread) {
-                request_snippet_top_level_comment_init(request);
-                if request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.is_none() {
-                    request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.is-public" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().is_public = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.is-public", "boolean"));
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.can-reply" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().can_reply = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.can-reply", "boolean"));
-                    },
-                "snippet.total-reply-count" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().total_reply_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.total-reply-count", "integer"));
-                    },
-                "snippet.top-level-comment.snippet.author-channel-url" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.viewer-rating" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().viewer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-display-name" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.channel-id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.video-id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.published-at" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.like-count" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.top-level-comment.snippet.like-count", "integer"));
-                    },
-                "snippet.top-level-comment.snippet.text-original" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().text_original = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-channel-id.value" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_channel_id.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.parent-id" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().parent_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.moderation-status" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().moderation_status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.can-rate" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().can_rate = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.top-level-comment.snippet.can-rate", "boolean"));
-                    },
-                "snippet.top-level-comment.snippet.updated-at" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().updated_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-profile-image-url" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_profile_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.author-googleplus-profile-url" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().author_googleplus_profile_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.snippet.text-display" => {
-                        request_snippet_top_level_comment_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().snippet.as_mut().unwrap().text_display = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.kind" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.etag" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().etag = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.top-level-comment.id" => {
-                        request_snippet_top_level_comment_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().top_level_comment.as_mut().unwrap().id = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.is-public" => Some(("snippet.isPublic", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.can-reply" => Some(("snippet.canReply", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.total-reply-count" => Some(("snippet.totalReplyCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-url" => Some(("snippet.topLevelComment.snippet.authorChannelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.viewer-rating" => Some(("snippet.topLevelComment.snippet.viewerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-display-name" => Some(("snippet.topLevelComment.snippet.authorDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.channel-id" => Some(("snippet.topLevelComment.snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.video-id" => Some(("snippet.topLevelComment.snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.published-at" => Some(("snippet.topLevelComment.snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.like-count" => Some(("snippet.topLevelComment.snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.text-original" => Some(("snippet.topLevelComment.snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-channel-id.value" => Some(("snippet.topLevelComment.snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.parent-id" => Some(("snippet.topLevelComment.snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.moderation-status" => Some(("snippet.topLevelComment.snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.can-rate" => Some(("snippet.topLevelComment.snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.updated-at" => Some(("snippet.topLevelComment.snippet.updatedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-profile-image-url" => Some(("snippet.topLevelComment.snippet.authorProfileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.author-googleplus-profile-url" => Some(("snippet.topLevelComment.snippet.authorGoogleplusProfileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.snippet.text-display" => Some(("snippet.topLevelComment.snippet.textDisplay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.kind" => Some(("snippet.topLevelComment.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.etag" => Some(("snippet.topLevelComment.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.top-level-comment.id" => Some(("snippet.topLevelComment.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "can-reply", "channel-id", "etag", "id", "is-public", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "top-level-comment", "total-reply-count", "updated-at", "value", "video-id", "viewer-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::CommentThread = json::value::from_value(object).unwrap();
         let mut call = self.hub.comment_threads().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3003,9 +1643,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3030,7 +1672,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3053,9 +1695,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3083,8 +1727,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _comments_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Comment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3099,102 +1744,39 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_author_channel_id_init(request: &mut api::Comment) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().author_channel_id.is_none() {
-                    request.snippet.as_mut().unwrap().author_channel_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Comment) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.author-channel-url" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_channel_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.viewer-rating" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().viewer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-display-name" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.like-count" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.like-count", "integer"));
-                    },
-                "snippet.text-original" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().text_original = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-channel-id.value" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_channel_id.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.parent-id" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().parent_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.moderation-status" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().moderation_status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.can-rate" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().can_rate = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.can-rate", "boolean"));
-                    },
-                "snippet.updated-at" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().updated_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-profile-image-url" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_profile_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-googleplus-profile-url" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_googleplus_profile_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.text-display" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().text_display = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.author-channel-url" => Some(("snippet.authorChannelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.viewer-rating" => Some(("snippet.viewerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-display-name" => Some(("snippet.authorDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.like-count" => Some(("snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.updated-at" => Some(("snippet.updatedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-profile-image-url" => Some(("snippet.authorProfileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-googleplus-profile-url" => Some(("snippet.authorGoogleplusProfileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.text-display" => Some(("snippet.textDisplay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Comment = json::value::from_value(object).unwrap();
         let mut call = self.hub.comments().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3209,9 +1791,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3236,7 +1820,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3274,9 +1858,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["page-token", "text-format", "id", "max-results", "parent-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "text-format", "id", "max-results", "parent-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3301,7 +1887,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3324,9 +1910,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3370,9 +1958,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["ban-author"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ban-author"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3400,8 +1990,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _comments_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Comment::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3416,102 +2007,39 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_snippet_author_channel_id_init(request: &mut api::Comment) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().author_channel_id.is_none() {
-                    request.snippet.as_mut().unwrap().author_channel_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Comment) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "snippet.author-channel-url" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_channel_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.viewer-rating" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().viewer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-display-name" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_display_name = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.video-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.like-count" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.like-count", "integer"));
-                    },
-                "snippet.text-original" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().text_original = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-channel-id.value" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_channel_id.as_mut().unwrap().value = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.parent-id" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().parent_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.moderation-status" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().moderation_status = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.can-rate" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().can_rate = Some(arg_from_str(value.unwrap_or("false"), err, "snippet.can-rate", "boolean"));
-                    },
-                "snippet.updated-at" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().updated_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-profile-image-url" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_profile_image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.author-googleplus-profile-url" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().author_googleplus_profile_url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.text-display" => {
-                        request_snippet_author_channel_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().text_display = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_snippet_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "snippet.author-channel-url" => Some(("snippet.authorChannelUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.viewer-rating" => Some(("snippet.viewerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-display-name" => Some(("snippet.authorDisplayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.video-id" => Some(("snippet.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.like-count" => Some(("snippet.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.text-original" => Some(("snippet.textOriginal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-channel-id.value" => Some(("snippet.authorChannelId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.parent-id" => Some(("snippet.parentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.moderation-status" => Some(("snippet.moderationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.can-rate" => Some(("snippet.canRate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.updated-at" => Some(("snippet.updatedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-profile-image-url" => Some(("snippet.authorProfileImageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.author-googleplus-profile-url" => Some(("snippet.authorGoogleplusProfileUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.text-display" => Some(("snippet.textDisplay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["author-channel-id", "author-channel-url", "author-display-name", "author-googleplus-profile-url", "author-profile-image-url", "can-rate", "channel-id", "etag", "id", "kind", "like-count", "moderation-status", "parent-id", "published-at", "snippet", "text-display", "text-original", "updated-at", "value", "video-id", "viewer-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Comment = json::value::from_value(object).unwrap();
         let mut call = self.hub.comments().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3526,9 +2054,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3553,7 +2083,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3585,9 +2115,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["region-code", "id", "hl"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["region-code", "id", "hl"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3612,7 +2144,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3638,9 +2170,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["hl"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["hl"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3665,7 +2199,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3691,9 +2225,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["hl"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["hl"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3718,7 +2254,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3750,9 +2286,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "stream-id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "stream-id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3777,7 +2315,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3815,9 +2353,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "display-slate", "offset-time-ms", "walltime"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "display-slate", "offset-time-ms", "walltime"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3842,7 +2382,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -3871,9 +2411,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -3901,8 +2443,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _live_broadcasts_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::LiveBroadcast::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -3917,244 +2460,61 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::LiveBroadcast) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_monitor_stream_init(request: &mut api::LiveBroadcast) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().monitor_stream.is_none() {
-                    request.content_details.as_mut().unwrap().monitor_stream = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::LiveBroadcast) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::LiveBroadcast) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::LiveBroadcast) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.recording-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().recording_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.life-cycle-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().life_cycle_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.is-default-broadcast" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().is_default_broadcast = Some(arg_from_str(value.unwrap_or("false"), err, "status.is-default-broadcast", "boolean"));
-                    },
-                "status.live-broadcast-priority" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().live_broadcast_priority = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.start-with-slate" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().start_with_slate = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.start-with-slate", "boolean"));
-                    },
-                "content-details.bound-stream-id" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().bound_stream_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.enable-embed" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_embed = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-embed", "boolean"));
-                    },
-                "content-details.enable-closed-captions" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_closed_captions = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-closed-captions", "boolean"));
-                    },
-                "content-details.enable-content-encryption" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_content_encryption = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-content-encryption", "boolean"));
-                    },
-                "content-details.record-from-start" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().record_from_start = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.record-from-start", "boolean"));
-                    },
-                "content-details.enable-dvr" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_dvr = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-dvr", "boolean"));
-                    },
-                "content-details.monitor-stream.broadcast-stream-delay-ms" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().broadcast_stream_delay_ms = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.monitor-stream.broadcast-stream-delay-ms", "integer"));
-                    },
-                "content-details.monitor-stream.embed-html" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.monitor-stream.enable-monitor-stream" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().enable_monitor_stream = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.monitor-stream.enable-monitor-stream", "boolean"));
-                    },
-                "snippet.actual-end-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().actual_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.scheduled-start-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().scheduled_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.actual-start-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().actual_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.scheduled-end-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().scheduled_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.is-default-broadcast" => Some(("status.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.actual-end-time" => Some(("snippet.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::LiveBroadcast = json::value::from_value(object).unwrap();
         let mut call = self.hub.live_broadcasts().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4175,9 +2535,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4202,7 +2564,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4246,9 +2608,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["broadcast-status", "on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["broadcast-status", "on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4273,7 +2637,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4302,9 +2666,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4329,7 +2695,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4339,8 +2705,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _live_broadcasts_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::LiveBroadcast::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4355,244 +2722,61 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::LiveBroadcast) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_monitor_stream_init(request: &mut api::LiveBroadcast) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().monitor_stream.is_none() {
-                    request.content_details.as_mut().unwrap().monitor_stream = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::LiveBroadcast) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::LiveBroadcast) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::LiveBroadcast) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::LiveBroadcast) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.recording-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().recording_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.life-cycle-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().life_cycle_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.is-default-broadcast" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().is_default_broadcast = Some(arg_from_str(value.unwrap_or("false"), err, "status.is-default-broadcast", "boolean"));
-                    },
-                "status.live-broadcast-priority" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().live_broadcast_priority = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.start-with-slate" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().start_with_slate = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.start-with-slate", "boolean"));
-                    },
-                "content-details.bound-stream-id" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().bound_stream_id = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.enable-embed" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_embed = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-embed", "boolean"));
-                    },
-                "content-details.enable-closed-captions" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_closed_captions = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-closed-captions", "boolean"));
-                    },
-                "content-details.enable-content-encryption" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_content_encryption = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-content-encryption", "boolean"));
-                    },
-                "content-details.record-from-start" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().record_from_start = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.record-from-start", "boolean"));
-                    },
-                "content-details.enable-dvr" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().enable_dvr = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.enable-dvr", "boolean"));
-                    },
-                "content-details.monitor-stream.broadcast-stream-delay-ms" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().broadcast_stream_delay_ms = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.monitor-stream.broadcast-stream-delay-ms", "integer"));
-                    },
-                "content-details.monitor-stream.embed-html" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.monitor-stream.enable-monitor-stream" => {
-                        request_content_details_monitor_stream_init(&mut request);
-                        request.content_details.as_mut().unwrap().monitor_stream.as_mut().unwrap().enable_monitor_stream = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.monitor-stream.enable-monitor-stream", "boolean"));
-                    },
-                "snippet.actual-end-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().actual_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.scheduled-start-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().scheduled_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.actual-start-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().actual_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.scheduled-end-time" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().scheduled_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.is-default-broadcast" => Some(("status.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.broadcast-stream-delay-ms" => Some(("contentDetails.monitorStream.broadcastStreamDelayMs", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.embed-html" => Some(("contentDetails.monitorStream.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.monitor-stream.enable-monitor-stream" => Some(("contentDetails.monitorStream.enableMonitorStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "snippet.actual-end-time" => Some(("snippet.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::LiveBroadcast = json::value::from_value(object).unwrap();
         let mut call = self.hub.live_broadcasts().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4613,9 +2797,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4640,7 +2826,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4669,9 +2855,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4699,8 +2887,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _live_streams_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::LiveStream::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4715,108 +2904,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_cdn_ingestion_info_init(request: &mut api::LiveStream) {
-                request_cdn_init(request);
-                if request.cdn.as_mut().unwrap().ingestion_info.is_none() {
-                    request.cdn.as_mut().unwrap().ingestion_info = Some(Default::default());
-                }
-            }
-            
-            fn request_cdn_init(request: &mut api::LiveStream) {
-                if request.cdn.is_none() {
-                    request.cdn = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::LiveStream) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::LiveStream) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::LiveStream) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.is-default-stream" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().is_default_stream = Some(arg_from_str(value.unwrap_or("false"), err, "status.is-default-stream", "boolean"));
-                    },
-                "status.stream-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().stream_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.is-reusable" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().is_reusable = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.is-reusable", "boolean"));
-                    },
-                "content-details.closed-captions-ingestion-url" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().closed_captions_ingestion_url = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-type" => {
-                        request_cdn_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_type = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.backup-ingestion-address" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().backup_ingestion_address = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.stream-name" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().stream_name = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.ingestion-address" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().ingestion_address = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.format" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().format = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.is-default-stream" => Some(("status.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::LiveStream = json::value::from_value(object).unwrap();
         let mut call = self.hub.live_streams().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -4837,9 +2954,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4864,7 +2983,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4905,9 +3024,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "mine", "max-results", "page-token", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -4932,7 +3053,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -4942,8 +3063,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _live_streams_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::LiveStream::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -4958,108 +3080,36 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_cdn_ingestion_info_init(request: &mut api::LiveStream) {
-                request_cdn_init(request);
-                if request.cdn.as_mut().unwrap().ingestion_info.is_none() {
-                    request.cdn.as_mut().unwrap().ingestion_info = Some(Default::default());
-                }
-            }
-            
-            fn request_cdn_init(request: &mut api::LiveStream) {
-                if request.cdn.is_none() {
-                    request.cdn = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::LiveStream) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::LiveStream) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::LiveStream) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.is-default-stream" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().is_default_stream = Some(arg_from_str(value.unwrap_or("false"), err, "status.is-default-stream", "boolean"));
-                    },
-                "status.stream-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().stream_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.is-reusable" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().is_reusable = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.is-reusable", "boolean"));
-                    },
-                "content-details.closed-captions-ingestion-url" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().closed_captions_ingestion_url = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-type" => {
-                        request_cdn_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_type = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.backup-ingestion-address" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().backup_ingestion_address = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.stream-name" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().stream_name = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.ingestion-info.ingestion-address" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().ingestion_info.as_mut().unwrap().ingestion_address = Some(value.unwrap_or("").to_string());
-                    },
-                "cdn.format" => {
-                        request_cdn_ingestion_info_init(&mut request);
-                        request.cdn.as_mut().unwrap().format = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.is-default-stream" => Some(("status.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-type" => Some(("cdn.ingestionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.backup-ingestion-address" => Some(("cdn.ingestionInfo.backupIngestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::LiveStream = json::value::from_value(object).unwrap();
         let mut call = self.hub.live_streams().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5080,9 +3130,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5107,7 +3159,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5130,9 +3182,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5160,8 +3214,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _playlist_items_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PlaylistItem::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5176,216 +3231,54 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::PlaylistItem) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::PlaylistItem) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_resource_id_init(request: &mut api::PlaylistItem) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().resource_id.is_none() {
-                    request.snippet.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::PlaylistItem) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::PlaylistItem) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.note" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().note = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.start-at" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().start_at = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.end-at" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().end_at = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.video-id" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.playlist-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.kind" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.playlist-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.video-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.position" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().position = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.position", "integer"));
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.note" => Some(("contentDetails.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.start-at" => Some(("contentDetails.startAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.end-at" => Some(("contentDetails.endAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.video-id" => Some(("contentDetails.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.playlist-id" => Some(("snippet.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.kind" => Some(("snippet.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.channel-id" => Some(("snippet.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.playlist-id" => Some(("snippet.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.video-id" => Some(("snippet.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.position" => Some(("snippet.position", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PlaylistItem = json::value::from_value(object).unwrap();
         let mut call = self.hub.playlist_items().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5403,9 +3296,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5430,7 +3325,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5471,9 +3366,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "playlist-id", "video-id", "max-results", "page-token", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "playlist-id", "video-id", "max-results", "page-token", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5498,7 +3395,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5508,8 +3405,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _playlist_items_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::PlaylistItem::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5524,216 +3422,54 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::PlaylistItem) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::PlaylistItem) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_resource_id_init(request: &mut api::PlaylistItem) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().resource_id.is_none() {
-                    request.snippet.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::PlaylistItem) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::PlaylistItem) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::PlaylistItem) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.note" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().note = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.start-at" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().start_at = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.end-at" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().end_at = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.video-id" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.playlist-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.kind" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.playlist-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.video-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.position" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().position = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.position", "integer"));
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.note" => Some(("contentDetails.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.start-at" => Some(("contentDetails.startAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.end-at" => Some(("contentDetails.endAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.video-id" => Some(("contentDetails.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.playlist-id" => Some(("snippet.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.kind" => Some(("snippet.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.channel-id" => Some(("snippet.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.playlist-id" => Some(("snippet.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.video-id" => Some(("snippet.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.position" => Some(("snippet.position", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "description", "end-at", "etag", "height", "high", "id", "kind", "maxres", "medium", "note", "playlist-id", "position", "privacy-status", "published-at", "resource-id", "snippet", "standard", "start-at", "status", "thumbnails", "title", "url", "video-id", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::PlaylistItem = json::value::from_value(object).unwrap();
         let mut call = self.hub.playlist_items().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -5748,9 +3484,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5775,7 +3513,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -5801,9 +3539,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -5831,8 +3571,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _playlists_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Playlist::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -5847,209 +3588,50 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::Playlist) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_player_init(request: &mut api::Playlist) {
-                if request.player.is_none() {
-                    request.player = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Playlist) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::Playlist) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Playlist) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Playlist) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.item-count" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().item_count = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.item-count", "integer"));
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.tags" => {
-                        request_snippet_init(&mut request);
-                        if request.snippet.as_mut().unwrap().tags.is_none() {
-                           request.snippet.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.snippet.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "player.embed-html" => {
-                        request_player_init(&mut request);
-                        request.player.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_player_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_player_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.item-count" => Some(("contentDetails.itemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "player.embed-html" => Some(("player.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Playlist = json::value::from_value(object).unwrap();
         let mut call = self.hub.playlists().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6070,9 +3652,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6097,7 +3681,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6144,9 +3728,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "page-token", "hl", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "page-token", "hl", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6171,7 +3757,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6181,8 +3767,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _playlists_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Playlist::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6197,209 +3784,50 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::Playlist) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_player_init(request: &mut api::Playlist) {
-                if request.player.is_none() {
-                    request.player = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Playlist) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::Playlist) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Playlist) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Playlist) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Playlist) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_status_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.item-count" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().item_count = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.item-count", "integer"));
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.tags" => {
-                        request_snippet_init(&mut request);
-                        if request.snippet.as_mut().unwrap().tags.is_none() {
-                           request.snippet.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.snippet.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "player.embed-html" => {
-                        request_player_init(&mut request);
-                        request.player.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_player_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "id" => {
-                        request_player_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.item-count" => Some(("contentDetails.itemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "player.embed-html" => Some(("player.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["channel-id", "channel-title", "content-details", "default", "default-language", "description", "embed-html", "etag", "height", "high", "id", "item-count", "kind", "localized", "maxres", "medium", "player", "privacy-status", "published-at", "snippet", "standard", "status", "tags", "thumbnails", "title", "url", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Playlist = json::value::from_value(object).unwrap();
         let mut call = self.hub.playlists().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6417,9 +3845,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6444,7 +3874,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6557,9 +3987,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["location-radius", "channel-id", "video-syndicated", "event-type", "channel-type", "video-caption", "published-after", "on-behalf-of-content-owner", "video-category-id", "for-content-owner", "region-code", "location", "for-developer", "video-type", "type", "topic-id", "published-before", "video-dimension", "video-license", "max-results", "related-to-video-id", "video-definition", "page-token", "video-duration", "relevance-language", "for-mine", "q", "safe-search", "video-embeddable", "order"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["location-radius", "channel-id", "video-syndicated", "event-type", "channel-type", "video-caption", "published-after", "on-behalf-of-content-owner", "video-category-id", "for-content-owner", "region-code", "location", "for-developer", "video-type", "type", "topic-id", "published-before", "video-dimension", "video-license", "max-results", "related-to-video-id", "video-definition", "page-token", "video-duration", "relevance-language", "for-mine", "q", "safe-search", "video-embeddable", "order"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6584,7 +4016,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -6607,9 +4039,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -6637,8 +4071,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _subscriptions_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Subscription::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -6653,313 +4088,68 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_content_details_init(request: &mut api::Subscription) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Subscription) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_resource_id_init(request: &mut api::Subscription) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().resource_id.is_none() {
-                    request.snippet.as_mut().unwrap().resource_id = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Subscription) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Subscription) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Subscription) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Subscription) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Subscription) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Subscription) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_init(request: &mut api::Subscription) {
-                if request.subscriber_snippet.is_none() {
-                    request.subscriber_snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_default_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_thumbnails_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_high_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_thumbnails_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_maxres_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_thumbnails_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_medium_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_thumbnails_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_subscriber_snippet_thumbnails_standard_init(request: &mut api::Subscription) {
-                request_subscriber_snippet_thumbnails_init(request);
-                if request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "kind" => {
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.new-item-count" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().new_item_count = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.new-item-count", "integer"));
-                    },
-                "content-details.activity-type" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().activity_type = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.total-item-count" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().total_item_count = Some(arg_from_str(value.unwrap_or("-0"), err, "content-details.total-item-count", "integer"));
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.kind" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().kind = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.playlist-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().playlist_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.resource-id.video-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().resource_id.as_mut().unwrap().video_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_resource_id_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "etag" => {
-                        request_snippet_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.title" => {
-                        request_subscriber_snippet_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.channel-id" => {
-                        request_subscriber_snippet_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.description" => {
-                        request_subscriber_snippet_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.default.url" => {
-                        request_subscriber_snippet_thumbnails_default_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.default.width" => {
-                        request_subscriber_snippet_thumbnails_default_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.default.width", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.default.height" => {
-                        request_subscriber_snippet_thumbnails_default_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.default.height", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.high.url" => {
-                        request_subscriber_snippet_thumbnails_high_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.high.width" => {
-                        request_subscriber_snippet_thumbnails_high_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.high.width", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.high.height" => {
-                        request_subscriber_snippet_thumbnails_high_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.high.height", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.medium.url" => {
-                        request_subscriber_snippet_thumbnails_medium_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.medium.width" => {
-                        request_subscriber_snippet_thumbnails_medium_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.medium.width", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.medium.height" => {
-                        request_subscriber_snippet_thumbnails_medium_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.medium.height", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.maxres.url" => {
-                        request_subscriber_snippet_thumbnails_maxres_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.maxres.width" => {
-                        request_subscriber_snippet_thumbnails_maxres_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.maxres.height" => {
-                        request_subscriber_snippet_thumbnails_maxres_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.standard.url" => {
-                        request_subscriber_snippet_thumbnails_standard_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "subscriber-snippet.thumbnails.standard.width" => {
-                        request_subscriber_snippet_thumbnails_standard_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.standard.width", "integer"));
-                    },
-                "subscriber-snippet.thumbnails.standard.height" => {
-                        request_subscriber_snippet_thumbnails_standard_init(&mut request);
-                        request.subscriber_snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "subscriber-snippet.thumbnails.standard.height", "integer"));
-                    },
-                "id" => {
-                        request_subscriber_snippet_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-type", "channel-id", "channel-title", "content-details", "default", "description", "etag", "height", "high", "id", "kind", "maxres", "medium", "new-item-count", "playlist-id", "published-at", "resource-id", "snippet", "standard", "subscriber-snippet", "thumbnails", "title", "total-item-count", "url", "video-id", "width"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.new-item-count" => Some(("contentDetails.newItemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.activity-type" => Some(("contentDetails.activityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.total-item-count" => Some(("contentDetails.totalItemCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.kind" => Some(("snippet.resourceId.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.channel-id" => Some(("snippet.resourceId.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.playlist-id" => Some(("snippet.resourceId.playlistId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.resource-id.video-id" => Some(("snippet.resourceId.videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.title" => Some(("subscriberSnippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.channel-id" => Some(("subscriberSnippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.description" => Some(("subscriberSnippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.default.url" => Some(("subscriberSnippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.default.width" => Some(("subscriberSnippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.default.height" => Some(("subscriberSnippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.high.url" => Some(("subscriberSnippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.high.width" => Some(("subscriberSnippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.high.height" => Some(("subscriberSnippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.medium.url" => Some(("subscriberSnippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.medium.width" => Some(("subscriberSnippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.medium.height" => Some(("subscriberSnippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.maxres.url" => Some(("subscriberSnippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.maxres.width" => Some(("subscriberSnippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.maxres.height" => Some(("subscriberSnippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.standard.url" => Some(("subscriberSnippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.standard.width" => Some(("subscriberSnippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscriber-snippet.thumbnails.standard.height" => Some(("subscriberSnippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-type", "channel-id", "channel-title", "content-details", "default", "description", "etag", "height", "high", "id", "kind", "maxres", "medium", "new-item-count", "playlist-id", "published-at", "resource-id", "snippet", "standard", "subscriber-snippet", "thumbnails", "title", "total-item-count", "url", "video-id", "width"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Subscription = json::value::from_value(object).unwrap();
         let mut call = self.hub.subscriptions().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -6974,9 +4164,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &[]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend([].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7001,7 +4193,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7054,9 +4246,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "id", "page-token", "my-subscribers", "for-channel-id", "order"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of-content-owner-channel", "channel-id", "mine", "max-results", "id", "page-token", "my-subscribers", "for-channel-id", "order"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7081,7 +4275,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7107,9 +4301,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7138,7 +4334,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7164,9 +4360,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["hl"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["hl"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7191,7 +4389,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7223,9 +4421,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["region-code", "id", "hl"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["region-code", "id", "hl"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7250,7 +4450,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7276,9 +4476,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7322,9 +4524,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -7349,7 +4553,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -7359,8 +4563,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _videos_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Video::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -7375,866 +4580,178 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_age_gating_init(request: &mut api::Video) {
-                if request.age_gating.is_none() {
-                    request.age_gating = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_content_rating_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().content_rating.is_none() {
-                    request.content_details.as_mut().unwrap().content_rating = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_country_restriction_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().country_restriction.is_none() {
-                    request.content_details.as_mut().unwrap().country_restriction = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::Video) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_region_restriction_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().region_restriction.is_none() {
-                    request.content_details.as_mut().unwrap().region_restriction = Some(Default::default());
-                }
-            }
-            
-            fn request_file_details_init(request: &mut api::Video) {
-                if request.file_details.is_none() {
-                    request.file_details = Some(Default::default());
-                }
-            }
-            
-            fn request_file_details_recording_location_init(request: &mut api::Video) {
-                request_file_details_init(request);
-                if request.file_details.as_mut().unwrap().recording_location.is_none() {
-                    request.file_details.as_mut().unwrap().recording_location = Some(Default::default());
-                }
-            }
-            
-            fn request_live_streaming_details_init(request: &mut api::Video) {
-                if request.live_streaming_details.is_none() {
-                    request.live_streaming_details = Some(Default::default());
-                }
-            }
-            
-            fn request_monetization_details_access_init(request: &mut api::Video) {
-                request_monetization_details_init(request);
-                if request.monetization_details.as_mut().unwrap().access.is_none() {
-                    request.monetization_details.as_mut().unwrap().access = Some(Default::default());
-                }
-            }
-            
-            fn request_monetization_details_init(request: &mut api::Video) {
-                if request.monetization_details.is_none() {
-                    request.monetization_details = Some(Default::default());
-                }
-            }
-            
-            fn request_player_init(request: &mut api::Video) {
-                if request.player.is_none() {
-                    request.player = Some(Default::default());
-                }
-            }
-            
-            fn request_processing_details_init(request: &mut api::Video) {
-                if request.processing_details.is_none() {
-                    request.processing_details = Some(Default::default());
-                }
-            }
-            
-            fn request_processing_details_processing_progress_init(request: &mut api::Video) {
-                request_processing_details_init(request);
-                if request.processing_details.as_mut().unwrap().processing_progress.is_none() {
-                    request.processing_details.as_mut().unwrap().processing_progress = Some(Default::default());
-                }
-            }
-            
-            fn request_project_details_init(request: &mut api::Video) {
-                if request.project_details.is_none() {
-                    request.project_details = Some(Default::default());
-                }
-            }
-            
-            fn request_recording_details_init(request: &mut api::Video) {
-                if request.recording_details.is_none() {
-                    request.recording_details = Some(Default::default());
-                }
-            }
-            
-            fn request_recording_details_location_init(request: &mut api::Video) {
-                request_recording_details_init(request);
-                if request.recording_details.as_mut().unwrap().location.is_none() {
-                    request.recording_details.as_mut().unwrap().location = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Video) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::Video) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Video) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_init(request: &mut api::Video) {
-                if request.statistics.is_none() {
-                    request.statistics = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Video) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            fn request_suggestions_init(request: &mut api::Video) {
-                if request.suggestions.is_none() {
-                    request.suggestions = Some(Default::default());
-                }
-            }
-            
-            fn request_topic_details_init(request: &mut api::Video) {
-                if request.topic_details.is_none() {
-                    request.topic_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.license" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().license = Some(value.unwrap_or("").to_string());
-                    },
-                "status.embeddable" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().embeddable = Some(arg_from_str(value.unwrap_or("false"), err, "status.embeddable", "boolean"));
-                    },
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.publish-at" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().publish_at = Some(value.unwrap_or("").to_string());
-                    },
-                "status.public-stats-viewable" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().public_stats_viewable = Some(arg_from_str(value.unwrap_or("false"), err, "status.public-stats-viewable", "boolean"));
-                    },
-                "status.upload-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().upload_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.rejection-reason" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().rejection_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "status.failure-reason" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "topic-details.topic-ids" => {
-                        request_topic_details_init(&mut request);
-                        if request.topic_details.as_mut().unwrap().topic_ids.is_none() {
-                           request.topic_details.as_mut().unwrap().topic_ids = Some(Default::default());
-                        }
-                                        request.topic_details.as_mut().unwrap().topic_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "topic-details.relevant-topic-ids" => {
-                        request_topic_details_init(&mut request);
-                        if request.topic_details.as_mut().unwrap().relevant_topic_ids.is_none() {
-                           request.topic_details.as_mut().unwrap().relevant_topic_ids = Some(Default::default());
-                        }
-                                        request.topic_details.as_mut().unwrap().relevant_topic_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_topic_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.comment-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().comment_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.comment-count", "int64"));
-                    },
-                "statistics.view-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().view_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.view-count", "int64"));
-                    },
-                "statistics.favorite-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().favorite_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.favorite-count", "int64"));
-                    },
-                "statistics.dislike-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().dislike_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.dislike-count", "int64"));
-                    },
-                "statistics.like-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.like-count", "int64"));
-                    },
-                "content-details.definition" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().definition = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.country-restriction.exception" => {
-                        request_content_details_country_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception.is_none() {
-                           request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.country-restriction.allowed" => {
-                        request_content_details_country_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().allowed = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.country-restriction.allowed", "boolean"));
-                    },
-                "content-details.content-rating.yt-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().yt_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.catvfr-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().catvfr_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cbfc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cbfc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bfvc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bfvc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mda-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mda_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.acb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().acb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nfvcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nfvcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bmukk-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bmukk_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.chfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().chfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.resorteviolencia-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().resorteviolencia_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.csa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().csa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.moctw-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().moctw_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.anatel-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().anatel_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.catv-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().catv_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.pefilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().pefilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.djctq-rating-reasons" => {
-                        request_content_details_content_rating_init(&mut request);
-                        if request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons.is_none() {
-                           request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.incaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().incaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.oflc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().oflc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fpb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fpb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mccaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mccaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.tvpg-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().tvpg_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rtc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rtc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cscf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cscf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fsk-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fsk_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bbfc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bbfc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kmrb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kmrb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.smsa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().smsa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.egfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().egfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cicf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cicf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nbcpl-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nbcpl_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nbc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nbc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.djctq-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ifco-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ifco_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fco-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fco_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.eefilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().eefilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.medietilsynet-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().medietilsynet_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.grfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().grfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ccc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ccc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rte-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rte_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.czfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().czfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.lsf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().lsf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fmoc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fmoc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.eirin-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().eirin_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cce-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cce_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nkclv-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nkclv_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mtrcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mtrcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mibac-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mibac_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ilfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ilfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.smais-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().smais_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.russia-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().russia_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mpaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mpaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kfcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kfcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.agcom-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().agcom_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.chvrs-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().chvrs_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cna-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cna_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.icaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().icaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mccyp-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mccyp_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nfrc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nfrc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.skfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().skfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.moc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().moc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rcnof-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rcnof_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.meku-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().meku_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fcbm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fcbm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kijkwijzer-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kijkwijzer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.caption" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.region-restriction.blocked" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked.is_none() {
-                           request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.region-restriction.allowed" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed.is_none() {
-                           request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.duration" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.licensed-content" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().licensed_content = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.licensed-content", "boolean"));
-                    },
-                "content-details.dimension" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().dimension = Some(value.unwrap_or("").to_string());
-                    },
-                "monetization-details.access.exception" => {
-                        request_monetization_details_access_init(&mut request);
-                        if request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception.is_none() {
-                           request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception = Some(Default::default());
-                        }
-                                        request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "monetization-details.access.allowed" => {
-                        request_monetization_details_access_init(&mut request);
-                        request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().allowed = Some(arg_from_str(value.unwrap_or("false"), err, "monetization-details.access.allowed", "boolean"));
-                    },
-                "age-gating.restricted" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().restricted = Some(arg_from_str(value.unwrap_or("false"), err, "age-gating.restricted", "boolean"));
-                    },
-                "age-gating.alcohol-content" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().alcohol_content = Some(arg_from_str(value.unwrap_or("false"), err, "age-gating.alcohol-content", "boolean"));
-                    },
-                "age-gating.video-game-rating" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().video_game_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-errors" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_errors.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_errors = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_errors.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.editor-suggestions" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().editor_suggestions.is_none() {
-                           request.suggestions.as_mut().unwrap().editor_suggestions = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().editor_suggestions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-warnings" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_warnings.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_warnings = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_warnings.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-hints" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_hints.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_hints = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_hints.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.concurrent-viewers" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().concurrent_viewers = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.scheduled-start-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().scheduled_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.scheduled-end-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().scheduled_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.actual-start-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().actual_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.actual-end-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().actual_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.bitrate-bps" => {
-                        request_file_details_init(&mut request);
-                        request.file_details.as_mut().unwrap().bitrate_bps = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.container" => {
-                        request_file_details_init(&mut request);
-                        request.file_details.as_mut().unwrap().container = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.recording-location.latitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.latitude", "number"));
-                    },
-                "file-details.recording-location.altitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().altitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.altitude", "number"));
-                    },
-                "file-details.recording-location.longitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.longitude", "number"));
-                    },
-                "file-details.file-type" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_type = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.creation-time" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.duration-ms" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().duration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.file-name" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.file-size" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_size = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.tags" => {
-                        request_snippet_init(&mut request);
-                        if request.snippet.as_mut().unwrap().tags.is_none() {
-                           request.snippet.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.snippet.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.live-broadcast-content" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().live_broadcast_content = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.category-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().category_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "player.embed-html" => {
-                        request_player_init(&mut request);
-                        request.player.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.file-details-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().file_details_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.editor-suggestions-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().editor_suggestions_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-status" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_status = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-issues-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_issues_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-failure-reason" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.thumbnails-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().thumbnails_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.time-left-ms" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().time_left_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.parts-processed" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().parts_processed = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.parts-total" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().parts_total = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.tag-suggestions-availability" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().tag_suggestions_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_processing_details_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "project-details.tags" => {
-                        request_project_details_init(&mut request);
-                        if request.project_details.as_mut().unwrap().tags.is_none() {
-                           request.project_details.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.project_details.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "recording-details.recording-date" => {
-                        request_recording_details_init(&mut request);
-                        request.recording_details.as_mut().unwrap().recording_date = Some(value.unwrap_or("").to_string());
-                    },
-                "recording-details.location-description" => {
-                        request_recording_details_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location_description = Some(value.unwrap_or("").to_string());
-                    },
-                "recording-details.location.latitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.latitude", "number"));
-                    },
-                "recording-details.location.altitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().altitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.altitude", "number"));
-                    },
-                "recording-details.location.longitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.longitude", "number"));
-                    },
-                "id" => {
-                        request_recording_details_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.license" => Some(("status.license", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.embeddable" => Some(("status.embeddable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.publish-at" => Some(("status.publishAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.public-stats-viewable" => Some(("status.publicStatsViewable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.upload-status" => Some(("status.uploadStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.rejection-reason" => Some(("status.rejectionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.failure-reason" => Some(("status.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-details.topic-ids" => Some(("topicDetails.topicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic-details.relevant-topic-ids" => Some(("topicDetails.relevantTopicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.comment-count" => Some(("statistics.commentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.view-count" => Some(("statistics.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.favorite-count" => Some(("statistics.favoriteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.dislike-count" => Some(("statistics.dislikeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.like-count" => Some(("statistics.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.definition" => Some(("contentDetails.definition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.country-restriction.exception" => Some(("contentDetails.countryRestriction.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.country-restriction.allowed" => Some(("contentDetails.countryRestriction.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.yt-rating" => Some(("contentDetails.contentRating.ytRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.catvfr-rating" => Some(("contentDetails.contentRating.catvfrRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cbfc-rating" => Some(("contentDetails.contentRating.cbfcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bfvc-rating" => Some(("contentDetails.contentRating.bfvcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mda-rating" => Some(("contentDetails.contentRating.mdaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.acb-rating" => Some(("contentDetails.contentRating.acbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nfvcb-rating" => Some(("contentDetails.contentRating.nfvcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bmukk-rating" => Some(("contentDetails.contentRating.bmukkRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.chfilm-rating" => Some(("contentDetails.contentRating.chfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.resorteviolencia-rating" => Some(("contentDetails.contentRating.resorteviolenciaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.csa-rating" => Some(("contentDetails.contentRating.csaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.moctw-rating" => Some(("contentDetails.contentRating.moctwRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.anatel-rating" => Some(("contentDetails.contentRating.anatelRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.catv-rating" => Some(("contentDetails.contentRating.catvRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.pefilm-rating" => Some(("contentDetails.contentRating.pefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.djctq-rating-reasons" => Some(("contentDetails.contentRating.djctqRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.content-rating.incaa-rating" => Some(("contentDetails.contentRating.incaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.oflc-rating" => Some(("contentDetails.contentRating.oflcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fpb-rating" => Some(("contentDetails.contentRating.fpbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mccaa-rating" => Some(("contentDetails.contentRating.mccaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.tvpg-rating" => Some(("contentDetails.contentRating.tvpgRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rtc-rating" => Some(("contentDetails.contentRating.rtcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cscf-rating" => Some(("contentDetails.contentRating.cscfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fsk-rating" => Some(("contentDetails.contentRating.fskRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bbfc-rating" => Some(("contentDetails.contentRating.bbfcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kmrb-rating" => Some(("contentDetails.contentRating.kmrbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.smsa-rating" => Some(("contentDetails.contentRating.smsaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.egfilm-rating" => Some(("contentDetails.contentRating.egfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cicf-rating" => Some(("contentDetails.contentRating.cicfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nbcpl-rating" => Some(("contentDetails.contentRating.nbcplRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nbc-rating" => Some(("contentDetails.contentRating.nbcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.djctq-rating" => Some(("contentDetails.contentRating.djctqRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ifco-rating" => Some(("contentDetails.contentRating.ifcoRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fco-rating" => Some(("contentDetails.contentRating.fcoRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.eefilm-rating" => Some(("contentDetails.contentRating.eefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.medietilsynet-rating" => Some(("contentDetails.contentRating.medietilsynetRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.grfilm-rating" => Some(("contentDetails.contentRating.grfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ccc-rating" => Some(("contentDetails.contentRating.cccRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rte-rating" => Some(("contentDetails.contentRating.rteRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.czfilm-rating" => Some(("contentDetails.contentRating.czfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.lsf-rating" => Some(("contentDetails.contentRating.lsfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fmoc-rating" => Some(("contentDetails.contentRating.fmocRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.eirin-rating" => Some(("contentDetails.contentRating.eirinRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cce-rating" => Some(("contentDetails.contentRating.cceRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nkclv-rating" => Some(("contentDetails.contentRating.nkclvRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mtrcb-rating" => Some(("contentDetails.contentRating.mtrcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mibac-rating" => Some(("contentDetails.contentRating.mibacRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ilfilm-rating" => Some(("contentDetails.contentRating.ilfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.smais-rating" => Some(("contentDetails.contentRating.smaisRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.russia-rating" => Some(("contentDetails.contentRating.russiaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mpaa-rating" => Some(("contentDetails.contentRating.mpaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kfcb-rating" => Some(("contentDetails.contentRating.kfcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.agcom-rating" => Some(("contentDetails.contentRating.agcomRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.chvrs-rating" => Some(("contentDetails.contentRating.chvrsRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cna-rating" => Some(("contentDetails.contentRating.cnaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.icaa-rating" => Some(("contentDetails.contentRating.icaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mccyp-rating" => Some(("contentDetails.contentRating.mccypRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nfrc-rating" => Some(("contentDetails.contentRating.nfrcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.skfilm-rating" => Some(("contentDetails.contentRating.skfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.moc-rating" => Some(("contentDetails.contentRating.mocRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rcnof-rating" => Some(("contentDetails.contentRating.rcnofRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.meku-rating" => Some(("contentDetails.contentRating.mekuRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fcbm-rating" => Some(("contentDetails.contentRating.fcbmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kijkwijzer-rating" => Some(("contentDetails.contentRating.kijkwijzerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.caption" => Some(("contentDetails.caption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.region-restriction.blocked" => Some(("contentDetails.regionRestriction.blocked", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.region-restriction.allowed" => Some(("contentDetails.regionRestriction.allowed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.duration" => Some(("contentDetails.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.licensed-content" => Some(("contentDetails.licensedContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.dimension" => Some(("contentDetails.dimension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monetization-details.access.exception" => Some(("monetizationDetails.access.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "monetization-details.access.allowed" => Some(("monetizationDetails.access.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.restricted" => Some(("ageGating.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.alcohol-content" => Some(("ageGating.alcoholContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.video-game-rating" => Some(("ageGating.videoGameRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suggestions.processing-errors" => Some(("suggestions.processingErrors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.editor-suggestions" => Some(("suggestions.editorSuggestions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.processing-warnings" => Some(("suggestions.processingWarnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.processing-hints" => Some(("suggestions.processingHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "live-streaming-details.concurrent-viewers" => Some(("liveStreamingDetails.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.scheduled-start-time" => Some(("liveStreamingDetails.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.scheduled-end-time" => Some(("liveStreamingDetails.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.actual-start-time" => Some(("liveStreamingDetails.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.actual-end-time" => Some(("liveStreamingDetails.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.bitrate-bps" => Some(("fileDetails.bitrateBps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.container" => Some(("fileDetails.container", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.latitude" => Some(("fileDetails.recordingLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.altitude" => Some(("fileDetails.recordingLocation.altitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.longitude" => Some(("fileDetails.recordingLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.file-type" => Some(("fileDetails.fileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.creation-time" => Some(("fileDetails.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.duration-ms" => Some(("fileDetails.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.file-name" => Some(("fileDetails.fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.file-size" => Some(("fileDetails.fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.live-broadcast-content" => Some(("snippet.liveBroadcastContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.category-id" => Some(("snippet.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "player.embed-html" => Some(("player.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.file-details-availability" => Some(("processingDetails.fileDetailsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.editor-suggestions-availability" => Some(("processingDetails.editorSuggestionsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-status" => Some(("processingDetails.processingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-issues-availability" => Some(("processingDetails.processingIssuesAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-failure-reason" => Some(("processingDetails.processingFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.thumbnails-availability" => Some(("processingDetails.thumbnailsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.time-left-ms" => Some(("processingDetails.processingProgress.timeLeftMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.parts-processed" => Some(("processingDetails.processingProgress.partsProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.parts-total" => Some(("processingDetails.processingProgress.partsTotal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.tag-suggestions-availability" => Some(("processingDetails.tagSuggestionsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-details.tags" => Some(("projectDetails.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "recording-details.recording-date" => Some(("recordingDetails.recordingDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recording-details.location-description" => Some(("recordingDetails.locationDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recording-details.location.latitude" => Some(("recordingDetails.location.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "recording-details.location.altitude" => Some(("recordingDetails.location.altitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Video = json::value::from_value(object).unwrap();
         let mut call = self.hub.videos().insert(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -8264,9 +4781,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "auto-levels", "notify-subscribers", "stabilize"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "auto-levels", "notify-subscribers", "stabilize"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8295,7 +4814,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8348,9 +4867,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "hl", "my-rating", "id"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "hl", "my-rating", "id"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8375,7 +4896,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -8401,9 +4922,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8431,8 +4954,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _videos_report_abuse(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::VideoAbuseReport::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -8447,28 +4971,25 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            match &temp_cursor.to_string()[..] {
-                "secondary-reason-id" => {
-                        request.secondary_reason_id = Some(value.unwrap_or("").to_string());
-                    },
-                "reason-id" => {
-                        request.reason_id = Some(value.unwrap_or("").to_string());
-                    },
-                "language" => {
-                        request.language = Some(value.unwrap_or("").to_string());
-                    },
-                "comments" => {
-                        request.comments = Some(value.unwrap_or("").to_string());
-                    },
-                "video-id" => {
-                        request.video_id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["comments", "language", "reason-id", "secondary-reason-id", "video-id"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "secondary-reason-id" => Some(("secondaryReasonId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reason-id" => Some(("reasonId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "comments" => Some(("comments", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video-id" => Some(("videoId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["comments", "language", "reason-id", "secondary-reason-id", "video-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::VideoAbuseReport = json::value::from_value(object).unwrap();
         let mut call = self.hub.videos().report_abuse(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -8486,9 +5007,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -8516,8 +5039,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _videos_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::Video::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -8532,866 +5056,178 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_age_gating_init(request: &mut api::Video) {
-                if request.age_gating.is_none() {
-                    request.age_gating = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_content_rating_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().content_rating.is_none() {
-                    request.content_details.as_mut().unwrap().content_rating = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_country_restriction_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().country_restriction.is_none() {
-                    request.content_details.as_mut().unwrap().country_restriction = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_init(request: &mut api::Video) {
-                if request.content_details.is_none() {
-                    request.content_details = Some(Default::default());
-                }
-            }
-            
-            fn request_content_details_region_restriction_init(request: &mut api::Video) {
-                request_content_details_init(request);
-                if request.content_details.as_mut().unwrap().region_restriction.is_none() {
-                    request.content_details.as_mut().unwrap().region_restriction = Some(Default::default());
-                }
-            }
-            
-            fn request_file_details_init(request: &mut api::Video) {
-                if request.file_details.is_none() {
-                    request.file_details = Some(Default::default());
-                }
-            }
-            
-            fn request_file_details_recording_location_init(request: &mut api::Video) {
-                request_file_details_init(request);
-                if request.file_details.as_mut().unwrap().recording_location.is_none() {
-                    request.file_details.as_mut().unwrap().recording_location = Some(Default::default());
-                }
-            }
-            
-            fn request_live_streaming_details_init(request: &mut api::Video) {
-                if request.live_streaming_details.is_none() {
-                    request.live_streaming_details = Some(Default::default());
-                }
-            }
-            
-            fn request_monetization_details_access_init(request: &mut api::Video) {
-                request_monetization_details_init(request);
-                if request.monetization_details.as_mut().unwrap().access.is_none() {
-                    request.monetization_details.as_mut().unwrap().access = Some(Default::default());
-                }
-            }
-            
-            fn request_monetization_details_init(request: &mut api::Video) {
-                if request.monetization_details.is_none() {
-                    request.monetization_details = Some(Default::default());
-                }
-            }
-            
-            fn request_player_init(request: &mut api::Video) {
-                if request.player.is_none() {
-                    request.player = Some(Default::default());
-                }
-            }
-            
-            fn request_processing_details_init(request: &mut api::Video) {
-                if request.processing_details.is_none() {
-                    request.processing_details = Some(Default::default());
-                }
-            }
-            
-            fn request_processing_details_processing_progress_init(request: &mut api::Video) {
-                request_processing_details_init(request);
-                if request.processing_details.as_mut().unwrap().processing_progress.is_none() {
-                    request.processing_details.as_mut().unwrap().processing_progress = Some(Default::default());
-                }
-            }
-            
-            fn request_project_details_init(request: &mut api::Video) {
-                if request.project_details.is_none() {
-                    request.project_details = Some(Default::default());
-                }
-            }
-            
-            fn request_recording_details_init(request: &mut api::Video) {
-                if request.recording_details.is_none() {
-                    request.recording_details = Some(Default::default());
-                }
-            }
-            
-            fn request_recording_details_location_init(request: &mut api::Video) {
-                request_recording_details_init(request);
-                if request.recording_details.as_mut().unwrap().location.is_none() {
-                    request.recording_details.as_mut().unwrap().location = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_init(request: &mut api::Video) {
-                if request.snippet.is_none() {
-                    request.snippet = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_localized_init(request: &mut api::Video) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().localized.is_none() {
-                    request.snippet.as_mut().unwrap().localized = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_default_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_high_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_init(request: &mut api::Video) {
-                request_snippet_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_maxres_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_medium_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium = Some(Default::default());
-                }
-            }
-            
-            fn request_snippet_thumbnails_standard_init(request: &mut api::Video) {
-                request_snippet_thumbnails_init(request);
-                if request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.is_none() {
-                    request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard = Some(Default::default());
-                }
-            }
-            
-            fn request_statistics_init(request: &mut api::Video) {
-                if request.statistics.is_none() {
-                    request.statistics = Some(Default::default());
-                }
-            }
-            
-            fn request_status_init(request: &mut api::Video) {
-                if request.status.is_none() {
-                    request.status = Some(Default::default());
-                }
-            }
-            
-            fn request_suggestions_init(request: &mut api::Video) {
-                if request.suggestions.is_none() {
-                    request.suggestions = Some(Default::default());
-                }
-            }
-            
-            fn request_topic_details_init(request: &mut api::Video) {
-                if request.topic_details.is_none() {
-                    request.topic_details = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "status.license" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().license = Some(value.unwrap_or("").to_string());
-                    },
-                "status.embeddable" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().embeddable = Some(arg_from_str(value.unwrap_or("false"), err, "status.embeddable", "boolean"));
-                    },
-                "status.privacy-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().privacy_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.publish-at" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().publish_at = Some(value.unwrap_or("").to_string());
-                    },
-                "status.public-stats-viewable" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().public_stats_viewable = Some(arg_from_str(value.unwrap_or("false"), err, "status.public-stats-viewable", "boolean"));
-                    },
-                "status.upload-status" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().upload_status = Some(value.unwrap_or("").to_string());
-                    },
-                "status.rejection-reason" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().rejection_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "status.failure-reason" => {
-                        request_status_init(&mut request);
-                        request.status.as_mut().unwrap().failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "topic-details.topic-ids" => {
-                        request_topic_details_init(&mut request);
-                        if request.topic_details.as_mut().unwrap().topic_ids.is_none() {
-                           request.topic_details.as_mut().unwrap().topic_ids = Some(Default::default());
-                        }
-                                        request.topic_details.as_mut().unwrap().topic_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "topic-details.relevant-topic-ids" => {
-                        request_topic_details_init(&mut request);
-                        if request.topic_details.as_mut().unwrap().relevant_topic_ids.is_none() {
-                           request.topic_details.as_mut().unwrap().relevant_topic_ids = Some(Default::default());
-                        }
-                                        request.topic_details.as_mut().unwrap().relevant_topic_ids.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "kind" => {
-                        request_topic_details_init(&mut request);
-                        request.kind = Some(value.unwrap_or("").to_string());
-                    },
-                "statistics.comment-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().comment_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.comment-count", "int64"));
-                    },
-                "statistics.view-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().view_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.view-count", "int64"));
-                    },
-                "statistics.favorite-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().favorite_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.favorite-count", "int64"));
-                    },
-                "statistics.dislike-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().dislike_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.dislike-count", "int64"));
-                    },
-                "statistics.like-count" => {
-                        request_statistics_init(&mut request);
-                        request.statistics.as_mut().unwrap().like_count = Some(arg_from_str(value.unwrap_or("-0"), err, "statistics.like-count", "int64"));
-                    },
-                "content-details.definition" => {
-                        request_content_details_init(&mut request);
-                        request.content_details.as_mut().unwrap().definition = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.country-restriction.exception" => {
-                        request_content_details_country_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception.is_none() {
-                           request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().exception.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.country-restriction.allowed" => {
-                        request_content_details_country_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().country_restriction.as_mut().unwrap().allowed = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.country-restriction.allowed", "boolean"));
-                    },
-                "content-details.content-rating.yt-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().yt_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.catvfr-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().catvfr_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cbfc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cbfc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bfvc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bfvc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mda-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mda_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.acb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().acb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nfvcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nfvcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bmukk-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bmukk_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.chfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().chfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.resorteviolencia-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().resorteviolencia_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.csa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().csa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.moctw-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().moctw_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.anatel-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().anatel_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.catv-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().catv_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.pefilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().pefilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.djctq-rating-reasons" => {
-                        request_content_details_content_rating_init(&mut request);
-                        if request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons.is_none() {
-                           request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating_reasons.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.incaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().incaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.oflc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().oflc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fpb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fpb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mccaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mccaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.tvpg-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().tvpg_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rtc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rtc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cscf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cscf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fsk-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fsk_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.bbfc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().bbfc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kmrb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kmrb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.smsa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().smsa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.egfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().egfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cicf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cicf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nbcpl-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nbcpl_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nbc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nbc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.djctq-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().djctq_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ifco-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ifco_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fco-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fco_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.eefilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().eefilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.medietilsynet-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().medietilsynet_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.grfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().grfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ccc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ccc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rte-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rte_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.czfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().czfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.lsf-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().lsf_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fmoc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fmoc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.eirin-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().eirin_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cce-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cce_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nkclv-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nkclv_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mtrcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mtrcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mibac-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mibac_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.ilfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().ilfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.smais-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().smais_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.russia-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().russia_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mpaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mpaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kfcb-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kfcb_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.agcom-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().agcom_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.chvrs-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().chvrs_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.cna-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().cna_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.icaa-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().icaa_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.mccyp-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().mccyp_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.nfrc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().nfrc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.skfilm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().skfilm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.moc-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().moc_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.rcnof-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().rcnof_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.meku-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().meku_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.fcbm-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().fcbm_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.content-rating.kijkwijzer-rating" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().content_rating.as_mut().unwrap().kijkwijzer_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.caption" => {
-                        request_content_details_content_rating_init(&mut request);
-                        request.content_details.as_mut().unwrap().caption = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.region-restriction.blocked" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked.is_none() {
-                           request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().blocked.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.region-restriction.allowed" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        if request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed.is_none() {
-                           request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed = Some(Default::default());
-                        }
-                                        request.content_details.as_mut().unwrap().region_restriction.as_mut().unwrap().allowed.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "content-details.duration" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().duration = Some(value.unwrap_or("").to_string());
-                    },
-                "content-details.licensed-content" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().licensed_content = Some(arg_from_str(value.unwrap_or("false"), err, "content-details.licensed-content", "boolean"));
-                    },
-                "content-details.dimension" => {
-                        request_content_details_region_restriction_init(&mut request);
-                        request.content_details.as_mut().unwrap().dimension = Some(value.unwrap_or("").to_string());
-                    },
-                "monetization-details.access.exception" => {
-                        request_monetization_details_access_init(&mut request);
-                        if request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception.is_none() {
-                           request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception = Some(Default::default());
-                        }
-                                        request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().exception.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "monetization-details.access.allowed" => {
-                        request_monetization_details_access_init(&mut request);
-                        request.monetization_details.as_mut().unwrap().access.as_mut().unwrap().allowed = Some(arg_from_str(value.unwrap_or("false"), err, "monetization-details.access.allowed", "boolean"));
-                    },
-                "age-gating.restricted" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().restricted = Some(arg_from_str(value.unwrap_or("false"), err, "age-gating.restricted", "boolean"));
-                    },
-                "age-gating.alcohol-content" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().alcohol_content = Some(arg_from_str(value.unwrap_or("false"), err, "age-gating.alcohol-content", "boolean"));
-                    },
-                "age-gating.video-game-rating" => {
-                        request_age_gating_init(&mut request);
-                        request.age_gating.as_mut().unwrap().video_game_rating = Some(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-errors" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_errors.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_errors = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_errors.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.editor-suggestions" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().editor_suggestions.is_none() {
-                           request.suggestions.as_mut().unwrap().editor_suggestions = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().editor_suggestions.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-warnings" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_warnings.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_warnings = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_warnings.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "suggestions.processing-hints" => {
-                        request_suggestions_init(&mut request);
-                        if request.suggestions.as_mut().unwrap().processing_hints.is_none() {
-                           request.suggestions.as_mut().unwrap().processing_hints = Some(Default::default());
-                        }
-                                        request.suggestions.as_mut().unwrap().processing_hints.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.concurrent-viewers" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().concurrent_viewers = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.scheduled-start-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().scheduled_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.scheduled-end-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().scheduled_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.actual-start-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().actual_start_time = Some(value.unwrap_or("").to_string());
-                    },
-                "live-streaming-details.actual-end-time" => {
-                        request_live_streaming_details_init(&mut request);
-                        request.live_streaming_details.as_mut().unwrap().actual_end_time = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.bitrate-bps" => {
-                        request_file_details_init(&mut request);
-                        request.file_details.as_mut().unwrap().bitrate_bps = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.container" => {
-                        request_file_details_init(&mut request);
-                        request.file_details.as_mut().unwrap().container = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.recording-location.latitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.latitude", "number"));
-                    },
-                "file-details.recording-location.altitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().altitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.altitude", "number"));
-                    },
-                "file-details.recording-location.longitude" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().recording_location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "file-details.recording-location.longitude", "number"));
-                    },
-                "file-details.file-type" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_type = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.creation-time" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().creation_time = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.duration-ms" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().duration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.file-name" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_name = Some(value.unwrap_or("").to_string());
-                    },
-                "file-details.file-size" => {
-                        request_file_details_recording_location_init(&mut request);
-                        request.file_details.as_mut().unwrap().file_size = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.description" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.tags" => {
-                        request_snippet_init(&mut request);
-                        if request.snippet.as_mut().unwrap().tags.is_none() {
-                           request.snippet.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.snippet.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.published-at" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().published_at = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.live-broadcast-content" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().live_broadcast_content = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.default-language" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().default_language = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.channel-title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().channel_title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.title" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.category-id" => {
-                        request_snippet_init(&mut request);
-                        request.snippet.as_mut().unwrap().category_id = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.description" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().description = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.localized.title" => {
-                        request_snippet_localized_init(&mut request);
-                        request.snippet.as_mut().unwrap().localized.as_mut().unwrap().title = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.url" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.default.width" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.width", "integer"));
-                    },
-                "snippet.thumbnails.default.height" => {
-                        request_snippet_thumbnails_default_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().default.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.default.height", "integer"));
-                    },
-                "snippet.thumbnails.high.url" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.high.width" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.width", "integer"));
-                    },
-                "snippet.thumbnails.high.height" => {
-                        request_snippet_thumbnails_high_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().high.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.high.height", "integer"));
-                    },
-                "snippet.thumbnails.medium.url" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.medium.width" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.width", "integer"));
-                    },
-                "snippet.thumbnails.medium.height" => {
-                        request_snippet_thumbnails_medium_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().medium.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.medium.height", "integer"));
-                    },
-                "snippet.thumbnails.maxres.url" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.maxres.width" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.width", "integer"));
-                    },
-                "snippet.thumbnails.maxres.height" => {
-                        request_snippet_thumbnails_maxres_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().maxres.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.maxres.height", "integer"));
-                    },
-                "snippet.thumbnails.standard.url" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().url = Some(value.unwrap_or("").to_string());
-                    },
-                "snippet.thumbnails.standard.width" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().width = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.width", "integer"));
-                    },
-                "snippet.thumbnails.standard.height" => {
-                        request_snippet_thumbnails_standard_init(&mut request);
-                        request.snippet.as_mut().unwrap().thumbnails.as_mut().unwrap().standard.as_mut().unwrap().height = Some(arg_from_str(value.unwrap_or("-0"), err, "snippet.thumbnails.standard.height", "integer"));
-                    },
-                "player.embed-html" => {
-                        request_player_init(&mut request);
-                        request.player.as_mut().unwrap().embed_html = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.file-details-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().file_details_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.editor-suggestions-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().editor_suggestions_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-status" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_status = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-issues-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_issues_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-failure-reason" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_failure_reason = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.thumbnails-availability" => {
-                        request_processing_details_init(&mut request);
-                        request.processing_details.as_mut().unwrap().thumbnails_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.time-left-ms" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().time_left_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.parts-processed" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().parts_processed = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.processing-progress.parts-total" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().processing_progress.as_mut().unwrap().parts_total = Some(value.unwrap_or("").to_string());
-                    },
-                "processing-details.tag-suggestions-availability" => {
-                        request_processing_details_processing_progress_init(&mut request);
-                        request.processing_details.as_mut().unwrap().tag_suggestions_availability = Some(value.unwrap_or("").to_string());
-                    },
-                "etag" => {
-                        request_processing_details_init(&mut request);
-                        request.etag = Some(value.unwrap_or("").to_string());
-                    },
-                "project-details.tags" => {
-                        request_project_details_init(&mut request);
-                        if request.project_details.as_mut().unwrap().tags.is_none() {
-                           request.project_details.as_mut().unwrap().tags = Some(Default::default());
-                        }
-                                        request.project_details.as_mut().unwrap().tags.as_mut().unwrap().push(value.unwrap_or("").to_string());
-                    },
-                "recording-details.recording-date" => {
-                        request_recording_details_init(&mut request);
-                        request.recording_details.as_mut().unwrap().recording_date = Some(value.unwrap_or("").to_string());
-                    },
-                "recording-details.location-description" => {
-                        request_recording_details_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location_description = Some(value.unwrap_or("").to_string());
-                    },
-                "recording-details.location.latitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().latitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.latitude", "number"));
-                    },
-                "recording-details.location.altitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().altitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.altitude", "number"));
-                    },
-                "recording-details.location.longitude" => {
-                        request_recording_details_location_init(&mut request);
-                        request.recording_details.as_mut().unwrap().location.as_mut().unwrap().longitude = Some(arg_from_str(value.unwrap_or("0.0"), err, "recording-details.location.longitude", "number"));
-                    },
-                "id" => {
-                        request_recording_details_init(&mut request);
-                        request.id = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "status.license" => Some(("status.license", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.embeddable" => Some(("status.embeddable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.publish-at" => Some(("status.publishAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.public-stats-viewable" => Some(("status.publicStatsViewable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.upload-status" => Some(("status.uploadStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.rejection-reason" => Some(("status.rejectionReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.failure-reason" => Some(("status.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic-details.topic-ids" => Some(("topicDetails.topicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic-details.relevant-topic-ids" => Some(("topicDetails.relevantTopicIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.comment-count" => Some(("statistics.commentCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.view-count" => Some(("statistics.viewCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.favorite-count" => Some(("statistics.favoriteCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.dislike-count" => Some(("statistics.dislikeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.like-count" => Some(("statistics.likeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.definition" => Some(("contentDetails.definition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.country-restriction.exception" => Some(("contentDetails.countryRestriction.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.country-restriction.allowed" => Some(("contentDetails.countryRestriction.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.yt-rating" => Some(("contentDetails.contentRating.ytRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.catvfr-rating" => Some(("contentDetails.contentRating.catvfrRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cbfc-rating" => Some(("contentDetails.contentRating.cbfcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bfvc-rating" => Some(("contentDetails.contentRating.bfvcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mda-rating" => Some(("contentDetails.contentRating.mdaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.acb-rating" => Some(("contentDetails.contentRating.acbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nfvcb-rating" => Some(("contentDetails.contentRating.nfvcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bmukk-rating" => Some(("contentDetails.contentRating.bmukkRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.chfilm-rating" => Some(("contentDetails.contentRating.chfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.resorteviolencia-rating" => Some(("contentDetails.contentRating.resorteviolenciaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.csa-rating" => Some(("contentDetails.contentRating.csaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.moctw-rating" => Some(("contentDetails.contentRating.moctwRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.anatel-rating" => Some(("contentDetails.contentRating.anatelRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.catv-rating" => Some(("contentDetails.contentRating.catvRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.pefilm-rating" => Some(("contentDetails.contentRating.pefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.djctq-rating-reasons" => Some(("contentDetails.contentRating.djctqRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.content-rating.incaa-rating" => Some(("contentDetails.contentRating.incaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.oflc-rating" => Some(("contentDetails.contentRating.oflcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fpb-rating" => Some(("contentDetails.contentRating.fpbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mccaa-rating" => Some(("contentDetails.contentRating.mccaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.tvpg-rating" => Some(("contentDetails.contentRating.tvpgRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rtc-rating" => Some(("contentDetails.contentRating.rtcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cscf-rating" => Some(("contentDetails.contentRating.cscfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fsk-rating" => Some(("contentDetails.contentRating.fskRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.bbfc-rating" => Some(("contentDetails.contentRating.bbfcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kmrb-rating" => Some(("contentDetails.contentRating.kmrbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.smsa-rating" => Some(("contentDetails.contentRating.smsaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.egfilm-rating" => Some(("contentDetails.contentRating.egfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cicf-rating" => Some(("contentDetails.contentRating.cicfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nbcpl-rating" => Some(("contentDetails.contentRating.nbcplRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nbc-rating" => Some(("contentDetails.contentRating.nbcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.djctq-rating" => Some(("contentDetails.contentRating.djctqRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ifco-rating" => Some(("contentDetails.contentRating.ifcoRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fco-rating" => Some(("contentDetails.contentRating.fcoRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.eefilm-rating" => Some(("contentDetails.contentRating.eefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.medietilsynet-rating" => Some(("contentDetails.contentRating.medietilsynetRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.grfilm-rating" => Some(("contentDetails.contentRating.grfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ccc-rating" => Some(("contentDetails.contentRating.cccRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rte-rating" => Some(("contentDetails.contentRating.rteRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.czfilm-rating" => Some(("contentDetails.contentRating.czfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.lsf-rating" => Some(("contentDetails.contentRating.lsfRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fmoc-rating" => Some(("contentDetails.contentRating.fmocRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.eirin-rating" => Some(("contentDetails.contentRating.eirinRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cce-rating" => Some(("contentDetails.contentRating.cceRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nkclv-rating" => Some(("contentDetails.contentRating.nkclvRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mtrcb-rating" => Some(("contentDetails.contentRating.mtrcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mibac-rating" => Some(("contentDetails.contentRating.mibacRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.ilfilm-rating" => Some(("contentDetails.contentRating.ilfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.smais-rating" => Some(("contentDetails.contentRating.smaisRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.russia-rating" => Some(("contentDetails.contentRating.russiaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mpaa-rating" => Some(("contentDetails.contentRating.mpaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kfcb-rating" => Some(("contentDetails.contentRating.kfcbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.agcom-rating" => Some(("contentDetails.contentRating.agcomRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.chvrs-rating" => Some(("contentDetails.contentRating.chvrsRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cna-rating" => Some(("contentDetails.contentRating.cnaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.icaa-rating" => Some(("contentDetails.contentRating.icaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.mccyp-rating" => Some(("contentDetails.contentRating.mccypRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.nfrc-rating" => Some(("contentDetails.contentRating.nfrcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.skfilm-rating" => Some(("contentDetails.contentRating.skfilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.moc-rating" => Some(("contentDetails.contentRating.mocRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.rcnof-rating" => Some(("contentDetails.contentRating.rcnofRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.meku-rating" => Some(("contentDetails.contentRating.mekuRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.fcbm-rating" => Some(("contentDetails.contentRating.fcbmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.kijkwijzer-rating" => Some(("contentDetails.contentRating.kijkwijzerRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.caption" => Some(("contentDetails.caption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.region-restriction.blocked" => Some(("contentDetails.regionRestriction.blocked", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.region-restriction.allowed" => Some(("contentDetails.regionRestriction.allowed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "content-details.duration" => Some(("contentDetails.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.licensed-content" => Some(("contentDetails.licensedContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.dimension" => Some(("contentDetails.dimension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "monetization-details.access.exception" => Some(("monetizationDetails.access.exception", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "monetization-details.access.allowed" => Some(("monetizationDetails.access.allowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.restricted" => Some(("ageGating.restricted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.alcohol-content" => Some(("ageGating.alcoholContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "age-gating.video-game-rating" => Some(("ageGating.videoGameRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suggestions.processing-errors" => Some(("suggestions.processingErrors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.editor-suggestions" => Some(("suggestions.editorSuggestions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.processing-warnings" => Some(("suggestions.processingWarnings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "suggestions.processing-hints" => Some(("suggestions.processingHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "live-streaming-details.concurrent-viewers" => Some(("liveStreamingDetails.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.scheduled-start-time" => Some(("liveStreamingDetails.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.scheduled-end-time" => Some(("liveStreamingDetails.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.actual-start-time" => Some(("liveStreamingDetails.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "live-streaming-details.actual-end-time" => Some(("liveStreamingDetails.actualEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.bitrate-bps" => Some(("fileDetails.bitrateBps", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.container" => Some(("fileDetails.container", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.latitude" => Some(("fileDetails.recordingLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.altitude" => Some(("fileDetails.recordingLocation.altitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.recording-location.longitude" => Some(("fileDetails.recordingLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "file-details.file-type" => Some(("fileDetails.fileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.creation-time" => Some(("fileDetails.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.duration-ms" => Some(("fileDetails.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.file-name" => Some(("fileDetails.fileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "file-details.file-size" => Some(("fileDetails.fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.live-broadcast-content" => Some(("snippet.liveBroadcastContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.default-language" => Some(("snippet.defaultLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.channel-title" => Some(("snippet.channelTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.category-id" => Some(("snippet.categoryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.description" => Some(("snippet.localized.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.localized.title" => Some(("snippet.localized.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.url" => Some(("snippet.thumbnails.high.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.width" => Some(("snippet.thumbnails.high.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.high.height" => Some(("snippet.thumbnails.high.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.url" => Some(("snippet.thumbnails.medium.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.width" => Some(("snippet.thumbnails.medium.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.medium.height" => Some(("snippet.thumbnails.medium.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.url" => Some(("snippet.thumbnails.maxres.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.width" => Some(("snippet.thumbnails.maxres.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.maxres.height" => Some(("snippet.thumbnails.maxres.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.url" => Some(("snippet.thumbnails.standard.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.width" => Some(("snippet.thumbnails.standard.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "snippet.thumbnails.standard.height" => Some(("snippet.thumbnails.standard.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "player.embed-html" => Some(("player.embedHtml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.file-details-availability" => Some(("processingDetails.fileDetailsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.editor-suggestions-availability" => Some(("processingDetails.editorSuggestionsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-status" => Some(("processingDetails.processingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-issues-availability" => Some(("processingDetails.processingIssuesAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-failure-reason" => Some(("processingDetails.processingFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.thumbnails-availability" => Some(("processingDetails.thumbnailsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.time-left-ms" => Some(("processingDetails.processingProgress.timeLeftMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.parts-processed" => Some(("processingDetails.processingProgress.partsProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.processing-progress.parts-total" => Some(("processingDetails.processingProgress.partsTotal", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processing-details.tag-suggestions-availability" => Some(("processingDetails.tagSuggestionsAvailability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-details.tags" => Some(("projectDetails.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "recording-details.recording-date" => Some(("recordingDetails.recordingDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recording-details.location-description" => Some(("recordingDetails.locationDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recording-details.location.latitude" => Some(("recordingDetails.location.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "recording-details.location.altitude" => Some(("recordingDetails.location.altitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::Video = json::value::from_value(object).unwrap();
         let mut call = self.hub.videos().update(request);
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -9409,9 +5245,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -9436,7 +5274,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 Ok((mut response, output_schema)) => {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
-                    serde::json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
                     Ok(())
                 }
             }
@@ -9446,8 +5284,9 @@ impl<'n, 'a> Engine<'n, 'a> {
     fn _watermarks_set(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
-        let mut request = api::InvideoBranding::default();
         let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
         for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
             let last_errc = err.issues.len();
             let (key, value) = parse_kv_arg(&*kvarg, err, false);
@@ -9462,56 +5301,28 @@ impl<'n, 'a> Engine<'n, 'a> {
                 }
                 continue;
             }
-            fn request_position_init(request: &mut api::InvideoBranding) {
-                if request.position.is_none() {
-                    request.position = Some(Default::default());
-                }
-            }
-            
-            fn request_timing_init(request: &mut api::InvideoBranding) {
-                if request.timing.is_none() {
-                    request.timing = Some(Default::default());
-                }
-            }
-            
-            match &temp_cursor.to_string()[..] {
-                "target-channel-id" => {
-                        request.target_channel_id = Some(value.unwrap_or("").to_string());
-                    },
-                "position.corner-position" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().corner_position = Some(value.unwrap_or("").to_string());
-                    },
-                "position.type" => {
-                        request_position_init(&mut request);
-                        request.position.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "image-url" => {
-                        request_position_init(&mut request);
-                        request.image_url = Some(value.unwrap_or("").to_string());
-                    },
-                "timing.offset-ms" => {
-                        request_timing_init(&mut request);
-                        request.timing.as_mut().unwrap().offset_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "timing.type" => {
-                        request_timing_init(&mut request);
-                        request.timing.as_mut().unwrap().type_ = Some(value.unwrap_or("").to_string());
-                    },
-                "timing.duration-ms" => {
-                        request_timing_init(&mut request);
-                        request.timing.as_mut().unwrap().duration_ms = Some(value.unwrap_or("").to_string());
-                    },
-                "image-bytes" => {
-                        request_timing_init(&mut request);
-                        request.image_bytes = Some(value.unwrap_or("").to_string());
-                    },
-                _ => {
-                    let suggestion = FieldCursor::did_you_mean(key, &vec!["corner-position", "duration-ms", "image-bytes", "image-url", "offset-ms", "position", "target-channel-id", "timing", "type"]);
-                    err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                }
+           
+            let type_info = 
+                match &temp_cursor.to_string()[..] {
+                    "target-channel-id" => Some(("targetChannelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.corner-position" => Some(("position.cornerPosition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "position.type" => Some(("position.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "image-url" => Some(("imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timing.offset-ms" => Some(("timing.offsetMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timing.type" => Some(("timing.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timing.duration-ms" => Some(("timing.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "image-bytes" => Some(("imageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["corner-position", "duration-ms", "image-bytes", "image-url", "offset-ms", "position", "target-channel-id", "timing", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
+        let mut request: api::InvideoBranding = json::value::from_value(object).unwrap();
         let mut call = self.hub.watermarks().set(request, opt.value_of("channel-id").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -9529,9 +5340,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -9579,9 +5392,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                         }
                     }
                     if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                Vec::new() + &self.gp + &["on-behalf-of-content-owner"]
-                                                            ));
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
+                                                                           v } ));
                     }
                 }
             }
@@ -10056,6 +5871,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 }
 
 fn main() {
+    let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
         ("activities", "methods: 'insert' and 'list'", vec![
@@ -11487,7 +7303,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.2.0+20150414")
+           .version("0.3.0+20150414")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
@@ -11528,7 +7344,8 @@ fn main() {
                                    (_        , &Some(f)) => f,
                                     _                    => unreachable!(),
                             };
-                       let mut arg = Arg::with_name(arg_name_str);
+                       let mut arg = Arg::with_name(arg_name_str)
+                                         .empty_values(false);
                        if let &Some(short_flag) = flag {
                            arg = arg.short(short_flag);
                        }
@@ -11567,12 +7384,12 @@ fn main() {
     let debug = matches.is_present("debug");
     match Engine::new(matches) {
         Err(err) => {
-            env::set_exit_status(err.exit_code);
+            exit_status = err.exit_code;
             writeln!(io::stderr(), "{}", err).ok();
         },
         Ok(engine) => {
             if let Err(doit_err) = engine.doit() {
-                env::set_exit_status(1);
+                exit_status = 1;
                 match doit_err {
                     DoitError::IoError(path, err) => {
                         writeln!(io::stderr(), "Failed to open output file '{}': {}", path, err).ok();
@@ -11588,4 +7405,6 @@ fn main() {
             }
         }
     }
+
+    std::process::exit(exit_status);
 }
