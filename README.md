@@ -10,7 +10,6 @@ To find a library of your interest, you might want to proceed looking at the [AP
 * first-class documentation with cross-links and complete code-examples
 * support all features, including downloads and resumable uploads
 * safety and resilience are built-in, allowing you to create highly available tools on top of it. For example, you can trigger retries for all operations that may temporarily fail, e.g. due to network outage.
-* *(soon)* Feature-complete command line tool to interact with each API.
 
 # Live-Development
 
@@ -46,8 +45,9 @@ To generate the APIs yourself, you will need to meet the following prerequisites
  * As [*mako*][mako] is a python program, you will need python installed on your system to run it. Some other programs we call depend on python being present as well.
 * **an internet connection and wget**
  * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
-* **Rust beta/nightly**
- * Due to the reliance on unstable dependencies, a beta or nightly build of the Rust toolchain is required. [Multirust][multirust] is recommended to support multiple toolchains on a per-project basis.
+* **Rust Stable**
+ * This project compiles on *stable* Rust only. You might consider using [Multirust][multirust] to control 
+   the toolchain on a per-project basis
 
 ## Using Make
 
