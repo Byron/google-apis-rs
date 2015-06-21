@@ -266,7 +266,9 @@ ${value_unwrap}\
                 err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                           {let mut v = Vec::new();
                                                                    v.extend(self.gp.iter().map(|v|*v));
+% if comma_sep_fields(optional_prop_names):
                                                                    v.extend([${comma_sep_fields(optional_prop_names)}].iter().map(|v|*v));
+% endif
                                                                    v } ));
             }
         }
