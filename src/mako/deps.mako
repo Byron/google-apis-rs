@@ -120,7 +120,7 @@ ${api_doc_index}: ${api_common}
 ${api_doc}: ${api_doc_index}
 
 ${central_api_index(crate_name)}: ${api_doc_index}
-	@[[ ! -d ${doc_root} ]] && mkdir -p target/doc && ln -s `pwd`/target/doc ${doc_root} || :
+	@test ! -d ${doc_root} && mkdir -p target/doc && ln -s `pwd`/target/doc ${doc_root} || :
 	% if make.documentation_engine == 'mkdocs':
 	cp -Rf ${api_doc_root} $(dir $@)
 	% endif
