@@ -844,7 +844,7 @@ def program_name(name, version):
 def api_index(DOC_ROOT, name, version, ti, check_exists=True):
     crate_dir = gen_crate_dir(name, version, ti)
     if ti.documentation_engine == 'rustdoc':
-        index_file_path = crate_dir + '/' + crate_dir + '/index.html'
+        index_file_path = crate_dir + '/index.html'
     else:
         index_file_path = crate_dir + '/' + 'index.html'
     if not check_exists or os.path.isfile(os.path.join(DOC_ROOT, index_file_path)):

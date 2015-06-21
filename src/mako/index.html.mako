@@ -11,20 +11,6 @@
         data = yaml.load_all(open(os.path.join(directories.api_base, 'type-%s.yaml' % api_type)))
         tc[api_type] = type(directories)(data.next())
     # end for each type to load cache for
-
-    first_api_prefix = None
-    for ad in tc.values():
-        if ad.make.documentation_engine != 'rustdoc':
-            continue
-        for an in sorted(api.list.keys()):
-            for v in api.list[an]:
-                if api_index(DOC_ROOT, an, v, ad.make):
-                    first_api_prefix = gen_crate_dir(an, v, ad.make)
-                    break
-            # for each version
-        # for each api name
-    # end for each type
-    assert first_api_prefix
 %>\
 <!DOCTYPE html>
 <!--
@@ -34,7 +20,7 @@ DO NOT EDIT !
 -->
 <html>
 <head>
-<link rel="stylesheet" href="${first_api_prefix}/main.css">
+<link rel="stylesheet" href="main.css">
 <style type="text/css">
 .text {
   color: #000000;
