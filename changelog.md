@@ -1,5 +1,20 @@
+<a name="cli-v0.3.1"></a>
+## cli-v0.3.1 (2015-06-26)
+
+
+#### Bug Fixes
+
+* **cli**
+  *  flush output stream on CLI output ([615ac64e](https://github.com/Byron/google-apis-rs/commit/615ac64ec1d86c1c00ff05a4d2f6065c866330a7))
+  *  add type annotation ([62db3ae8](https://github.com/Byron/google-apis-rs/commit/62db3ae87c1ad71082566a2e195a1e5d2cb7219f))
+* **deps**  make statement shell compatible ([a566b702](https://github.com/Byron/google-apis-rs/commit/a566b702738c4b470988645f2867966d1d288370))
+* **hyper-up**  work with hyper v0.6.0 ([d0491a49](https://github.com/Byron/google-apis-rs/commit/d0491a4950f657c55dfbf6a16a16a64c72b9077c))
+* **rustup**  type-inference fails on empty vec ([27fdd8ee](https://github.com/Byron/google-apis-rs/commit/27fdd8ee0c19dda409b6ca5a804edf23b8555ff3))
+
+
+
 <a name="cli-v0.3.0:cli-v0.1.7"></a>
-## cli-v0.3.0:cli-v0.1.7 (2015-06-19)
+## cli-v0.3.0:api-v0.1.7 (2015-06-19)
 
 This release allows both API and CLI to be built on stable (verified with 
 *rustc 1.0.0 (a59de37e9 2015-05-13) (built 2015-05-14)*).
