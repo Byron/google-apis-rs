@@ -326,6 +326,7 @@ if dry_run {
             let mut value = json::value::to_value(&output_schema);
             remove_json_null_values(&mut value);
             json::to_writer_pretty(&mut ostream, &value).unwrap();
+            ostream.flush().unwrap();
             % endif
             % if track_download_flag:
             } else {
@@ -333,6 +334,7 @@ if dry_run {
             % if supports_media_download:
             ## Download is the only option - nothing else matters
             io::copy(&mut response, &mut ostream).unwrap();
+            ostream.flush().unwrap();
             % endif
             % if track_download_flag:
             }
