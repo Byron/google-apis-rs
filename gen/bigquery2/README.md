@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-bigquery2` library allows access to all features of the *Google bigquery* service.
 
-This documentation was generated from *bigquery* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *bigquery* crate version *0.1.8+20150526*, where *20150526* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *bigquery* *v2* API can be found at the
 [official documentation site](https://cloud.google.com/bigquery/).
@@ -16,7 +16,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [datasets](http://byron.github.io/google-apis-rs/google_bigquery2/struct.Dataset.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.DatasetUpdateCall.html)
 * [jobs](http://byron.github.io/google-apis-rs/google_bigquery2/struct.Job.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobGetCall.html), [*get query results*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobGetQueryResultCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobListCall.html) and [*query*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobQueryCall.html)
+ * [*cancel*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobCancelCall.html), [*get*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobGetCall.html), [*get query results*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobGetQueryResultCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobListCall.html) and [*query*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.JobQueryCall.html)
 * projects
  * [*list*](http://byron.github.io/google-apis-rs/google_bigquery2/struct.ProjectListCall.html)
 * tabledata

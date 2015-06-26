@@ -139,6 +139,9 @@ impl<'a, C, A> AndroidPublisher<C, A>
     pub fn edits(&'a self) -> EditMethods<'a, C, A> {
         EditMethods { hub: &self }
     }
+    pub fn entitlements(&'a self) -> EntitlementMethods<'a, C, A> {
+        EntitlementMethods { hub: &self }
+    }
     pub fn inappproducts(&'a self) -> InappproductMethods<'a, C, A> {
         InappproductMethods { hub: &self }
     }
@@ -161,6 +164,34 @@ impl<'a, C, A> AndroidPublisher<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// An Entitlement resource indicates a user's current entitlement to an inapp item or subscription.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list entitlements](struct.EntitlementListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Entitlement {
+    /// This kind represents an entitlement object in the androidpublisher service.
+    pub kind: Option<String>,
+    /// The token which can be verified using the subscriptions or products API.
+    pub token: Option<String>,
+    /// The type of the inapp product. Possible values are:  
+    /// - In-app item: "inapp" 
+    /// - Subscription: "subs"
+    #[serde(rename="productType")]
+    pub product_type: Option<String>,
+    /// The SKU of the product.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+}
+
+impl Resource for Entitlement {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -442,17 +473,26 @@ impl ResponseResult for Track {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list entitlements](struct.EntitlementListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Season {
-    /// Inclusive start date of the recurrence period.
-    pub start: Option<MonthDay>,
-    /// Inclusive end date of the recurrence period.
-    pub end: Option<MonthDay>,
+pub struct EntitlementsListResponse {
+    /// no description provided
+    #[serde(rename="tokenPagination")]
+    pub token_pagination: Option<TokenPagination>,
+    /// no description provided
+    #[serde(rename="pageInfo")]
+    pub page_info: Option<PageInfo>,
+    /// no description provided
+    pub resources: Option<Vec<Entitlement>>,
 }
 
-impl Part for Season {}
+impl ResponseResult for EntitlementsListResponse {}
 
 
 /// There is no detailed description.
@@ -605,6 +645,31 @@ pub struct InappproductsBatchResponseEntry {
 }
 
 impl Part for InappproductsBatchResponseEntry {}
+
+
+/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert edits](struct.EditInsertCall.html) (request|response)
+/// * [commit edits](struct.EditCommitCall.html) (response)
+/// * [validate edits](struct.EditValidateCall.html) (response)
+/// * [get edits](struct.EditGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppEdit {
+    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
+    #[serde(rename="expiryTimeSeconds")]
+    pub expiry_time_seconds: Option<String>,
+    /// The ID of the edit that can be used in subsequent API calls.
+    pub id: Option<String>,
+}
+
+impl RequestValue for AppEdit {}
+impl ResponseResult for AppEdit {}
 
 
 /// There is no detailed description.
@@ -859,29 +924,21 @@ pub struct SubscriptionPurchase {
 impl ResponseResult for SubscriptionPurchase {}
 
 
-/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert edits](struct.EditInsertCall.html) (request|response)
-/// * [commit edits](struct.EditCommitCall.html) (response)
-/// * [validate edits](struct.EditValidateCall.html) (response)
-/// * [get edits](struct.EditGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEdit {
-    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
-    #[serde(rename="expiryTimeSeconds")]
-    pub expiry_time_seconds: Option<String>,
-    /// The ID of the edit that can be used in subsequent API calls.
+pub struct Image {
+    /// A URL that will serve a preview of the image.
+    pub url: Option<String>,
+    /// A sha1 hash of the image that was uploaded.
+    pub sha1: Option<String>,
+    /// A unique id representing this image.
     pub id: Option<String>,
 }
 
-impl RequestValue for AppEdit {}
-impl ResponseResult for AppEdit {}
+impl Part for Image {}
 
 
 /// There is no detailed description.
@@ -1001,16 +1058,14 @@ impl ResponseResult for InappproductsBatchResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Image {
-    /// A URL that will serve a preview of the image.
-    pub url: Option<String>,
-    /// A sha1 hash of the image that was uploaded.
-    pub sha1: Option<String>,
-    /// A unique id representing this image.
-    pub id: Option<String>,
+pub struct Season {
+    /// Inclusive start date of the recurrence period.
+    pub start: Option<MonthDay>,
+    /// Inclusive end date of the recurrence period.
+    pub end: Option<MonthDay>,
 }
 
-impl Part for Image {}
+impl Part for Season {}
 
 
 /// There is no detailed description.
@@ -1085,6 +1140,67 @@ impl ResponseResult for ListingsListResponse {}
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *entitlement* resources.
+/// It is not used directly, but through the `AndroidPublisher` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_androidpublisher2 as androidpublisher2;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use androidpublisher2::AndroidPublisher;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `list(...)`
+/// // to build up your call.
+/// let rb = hub.entitlements();
+/// # }
+/// ```
+pub struct EntitlementMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for EntitlementMethods<'a, C, A> {}
+
+impl<'a, C, A> EntitlementMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the user's current inapp item or subscription entitlements
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    pub fn list(&self, package_name: &str) -> EntitlementListCall<'a, C, A> {
+        EntitlementListCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _token: Default::default(),
+            _start_index: Default::default(),
+            _product_id: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *purchase* resources.
 /// It is not used directly, but through the `AndroidPublisher` hub.
@@ -1354,29 +1470,6 @@ impl<'a, C, A> EditMethods<'a, C, A> {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes the APK-specific localized listing for a specified APK and language code.
-    /// 
-    /// # Arguments
-    ///
-    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    /// * `editId` - Unique identifier for this edit.
-    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
-    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    pub fn apklistings_delete(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingDeleteCall<'a, C, A> {
-        EditApklistingDeleteCall {
-            hub: self.hub,
-            _package_name: package_name.to_string(),
-            _edit_id: edit_id.to_string(),
-            _apk_version_code: apk_version_code,
-            _language: language.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1720,6 +1813,29 @@ impl<'a, C, A> EditMethods<'a, C, A> {
             hub: self.hub,
             _package_name: package_name.to_string(),
             _edit_id: edit_id.to_string(),
+            _language: language.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the APK-specific localized listing for a specified APK and language code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `packageName` - Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    /// * `editId` - Unique identifier for this edit.
+    /// * `apkVersionCode` - The APK version code whose APK-specific listings should be read or modified.
+    /// * `language` - The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    pub fn apklistings_delete(&self, package_name: &str, edit_id: &str, apk_version_code: i32, language: &str) -> EditApklistingDeleteCall<'a, C, A> {
+        EditApklistingDeleteCall {
+            hub: self.hub,
+            _package_name: package_name.to_string(),
+            _edit_id: edit_id.to_string(),
+            _apk_version_code: apk_version_code,
             _language: language.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2285,6 +2401,264 @@ impl<'a, C, A> InappproductMethods<'a, C, A> {
 // ###################
 // CallBuilders   ###
 // #################
+
+/// Lists the user's current inapp item or subscription entitlements
+///
+/// A builder for the *list* method supported by a *entitlement* resource.
+/// It is not used directly, but through a `EntitlementMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.entitlements().list("packageName")
+///              .token("accusam")
+///              .start_index(93)
+///              .product_id("justo")
+///              .max_results(100)
+///              .doit();
+/// # }
+/// ```
+pub struct EntitlementListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _token: Option<String>,
+    _start_index: Option<u32>,
+    _product_id: Option<String>,
+    _max_results: Option<u32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for EntitlementListCall<'a, C, A> {}
+
+impl<'a, C, A> EntitlementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, EntitlementsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.entitlements.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        if let Some(value) = self._token {
+            params.push(("token", value.to_string()));
+        }
+        if let Some(value) = self._start_index {
+            params.push(("startIndex", value.to_string()));
+        }
+        if let Some(value) = self._product_id {
+            params.push(("productId", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "packageName", "token", "startIndex", "productId", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/entitlements".to_string();
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()));
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The package name of the application the inapp product was sold in (for example, 'com.some.thing').
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *token* query property to the given value.
+    pub fn token(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
+        self._token = Some(new_value.to_string());
+        self
+    }
+    ///
+    /// Sets the *start index* query property to the given value.
+    pub fn start_index(mut self, new_value: u32) -> EntitlementListCall<'a, C, A> {
+        self._start_index = Some(new_value);
+        self
+    }
+    /// The product id of the inapp product (for example, 'sku1'). This can be used to restrict the result set.
+    ///
+    /// Sets the *product id* query property to the given value.
+    pub fn product_id(mut self, new_value: &str) -> EntitlementListCall<'a, C, A> {
+        self._product_id = Some(new_value.to_string());
+        self
+    }
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> EntitlementListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntitlementListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EntitlementListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
 
 /// Refunds and immediately revokes a user's subscription purchase. Access to the subscription will be terminated immediately and it will stop recurring.
 ///
@@ -4259,7 +4633,7 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -32, "expansionFileType")
+/// let result = hub.edits().expansionfiles_update(req, "packageName", "editId", -95, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -4770,267 +5144,6 @@ impl<'a, C, A> EditDetailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> EditDetailGetCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Deletes the APK-specific localized listing for a specified APK and language code.
-///
-/// A builder for the *apklistings.delete* method supported by a *edit* resource.
-/// It is not used directly, but through a `EditMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidpublisher2 as androidpublisher2;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidpublisher2::AndroidPublisher;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_delete("packageName", "editId", -48, "language")
-///              .doit();
-/// # }
-/// ```
-pub struct EditApklistingDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidPublisher<C, A>,
-    _package_name: String,
-    _edit_id: String,
-    _apk_version_code: i32,
-    _language: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for EditApklistingDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidpublisher.edits.apklistings.delete", 
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("packageName", self._package_name.to_string()));
-        params.push(("editId", self._edit_id.to_string()));
-        params.push(("apkVersionCode", self._apk_version_code.to_string()));
-        params.push(("language", self._language.to_string()));
-        for &field in ["packageName", "editId", "apkVersionCode", "language"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{editId}", "editId"), ("{apkVersionCode}", "apkVersionCode"), ("{language}", "language")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
-            for param_name in ["language", "apkVersionCode", "editId", "packageName"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
-    ///
-    /// Sets the *package name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
-        self._package_name = new_value.to_string();
-        self
-    }
-    /// Unique identifier for this edit.
-    ///
-    /// Sets the *edit id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
-        self._edit_id = new_value.to_string();
-        self
-    }
-    /// The APK version code whose APK-specific listings should be read or modified.
-    ///
-    /// Sets the *apk version code* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, A> {
-        self._apk_version_code = new_value;
-        self
-    }
-    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
-    ///
-    /// Sets the *language* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
-        self._language = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -5580,7 +5693,7 @@ impl<'a, C, A> EditApkAddexternallyhostedCall<'a, C, A> where C: BorrowMut<hyper
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_deleteall("packageName", "editId", -37)
+/// let result = hub.edits().apklistings_deleteall("packageName", "editId", -82)
 ///              .doit();
 /// # }
 /// ```
@@ -6374,7 +6487,7 @@ impl<'a, C, A> EditTrackGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -40, "expansionFileType")
+/// let result = hub.edits().expansionfiles_patch(req, "packageName", "editId", -58, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -8407,7 +8520,7 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_update(req, "packageName", "editId", -45, "language")
+/// let result = hub.edits().apklistings_update(req, "packageName", "editId", -44, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -8956,7 +9069,7 @@ impl<'a, C, A> EditApkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_patch(req, "packageName", "editId", -84, "language")
+/// let result = hub.edits().apklistings_patch(req, "packageName", "editId", -19, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -9487,6 +9600,267 @@ impl<'a, C, A> EditListingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Deletes the APK-specific localized listing for a specified APK and language code.
+///
+/// A builder for the *apklistings.delete* method supported by a *edit* resource.
+/// It is not used directly, but through a `EditMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidpublisher2 as androidpublisher2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidpublisher2::AndroidPublisher;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidPublisher::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.edits().apklistings_delete("packageName", "editId", -40, "language")
+///              .doit();
+/// # }
+/// ```
+pub struct EditApklistingDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidPublisher<C, A>,
+    _package_name: String,
+    _edit_id: String,
+    _apk_version_code: i32,
+    _language: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EditApklistingDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> EditApklistingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidpublisher.edits.apklistings.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("packageName", self._package_name.to_string()));
+        params.push(("editId", self._edit_id.to_string()));
+        params.push(("apkVersionCode", self._apk_version_code.to_string()));
+        params.push(("language", self._language.to_string()));
+        for &field in ["packageName", "editId", "apkVersionCode", "language"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/androidpublisher/v2/applications/{packageName}/edits/{editId}/apks/{apkVersionCode}/listings/{language}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{packageName}", "packageName"), ("{editId}", "editId"), ("{apkVersionCode}", "apkVersionCode"), ("{language}", "language")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(4);
+            for param_name in ["language", "apkVersionCode", "editId", "packageName"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Unique identifier for the Android app that is being updated; for example, "com.spiffygame".
+    ///
+    /// Sets the *package name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn package_name(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
+        self._package_name = new_value.to_string();
+        self
+    }
+    /// Unique identifier for this edit.
+    ///
+    /// Sets the *edit id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn edit_id(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
+        self._edit_id = new_value.to_string();
+        self
+    }
+    /// The APK version code whose APK-specific listings should be read or modified.
+    ///
+    /// Sets the *apk version code* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn apk_version_code(mut self, new_value: i32) -> EditApklistingDeleteCall<'a, C, A> {
+        self._apk_version_code = new_value;
+        self
+    }
+    /// The language code (a BCP-47 language tag) of the APK-specific localized listing to read or modify. For example, to select Austrian German, pass "de-AT".
+    ///
+    /// Sets the *language* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn language(mut self, new_value: &str) -> EditApklistingDeleteCall<'a, C, A> {
+        self._language = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EditApklistingDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EditApklistingDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> EditApklistingDeleteCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// A builder for the *testers.get* method supported by a *edit* resource.
 /// It is not used directly, but through a `EditMethods` instance.
 ///
@@ -10008,7 +10382,7 @@ impl<'a, C, A> EditDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -27, "expansionFileType")
+/// let result = hub.edits().expansionfiles_upload("packageName", "editId", -66, "expansionFileType")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -12228,7 +12602,7 @@ impl<'a, C, A> EditListingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().expansionfiles_get("packageName", "editId", -38, "expansionFileType")
+/// let result = hub.edits().expansionfiles_get("packageName", "editId", -69, "expansionFileType")
 ///              .doit();
 /// # }
 /// ```
@@ -13589,7 +13963,7 @@ impl<'a, C, A> EditListingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_get("packageName", "editId", -57, "language")
+/// let result = hub.edits().apklistings_get("packageName", "editId", -24, "language")
 ///              .doit();
 /// # }
 /// ```
@@ -14149,7 +14523,7 @@ impl<'a, C, A> EditTesterUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.edits().apklistings_list("packageName", "editId", -19)
+/// let result = hub.edits().apklistings_list("packageName", "editId", -74)
 ///              .doit();
 /// # }
 /// ```
@@ -14642,9 +15016,9 @@ impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().list("packageName")
-///              .token("aliquyam")
-///              .start_index(34)
-///              .max_results(84)
+///              .token("diam")
+///              .start_index(39)
+///              .max_results(14)
 ///              .doit();
 /// # }
 /// ```
@@ -15680,7 +16054,7 @@ impl<'a, C, A> InappproductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().update(req, "packageName", "sku")
-///              .auto_convert_missing_prices(true)
+///              .auto_convert_missing_prices(false)
 ///              .doit();
 /// # }
 /// ```
@@ -15971,7 +16345,7 @@ impl<'a, C, A> InappproductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inappproducts().patch(req, "packageName", "sku")
-///              .auto_convert_missing_prices(false)
+///              .auto_convert_missing_prices(true)
 ///              .doit();
 /// # }
 /// ```

@@ -1,0 +1,33 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-genomics1-cli"
+version = "0.3.0+20150615"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with genomics (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli"
+documentation = "http://byron.github.io/google-apis-rs/google_genomics1_cli"
+license = "MIT"
+keywords = ["genomics", "google", "cli"]
+
+[[bin]]
+name = "genomics1"
+
+[dependencies]
+hyper = ">= 0.5.2"
+mime = "0.0.11"
+serde = ">= 0.4.1"
+yup-oauth2 = "*"
+strsim = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
+
+[dependencies.google-genomics1]
+path = "../genomics1"

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *container* API at revision *20150420*. The CLI is at version *0.3.0*.
+This documentation was generated from the *container* API at revision *20150617*. The CLI is at version *0.3.0*.
 
 ```bash
 container1-beta1 [options]
@@ -37,7 +37,6 @@ container1-beta1 [options]
                 zones-clusters-list <project-id> <zone-id> [-p <v>]... [-o <out>]
                 zones-operations-get <project-id> <zone-id> <operation-id> [-p <v>]... [-o <out>]
                 zones-operations-list <project-id> <zone-id> [-p <v>]... [-o <out>]
-                zones-tokens-get <master-project-id> <zone-id> <project-number> <cluster-name> [-p <v>]... [-o <out>]
   container1-beta1 --help
 
 Configuration:

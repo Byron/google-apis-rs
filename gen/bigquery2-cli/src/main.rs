@@ -137,6 +137,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -173,12 +174,13 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "location", "project-id", "self-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -231,6 +233,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -292,6 +295,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -328,12 +332,13 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "location", "project-id", "self-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -386,6 +391,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -422,12 +428,13 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-table-expiration-ms" => Some(("defaultTableExpirationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "friendly-name" => Some(("friendlyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modified-time" => Some(("lastModifiedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "project-id", "self-link"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "dataset-id", "dataset-reference", "default-table-expiration-ms", "description", "etag", "friendly-name", "id", "kind", "last-modified-time", "location", "project-id", "self-link"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -480,6 +487,59 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _jobs_cancel(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.jobs().cancel(opt.value_of("project-id").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -531,6 +591,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -595,6 +656,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -760,6 +822,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -827,6 +890,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -919,6 +983,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -977,6 +1042,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1063,6 +1129,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1124,6 +1191,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1219,6 +1287,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1318,6 +1387,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1376,6 +1446,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1475,6 +1546,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1574,6 +1646,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1613,6 +1686,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             },
             ("jobs", Some(opt)) => {
                 match opt.subcommand() {
+                    ("cancel", Some(opt)) => {
+                        call_result = self._jobs_cancel(opt, dry_run, &mut err);
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._jobs_get(opt, dry_run, &mut err);
                     },
@@ -1719,7 +1795,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -1732,7 +1808,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -1939,7 +2015,35 @@ fn main() {
                   ]),
             ]),
         
-        ("jobs", "methods: 'get', 'get-query-results', 'insert', 'list' and 'query'", vec![
+        ("jobs", "methods: 'cancel', 'get', 'get-query-results', 'insert', 'list' and 'query'", vec![
+            ("cancel",  
+                    Some(r##"Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/jobs_cancel",
+                  vec![
+                    (Some(r##"project-id"##),
+                     None,
+                     Some(r##"Project ID of the job to cancel"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"job-id"##),
+                     None,
+                     Some(r##"Job ID of the job to cancel"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get",  
                     Some(r##"Returns information about a specific job. Job information is available for a six month period after creation. Requires that you're the person who ran the job, or have the Is Owner project role."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquery2_cli/jobs_get",
@@ -2389,7 +2493,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150326")
+           .version("0.3.0+20150526")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

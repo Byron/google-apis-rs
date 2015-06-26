@@ -89,6 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -192,6 +193,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -291,6 +293,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -390,6 +393,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -441,6 +445,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -531,6 +536,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -616,6 +622,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -703,6 +710,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -798,6 +806,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -833,14 +842,15 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-settings.trial-end-time" => Some(("trialSettings.trialEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trial-settings.is-in-trial" => Some(("trialSettings.isInTrial", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "transfer-info.transferability-expiration-time" => Some(("transferInfo.transferabilityExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transfer-info.minimum-transferable-seats" => Some(("transferInfo.minimumTransferableSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "resource-ui-url" => Some(("resourceUiUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seats.kind" => Some(("seats.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seats.number-of-seats" => Some(("seats.numberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "seats.maximum-number-of-seats" => Some(("seats.maximumNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "seats.licensed-number-of-seats" => Some(("seats.licensedNumberOfSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-info.transferability-expiration-time" => Some(("transferInfo.transferabilityExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-info.minimum-transferable-seats" => Some(("transferInfo.minimumTransferableSeats", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plan.plan-name" => Some(("plan.planName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plan.commitment-interval.end-time" => Some(("plan.commitmentInterval.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -851,7 +861,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "billing-method" => Some(("billingMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-id", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["billing-method", "commitment-interval", "creation-time", "customer-id", "end-time", "is-commitment-plan", "is-in-trial", "kind", "licensed-number-of-seats", "maximum-number-of-seats", "minimum-transferable-seats", "number-of-seats", "plan", "plan-name", "purchase-order-id", "renewal-settings", "renewal-type", "resource-ui-url", "seats", "sku-id", "start-time", "status", "subscription-id", "suspension-reasons", "transfer-info", "transferability-expiration-time", "trial-end-time", "trial-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -908,6 +918,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -975,6 +986,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1026,6 +1038,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1077,6 +1090,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1180,7 +1194,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -1193,7 +1207,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -1624,7 +1638,7 @@ fn main() {
     
     let mut app = App::new("reseller1-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20141112")
+           .version("0.3.0+20150603")
            .about("Lets you create and manage your customers and their subscriptions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli")
            .arg(Arg::with_name("url")

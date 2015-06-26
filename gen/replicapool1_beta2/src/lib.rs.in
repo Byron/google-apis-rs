@@ -349,6 +349,9 @@ pub struct InstanceGroupManager {
     pub group: Option<String>,
     /// An optional textual description of the instance group manager.
     pub description: Option<String>,
+    /// The autohealing policy for this managed instance group. You can specify only one value.
+    #[serde(rename="autoHealingPolicies")]
+    pub auto_healing_policies: Option<Vec<ReplicaPoolAutoHealingPolicy>>,
     /// [Output only] Fingerprint of the instance group manager. This field is used for optimistic locking. An up-to-date fingerprint must be provided in order to modify the Instance Group Manager resource.
     pub fingerprint: Option<String>,
     /// [Output only] The resource type. Always replicapool#instanceGroupManager.
@@ -401,6 +404,20 @@ pub struct InstanceGroupManagersSetTargetPoolsRequest {
 }
 
 impl RequestValue for InstanceGroupManagersSetTargetPoolsRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReplicaPoolAutoHealingPolicy {
+    /// The URL for the HealthCheck that signals autohealing.
+    #[serde(rename="healthCheck")]
+    pub health_check: Option<String>,
+}
+
+impl Part for ReplicaPoolAutoHealingPolicy {}
 
 
 /// There is no detailed description.

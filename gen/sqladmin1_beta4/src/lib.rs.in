@@ -289,7 +289,7 @@ pub struct SslCert {
     /// The time when the certificate was created in RFC 3339 format, for example 2012-11-15T16:19:00.094Z
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// no description provided
+    /// The URI of this resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
 }
@@ -304,6 +304,9 @@ impl ResponseResult for SslCert {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestoreBackupContext {
+    /// The ID of the instance that the backup was taken from.
+    #[serde(rename="instanceId")]
+    pub instance_id: Option<String>,
     /// This is always sql#restoreBackupContext.
     pub kind: Option<String>,
     /// The ID of the backup run to restore from.
@@ -1089,6 +1092,7 @@ pub struct DatabaseInstance {
     /// SUSPENDED: The instance is not available, for example due to problems with billing.
     /// PENDING_CREATE: The instance is being created.
     /// MAINTENANCE: The instance is down for maintenance.
+    /// FAILED: The instance creation failed.
     /// UNKNOWN_STATE: The state of the instance is unknown.
     pub state: Option<String>,
     /// HTTP 1.1 Entity tag for the resource.
@@ -1226,7 +1230,7 @@ pub struct Operation {
     /// The time this operation actually started in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// no description provided
+    /// If errors occurred during processing of this operation, this field will be populated.
     pub error: Option<OperationErrors>,
     /// The time this operation finished in UTC timezone in RFC 3339 format, for example 2012-11-15T16:19:00.094Z.
     #[serde(rename="endTime")]

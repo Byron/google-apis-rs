@@ -135,6 +135,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -186,6 +187,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -327,6 +329,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -397,6 +400,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -507,6 +511,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -617,6 +622,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -749,6 +755,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -800,6 +807,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -895,6 +903,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -988,6 +997,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1055,6 +1065,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1148,6 +1159,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1241,6 +1253,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1336,6 +1349,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1425,6 +1439,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1486,6 +1501,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1575,6 +1591,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1664,6 +1681,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1840,6 +1858,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1910,6 +1929,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2005,6 +2025,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2066,6 +2087,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2157,6 +2179,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2248,6 +2271,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2343,6 +2367,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2435,6 +2460,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2493,6 +2519,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2585,6 +2612,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2677,6 +2705,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2772,6 +2801,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2859,6 +2889,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2910,6 +2941,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2997,6 +3029,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3084,6 +3117,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3179,6 +3213,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3230,6 +3265,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3362,6 +3398,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3417,6 +3454,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3514,6 +3552,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3619,6 +3658,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3649,6 +3689,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "is-delegated-admin" => Some(("isDelegatedAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "thumbnail-photo-etag" => Some(("thumbnailPhotoEtag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aliases" => Some(("aliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3675,7 +3716,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3728,6 +3769,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3816,6 +3858,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3923,6 +3966,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "is-delegated-admin" => Some(("isDelegatedAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "thumbnail-photo-etag" => Some(("thumbnailPhotoEtag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aliases" => Some(("aliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3949,7 +3993,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4002,6 +4046,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4097,6 +4142,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4188,6 +4234,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4279,6 +4326,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4386,6 +4434,7 @@ impl<'n, 'a> Engine<'n, 'a> {
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
                     "is-delegated-admin" => Some(("isDelegatedAdmin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "thumbnail-photo-etag" => Some(("thumbnailPhotoEtag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "aliases" => Some(("aliases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4412,7 +4461,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "change-password-at-next-login" => Some(("changePasswordAtNextLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agreed-to-terms", "aliases", "change-password-at-next-login", "creation-time", "customer-id", "deletion-time", "etag", "family-name", "full-name", "given-name", "hash-function", "id", "include-in-global-address-list", "ip-whitelisted", "is-admin", "is-delegated-admin", "is-mailbox-setup", "kind", "last-login-time", "name", "non-editable-aliases", "org-unit-path", "password", "primary-email", "suspended", "suspension-reason", "thumbnail-photo-etag", "thumbnail-photo-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4465,6 +4514,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4595,6 +4645,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4734,6 +4785,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5076,7 +5128,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -5089,7 +5141,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -6836,7 +6888,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150314")
+           .version("0.3.0+20150326")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

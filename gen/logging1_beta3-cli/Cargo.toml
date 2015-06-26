@@ -16,8 +16,8 @@ keywords = ["logging", "google", "cli"]
 name = "logging1-beta3"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"

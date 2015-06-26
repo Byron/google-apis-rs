@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *0.1.8+20150323*, where *20150323* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *Android Publisher* crate version *0.1.8+20150316*, where *20150316* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -13,6 +13,8 @@
 //! 
 //! * edits
 //!  * [*apklistings delete*](struct.EditApklistingDeleteCall.html), [*apklistings deleteall*](struct.EditApklistingDeleteallCall.html), [*apklistings get*](struct.EditApklistingGetCall.html), [*apklistings list*](struct.EditApklistingListCall.html), [*apklistings patch*](struct.EditApklistingPatchCall.html), [*apklistings update*](struct.EditApklistingUpdateCall.html), [*apks addexternallyhosted*](struct.EditApkAddexternallyhostedCall.html), [*apks list*](struct.EditApkListCall.html), [*apks upload*](struct.EditApkUploadCall.html), [*commit*](struct.EditCommitCall.html), [*delete*](struct.EditDeleteCall.html), [*details get*](struct.EditDetailGetCall.html), [*details patch*](struct.EditDetailPatchCall.html), [*details update*](struct.EditDetailUpdateCall.html), [*expansionfiles get*](struct.EditExpansionfileGetCall.html), [*expansionfiles patch*](struct.EditExpansionfilePatchCall.html), [*expansionfiles update*](struct.EditExpansionfileUpdateCall.html), [*expansionfiles upload*](struct.EditExpansionfileUploadCall.html), [*get*](struct.EditGetCall.html), [*images delete*](struct.EditImageDeleteCall.html), [*images deleteall*](struct.EditImageDeleteallCall.html), [*images list*](struct.EditImageListCall.html), [*images upload*](struct.EditImageUploadCall.html), [*insert*](struct.EditInsertCall.html), [*listings delete*](struct.EditListingDeleteCall.html), [*listings deleteall*](struct.EditListingDeleteallCall.html), [*listings get*](struct.EditListingGetCall.html), [*listings list*](struct.EditListingListCall.html), [*listings patch*](struct.EditListingPatchCall.html), [*listings update*](struct.EditListingUpdateCall.html), [*testers get*](struct.EditTesterGetCall.html), [*testers patch*](struct.EditTesterPatchCall.html), [*testers update*](struct.EditTesterUpdateCall.html), [*tracks get*](struct.EditTrackGetCall.html), [*tracks list*](struct.EditTrackListCall.html), [*tracks patch*](struct.EditTrackPatchCall.html), [*tracks update*](struct.EditTrackUpdateCall.html) and [*validate*](struct.EditValidateCall.html)
+//! * [entitlements](struct.Entitlement.html)
+//!  * [*list*](struct.EntitlementListCall.html)
 //! * inappproducts
 //!  * [*batch*](struct.InappproductBatchCall.html), [*delete*](struct.InappproductDeleteCall.html), [*get*](struct.InappproductGetCall.html), [*insert*](struct.InappproductInsertCall.html), [*list*](struct.InappproductListCall.html), [*patch*](struct.InappproductPatchCall.html) and [*update*](struct.InappproductUpdateCall.html)
 //! * purchases

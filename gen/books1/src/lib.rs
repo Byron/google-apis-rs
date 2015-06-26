@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.8+20150401*, where *20150401* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *books* crate version *0.1.8+20150318*, where *20150318* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -117,18 +117,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.volumes().list("q")
-//!              .start_index(76)
-//!              .source("consetetur")
-//!              .show_preorders(true)
-//!              .projection("justo")
-//!              .print_type("tempor")
-//!              .partner("gubergren")
-//!              .order_by("dolore")
-//!              .max_results(50)
-//!              .library_restrict("dolore")
-//!              .lang_restrict("magna")
-//!              .filter("elitr")
-//!              .download("magna")
+//!              .start_index(80)
+//!              .source("tempor")
+//!              .show_preorders(false)
+//!              .projection("dolore")
+//!              .print_type("amet.")
+//!              .partner("dolore")
+//!              .order_by("magna")
+//!              .max_results(7)
+//!              .library_restrict("magna")
+//!              .lang_restrict("ipsum")
+//!              .filter("invidunt")
+//!              .download("accusam")
 //!              .doit();
 //! 
 //! match result {

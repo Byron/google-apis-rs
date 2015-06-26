@@ -442,9 +442,9 @@ pub struct Subscription {
     /// Trial Settings of the subscription.
     #[serde(rename="trialSettings")]
     pub trial_settings: Option<SubscriptionTrialSettings>,
-    /// Transfer related information for the subscription.
-    #[serde(rename="transferInfo")]
-    pub transfer_info: Option<SubscriptionTransferInfo>,
+    /// Suspension Reasons
+    #[serde(rename="suspensionReasons")]
+    pub suspension_reasons: Option<Vec<String>>,
     /// Ui url for subscription resource.
     #[serde(rename="resourceUiUrl")]
     pub resource_ui_url: Option<String>,
@@ -454,6 +454,9 @@ pub struct Subscription {
     /// Creation time of this subscription in milliseconds since Unix epoch.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
+    /// Transfer related information for the subscription.
+    #[serde(rename="transferInfo")]
+    pub transfer_info: Option<SubscriptionTransferInfo>,
     /// Status of the subscription.
     pub status: Option<String>,
     /// Plan details of the subscription

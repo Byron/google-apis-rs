@@ -89,6 +89,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -140,6 +141,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -172,25 +174,30 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "cluster.status" => Some(("cluster.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.container-ipv4-cidr" => Some(("cluster.containerIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.description" => Some(("cluster.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.num-nodes" => Some(("cluster.numNodes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cluster.node-routing-prefix-size" => Some(("cluster.nodeRoutingPrefixSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cluster.instance-group-urls" => Some(("cluster.instanceGroupUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.bearer-token" => Some(("cluster.masterAuth.bearerToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.client-key" => Some(("cluster.masterAuth.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.client-certificate" => Some(("cluster.masterAuth.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.master-auth.user" => Some(("cluster.masterAuth.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.password" => Some(("cluster.masterAuth.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.master-auth.cluster-ca-certificate" => Some(("cluster.masterAuth.clusterCaCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.cluster-api-version" => Some(("cluster.clusterApiVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.network" => Some(("cluster.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.endpoint" => Some(("cluster.endpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.machine-type" => Some(("cluster.nodeConfig.machineType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.node-config.source-image" => Some(("cluster.nodeConfig.sourceImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.status-message" => Some(("cluster.statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.services-ipv4-cidr" => Some(("cluster.servicesIpv4Cidr", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.zone" => Some(("cluster.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.creation-timestamp" => Some(("cluster.creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster.enable-cloud-logging" => Some(("cluster.enableCloudLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cluster.self-link" => Some(("cluster.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster.name" => Some(("cluster.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster.enable-cloud-monitoring" => Some(("cluster.enableCloudMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bearer-token", "cluster", "cluster-api-version", "container-ipv4-cidr", "creation-timestamp", "description", "enable-cloud-logging", "endpoint", "machine-type", "master-auth", "name", "network", "node-config", "node-routing-prefix-size", "num-nodes", "password", "self-link", "services-ipv4-cidr", "source-image", "status", "status-message", "user", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bearer-token", "client-certificate", "client-key", "cluster", "cluster-api-version", "cluster-ca-certificate", "container-ipv4-cidr", "creation-timestamp", "description", "enable-cloud-logging", "enable-cloud-monitoring", "endpoint", "instance-group-urls", "machine-type", "master-auth", "name", "network", "node-config", "node-routing-prefix-size", "num-nodes", "password", "self-link", "services-ipv4-cidr", "source-image", "status", "status-message", "user", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -243,6 +250,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -294,6 +302,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -345,6 +354,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -396,6 +406,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -447,6 +458,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -498,54 +510,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_zones_tokens_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().zones_tokens_get(opt.value_of("master-project-id").unwrap_or(""), opt.value_of("zone-id").unwrap_or(""), opt.value_of("project-number").unwrap_or(""), opt.value_of("cluster-name").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -582,9 +547,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     ("zones-operations-list", Some(opt)) => {
                         call_result = self._projects_zones_operations_list(opt, dry_run, &mut err);
-                    },
-                    ("zones-tokens-get", Some(opt)) => {
-                        call_result = self._projects_zones_tokens_get(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -626,7 +588,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -639,7 +601,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -674,7 +636,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'clusters-list', 'operations-list', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-list', 'zones-operations-get', 'zones-operations-list' and 'zones-tokens-get'", vec![
+        ("projects", "methods: 'clusters-list', 'operations-list', 'zones-clusters-create', 'zones-clusters-delete', 'zones-clusters-get', 'zones-clusters-list', 'zones-operations-get' and 'zones-operations-list'", vec![
             ("clusters-list",  
                     Some(r##"Lists all clusters owned by a project across all zones."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_beta1_cli/projects_clusters-list",
@@ -726,7 +688,7 @@ fn main() {
         
         A firewall is added that allows traffic into port 443 on the master, which enables HTTPS. A firewall and a route is added for each node to allow the containers on that node to communicate with all other instances in the cluster.
         
-        Finally, a route named k8s-iproute-10-xx-0-0 is created to track that the cluster's 10.xx.0.0/16 CIDR has been assigned."##),
+        Finally, an entry is added to the project's global metadata indicating which CIDR range is being used by the cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_container1_beta1_cli/projects_zones-clusters-create",
                   vec![
                     (Some(r##"project-id"##),
@@ -919,54 +881,13 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("zones-tokens-get",  
-                    Some(r##"Gets a compute-rw scoped OAuth2 access token for
-        . Authentication is performed to ensure that the caller is a member of  and that the request is coming from the expected master VM for the specified cluster. See go/gke-cross-project-auth for more details."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_container1_beta1_cli/projects_zones-tokens-get",
-                  vec![
-                    (Some(r##"master-project-id"##),
-                     None,
-                     Some(r##"The hosted master project from which this request is coming."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"zone-id"##),
-                     None,
-                     Some(r##"The zone of the specified cluster."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"project-number"##),
-                     None,
-                     Some(r##"The project number for which the access token is being requested."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"cluster-name"##),
-                     None,
-                     Some(r##"The name of the specified cluster."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ]),
         
     ];
     
     let mut app = App::new("container1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150420")
+           .version("0.3.0+20150617")
            .about("The Google Container Engine API is used for building and managing container based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_beta1_cli")
            .arg(Arg::with_name("url")

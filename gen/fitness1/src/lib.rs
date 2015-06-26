@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *fitness* crate version *0.1.8+20150527*, where *20150527* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Fitness.html) ... 
 //! 
 //! * users
-//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](struct.UserDataSourceDeleteCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
+//!  * [*data sources create*](struct.UserDataSourceCreateCall.html), [*data sources datasets delete*](struct.UserDataSourceDatasetDeleteCall.html), [*data sources datasets get*](struct.UserDataSourceDatasetGetCall.html), [*data sources datasets patch*](struct.UserDataSourceDatasetPatchCall.html), [*data sources delete*](struct.UserDataSourceDeleteCall.html), [*data sources get*](struct.UserDataSourceGetCall.html), [*data sources list*](struct.UserDataSourceListCall.html), [*data sources patch*](struct.UserDataSourcePatchCall.html), [*data sources update*](struct.UserDataSourceUpdateCall.html), [*dataset aggregate*](struct.UserDatasetAggregateCall.html), [*sessions delete*](struct.UserSessionDeleteCall.html), [*sessions list*](struct.UserSessionListCall.html) and [*sessions update*](struct.UserSessionUpdateCall.html)
 //! 
 //! 
 //! 

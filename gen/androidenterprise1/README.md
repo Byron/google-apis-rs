@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *0.1.8+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *Android Enterprise* crate version *0.1.8+20150303*, where *20150303* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.AndroidEnterprise.html) ... 
@@ -29,7 +29,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [permissions](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Permission.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.PermissionGetCall.html)
 * [products](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Product.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetCall.html), [*get app restrictions schema*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetPermissionCall.html) and [*update permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUpdatePermissionCall.html)
+ * [*approve*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductApproveCall.html), [*generate approval url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGenerateApprovalUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetCall.html), [*get app restrictions schema*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetPermissionCall.html) and [*update permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUpdatePermissionCall.html)
 * [users](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.User.html)
  * [*generate token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateTokenCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserListCall.html) and [*revoke token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserRevokeTokenCall.html)
 

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *gmail* API at revision *20150303*. The CLI is at version *0.3.0*.
+This documentation was generated from the *gmail* API at revision *20150526*. The CLI is at version *0.3.0*.
 
 ```bash
 gmail1 [options]
@@ -53,12 +53,14 @@ gmail1 [options]
                 messages-send <user-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 messages-trash <user-id> <id> [-p <v>]... [-o <out>]
                 messages-untrash <user-id> <id> [-p <v>]... [-o <out>]
+                stop <user-id> [-p <v>]...
                 threads-delete <user-id> <id> [-p <v>]...
                 threads-get <user-id> <id> [-p <v>]... [-o <out>]
                 threads-list <user-id> [-p <v>]... [-o <out>]
                 threads-modify <user-id> <id> (-r <kv>)... [-p <v>]... [-o <out>]
                 threads-trash <user-id> <id> [-p <v>]... [-o <out>]
                 threads-untrash <user-id> <id> [-p <v>]... [-o <out>]
+                watch <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
   gmail1 --help
 
 Configuration:

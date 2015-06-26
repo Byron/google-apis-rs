@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *App State* API at revision *20150414*. The CLI is at version *0.3.0*.
+This documentation was generated from the *App State* API at revision *20150527*. The CLI is at version *0.3.0*.
 
 ```bash
 appstate1 [options]

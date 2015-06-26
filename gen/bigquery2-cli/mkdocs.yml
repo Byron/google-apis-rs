@@ -1,4 +1,4 @@
-site_name: bigquery v0.3.0+20150326
+site_name: bigquery v0.3.0+20150526
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: Write integrating applications with bcore
 
@@ -15,6 +15,7 @@ pages:
 - ['datasets_list.md', 'Datasets', 'List']
 - ['datasets_patch.md', 'Datasets', 'Patch']
 - ['datasets_update.md', 'Datasets', 'Update']
+- ['jobs_cancel.md', 'Jobs', 'Cancel']
 - ['jobs_get.md', 'Jobs', 'Get']
 - ['jobs_get-query-results.md', 'Jobs', 'Get Query Results']
 - ['jobs_insert.md', 'Jobs', 'Insert']

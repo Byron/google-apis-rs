@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-container1_beta1` library allows access to all features of the *Google container* service.
 
-This documentation was generated from *container* crate version *0.1.8+20150420*, where *20150420* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *container* crate version *0.1.8+20150617*, where *20150617* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *container* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -14,7 +14,7 @@ Everything else about the *container* *v1_beta1* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.Container.html) ... 
 
 * projects
- * [*clusters list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectClusterListCall.html), [*operations list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectOperationListCall.html), [*zones clusters create*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterListCall.html), [*zones operations get*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneOperationGetCall.html), [*zones operations list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneOperationListCall.html) and [*zones tokens get*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneTokenGetCall.html)
+ * [*clusters list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectClusterListCall.html), [*operations list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectOperationListCall.html), [*zones clusters create*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneClusterListCall.html), [*zones operations get*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](http://byron.github.io/google-apis-rs/google_container1_beta1/struct.ProjectZoneOperationListCall.html)
 
 
 

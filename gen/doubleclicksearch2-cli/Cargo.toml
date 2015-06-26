@@ -4,7 +4,7 @@
 [package]
 
 name = "google-doubleclicksearch2-cli"
-version = "0.3.0+20150303"
+version = "0.3.0+20150526"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with doubleclicksearch (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/doubleclicksearch2-cli"
@@ -17,8 +17,8 @@ keywords = ["doubleclicksearch", "google", "cli"]
 name = "doubleclicksearch2"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"

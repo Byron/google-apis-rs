@@ -218,21 +218,27 @@ pub struct IdentitytoolkitRelyingpartySetAccountInfoRequest {
     /// The local ID of the user.
     #[serde(rename="localId")]
     pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
     /// Mark the user to upgrade to federated login.
     #[serde(rename="upgradeToFederatedLogin")]
     pub upgrade_to_federated_login: Option<bool>,
     /// Response to the captcha.
     #[serde(rename="captchaResponse")]
     pub captcha_response: Option<String>,
-    /// The GITKit token of the authenticated user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
     /// Mark the email as verified or not.
     #[serde(rename="emailVerified")]
     pub email_verified: Option<bool>,
+    /// Whether to disable the user.
+    #[serde(rename="disableUser")]
+    pub disable_user: Option<bool>,
     /// The captcha challenge.
     #[serde(rename="captchaChallenge")]
     pub captcha_challenge: Option<String>,
+    /// The GITKit token of the authenticated user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
     /// The associated IDPs of the user.
     pub provider: Option<Vec<String>>,
     /// The out-of-band code of the change email request.
@@ -750,6 +756,9 @@ pub struct UserInfo {
     /// The local ID of the user.
     #[serde(rename="localId")]
     pub local_id: Option<String>,
+    /// Timestamp in seconds for valid login token.
+    #[serde(rename="validSince")]
+    pub valid_since: Option<String>,
     /// The URL of the user profile photo.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
@@ -759,6 +768,8 @@ pub struct UserInfo {
     /// The user's hashed password.
     #[serde(rename="passwordHash")]
     pub password_hash: Option<String>,
+    /// Whether the user is disabled.
+    pub disabled: Option<bool>,
     /// Version of the user's password.
     pub version: Option<i32>,
     /// The IDP of the user.

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *licensing* crate version *0.1.8+20140122*, where *20140122* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *licensing* crate version *0.1.8+20150525*, where *20150525* is the exact revision of the *licensing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *licensing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/licensing/).

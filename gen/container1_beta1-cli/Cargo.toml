@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1_beta1-cli"
-version = "0.3.0+20150420"
+version = "0.3.0+20150617"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with container (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1_beta1-cli"
@@ -17,8 +17,8 @@ keywords = ["container", "google", "cli"]
 name = "container1-beta1"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"

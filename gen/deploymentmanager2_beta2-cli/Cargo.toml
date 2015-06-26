@@ -1,0 +1,34 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-deploymentmanager2_beta2-cli"
+version = "0.3.0+20150616"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Deployment Manager (protocol v2beta2)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta2-cli"
+homepage = "https://developers.google.com/deployment-manager/"
+documentation = "http://byron.github.io/google-apis-rs/google_deploymentmanager2_beta2_cli"
+license = "MIT"
+keywords = ["deploymentmanager", "google", "cli"]
+
+[[bin]]
+name = "deploymentmanager2-beta2"
+
+[dependencies]
+hyper = ">= 0.6.0"
+mime = "0.0.12"
+serde = ">= 0.4.1"
+yup-oauth2 = "*"
+strsim = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 0.9.1"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
+
+[dependencies.google-deploymentmanager2_beta2]
+path = "../deploymentmanager2_beta2"

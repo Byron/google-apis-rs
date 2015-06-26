@@ -46,7 +46,7 @@ pub enum Scope {
     /// View metadata for files in your Google Drive
     MetadataReadonly,
 
-    /// View and manage Google Drive files that you have opened or created with this app
+    /// View and manage Google Drive files and folders that you have opened or created with this app
     File,
 
     /// Modify your Google Apps Script scripts' behavior
@@ -394,7 +394,11 @@ pub struct About {
     /// The allowable export formats.
     #[serde(rename="exportFormats")]
     pub export_formats: Option<Vec<AboutExportFormats>>,
-    /// The domain sharing policy for the current user.
+    /// The domain sharing policy for the current user. Possible values are:  
+    /// - ALLOWED 
+    /// - ALLOWED_WITH_WARNING 
+    /// - INCOMING_ONLY 
+    /// - DISALLOWED
     #[serde(rename="domainSharingPolicy")]
     pub domain_sharing_policy: Option<String>,
     /// A link back to this item.
@@ -571,6 +575,8 @@ pub struct File {
     /// The permissions for the authenticated user on this file.
     #[serde(rename="userPermission")]
     pub user_permission: Option<Permission>,
+    /// The list of spaces which contain the file. Supported values are 'drive' and 'appDataFolder'.
+    pub spaces: Option<Vec<String>>,
     /// The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive.
     #[serde(rename="originalFilename")]
     pub original_filename: Option<String>,
@@ -1815,6 +1821,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
     pub fn list(&self) -> FileListCall<'a, C, A> {
         FileListCall {
             hub: self.hub,
+            _spaces: Default::default(),
             _q: Default::default(),
             _projection: Default::default(),
             _page_token: Default::default(),
@@ -3006,6 +3013,7 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _start_change_id: Default::default(),
+            _spaces: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _include_subscribed: Default::default(),
@@ -3023,6 +3031,7 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
         ChangeListCall {
             hub: self.hub,
             _start_change_id: Default::default(),
+            _spaces: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
             _include_subscribed: Default::default(),
@@ -4068,7 +4077,7 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._pinned = Some(new_value);
         self
     }
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    /// If ocr is true, hints at the language to use. Valid values are BCP 47 codes.
     ///
     /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileInsertCall<'a, C, A> {
@@ -4655,7 +4664,7 @@ impl<'a, C, A> FileCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._pinned = Some(new_value);
         self
     }
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    /// If ocr is true, hints at the language to use. Valid values are BCP 47 codes.
     ///
     /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C, A> {
@@ -5183,11 +5192,12 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
-///              .q("et")
-///              .projection("duo")
-///              .page_token("et")
-///              .max_results(-40)
-///              .corpus("sanctus")
+///              .spaces("et")
+///              .q("duo")
+///              .projection("et")
+///              .page_token("eirmod")
+///              .max_results(-58)
+///              .corpus("et")
 ///              .doit();
 /// # }
 /// ```
@@ -5195,6 +5205,7 @@ pub struct FileListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Drive<C, A>,
+    _spaces: Option<String>,
     _q: Option<String>,
     _projection: Option<String>,
     _page_token: Option<String>,
@@ -5221,7 +5232,10 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "drive.files.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        if let Some(value) = self._spaces {
+            params.push(("spaces", value.to_string()));
+        }
         if let Some(value) = self._q {
             params.push(("q", value.to_string()));
         }
@@ -5237,7 +5251,7 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._corpus {
             params.push(("corpus", value.to_string()));
         }
-        for &field in ["alt", "q", "projection", "pageToken", "maxResults", "corpus"].iter() {
+        for &field in ["alt", "spaces", "q", "projection", "pageToken", "maxResults", "corpus"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5332,6 +5346,13 @@ impl<'a, C, A> FileListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
+    /// A comma-separated list of spaces to query. Supported values are 'drive' and 'appDataFolder'.
+    ///
+    /// Sets the *spaces* query property to the given value.
+    pub fn spaces(mut self, new_value: &str) -> FileListCall<'a, C, A> {
+        self._spaces = Some(new_value.to_string());
+        self
+    }
     /// Query string for searching files.
     ///
     /// Sets the *q* query property to the given value.
@@ -5691,16 +5712,16 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(true)
 ///              .update_viewed_date(true)
-///              .timed_text_track_name("ut")
-///              .timed_text_language("ea")
-///              .set_modified_date(false)
+///              .timed_text_track_name("ea")
+///              .timed_text_language("sed")
+///              .set_modified_date(true)
 ///              .remove_parents("dolor")
 ///              .pinned(true)
-///              .ocr_language("dolor")
-///              .ocr(true)
+///              .ocr_language("et")
+///              .ocr(false)
 ///              .new_revision(false)
-///              .convert(false)
-///              .add_parents("voluptua.")
+///              .convert(true)
+///              .add_parents("Lorem")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -6096,7 +6117,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._pinned = Some(new_value);
         self
     }
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    /// If ocr is true, hints at the language to use. Valid values are BCP 47 codes.
     ///
     /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
@@ -6110,7 +6131,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._ocr = Some(new_value);
         self
     }
-    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
+    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous unpinned revisions are preserved for a short period of time. Pinned revisions are stored indefinitely, using additional storage quota, up to a maximum of 200 revisions.
     ///
     /// Sets the *new revision* query property to the given value.
     pub fn new_revision(mut self, new_value: bool) -> FileUpdateCall<'a, C, A> {
@@ -6441,18 +6462,18 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
-///              .use_content_as_indexable_text(true)
-///              .update_viewed_date(false)
-///              .timed_text_track_name("vero")
-///              .timed_text_language("diam")
-///              .set_modified_date(false)
-///              .remove_parents("consetetur")
-///              .pinned(true)
-///              .ocr_language("vero")
+///              .use_content_as_indexable_text(false)
+///              .update_viewed_date(true)
+///              .timed_text_track_name("diam")
+///              .timed_text_language("rebum.")
+///              .set_modified_date(true)
+///              .remove_parents("sadipscing")
+///              .pinned(false)
+///              .ocr_language("sadipscing")
 ///              .ocr(false)
 ///              .new_revision(false)
 ///              .convert(false)
-///              .add_parents("dolore")
+///              .add_parents("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -6732,7 +6753,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._pinned = Some(new_value);
         self
     }
-    /// If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.
+    /// If ocr is true, hints at the language to use. Valid values are BCP 47 codes.
     ///
     /// Sets the *ocr language* query property to the given value.
     pub fn ocr_language(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
@@ -6746,7 +6767,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._ocr = Some(new_value);
         self
     }
-    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous revisions are preserved (causing increased use of the user's data storage quota).
+    /// Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous unpinned revisions are preserved for a short period of time. Pinned revisions are stored indefinitely, using additional storage quota, up to a maximum of 200 revisions.
     ///
     /// Sets the *new revision* query property to the given value.
     pub fn new_revision(mut self, new_value: bool) -> FilePatchCall<'a, C, A> {
@@ -6851,9 +6872,9 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .update_viewed_date(false)
-///              .revision_id("Lorem")
-///              .projection("et")
+///              .update_viewed_date(true)
+///              .revision_id("et")
+///              .projection("clita")
 ///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
@@ -7151,8 +7172,8 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.about().get()
-///              .start_change_id("consetetur")
-///              .max_change_id_count(-58)
+///              .start_change_id("takimata")
+///              .max_change_id_count(-40)
 ///              .include_subscribed(true)
 ///              .doit();
 /// # }
@@ -7391,7 +7412,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().update("fileId")
-///              .base_revision("sanctus")
+///              .base_revision("takimata")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -7742,7 +7763,7 @@ impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().get("fileId")
-///              .revision(-27)
+///              .revision(-86)
 ///              .doit();
 /// # }
 /// ```
@@ -8215,9 +8236,9 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
-///              .language_code("invidunt")
-///              .app_filter_mime_types("ea")
-///              .app_filter_extensions("sadipscing")
+///              .language_code("ea")
+///              .app_filter_mime_types("sadipscing")
+///              .app_filter_extensions("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -9776,10 +9797,10 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .updated_min("gubergren")
-///              .page_token("aliquyam")
-///              .max_results(-24)
-///              .include_deleted(true)
+///              .updated_min("aliquyam")
+///              .page_token("eos")
+///              .max_results(-38)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10060,9 +10081,9 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().list("folderId")
-///              .q("labore")
-///              .page_token("ipsum")
-///              .max_results(-31)
+///              .q("ipsum")
+///              .page_token("aliquyam")
+///              .max_results(-69)
 ///              .doit();
 /// # }
 /// ```
@@ -12586,9 +12607,9 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("eos")
-///              .max_results(-78)
-///              .include_deleted(true)
+///              .page_token("voluptua.")
+///              .max_results(-19)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12870,7 +12891,7 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().get("fileId", "commentId", "replyId")
-///              .include_deleted(true)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -14204,8 +14225,8 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().insert(req, "fileId")
-///              .send_notification_emails(false)
-///              .email_message("et")
+///              .send_notification_emails(true)
+///              .email_message("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -15797,10 +15818,11 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req)
-///              .start_change_id("ut")
-///              .page_token("amet.")
-///              .max_results(-100)
-///              .include_subscribed(false)
+///              .start_change_id("amet.")
+///              .spaces("ipsum")
+///              .page_token("ut")
+///              .max_results(-3)
+///              .include_subscribed(true)
 ///              .include_deleted(true)
 ///              .doit();
 /// # }
@@ -15811,6 +15833,7 @@ pub struct ChangeWatchCall<'a, C, A>
     hub: &'a Drive<C, A>,
     _request: Channel,
     _start_change_id: Option<String>,
+    _spaces: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _include_subscribed: Option<bool>,
@@ -15836,9 +15859,12 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "drive.changes.watch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         if let Some(value) = self._start_change_id {
             params.push(("startChangeId", value.to_string()));
+        }
+        if let Some(value) = self._spaces {
+            params.push(("spaces", value.to_string()));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -15852,7 +15878,7 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._include_deleted {
             params.push(("includeDeleted", value.to_string()));
         }
-        for &field in ["alt", "startChangeId", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
+        for &field in ["alt", "startChangeId", "spaces", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15978,6 +16004,13 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._start_change_id = Some(new_value.to_string());
         self
     }
+    /// A comma-separated list of spaces to query. Supported values are 'drive' and 'appDataFolder'.
+    ///
+    /// Sets the *spaces* query property to the given value.
+    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, C, A> {
+        self._spaces = Some(new_value.to_string());
+        self
+    }
     /// Page token for changes.
     ///
     /// Sets the *page token* query property to the given value.
@@ -16085,11 +16118,12 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .start_change_id("sea")
-///              .page_token("ut")
-///              .max_results(-39)
+///              .start_change_id("eirmod")
+///              .spaces("sanctus")
+///              .page_token("voluptua.")
+///              .max_results(-99)
 ///              .include_subscribed(true)
-///              .include_deleted(true)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -16098,6 +16132,7 @@ pub struct ChangeListCall<'a, C, A>
 
     hub: &'a Drive<C, A>,
     _start_change_id: Option<String>,
+    _spaces: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _include_subscribed: Option<bool>,
@@ -16123,9 +16158,12 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.changes.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
         if let Some(value) = self._start_change_id {
             params.push(("startChangeId", value.to_string()));
+        }
+        if let Some(value) = self._spaces {
+            params.push(("spaces", value.to_string()));
         }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -16139,7 +16177,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._include_deleted {
             params.push(("includeDeleted", value.to_string()));
         }
-        for &field in ["alt", "startChangeId", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
+        for &field in ["alt", "startChangeId", "spaces", "pageToken", "maxResults", "includeSubscribed", "includeDeleted"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16239,6 +16277,13 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *start change id* query property to the given value.
     pub fn start_change_id(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
         self._start_change_id = Some(new_value.to_string());
+        self
+    }
+    /// A comma-separated list of spaces to query. Supported values are 'drive' and 'appDataFolder'.
+    ///
+    /// Sets the *spaces* query property to the given value.
+    pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._spaces = Some(new_value.to_string());
         self
     }
     /// Page token for changes.
@@ -16590,7 +16635,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("vero")
+///              .visibility("et")
 ///              .doit();
 /// # }
 /// ```
@@ -16875,7 +16920,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("et")
+///              .visibility("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -17633,7 +17678,7 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("dolor")
+///              .visibility("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -17918,7 +17963,7 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("nonumy")
+///              .visibility("no")
 ///              .doit();
 /// # }
 /// ```

@@ -21,7 +21,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *cloudlatencytest* API at revision *20150206*. The CLI is at version *0.3.0*.
+This documentation was generated from the *cloudlatencytest* API at revision *20150508*. The CLI is at version *0.3.0*.
 
 ```bash
 cloudlatencytest2 [options]

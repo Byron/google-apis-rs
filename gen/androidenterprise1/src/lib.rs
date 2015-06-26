@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.8+20150309*, where *20150309* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *Android Enterprise* crate version *0.1.8+20150303*, where *20150303* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1).
 //! # Features
 //! 
@@ -27,7 +27,7 @@
 //! * [permissions](struct.Permission.html)
 //!  * [*get*](struct.PermissionGetCall.html)
 //! * [products](struct.Product.html)
-//!  * [*get*](struct.ProductGetCall.html), [*get app restrictions schema*](struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](struct.ProductGetPermissionCall.html) and [*update permissions*](struct.ProductUpdatePermissionCall.html)
+//!  * [*approve*](struct.ProductApproveCall.html), [*generate approval url*](struct.ProductGenerateApprovalUrlCall.html), [*get*](struct.ProductGetCall.html), [*get app restrictions schema*](struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](struct.ProductGetPermissionCall.html) and [*update permissions*](struct.ProductUpdatePermissionCall.html)
 //! * [users](struct.User.html)
 //!  * [*generate token*](struct.UserGenerateTokenCall.html), [*get*](struct.UserGetCall.html), [*list*](struct.UserListCall.html) and [*revoke token*](struct.UserRevokeTokenCall.html)
 //! 

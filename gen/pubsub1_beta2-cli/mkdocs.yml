@@ -1,4 +1,4 @@
-site_name: pubsub v0.3.0+20150326
+site_name: pubsub v0.3.0+20150427
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1_beta2-cli
 site_description: Write integrating applications with bcore
 
@@ -13,16 +13,22 @@ pages:
 - ['projects_subscriptions-create.md', 'Projects', 'Subscriptions Create']
 - ['projects_subscriptions-delete.md', 'Projects', 'Subscriptions Delete']
 - ['projects_subscriptions-get.md', 'Projects', 'Subscriptions Get']
+- ['projects_subscriptions-get-iam-policy.md', 'Projects', 'Subscriptions Get Iam Policy']
 - ['projects_subscriptions-list.md', 'Projects', 'Subscriptions List']
 - ['projects_subscriptions-modify-ack-deadline.md', 'Projects', 'Subscriptions Modify Ack Deadline']
 - ['projects_subscriptions-modify-push-config.md', 'Projects', 'Subscriptions Modify Push Config']
 - ['projects_subscriptions-pull.md', 'Projects', 'Subscriptions Pull']
+- ['projects_subscriptions-set-iam-policy.md', 'Projects', 'Subscriptions Set Iam Policy']
+- ['projects_subscriptions-test-iam-permissions.md', 'Projects', 'Subscriptions Test Iam Permissions']
 - ['projects_topics-create.md', 'Projects', 'Topics Create']
 - ['projects_topics-delete.md', 'Projects', 'Topics Delete']
 - ['projects_topics-get.md', 'Projects', 'Topics Get']
+- ['projects_topics-get-iam-policy.md', 'Projects', 'Topics Get Iam Policy']
 - ['projects_topics-list.md', 'Projects', 'Topics List']
 - ['projects_topics-publish.md', 'Projects', 'Topics Publish']
+- ['projects_topics-set-iam-policy.md', 'Projects', 'Topics Set Iam Policy']
 - ['projects_topics-subscriptions-list.md', 'Projects', 'Topics Subscriptions List']
+- ['projects_topics-test-iam-permissions.md', 'Projects', 'Topics Test Iam Permissions']
 
 theme: readthedocs
 

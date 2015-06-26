@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_reports` library allows access to all features of the *Google reports* service.
 
-This documentation was generated from *reports* crate version *0.1.8+20150115*, where *20150115* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *reports* crate version *0.1.8+20150429*, where *20150429* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 
 Everything else about the *reports* *v1_reports* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/reports/).

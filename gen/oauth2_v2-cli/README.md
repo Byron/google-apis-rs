@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *oauth2* API at revision *20150416*. The CLI is at version *0.3.0*.
+This documentation was generated from the *oauth2* API at revision *20150526*. The CLI is at version *0.3.0*.
 
 ```bash
 oauth2-v2 [options]

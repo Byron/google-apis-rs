@@ -135,6 +135,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -244,6 +245,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -335,6 +337,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -386,6 +389,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -437,6 +441,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -492,6 +497,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -589,6 +595,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -686,6 +693,96 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_dataset_aggregate(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "bucket-by-activity-segment.activity-data-source-id" => Some(("bucketByActivitySegment.activityDataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-activity-segment.min-duration-millis" => Some(("bucketByActivitySegment.minDurationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-time-millis" => Some(("endTimeMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-session.min-duration-millis" => Some(("bucketBySession.minDurationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-activity-type.activity-data-source-id" => Some(("bucketByActivityType.activityDataSourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-activity-type.min-duration-millis" => Some(("bucketByActivityType.minDurationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time-millis" => Some(("startTimeMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bucket-by-time.duration-millis" => Some(("bucketByTime.durationMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activity-data-source-id", "bucket-by-activity-segment", "bucket-by-activity-type", "bucket-by-session", "bucket-by-time", "duration-millis", "end-time-millis", "min-duration-millis", "start-time-millis"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AggregateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().dataset_aggregate(request, opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -798,6 +895,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -897,6 +995,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -936,6 +1035,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     ("data-sources-update", Some(opt)) => {
                         call_result = self._users_data_sources_update(opt, dry_run, &mut err);
+                    },
+                    ("dataset-aggregate", Some(opt)) => {
+                        call_result = self._users_dataset_aggregate(opt, dry_run, &mut err);
                     },
                     ("sessions-delete", Some(opt)) => {
                         call_result = self._users_sessions_delete(opt, dry_run, &mut err);
@@ -986,7 +1088,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -999,7 +1101,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -1034,7 +1136,7 @@ impl<'n, 'a> Engine<'n, 'a> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("users", "methods: 'data-sources-create', 'data-sources-datasets-delete', 'data-sources-datasets-get', 'data-sources-datasets-patch', 'data-sources-delete', 'data-sources-get', 'data-sources-list', 'data-sources-patch', 'data-sources-update', 'sessions-delete', 'sessions-list' and 'sessions-update'", vec![
+        ("users", "methods: 'data-sources-create', 'data-sources-datasets-delete', 'data-sources-datasets-get', 'data-sources-datasets-patch', 'data-sources-delete', 'data-sources-get', 'data-sources-list', 'data-sources-patch', 'data-sources-update', 'dataset-aggregate', 'sessions-delete', 'sessions-list' and 'sessions-update'", vec![
             ("data-sources-create",  
                     Some(r##"Creates a new data source that is unique across all data sources belonging to this user. The data stream ID field can be omitted and will be generated by the server with the correct format. The data stream ID is an ordered combination of some fields from the data source. In addition to the data source fields reflected into the data source ID, the developer project number that is authenticated when creating the data source is included. This developer project number is obfuscated when read by any other developer reading public data types."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_data-sources-create",
@@ -1315,6 +1417,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("dataset-aggregate",  
+                    None,
+                    "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_dataset-aggregate",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     None,
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sessions-delete",  
                     Some(r##"Deletes a session specified by the given session ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_sessions-delete",
@@ -1399,7 +1529,7 @@ fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150326")
+           .version("0.3.0+20150527")
            .about("Google Fit API")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")

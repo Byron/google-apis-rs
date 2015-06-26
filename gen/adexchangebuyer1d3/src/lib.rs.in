@@ -571,11 +571,18 @@ pub struct PerformanceReport {
     /// Average QPS for hosted match operations.
     #[serde(rename="hostedMatchStatusRate")]
     pub hosted_match_status_rate: Option<Vec<String>>,
-    /// The unix timestamp of the starting time of this performance data.
-    pub timestamp: Option<String>,
+    /// The number of bid requests sent to your bidder.
+    #[serde(rename="bidRequestRate")]
+    pub bid_request_rate: Option<f64>,
+    /// The number of bid responses that were unsuccessful due to timeouts, incorrect formatting, etc.
+    #[serde(rename="unsuccessfulRequestRate")]
+    pub unsuccessful_request_rate: Option<f64>,
     /// The 50th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(rename="latency50thPercentile")]
     pub latency50th_percentile: Option<f64>,
+    /// The number of properly formed bid responses received by our servers within the deadline.
+    #[serde(rename="successfulRequestRate")]
+    pub successful_request_rate: Option<f64>,
     /// The 85th percentile round trip latency(ms) as perceived from Google servers for the duration period covered by the report.
     #[serde(rename="latency85thPercentile")]
     pub latency85th_percentile: Option<f64>,
@@ -593,17 +600,28 @@ pub struct PerformanceReport {
     pub no_quota_in_region: Option<f64>,
     /// Resource type.
     pub kind: Option<String>,
+    /// The number of potential queries based on your pretargeting settings.
+    #[serde(rename="inventoryMatchRate")]
+    pub inventory_match_rate: Option<f64>,
     /// The trading location of this data.
     pub region: Option<String>,
+    /// The number of bid responses with an ad.
+    #[serde(rename="bidRate")]
+    pub bid_rate: Option<f64>,
     /// The configured quota limits for this account.
     #[serde(rename="quotaConfiguredLimit")]
     pub quota_configured_limit: Option<f64>,
     /// Rate of various quota account statuses per quota check.
     #[serde(rename="outOfQuota")]
     pub out_of_quota: Option<f64>,
+    /// The unix timestamp of the starting time of this performance data.
+    pub timestamp: Option<String>,
     /// The throttled quota limits for this account.
     #[serde(rename="quotaThrottledLimit")]
     pub quota_throttled_limit: Option<f64>,
+    /// The number of bid responses that were filtered due to a policy violation or other errors.
+    #[serde(rename="filteredBidRate")]
+    pub filtered_bid_rate: Option<f64>,
     /// Average QPS for pixel match requests from clients.
     #[serde(rename="pixelMatchRequests")]
     pub pixel_match_requests: Option<f64>,

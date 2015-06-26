@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20150323*. The CLI is at version *0.3.0*.
+This documentation was generated from the *Android Publisher* API at revision *20150316*. The CLI is at version *0.3.0*.
 
 ```bash
 androidpublisher2 [options]
@@ -67,6 +67,8 @@ androidpublisher2 [options]
                 tracks-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 tracks-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 validate <package-name> <edit-id> [-p <v>]... [-o <out>]
+        entitlements
+                list <package-name> [-p <v>]... [-o <out>]
         inappproducts
                 batch (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <package-name> <sku> [-p <v>]...

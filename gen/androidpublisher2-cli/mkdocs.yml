@@ -1,4 +1,4 @@
-site_name: Android Publisher v0.3.0+20150323
+site_name: Android Publisher v0.3.0+20150316
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: Write integrating applications with bcore
 
@@ -47,6 +47,7 @@ pages:
 - ['edits_tracks-patch.md', 'Edits', 'Tracks Patch']
 - ['edits_tracks-update.md', 'Edits', 'Tracks Update']
 - ['edits_validate.md', 'Edits', 'Validate']
+- ['entitlements_list.md', 'Entitlements', 'List']
 - ['inappproducts_batch.md', 'Inappproducts', 'Batch']
 - ['inappproducts_delete.md', 'Inappproducts', 'Delete']
 - ['inappproducts_get.md', 'Inappproducts', 'Get']

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *licensing* API at revision *20140122*. The CLI is at version *0.3.0*.
+This documentation was generated from the *licensing* API at revision *20150525*. The CLI is at version *0.3.0*.
 
 ```bash
 licensing1 [options]

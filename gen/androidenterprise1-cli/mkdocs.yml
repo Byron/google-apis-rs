@@ -1,4 +1,4 @@
-site_name: Android Enterprise v0.3.0+20150309
+site_name: Android Enterprise v0.3.0+20150303
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: Write integrating applications with bcore
 
@@ -45,6 +45,8 @@ pages:
 - ['installs_patch.md', 'Installs', 'Patch']
 - ['installs_update.md', 'Installs', 'Update']
 - ['permissions_get.md', 'Permissions', 'Get']
+- ['products_approve.md', 'Products', 'Approve']
+- ['products_generate-approval-url.md', 'Products', 'Generate Approval Url']
 - ['products_get.md', 'Products', 'Get']
 - ['products_get-app-restrictions-schema.md', 'Products', 'Get App Restrictions Schema']
 - ['products_get-permissions.md', 'Products', 'Get Permissions']

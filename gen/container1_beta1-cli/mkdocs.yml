@@ -1,4 +1,4 @@
-site_name: container v0.3.0+20150420
+site_name: container v0.3.0+20150617
 site_url: http://byron.github.io/google-apis-rs/google-container1_beta1-cli
 site_description: Write integrating applications with bcore
 
@@ -17,7 +17,6 @@ pages:
 - ['projects_zones-clusters-list.md', 'Projects', 'Zones Clusters List']
 - ['projects_zones-operations-get.md', 'Projects', 'Zones Operations Get']
 - ['projects_zones-operations-list.md', 'Projects', 'Zones Operations List']
-- ['projects_zones-tokens-get.md', 'Projects', 'Zones Tokens Get']
 
 theme: readthedocs
 

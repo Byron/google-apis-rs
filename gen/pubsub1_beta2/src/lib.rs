@@ -2,14 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pubsub* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *pubsub* crate version *0.1.8+20150427*, where *20150427* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! 
+//! Everything else about the *pubsub* *v1_beta2* API can be found at the
+//! [official documentation site](https://cloud.google.com/pubsub/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1_beta2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Pubsub.html) ... 
 //! 
 //! * projects
-//!  * [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html) and [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html)
+//!  * [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
 //! 
 //! 
 //! 

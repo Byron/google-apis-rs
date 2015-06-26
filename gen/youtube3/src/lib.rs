@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.8+20150414*, where *20150414* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *YouTube* crate version *0.1.8+20150529*, where *20150529* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -157,16 +157,17 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.videos().list("part")
-//!              .video_category_id("erat")
-//!              .region_code("amet.")
-//!              .page_token("dolores")
-//!              .on_behalf_of_content_owner("dolores")
-//!              .my_rating("et")
-//!              .max_results(59)
-//!              .locale("et")
+//!              .video_category_id("dolores")
+//!              .region_code("et")
+//!              .page_token("sed")
+//!              .on_behalf_of_content_owner("et")
+//!              .my_rating("aliquyam")
+//!              .max_results(10)
+//!              .locale("sit")
 //!              .id("aliquyam")
-//!              .hl("nonumy")
-//!              .chart("sit")
+//!              .hl("sadipscing")
+//!              .debug_project_id_override("magna")
+//!              .chart("gubergren")
 //!              .doit();
 //! 
 //! match result {

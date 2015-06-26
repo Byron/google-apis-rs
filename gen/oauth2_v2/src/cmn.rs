@@ -12,7 +12,7 @@ use oauth2::{TokenType, Retry, self};
 use hyper;
 use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
                     HeaderFormat};
-use hyper::http::LINE_ENDING;
+use hyper::http::h1::LINE_ENDING;
 use hyper::method::Method;
 use hyper::status::StatusCode;
 
@@ -504,7 +504,7 @@ impl ::std::ops::DerefMut for XUploadContentType {
 }
 impl Header for XUploadContentType {
     fn header_name() -> &'static str { "X-Upload-Content-Type" }
-    fn parse_header(raw: &[Vec<u8>]) -> Option<Self> {
+    fn parse_header(raw: &[Vec<u8>]) -> hyper::error::Result<Self> {
         hyper::header::parsing::from_one_raw_str(raw).map(XUploadContentType)
     }
 }
@@ -569,8 +569,8 @@ impl Header for ContentRange {
     }
 
     /// We are not parsable, as parsing is done by the `Range` header
-    fn parse_header(_: &[Vec<u8>]) -> Option<Self> {
-        None
+    fn parse_header(_: &[Vec<u8>]) -> hyper::error::Result<Self> {
+        Err(hyper::error::Error::Method)
     }
 }
 
@@ -595,19 +595,19 @@ impl Header for RangeResponseHeader {
         "Range"
     }
 
-    fn parse_header(raw: &[Vec<u8>]) -> Option<Self> {
+    fn parse_header(raw: &[Vec<u8>]) -> hyper::error::Result<Self> {
         if raw.len() > 0 {
             let v = &raw[0];
             if let Ok(s) = std::str::from_utf8(v) {
                 const PREFIX: &'static str = "bytes ";
                 if s.starts_with(PREFIX) {
                     if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
-                        return  Some(RangeResponseHeader(c))
+                        return  Ok(RangeResponseHeader(c))
                     }
                 }
             }
         }
-        None
+        Err(hyper::error::Error::Method)
     }
 }
 

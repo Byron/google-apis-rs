@@ -21,7 +21,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20150309*. The CLI is at version *0.3.0*.
+This documentation was generated from the *Android Enterprise* API at revision *20150303*. The CLI is at version *0.3.0*.
 
 ```bash
 androidenterprise1 [options]
@@ -71,6 +71,8 @@ androidenterprise1 [options]
         permissions
                 get <permission-id> [-p <v>]... [-o <out>]
         products
+                approve <enterprise-id> <product-id> (-r <kv>)... [-p <v>]...
+                generate-approval-url <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get-app-restrictions-schema <enterprise-id> <product-id> [-p <v>]... [-o <out>]
                 get-permissions <enterprise-id> <product-id> [-p <v>]... [-o <out>]

@@ -443,7 +443,7 @@ pub struct Object {
     pub bucket: Option<String>,
     /// Access controls on the object.
     pub acl: Option<Vec<ObjectAccessControl>>,
-    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64.
+    /// CRC32c checksum, as described in RFC 4960, Appendix B; encoded using base64 in big-endian byte order.
     pub crc32c: Option<String>,
     /// HTTP 1.1 Entity tag for the object.
     pub etag: Option<String>,
@@ -771,7 +771,7 @@ impl Resource for ObjectAccessControl {}
 impl ResponseResult for ObjectAccessControl {}
 
 
-/// A Rewrite response.
+/// A rewrite response.
 /// 
 /// # Activities
 /// 
@@ -782,19 +782,19 @@ impl ResponseResult for ObjectAccessControl {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RewriteResponse {
-    /// no description provided
+    /// The total size of the object being copied in bytes. This property is always present in the response.
     #[serde(rename="objectSize")]
     pub object_size: Option<String>,
     /// The kind of item this is.
     pub kind: Option<String>,
-    /// no description provided
+    /// A resource containing the metadata for the copied-to object. This property is present in the response only when copying completes.
     pub resource: Option<Object>,
-    /// no description provided
+    /// true if the copy is finished; otherwise, false if the copy is in progress. This property is always present in the response.
     pub done: Option<bool>,
-    /// no description provided
+    /// The total bytes written so far, which can be used to provide a waiting user with a progress indicator. This property is always present in the response.
     #[serde(rename="totalBytesRewritten")]
     pub total_bytes_rewritten: Option<String>,
-    /// no description provided
+    /// A token to use in subsequent requests to continue copying data. This token is present in the response only when there is more data to copy.
     #[serde(rename="rewriteToken")]
     pub rewrite_token: Option<String>,
 }
@@ -1530,7 +1530,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Copies an object to a specified location. Optionally overrides metadata.
+    /// Copies a source object to a destination object. Optionally overrides metadata.
     /// 
     /// # Arguments
     ///
@@ -5609,7 +5609,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._source_generation = Some(new_value.to_string());
         self
     }
-    /// Include this field (from the previous Rewrite response) on each Rewrite request after the first one, until the Rewrite response 'done' flag is true. Calls that provide a rewriteToken can omit all other request fields, but if included those fields must match the values provided in the first rewrite request.
+    /// Include this field (from the previous rewrite response) on each rewrite request after the first one, until the rewrite response 'done' flag is true. Calls that provide a rewriteToken can omit all other request fields, but if included those fields must match the values provided in the first rewrite request.
     ///
     /// Sets the *rewrite token* query property to the given value.
     pub fn rewrite_token(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
@@ -5623,7 +5623,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._projection = Some(new_value.to_string());
         self
     }
-    /// The maximum number of bytes that will be rewritten per Rewrite request. Most callers shouldn't need to specify this parameter - it is primarily in place to support testing. If specified the value must be an integral multiple of 1 MiB (1048576). Also, this only applies to requests where the source and destination span locations and/or storage classes. Finally, this value must not change across Rewrite calls else you'll get an error that the rewrite token is invalid.
+    /// The maximum number of bytes that will be rewritten per rewrite request. Most callers shouldn't need to specify this parameter - it is primarily in place to support testing. If specified the value must be an integral multiple of 1 MiB (1048576). Also, this only applies to requests where the source and destination span locations and/or storage classes. Finally, this value must not change across rewrite calls else you'll get an error that the rewriteToken is invalid.
     ///
     /// Sets the *max bytes rewritten per call* query property to the given value.
     pub fn max_bytes_rewritten_per_call(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
@@ -8247,7 +8247,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Copies an object to a specified location. Optionally overrides metadata.
+/// Copies a source object to a destination object. Optionally overrides metadata.
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.

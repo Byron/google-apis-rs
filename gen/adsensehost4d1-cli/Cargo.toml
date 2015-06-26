@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adsensehost4d1-cli"
-version = "0.3.0+20150307"
+version = "0.3.0+20150617"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense Host (protocol v4.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsensehost4d1-cli"
@@ -17,8 +17,8 @@ keywords = ["adsensehost", "google", "cli"]
 name = "adsensehost4d1"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"

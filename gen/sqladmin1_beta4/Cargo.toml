@@ -4,11 +4,11 @@
 [package]
 
 name = "google-sqladmin1_beta4"
-version = "0.1.8+20150305"
+version = "0.1.8+20150330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4"
-homepage = "https://developers.google.com/cloud-sql/docs/admin-api/"
+homepage = "https://cloud.google.com/sql/docs/reference/latest"
 documentation = "http://byron.github.io/google-apis-rs/google_sqladmin1_beta4"
 license = "MIT"
 keywords = ["sqladmin", "google", "protocol", "web", "api"]
@@ -16,8 +16,8 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 url = "*"

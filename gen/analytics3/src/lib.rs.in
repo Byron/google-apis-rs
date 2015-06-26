@@ -857,9 +857,15 @@ impl ResponseResult for Accounts {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterAdvancedDetails {
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="fieldBIndex")]
+    pub field_b_index: Option<i32>,
     /// Field A.
     #[serde(rename="fieldA")]
     pub field_a: Option<String>,
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="outputToFieldIndex")]
+    pub output_to_field_index: Option<i32>,
     /// Indicates if the existing value of the output field, if any, should be overridden by the output expression.
     #[serde(rename="overrideOutputField")]
     pub override_output_field: Option<bool>,
@@ -875,6 +881,9 @@ pub struct FilterAdvancedDetails {
     /// Indicates if the filter expressions are case sensitive.
     #[serde(rename="caseSensitive")]
     pub case_sensitive: Option<bool>,
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="fieldAIndex")]
+    pub field_a_index: Option<i32>,
     /// Field B.
     #[serde(rename="fieldB")]
     pub field_b: Option<String>,
@@ -1530,6 +1539,9 @@ pub struct FilterSearchAndReplaceDetails {
     /// Determines if the filter is case sensitive.
     #[serde(rename="caseSensitive")]
     pub case_sensitive: Option<bool>,
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="fieldIndex")]
+    pub field_index: Option<i32>,
     /// Term to search.
     #[serde(rename="searchString")]
     pub search_string: Option<String>,
@@ -1757,9 +1769,6 @@ pub struct FilterExpression {
     pub case_sensitive: Option<bool>,
     /// Kind value for filter expression
     pub kind: Option<String>,
-    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
-    #[serde(rename="matchType")]
-    pub match_type: Option<String>,
     /// Filter expression value
     #[serde(rename="expressionValue")]
     pub expression_value: Option<String>,
@@ -1847,8 +1856,16 @@ pub struct FilterExpression {
     /// - Social  
     /// - SOCIAL_NETWORK, 
     /// - SOCIAL_ACTION, 
-    /// - SOCIAL_ACTION_TARGET,
+    /// - SOCIAL_ACTION_TARGET,   
+    /// - Custom dimension  
+    /// - CUSTOM_DIMENSION (See accompanying field index),
     pub field: Option<String>,
+    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
+    #[serde(rename="matchType")]
+    pub match_type: Option<String>,
+    /// The Index of the custom dimension. Set only if the field is a is CUSTOM_DIMENSION.
+    #[serde(rename="fieldIndex")]
+    pub field_index: Option<i32>,
 }
 
 impl Part for FilterExpression {}
@@ -2156,6 +2173,9 @@ impl ResponseResult for Uploads {}
 pub struct FilterLowercaseDetails {
     /// Field to use in the filter.
     pub field: Option<String>,
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="fieldIndex")]
+    pub field_index: Option<i32>,
 }
 
 impl NestedType for FilterLowercaseDetails {}
@@ -2434,6 +2454,9 @@ impl Part for AccountChildLink {}
 pub struct FilterUppercaseDetails {
     /// Field to use in the filter.
     pub field: Option<String>,
+    /// The Index of the custom dimension. Required if field is a CUSTOM_DIMENSION.
+    #[serde(rename="fieldIndex")]
+    pub field_index: Option<i32>,
 }
 
 impl NestedType for FilterUppercaseDetails {}

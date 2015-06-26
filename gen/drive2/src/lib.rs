@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *drive* crate version *0.1.8+20150305*, where *20150305* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -155,18 +155,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
-//!              .use_content_as_indexable_text(true)
+//!              .use_content_as_indexable_text(false)
 //!              .update_viewed_date(false)
-//!              .timed_text_track_name("sea")
-//!              .timed_text_language("consetetur")
-//!              .set_modified_date(false)
-//!              .remove_parents("accusam")
+//!              .timed_text_track_name("accusam")
+//!              .timed_text_language("dolores")
+//!              .set_modified_date(true)
+//!              .remove_parents("dolor")
 //!              .pinned(false)
-//!              .ocr_language("consetetur")
-//!              .ocr(false)
-//!              .new_revision(false)
+//!              .ocr_language("elitr")
+//!              .ocr(true)
+//!              .new_revision(true)
 //!              .convert(false)
-//!              .add_parents("ea")
+//!              .add_parents("sed")
 //!              .doit();
 //! 
 //! match result {

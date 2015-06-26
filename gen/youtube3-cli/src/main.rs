@@ -204,6 +204,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -280,6 +281,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -292,6 +294,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
@@ -311,7 +316,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "debug-project-id-override"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -350,6 +355,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "tfmt" => {
                     call = call.tfmt(value.unwrap_or(""));
                 },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
@@ -372,7 +380,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["tfmt", "on-behalf-of", "tlang", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["tfmt", "on-behalf-of-content-owner", "on-behalf-of", "tlang", "debug-project-id-override"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -399,6 +407,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     if !download_mode {
                     } else {
                     io::copy(&mut response, &mut ostream).unwrap();
+                    ostream.flush().unwrap();
                     }
                     Ok(())
                 }
@@ -463,6 +472,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "sync" => {
                     call = call.sync(arg_from_str(value.unwrap_or("false"), err, "sync", "boolean"));
                 },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
@@ -482,7 +494,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -513,6 +525,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -525,6 +538,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
@@ -547,7 +563,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of", "id", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "debug-project-id-override", "on-behalf-of", "id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -574,6 +590,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -637,6 +654,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "sync" => {
                     call = call.sync(arg_from_str(value.unwrap_or("false"), err, "sync", "boolean"));
                 },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
@@ -656,7 +676,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -687,6 +707,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -781,6 +802,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -934,6 +956,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1001,6 +1024,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1103,6 +1127,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1185,6 +1210,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1368,6 +1394,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1482,6 +1509,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1505,6 +1533,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
+                },
+                "order" => {
+                    call = call.order(value.unwrap_or(""));
                 },
                 "moderation-status" => {
                     call = call.moderation_status(value.unwrap_or(""));
@@ -1534,7 +1565,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["all-threads-related-to-channel-id", "channel-id", "video-id", "max-results", "page-token", "search-terms", "text-format", "id", "moderation-status"].iter().map(|v|*v));
+                                                                           v.extend(["max-results", "all-threads-related-to-channel-id", "channel-id", "video-id", "moderation-status", "id", "page-token", "search-terms", "text-format", "order"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1561,6 +1592,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1671,6 +1703,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1817,6 +1850,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1884,6 +1918,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2078,6 +2113,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2139,6 +2175,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2194,6 +2231,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2249,6 +2287,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2310,6 +2349,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2377,6 +2417,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2460,13 +2501,15 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.is-default-broadcast" => Some(("status.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2481,6 +2524,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-default-broadcast" => Some(("snippet.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2499,7 +2543,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2559,6 +2603,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2632,6 +2677,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2690,6 +2736,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2722,13 +2769,15 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "status.recording-status" => Some(("status.recordingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.privacy-status" => Some(("status.privacyStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.life-cycle-status" => Some(("status.lifeCycleStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.is-default-broadcast" => Some(("status.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.live-broadcast-priority" => Some(("status.liveBroadcastPriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "statistics.concurrent-viewers" => Some(("statistics.concurrentViewers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.total-chat-count" => Some(("statistics.totalChatCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "content-details.enable-low-latency" => Some(("contentDetails.enableLowLatency", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.bound-stream-id" => Some(("contentDetails.boundStreamId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.enable-embed" => Some(("contentDetails.enableEmbed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-closed-captions" => Some(("contentDetails.enableClosedCaptions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "content-details.start-with-slate" => Some(("contentDetails.startWithSlate", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-content-encryption" => Some(("contentDetails.enableContentEncryption", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.record-from-start" => Some(("contentDetails.recordFromStart", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.enable-dvr" => Some(("contentDetails.enableDvr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2743,6 +2792,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-default-broadcast" => Some(("snippet.isDefaultBroadcast", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.url" => Some(("snippet.thumbnails.default.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.width" => Some(("snippet.thumbnails.default.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "snippet.thumbnails.default.height" => Some(("snippet.thumbnails.default.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2761,7 +2811,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "status", "thumbnails", "title", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2821,6 +2871,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2901,8 +2952,9 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
-                    "status.is-default-stream" => Some(("status.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.status" => Some(("status.healthStatus.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.last-update-time-s" => Some(("status.healthStatus.lastUpdateTimeS", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2911,6 +2963,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2918,7 +2971,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-s", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2978,6 +3031,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3048,6 +3102,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3077,8 +3132,9 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
-                    "status.is-default-stream" => Some(("status.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.status" => Some(("status.healthStatus.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.last-update-time-s" => Some(("status.healthStatus.lastUpdateTimeS", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3087,6 +3143,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "cdn.ingestion-info.stream-name" => Some(("cdn.ingestionInfo.streamName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.ingestion-info.ingestion-address" => Some(("cdn.ingestionInfo.ingestionAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cdn.format" => Some(("cdn.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.is-default-stream" => Some(("snippet.isDefaultStream", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3094,7 +3151,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-s", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3154,6 +3211,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3319,6 +3377,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3389,6 +3448,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3506,6 +3566,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3674,6 +3735,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3750,6 +3812,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3867,6 +3930,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4009,6 +4073,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4184,6 +4249,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4266,6 +4332,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4325,6 +4392,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4380,6 +4448,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4441,6 +4510,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4544,6 +4614,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4688,6 +4759,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "file-details.file-size" => Some(("fileDetails.fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.default-audio-language" => Some(("snippet.defaultAudioLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.live-broadcast-content" => Some(("snippet.liveBroadcastContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4732,7 +4804,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4805,6 +4877,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4844,6 +4917,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
+                "debug-project-id-override" => {
+                    call = call.debug_project_id_override(value.unwrap_or(""));
+                },
                 "chart" => {
                     call = call.chart(value.unwrap_or(""));
                 },
@@ -4860,7 +4936,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "hl", "my-rating", "id"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "debug-project-id-override", "hl", "my-rating", "id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4887,6 +4963,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4899,9 +4976,6 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "on-behalf-of-content-owner" => {
-                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4915,7 +4989,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5164,6 +5237,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "file-details.file-size" => Some(("fileDetails.fileSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.description" => Some(("snippet.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.tags" => Some(("snippet.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "snippet.default-audio-language" => Some(("snippet.defaultAudioLanguage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.live-broadcast-content" => Some(("snippet.liveBroadcastContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5208,7 +5282,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5265,6 +5339,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5815,7 +5890,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -5828,7 +5903,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -5895,9 +5970,9 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more activity resource properties that the API response will include.
         
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
+        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in an activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
                      Some(false)),
         
@@ -6169,7 +6244,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, statistics, topicDetails, and invideoPromotion.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more channel resource properties that the API response will include.
         
         If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set part=contentDetails, the API response will also contain all of those nested properties."##),
                      Some(true),
@@ -6188,7 +6263,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",  
-                    Some(r##"Updates a channel's metadata."##),
+                    Some(r##"Updates a channel's metadata. Note that this method currently only supports updates to the channel resource's brandingSettings and invideoPromotion objects and their child properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/channels_update",
                   vec![
                     (Some(r##"kv"##),
@@ -6213,7 +6288,7 @@ fn main() {
         
         ("comment-threads", "methods: 'insert', 'list' and 'update'", vec![
             ("insert",  
-                    Some(r##"Creates a new comment thread and top level comment."##),
+                    Some(r##"Creates a new top-level comment. To add a reply to an existing comment, use the comments.insert method instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -6240,7 +6315,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the commentThread resource parts that the API response will include. Supported values are id, snippet and replies."##),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more commentThread resource properties that the API response will include."##),
                      Some(true),
                      Some(false)),
         
@@ -6257,7 +6332,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",  
-                    Some(r##"Modifies an existing comment."##),
+                    Some(r##"Modifies the top-level comment in a comment thread."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comment-threads_update",
                   vec![
                     (Some(r##"kv"##),
@@ -6287,7 +6362,7 @@ fn main() {
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies the comment ID for the resource that should be deleted."##),
+                     Some(r##"The id parameter specifies the comment ID for the resource that is being deleted."##),
                      Some(true),
                      Some(false)),
         
@@ -6298,9 +6373,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("insert",  
-                    Some(r##"Creates a new comment.
-        
-        Note: to create a top level comment it is also necessary to create a comment thread. Both are accomplished through the commentThreads resource."##),
+                    Some(r##"Creates a reply to an existing comment. Note: To create a top-level comment, use the commentThreads.insert method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -6327,7 +6400,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the comment resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more comment resource properties that the API response will include."##),
                      Some(true),
                      Some(false)),
         
@@ -6344,12 +6417,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("mark-as-spam",  
-                    Some(r##"Expresses the caller's opinion that a comment is spam."##),
+                    Some(r##"Expresses the caller's opinion that one or more comments should be flagged as spam."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_mark-as-spam",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments which should get flagged as spam."##),
+                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments that the caller believes should be classified as spam."##),
                      Some(true),
                      Some(false)),
         
@@ -6360,18 +6433,18 @@ fn main() {
                      Some(true)),
                   ]),
             ("set-moderation-status",  
-                    Some(r##"Sets the moderation status of one or more comments."##),
+                    Some(r##"Sets the moderation status of one or more comments. The API request must be authorized by the owner of the channel or video associated with the comments."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_set-moderation-status",
                   vec![
                     (Some(r##"id"##),
                      None,
-                     Some(r##"The id parameter specifies a comma-separated list of IDs of comments whose moderation status should be updated."##),
+                     Some(r##"The id parameter specifies a comma-separated list of IDs that identify the comments for which you are updating the moderation status."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"moderation-status"##),
                      None,
-                     Some(r##"Determines the new moderation status of the specified comments."##),
+                     Some(r##"Identifies the new moderation status of the specified comments."##),
                      Some(true),
                      Some(false)),
         
@@ -6382,7 +6455,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("update",  
-                    Some(r##"Modifies an existing comment."##),
+                    Some(r##"Modifies a comment."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/comments_update",
                   vec![
                     (Some(r##"kv"##),
@@ -6412,9 +6485,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more guideCategory resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a guideCategory resource, the snippet property contains other properties, such as the category's title. If you set part=snippet, the API response will also contain all of those nested properties."##),
+                     Some(r##"The part parameter specifies the guideCategory resource properties that the API response will include. Set the parameter value to snippet."##),
                      Some(true),
                      Some(false)),
         
@@ -6434,12 +6505,12 @@ fn main() {
         
         ("i18n-languages", "methods: 'list'", vec![
             ("list",  
-                    Some(r##"Returns a list of supported languages."##),
+                    Some(r##"Returns a list of application languages that the YouTube website supports."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-languages_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more i18nLanguage resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
+                     Some(r##"The part parameter specifies the i18nLanguage resource properties that the API response will include. Set the parameter value to snippet."##),
                      Some(true),
                      Some(false)),
         
@@ -6459,12 +6530,12 @@ fn main() {
         
         ("i18n-regions", "methods: 'list'", vec![
             ("list",  
-                    Some(r##"Returns a list of supported regions."##),
+                    Some(r##"Returns a list of content regions that the YouTube website supports."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/i18n-regions_list",
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more i18nRegion resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet."##),
+                     Some(r##"The part parameter specifies the i18nRegion resource properties that the API response will include. Set the parameter value to snippet."##),
                      Some(true),
                      Some(false)),
         
@@ -6484,7 +6555,7 @@ fn main() {
         
         ("live-broadcasts", "methods: 'bind', 'control', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
             ("bind",  
-                    Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream."##),
+                    Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream, though a video stream may be bound to more than one broadcast."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind",
                   vec![
                     (Some(r##"id"##),
@@ -6787,7 +6858,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include.
         
         If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
@@ -6874,7 +6945,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, status, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include.
         
         If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
@@ -6923,9 +6994,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. The part names that you can include in the parameter value are id and snippet.
-        
-        If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a search result, the snippet property contains other properties that identify the result's title, description, and so forth. If you set part=snippet, the API response will also contain all of those nested properties."##),
+                     Some(r##"The part parameter specifies a comma-separated list of one or more search resource properties that the API response will include. Set the parameter value to snippet."##),
                      Some(true),
                      Some(false)),
         
@@ -6988,7 +7057,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include.
         
         If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set part=snippet, the API response will also contain all of those nested properties."##),
                      Some(true),
@@ -7071,7 +7140,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet."##),
+                     Some(r##"The part parameter specifies the videoCategory resource properties that the API response will include. Set the parameter value to snippet."##),
                      Some(true),
                      Some(false)),
         
@@ -7162,7 +7231,7 @@ fn main() {
                   vec![
                     (Some(r##"part"##),
                      None,
-                     Some(r##"The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, fileDetails, liveStreamingDetails, localizations, player, processingDetails, recordingDetails, statistics, status, suggestions, and topicDetails.
+                     Some(r##"The part parameter specifies a comma-separated list of one or more video resource properties that the API response will include.
         
         If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set part=snippet, the API response will contain all of those properties."##),
                      Some(true),
@@ -7249,7 +7318,7 @@ fn main() {
                   vec![
                     (Some(r##"channel-id"##),
                      None,
-                     Some(r##"The channelId parameter specifies a YouTube channel ID for which the watermark is being provided."##),
+                     Some(r##"The channelId parameter specifies the YouTube channel ID for which the watermark is being provided."##),
                      Some(true),
                      Some(false)),
         
@@ -7272,12 +7341,12 @@ fn main() {
                      Some(true)),
                   ]),
             ("unset",  
-                    Some(r##"Deletes a watermark."##),
+                    Some(r##"Deletes a channel's watermark image."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/watermarks_unset",
                   vec![
                     (Some(r##"channel-id"##),
                      None,
-                     Some(r##"The channelId parameter specifies a YouTube channel ID for which the watermark is being unset."##),
+                     Some(r##"The channelId parameter specifies the YouTube channel ID for which the watermark is being unset."##),
                      Some(true),
                      Some(false)),
         
@@ -7293,7 +7362,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150414")
+           .version("0.3.0+20150529")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")

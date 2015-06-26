@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20150326*. The CLI is at version *0.3.0*.
+This documentation was generated from the *bigquery* API at revision *20150526*. The CLI is at version *0.3.0*.
 
 ```bash
 bigquery2 [options]
@@ -36,6 +36,7 @@ bigquery2 [options]
                 patch <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
         jobs
+                cancel <project-id> <job-id> [-p <v>]... [-o <out>]
                 get <project-id> <job-id> [-p <v>]... [-o <out>]
                 get-query-results <project-id> <job-id> [-p <v>]... [-o <out>]
                 insert <project-id> (-r <kv>)... (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]

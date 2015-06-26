@@ -4,7 +4,7 @@
 [package]
 
 name = "google-calendar3"
-version = "0.1.8+20150326"
+version = "0.1.8+20150408"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3"
@@ -16,8 +16,8 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 url = "*"

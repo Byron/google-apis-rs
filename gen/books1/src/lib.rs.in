@@ -318,6 +318,9 @@ pub struct VolumeVolumeInfo {
     /// no description provided
     #[serde(rename="maturityRating")]
     pub maturity_rating: Option<String>,
+    /// URL to view information about this volume on the Google Books site. (In LITE projection)
+    #[serde(rename="infoLink")]
+    pub info_link: Option<String>,
     /// Date of publication. (In LITE projection.)
     #[serde(rename="publishedDate")]
     pub published_date: Option<String>,
@@ -344,9 +347,9 @@ pub struct VolumeVolumeInfo {
     /// The mean review rating for this volume. (min = 1.0, max = 5.0)
     #[serde(rename="averageRating")]
     pub average_rating: Option<f64>,
-    /// URL to view information about this volume on the Google Books site. (In LITE projection)
-    #[serde(rename="infoLink")]
-    pub info_link: Option<String>,
+    /// Whether anonymous logging should be allowed.
+    #[serde(rename="allowAnonLogging")]
+    pub allow_anon_logging: Option<bool>,
     /// Canonical URL for a volume. (In LITE projection.)
     #[serde(rename="canonicalVolumeLink")]
     pub canonical_volume_link: Option<String>,
@@ -2163,6 +2166,7 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
             hub: self.hub,
             _volume_id: volume_id.to_string(),
             _source: Default::default(),
+            _max_allowed_maturity_rating: Default::default(),
             _locale: Default::default(),
             _association: Default::default(),
             _delegate: Default::default(),
@@ -2200,6 +2204,7 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
         VolumeRecommendedListCall {
             hub: self.hub,
             _source: Default::default(),
+            _max_allowed_maturity_rating: Default::default(),
             _locale: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2527,6 +2532,7 @@ impl<'a, C, A> OnboardingMethods<'a, C, A> {
             hub: self.hub,
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _max_allowed_maturity_rating: Default::default(),
             _locale: Default::default(),
             _category_id: Default::default(),
             _delegate: Default::default(),
@@ -6278,8 +6284,9 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().associated_list("volumeId")
 ///              .source("ea")
-///              .locale("gubergren")
-///              .association("aliquyam")
+///              .max_allowed_maturity_rating("gubergren")
+///              .locale("aliquyam")
+///              .association("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -6289,6 +6296,7 @@ pub struct VolumeAssociatedListCall<'a, C, A>
     hub: &'a Books<C, A>,
     _volume_id: String,
     _source: Option<String>,
+    _max_allowed_maturity_rating: Option<String>,
     _locale: Option<String>,
     _association: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -6312,10 +6320,13 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "books.volumes.associated.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._max_allowed_maturity_rating {
+            params.push(("maxAllowedMaturityRating", value.to_string()));
         }
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));
@@ -6323,7 +6334,7 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         if let Some(value) = self._association {
             params.push(("association", value.to_string()));
         }
-        for &field in ["alt", "volumeId", "source", "locale", "association"].iter() {
+        for &field in ["alt", "volumeId", "source", "maxAllowedMaturityRating", "locale", "association"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6456,6 +6467,13 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._source = Some(new_value.to_string());
         self
     }
+    /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
+    ///
+    /// Sets the *max allowed maturity rating* query property to the given value.
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeAssociatedListCall<'a, C, A> {
+        self._max_allowed_maturity_rating = Some(new_value.to_string());
+        self
+    }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
     /// Sets the *locale* query property to the given value.
@@ -6549,11 +6567,11 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().get("volumeId")
-///              .user_library_consistent_read(true)
-///              .source("sea")
-///              .projection("labore")
-///              .partner("ipsum")
-///              .country("aliquyam")
+///              .user_library_consistent_read(false)
+///              .source("labore")
+///              .projection("ipsum")
+///              .partner("aliquyam")
+///              .country("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -6844,8 +6862,9 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().recommended_list()
-///              .source("dolores")
-///              .locale("sit")
+///              .source("sit")
+///              .max_allowed_maturity_rating("diam")
+///              .locale("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -6854,6 +6873,7 @@ pub struct VolumeRecommendedListCall<'a, C, A>
 
     hub: &'a Books<C, A>,
     _source: Option<String>,
+    _max_allowed_maturity_rating: Option<String>,
     _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -6876,14 +6896,17 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "books.volumes.recommended.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._max_allowed_maturity_rating {
+            params.push(("maxAllowedMaturityRating", value.to_string()));
         }
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));
         }
-        for &field in ["alt", "source", "locale"].iter() {
+        for &field in ["alt", "source", "maxAllowedMaturityRating", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6983,6 +7006,13 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Sets the *source* query property to the given value.
     pub fn source(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
+        self
+    }
+    /// The maximum allowed maturity rating of returned recommendations. Books with a higher maturity rating are filtered out.
+    ///
+    /// Sets the *max allowed maturity rating* query property to the given value.
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> VolumeRecommendedListCall<'a, C, A> {
+        self._max_allowed_maturity_rating = Some(new_value.to_string());
         self
     }
     /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
@@ -7286,10 +7316,10 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().volumes_list("userId", "shelf")
-///              .start_index(95)
-///              .source("amet")
-///              .show_preorders(true)
-///              .max_results(88)
+///              .start_index(78)
+///              .source("clita")
+///              .show_preorders(false)
+///              .max_results(30)
 ///              .doit();
 /// # }
 /// ```
@@ -7582,7 +7612,7 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().list("userId")
-///              .source("justo")
+///              .source("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -7830,7 +7860,7 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().get("userId", "shelf")
-///              .source("invidunt")
+///              .source("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -8090,14 +8120,14 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().accept()
-///              .volume_id("ut")
-///              .serial("dolores")
-///              .product("eos")
-///              .offer_id("voluptua.")
-///              .model("duo")
-///              .manufacturer("sed")
-///              .device("aliquyam")
-///              .android_id("ea")
+///              .volume_id("eos")
+///              .serial("voluptua.")
+///              .product("duo")
+///              .offer_id("sed")
+///              .model("aliquyam")
+///              .manufacturer("ea")
+///              .device("ea")
+///              .android_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -8377,13 +8407,13 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().dismiss()
-///              .serial("ea")
-///              .product("et")
-///              .offer_id("dolor")
-///              .model("diam")
-///              .manufacturer("kasd")
-///              .device("invidunt")
-///              .android_id("rebum.")
+///              .serial("dolor")
+///              .product("diam")
+///              .offer_id("kasd")
+///              .model("invidunt")
+///              .manufacturer("rebum.")
+///              .device("Lorem")
+///              .android_id("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -8653,12 +8683,12 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().get()
-///              .serial("Lorem")
-///              .product("clita")
-///              .model("invidunt")
-///              .manufacturer("eirmod")
-///              .device("At")
-///              .android_id("consetetur")
+///              .serial("invidunt")
+///              .product("eirmod")
+///              .model("At")
+///              .manufacturer("consetetur")
+///              .device("et")
+///              .android_id("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -8928,7 +8958,7 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_categories()
-///              .locale("et")
+///              .locale("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -9143,10 +9173,11 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_category_volumes()
-///              .page_token("sed")
-///              .page_size(54)
-///              .locale("takimata")
-///              .add_category_id("elitr")
+///              .page_token("takimata")
+///              .page_size(58)
+///              .max_allowed_maturity_rating("nonumy")
+///              .locale("rebum.")
+///              .add_category_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -9156,6 +9187,7 @@ pub struct OnboardingListCategoryVolumeCall<'a, C, A>
     hub: &'a Books<C, A>,
     _page_token: Option<String>,
     _page_size: Option<u32>,
+    _max_allowed_maturity_rating: Option<String>,
     _locale: Option<String>,
     _category_id: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -9179,12 +9211,15 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "books.onboarding.listCategoryVolumes", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._max_allowed_maturity_rating {
+            params.push(("maxAllowedMaturityRating", value.to_string()));
         }
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));
@@ -9196,7 +9231,7 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
             }
             params.push(("categoryId", s));
         }
-        for &field in ["alt", "pageToken", "pageSize", "locale", "categoryId"].iter() {
+        for &field in ["alt", "pageToken", "pageSize", "maxAllowedMaturityRating", "locale", "categoryId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9305,6 +9340,13 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
         self._page_size = Some(new_value);
         self
     }
+    /// The maximum allowed maturity rating of returned volumes. Books with a higher maturity rating are filtered out.
+    ///
+    /// Sets the *max allowed maturity rating* query property to the given value.
+    pub fn max_allowed_maturity_rating(mut self, new_value: &str) -> OnboardingListCategoryVolumeCall<'a, C, A> {
+        self._max_allowed_maturity_rating = Some(new_value.to_string());
+        self
+    }
     /// ISO-639-1 language and ISO-3166-1 country code. Default is en-US if unset.
     ///
     /// Sets the *locale* query property to the given value.
@@ -9399,8 +9441,8 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().request_access("source", "volumeId", "nonce", "cpksver")
-///              .locale("diam")
-///              .license_types("ut")
+///              .locale("amet.")
+///              .license_types("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -9674,7 +9716,7 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().release_download_access("volumeIds", "cpksver")
-///              .source("ipsum")
+///              .source("sea")
 ///              .locale("ut")
 ///              .doit();
 /// # }
@@ -9932,10 +9974,10 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().sync_volume_licenses("source", "nonce", "cpksver")
-///              .add_volume_ids("eirmod")
+///              .add_volume_ids("dolor")
 ///              .show_preorders(true)
-///              .locale("voluptua.")
-///              .add_features("dolor")
+///              .locale("et")
+///              .add_features("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -10666,7 +10708,7 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_clear_volumes("shelf")
-///              .source("et")
+///              .source("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -10902,8 +10944,8 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -30)
-///              .source("et")
+/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -20)
+///              .source("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -11164,13 +11206,13 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_volumes_list("shelf")
-///              .start_index(81)
-///              .source("dolore")
+///              .start_index(2)
+///              .source("takimata")
 ///              .show_preorders(true)
-///              .q("dolor")
-///              .projection("takimata")
-///              .max_results(80)
-///              .country("nonumy")
+///              .q("nonumy")
+///              .projection("et")
+///              .max_results(72)
+///              .country("no")
 ///              .doit();
 /// # }
 /// ```
@@ -11718,7 +11760,7 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_delete("annotationId")
-///              .source("invidunt")
+///              .source("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -11955,7 +11997,7 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_add_volume("shelf", "volumeId")
-///              .source("aliquyam")
+///              .source("sea")
 ///              .reason("elitr")
 ///              .doit();
 /// # }
@@ -12222,9 +12264,9 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_insert(req)
-///              .source("consetetur")
+///              .source("At")
 ///              .show_only_summary_in_response(true)
-///              .country("elitr")
+///              .country("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -12486,8 +12528,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("consetetur")
-///              .reason("diam")
+///              .source("dolores")
+///              .reason("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -12747,16 +12789,16 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("accusam")
-///              .updated_min("dolores")
-///              .updated_max("consetetur")
-///              .source("dolor")
-///              .show_deleted(false)
-///              .page_token("elitr")
-///              .max_results(85)
-///              .add_layer_ids("et")
-///              .layer_id("Stet")
-///              .content_version("sed")
+///              .volume_id("dolor")
+///              .updated_min("aliquyam")
+///              .updated_max("elitr")
+///              .source("ea")
+///              .show_deleted(true)
+///              .page_token("Stet")
+///              .max_results(58)
+///              .add_layer_ids("dolor")
+///              .layer_id("sanctus")
+///              .content_version("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -13081,7 +13123,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("sanctus")
+///              .source("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -13354,10 +13396,10 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "timestamp", "position")
-///              .source("consetetur")
-///              .device_cookie("eirmod")
-///              .content_version("labore")
-///              .action("gubergren")
+///              .source("gubergren")
+///              .device_cookie("et")
+///              .content_version("sadipscing")
+///              .action("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -13651,7 +13693,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("sadipscing")
+///              .source("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -13899,7 +13941,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("accusam")
+///              .source("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -14114,8 +14156,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("Lorem")
-///              .content_version("rebum.")
+///              .source("clita")
+///              .content_version("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -14374,10 +14416,10 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cloudloading().add_book()
-///              .upload_client_token("et")
-///              .name("clita")
-///              .mime_type("eos")
-///              .drive_document_id("dolores")
+///              .upload_client_token("dolores")
+///              .name("vero")
+///              .mime_type("consetetur")
+///              .drive_document_id("vero")
 ///              .doit();
 /// # }
 /// ```

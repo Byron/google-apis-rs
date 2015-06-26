@@ -1,4 +1,4 @@
-site_name: gmail v0.3.0+20150303
+site_name: gmail v0.3.0+20150526
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: Write integrating applications with bcore
 
@@ -33,12 +33,14 @@ pages:
 - ['users_messages-send.md', 'Users', 'Messages Send']
 - ['users_messages-trash.md', 'Users', 'Messages Trash']
 - ['users_messages-untrash.md', 'Users', 'Messages Untrash']
+- ['users_stop.md', 'Users', 'Stop']
 - ['users_threads-delete.md', 'Users', 'Threads Delete']
 - ['users_threads-get.md', 'Users', 'Threads Get']
 - ['users_threads-list.md', 'Users', 'Threads List']
 - ['users_threads-modify.md', 'Users', 'Threads Modify']
 - ['users_threads-trash.md', 'Users', 'Threads Trash']
 - ['users_threads-untrash.md', 'Users', 'Threads Untrash']
+- ['users_watch.md', 'Users', 'Watch']
 
 theme: readthedocs
 

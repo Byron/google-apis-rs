@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *SQL Admin* API can be found at the
-[official documentation site](https://developers.google.com/cloud-sql/docs/admin-api/).
+[official documentation site](https://cloud.google.com/sql/docs/reference/latest).
 
 # Downloads
 
@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20150305*. The CLI is at version *0.3.0*.
+This documentation was generated from the *SQL Admin* API at revision *20150330*. The CLI is at version *0.3.0*.
 
 ```bash
 sqladmin1-beta4 [options]

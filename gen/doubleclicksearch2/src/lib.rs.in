@@ -196,12 +196,9 @@ pub struct Conversion {
     /// DS ad group ID.
     #[serde(rename="adGroupId")]
     pub ad_group_id: Option<String>,
-    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
-    #[serde(rename="segmentationId")]
-    pub segmentation_id: Option<String>,
-    /// Attribution model name. This field is ignored.
-    #[serde(rename="attributionModel")]
-    pub attribution_model: Option<String>,
+    /// ID that DoubleClick Search generates for each conversion.
+    #[serde(rename="dsConversionId")]
+    pub ds_conversion_id: Option<String>,
     /// DS campaign ID.
     #[serde(rename="campaignId")]
     pub campaign_id: Option<String>,
@@ -211,59 +208,87 @@ pub struct Conversion {
     /// DS advertiser ID.
     #[serde(rename="advertiserId")]
     pub advertiser_id: Option<String>,
-    /// The quantity of this conversion, in millis.
-    #[serde(rename="quantityMillis")]
-    pub quantity_millis: Option<String>,
-    /// The number of conversions, formatted in millis (conversions multiplied by 1000). This field is ignored.
+    /// This field is ignored.
     #[serde(rename="countMillis")]
     pub count_millis: Option<String>,
-    /// DS criterion (keyword) ID.
-    #[serde(rename="criterionId")]
-    pub criterion_id: Option<String>,
     /// The time at which the conversion took place, in epoch millis UTC.
     #[serde(rename="conversionTimestamp")]
     pub conversion_timestamp: Option<String>,
-    /// The advertiser-provided order id for the conversion.
+    /// DS click ID for the conversion.
+    #[serde(rename="clickId")]
+    pub click_id: Option<String>,
+    /// This field is ignored.
+    #[serde(rename="attributionModel")]
+    pub attribution_model: Option<String>,
+    /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.
+    #[serde(rename="currencyCode")]
+    pub currency_code: Option<String>,
+    /// The country registered for the Merchant Center feed that contains the product. Use an ISO 3166 code to specify a country.
+    #[serde(rename="productCountry")]
+    pub product_country: Option<i64>,
+    /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
+    pub state: Option<String>,
+    /// The type of device on which the conversion occurred.
+    #[serde(rename="deviceType")]
+    pub device_type: Option<String>,
+    /// DS ad ID.
+    #[serde(rename="adId")]
+    pub ad_id: Option<String>,
+    /// For offline conversions, this is an ID provided by advertisers. Advertisers can use this property to specify an ID that is meaningful to them. If an advertiser doesn't specify a conversionId, DoubleClick Search generates one. For online conversions, DS copies the dsConversionId or floodlightOrderId into this property depending on the advertiser's Floodlight instructions.
+    #[serde(rename="conversionId")]
+    pub conversion_id: Option<String>,
+    /// The time at which the conversion was last modified, in epoch millis UTC.
+    #[serde(rename="conversionModifiedTimestamp")]
+    pub conversion_modified_timestamp: Option<String>,
+    /// Sales channel for the product. Acceptable values are:  
+    /// - "local": a physical store 
+    /// - "online": an online store
+    pub channel: Option<String>,
+    /// The product ID (SKU).
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The numeric segmentation identifier (for example, DoubleClick Search Floodlight activity ID).
+    #[serde(rename="segmentationId")]
+    pub segmentation_id: Option<String>,
+    /// DS agency ID.
+    #[serde(rename="agencyId")]
+    pub agency_id: Option<String>,
+    /// The ID of the local store for which the product was advertised. Applicable only when the channel is "local".
+    #[serde(rename="storeId")]
+    pub store_id: Option<String>,
+    /// The quantity of this conversion, in millis.
+    #[serde(rename="quantityMillis")]
+    pub quantity_millis: Option<String>,
+    /// DS criterion (keyword) ID.
+    #[serde(rename="criterionId")]
+    pub criterion_id: Option<String>,
+    /// The Floodlight order ID provided by the advertiser for the conversion.
     #[serde(rename="floodlightOrderId")]
     pub floodlight_order_id: Option<String>,
     /// The segmentation type of this conversion (for example, FLOODLIGHT).
     #[serde(rename="segmentationType")]
     pub segmentation_type: Option<String>,
-    /// DS click ID for the conversion.
-    #[serde(rename="clickId")]
-    pub click_id: Option<String>,
     /// Custom metrics for the conversion.
     #[serde(rename="customMetric")]
     pub custom_metric: Option<Vec<CustomMetric>>,
-    /// DS conversion ID.
-    #[serde(rename="dsConversionId")]
-    pub ds_conversion_id: Option<String>,
-    /// DS engine account ID.
-    #[serde(rename="engineAccountId")]
-    pub engine_account_id: Option<String>,
-    /// The time at which the conversion was last modified, in epoch millis UTC.
-    #[serde(rename="conversionModifiedTimestamp")]
-    pub conversion_modified_timestamp: Option<String>,
-    /// The currency code for the conversion's revenue. Should be in ISO 4217 alphabetic (3-char) format.
-    #[serde(rename="currencyCode")]
-    pub currency_code: Option<String>,
-    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
-    #[serde(rename="segmentationName")]
-    pub segmentation_name: Option<String>,
-    /// The state of the conversion, that is, either ACTIVE or REMOVED. Note: state DELETED is deprecated.
-    pub state: Option<String>,
-    /// DS ad ID.
-    #[serde(rename="adId")]
-    pub ad_id: Option<String>,
-    /// DS agency ID.
-    #[serde(rename="agencyId")]
-    pub agency_id: Option<String>,
-    /// Advertiser-provided ID for the conversion, also known as the order ID.
-    #[serde(rename="conversionId")]
-    pub conversion_id: Option<String>,
+    /// DS product group ID.
+    #[serde(rename="productGroupId")]
+    pub product_group_id: Option<String>,
     /// The type of the conversion, that is, either ACTION or TRANSACTION. An ACTION conversion is an action by the user that has no monetarily quantifiable value, while a TRANSACTION conversion is an action that does have a monetarily quantifiable value. Examples are email list signups (ACTION) versus ecommerce purchases (TRANSACTION).
     #[serde(rename="type")]
     pub type_: Option<String>,
+    /// The friendly segmentation identifier (for example, DoubleClick Search Floodlight activity name).
+    #[serde(rename="segmentationName")]
+    pub segmentation_name: Option<String>,
+    /// ID that DS generates and uses to uniquely identify the inventory account that contains the product.
+    #[serde(rename="inventoryAccountId")]
+    pub inventory_account_id: Option<String>,
+    /// DS engine account ID.
+    #[serde(rename="engineAccountId")]
+    pub engine_account_id: Option<String>,
+    /// The language registered for the Merchant Center feed that contains the product. Use an ISO 639 code to specify a language.
+    #[serde(rename="productLanguage")]
+    pub product_language: Option<String>,
 }
 
 impl Part for Conversion {}

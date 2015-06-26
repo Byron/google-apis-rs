@@ -67,6 +67,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "message.internal-date" => Some(("message.internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.attachment-id" => Some(("message.payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -82,7 +83,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "message.id" => Some(("message.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -139,6 +140,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -238,6 +240,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -296,6 +299,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -325,6 +329,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "message.internal-date" => Some(("message.internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.attachment-id" => Some(("message.payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -340,7 +345,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "message.id" => Some(("message.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -397,6 +402,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -426,6 +432,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "message.internal-date" => Some(("message.internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.history-id" => Some(("message.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.data" => Some(("message.payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.payload.body.attachment-id" => Some(("message.payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -441,7 +448,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "message.id" => Some(("message.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "message", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -498,6 +505,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -549,6 +557,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -613,6 +622,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -705,6 +715,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -800,6 +811,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -851,6 +863,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -943,6 +956,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1035,6 +1049,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1086,6 +1101,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1188,6 +1204,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1217,6 +1234,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "internal-date" => Some(("internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.attachment-id" => Some(("payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1231,7 +1249,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "label-ids" => Some(("labelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1301,6 +1319,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1330,6 +1349,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "internal-date" => Some(("internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.attachment-id" => Some(("payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1344,7 +1364,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "label-ids" => Some(("labelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1408,6 +1428,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1475,6 +1496,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1560,6 +1582,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1589,6 +1612,7 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "internal-date" => Some(("internalDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "history-id" => Some(("historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.data" => Some(("payload.body.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "payload.body.attachment-id" => Some(("payload.body.attachmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1603,7 +1627,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "label-ids" => Some(("labelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment-id", "body", "data", "filename", "history-id", "id", "internal-date", "label-ids", "mime-type", "part-id", "payload", "raw", "size", "size-estimate", "snippet", "thread-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1660,6 +1684,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1711,6 +1736,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1762,6 +1788,51 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_stop(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().stop(opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
                     Ok(())
                 }
             }
@@ -1864,6 +1935,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1931,6 +2003,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2016,6 +2089,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2067,6 +2141,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2118,6 +2193,94 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_watch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "label-ids" => Some(("labelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "topic-name" => Some(("topicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "label-filter-action" => Some(("labelFilterAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["label-filter-action", "label-ids", "topic-name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WatchRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().watch(request, opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2203,6 +2366,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     ("messages-untrash", Some(opt)) => {
                         call_result = self._users_messages_untrash(opt, dry_run, &mut err);
                     },
+                    ("stop", Some(opt)) => {
+                        call_result = self._users_stop(opt, dry_run, &mut err);
+                    },
                     ("threads-delete", Some(opt)) => {
                         call_result = self._users_threads_delete(opt, dry_run, &mut err);
                     },
@@ -2220,6 +2386,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     ("threads-untrash", Some(opt)) => {
                         call_result = self._users_threads_untrash(opt, dry_run, &mut err);
+                    },
+                    ("watch", Some(opt)) => {
+                        call_result = self._users_watch(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("users".to_string()));
@@ -2261,7 +2430,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -2274,7 +2443,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -2310,7 +2479,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash' and 'threads-untrash'", vec![
+        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
             ("drafts-create",  
                     Some(r##"Creates a new draft with the DRAFT label."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_drafts-create",
@@ -3001,6 +3170,22 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("stop",  
+                    Some(r##"Stop receiving push notifications for the given user mailbox."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_stop",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
             ("threads-delete",  
                     Some(r##"Immediately and permanently deletes the specified thread. This operation cannot be undone. Prefer threads.trash instead."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_threads-delete",
@@ -3163,13 +3348,41 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("watch",  
+                    Some(r##"Set up or update a push notification watch on the given user mailbox."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_watch",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The user's email address. The special value me can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150303")
+           .version("0.3.0+20150526")
            .about("The Gmail REST API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")

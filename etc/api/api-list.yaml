@@ -43,6 +43,8 @@ api:
     - v2
     cloudmonitoring:
     - v2beta2
+    cloudresourcemanager:
+    - v1beta1
     cloudsearch:
     - v1
     compute:
@@ -60,7 +62,7 @@ api:
     datastore:
     - v1beta2
     deploymentmanager:
-    - v2beta1
+    - v2beta2
     dfareporting:
     - v2.1
     discovery:
@@ -88,8 +90,6 @@ api:
     - v1management
     gan:
     - v1beta1
-    genomics:
-    - v1beta2
     gmail:
     - v1
     groupsmigration:

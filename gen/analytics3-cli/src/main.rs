@@ -114,6 +114,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -184,6 +185,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -248,6 +250,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -306,6 +309,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -458,6 +462,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -516,6 +521,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -624,6 +630,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -682,6 +689,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -740,6 +748,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -791,6 +800,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -887,6 +897,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -945,6 +956,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1045,6 +1057,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1145,6 +1158,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1196,6 +1210,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1295,6 +1310,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1353,6 +1369,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1456,6 +1473,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1559,6 +1577,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1654,6 +1673,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1765,6 +1785,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1823,6 +1844,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -1934,6 +1956,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2045,6 +2068,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2096,6 +2120,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2147,6 +2172,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2180,32 +2206,40 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2213,7 +2247,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2266,6 +2300,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2324,6 +2359,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2357,32 +2393,40 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2390,7 +2434,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2443,6 +2487,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2476,32 +2521,40 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uppercase-details.field" => Some(("uppercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uppercase-details.field-index" => Some(("uppercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.field-b-index" => Some(("advancedDetails.fieldBIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.extract-b" => Some(("advancedDetails.extractB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-details.output-to-field-index" => Some(("advancedDetails.outputToFieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.override-output-field" => Some(("advancedDetails.overrideOutputField", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.field-a-required" => Some(("advancedDetails.fieldARequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.output-constructor" => Some(("advancedDetails.outputConstructor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-b-required" => Some(("advancedDetails.fieldBRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-details.case-sensitive" => Some(("advancedDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-details.field-a-index" => Some(("advancedDetails.fieldAIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-details.field-b" => Some(("advancedDetails.fieldB", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.field-a" => Some(("advancedDetails.fieldA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.extract-a" => Some(("advancedDetails.extractA", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advanced-details.output-to-field" => Some(("advancedDetails.outputToField", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "lowercase-details.field" => Some(("lowercaseDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lowercase-details.field-index" => Some(("lowercaseDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.case-sensitive" => Some(("searchAndReplaceDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "search-and-replace-details.field-index" => Some(("searchAndReplaceDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "search-and-replace-details.search-string" => Some(("searchAndReplaceDetails.searchString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.replace-string" => Some(("searchAndReplaceDetails.replaceString", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "search-and-replace-details.field" => Some(("searchAndReplaceDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "exclude-details.kind" => Some(("excludeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.expression-value" => Some(("excludeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "exclude-details.field" => Some(("excludeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.case-sensitive" => Some(("excludeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "exclude-details.field-index" => Some(("excludeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "exclude-details.match-type" => Some(("excludeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.kind" => Some(("includeDetails.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.expression-value" => Some(("includeDetails.expressionValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "include-details.field" => Some(("includeDetails.field", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-details.case-sensitive" => Some(("includeDetails.caseSensitive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "include-details.field-index" => Some(("includeDetails.fieldIndex", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "include-details.match-type" => Some(("includeDetails.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2509,7 +2562,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-required", "field-b", "field-b-required", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "advanced-details", "case-sensitive", "created", "exclude-details", "expression-value", "extract-a", "extract-b", "field", "field-a", "field-a-index", "field-a-required", "field-b", "field-b-index", "field-b-required", "field-index", "href", "id", "include-details", "kind", "lowercase-details", "match-type", "name", "output-constructor", "output-to-field", "output-to-field-index", "override-output-field", "parent-link", "replace-string", "search-and-replace-details", "search-string", "self-link", "type", "updated", "uppercase-details"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2562,6 +2615,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2613,6 +2667,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2720,6 +2775,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2778,6 +2834,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2885,6 +2942,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -2992,6 +3050,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3087,6 +3146,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3186,6 +3246,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3244,6 +3305,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3343,6 +3405,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3442,6 +3505,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3594,6 +3658,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3652,6 +3717,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3760,6 +3826,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3855,6 +3922,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -3964,6 +4032,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4022,6 +4091,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4131,6 +4201,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4240,6 +4311,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4298,6 +4370,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4349,6 +4422,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4452,6 +4526,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4510,6 +4585,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4638,6 +4714,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4696,6 +4773,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4751,6 +4829,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4846,6 +4925,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4940,6 +5020,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -4998,6 +5079,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5092,6 +5174,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5186,6 +5269,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5237,6 +5321,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5338,6 +5423,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5396,6 +5482,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5497,6 +5584,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5598,6 +5686,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5750,6 +5839,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5808,6 +5898,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5916,6 +6007,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -5967,6 +6059,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -6106,6 +6199,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     let mut value = json::value::to_value(&output_schema);
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
                     Ok(())
                 }
             }
@@ -6417,7 +6511,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let auth = Authenticator::new(  &secret, DefaultAuthenticatorDelegate,
                                         if opt.is_present("debug-auth") {
                                             hyper::Client::with_connector(mock::TeeConnector {
-                                                    connector: hyper::net::HttpConnector(None) 
+                                                    connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                                                 })
                                         } else {
                                             hyper::Client::new()
@@ -6430,7 +6524,7 @@ impl<'n, 'a> Engine<'n, 'a> {
         let client = 
             if opt.is_present("debug") {
                 hyper::Client::with_connector(mock::TeeConnector {
-                        connector: hyper::net::HttpConnector(None) 
+                        connector: hyper::net::HttpsConnector::<hyper::net::Openssl>::default()
                     })
             } else {
                 hyper::Client::new()
@@ -9128,7 +9222,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150305")
+           .version("0.3.0+20150417")
            .about("View and manage your Google Analytics data")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

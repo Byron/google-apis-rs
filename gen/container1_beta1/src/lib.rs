@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *container* crate version *0.1.8+20150420*, where *20150420* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *container* crate version *0.1.8+20150617*, where *20150617* is the exact revision of the *container:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *container* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-engine/docs/v1beta1/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Container.html) ... 
 //! 
 //! * projects
-//!  * [*clusters list*](struct.ProjectClusterListCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html), [*zones operations list*](struct.ProjectZoneOperationListCall.html) and [*zones tokens get*](struct.ProjectZoneTokenGetCall.html)
+//!  * [*clusters list*](struct.ProjectClusterListCall.html), [*operations list*](struct.ProjectOperationListCall.html), [*zones clusters create*](struct.ProjectZoneClusterCreateCall.html), [*zones clusters delete*](struct.ProjectZoneClusterDeleteCall.html), [*zones clusters get*](struct.ProjectZoneClusterGetCall.html), [*zones clusters list*](struct.ProjectZoneClusterListCall.html), [*zones operations get*](struct.ProjectZoneOperationGetCall.html) and [*zones operations list*](struct.ProjectZoneOperationListCall.html)
 //! 
 //! 
 //! 

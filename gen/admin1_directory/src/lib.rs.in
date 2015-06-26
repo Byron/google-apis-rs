@@ -825,6 +825,9 @@ pub struct User {
     /// Boolean indicating if the user is delegated admin (Read-only)
     #[serde(rename="isDelegatedAdmin")]
     pub is_delegated_admin: Option<bool>,
+    /// ETag of the user's photo (Read-only)
+    #[serde(rename="thumbnailPhotoEtag")]
+    pub thumbnail_photo_etag: Option<String>,
     /// Indicates if user is suspended
     pub suspended: Option<bool>,
     /// Unique identifier of User (Read-only)

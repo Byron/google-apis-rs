@@ -1,0 +1,22 @@
+site_name: cloudresourcemanager v0.3.0+20150603
+site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1_beta1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_create.md', 'Projects', 'Create']
+- ['projects_delete.md', 'Projects', 'Delete']
+- ['projects_get.md', 'Projects', 'Get']
+- ['projects_list.md', 'Projects', 'List']
+- ['projects_undelete.md', 'Projects', 'Undelete']
+- ['projects_update.md', 'Projects', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

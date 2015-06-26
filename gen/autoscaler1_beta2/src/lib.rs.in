@@ -211,7 +211,7 @@ impl Part for OperationWarningsData {}
 pub struct Zone {
     /// no description provided
     pub status: Option<String>,
-    /// Type of the resource.
+    /// [Output Only] Type of the resource. Always kind#zone for zones.
     pub kind: Option<String>,
     /// no description provided
     pub description: Option<String>,
@@ -227,7 +227,7 @@ pub struct Zone {
     pub creation_timestamp: Option<String>,
     /// no description provided
     pub id: Option<String>,
-    /// Server defined URL for the resource (output only).
+    /// [Output Only] Server defined URL for the resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// no description provided
@@ -271,7 +271,7 @@ pub struct OperationList {
     pub next_page_token: Option<String>,
     /// no description provided
     pub items: Option<Vec<Operation>>,
-    /// Type of resource. Always compute#operations for Operations resource.
+    /// [Output Only] Type of resource. Always compute#operations for Operations resource.
     pub kind: Option<String>,
     /// no description provided
     pub id: Option<String>,
@@ -477,7 +477,7 @@ pub struct Operation {
     pub creation_timestamp: Option<String>,
     /// no description provided
     pub id: Option<String>,
-    /// [Output Only] Type of the resource. Always kind#operation for Operation resources.
+    /// [Output Only] Type of the resource. Always compute#Operation for Operation resources.
     pub kind: Option<String>,
     /// no description provided
     pub name: Option<String>,

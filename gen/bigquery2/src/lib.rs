@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *bigquery* crate version *0.1.8+20150526*, where *20150526* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -14,7 +14,7 @@
 //! * [datasets](struct.Dataset.html)
 //!  * [*delete*](struct.DatasetDeleteCall.html), [*get*](struct.DatasetGetCall.html), [*insert*](struct.DatasetInsertCall.html), [*list*](struct.DatasetListCall.html), [*patch*](struct.DatasetPatchCall.html) and [*update*](struct.DatasetUpdateCall.html)
 //! * [jobs](struct.Job.html)
-//!  * [*get*](struct.JobGetCall.html), [*get query results*](struct.JobGetQueryResultCall.html), [*insert*](struct.JobInsertCall.html), [*list*](struct.JobListCall.html) and [*query*](struct.JobQueryCall.html)
+//!  * [*cancel*](struct.JobCancelCall.html), [*get*](struct.JobGetCall.html), [*get query results*](struct.JobGetQueryResultCall.html), [*insert*](struct.JobInsertCall.html), [*list*](struct.JobListCall.html) and [*query*](struct.JobQueryCall.html)
 //! * projects
 //!  * [*list*](struct.ProjectListCall.html)
 //! * tabledata

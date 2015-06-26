@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/hE1oPYTxWhviFb0v73gueyAW5mA\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/zdpw3TZ9gd3rzuoO0gRqQ93MGhU\"",
  "discoveryVersion": "v1",
  "id": "deploymentmanager:v2beta1",
  "name": "deploymentmanager",
  "version": "v2beta1",
- "revision": "20150415",
+ "revision": "20150616",
  "title": "Google Cloud Deployment Manager API V2",
  "description": "The Deployment Manager API allows users to declaratively configure, deploy and run complex solutions on the Google Cloud Platform.",
  "ownerDomain": "google.com",

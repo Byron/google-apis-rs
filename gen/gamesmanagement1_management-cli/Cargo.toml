@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesmanagement1_management-cli"
-version = "0.3.0+20150413"
+version = "0.3.0+20150601"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Management (protocol v1management)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gamesmanagement1_management-cli"
@@ -17,8 +17,8 @@ keywords = ["gamesManagement", "google", "cli"]
 name = "gamesmanagement1-management"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.0"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"

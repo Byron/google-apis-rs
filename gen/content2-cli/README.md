@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20150421*. The CLI is at version *0.3.0*.
+This documentation was generated from the *Shopping Content* API at revision *20150528*. The CLI is at version *0.3.0*.
 
 ```bash
 content2 [options]

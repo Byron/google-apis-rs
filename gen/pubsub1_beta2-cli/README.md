@@ -10,6 +10,9 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *pubsub* API can be found at the
+[official documentation site](https://cloud.google.com/pubsub/docs).
+
 # Downloads
 
 You can download the pre-compiled 64bit binaries for the following platforms:
@@ -21,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *pubsub* API at revision *20150326*. The CLI is at version *0.3.0*.
+This documentation was generated from the *pubsub* API at revision *20150427*. The CLI is at version *0.3.0*.
 
 ```bash
 pubsub1-beta2 [options]
@@ -30,16 +33,22 @@ pubsub1-beta2 [options]
                 subscriptions-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-delete <subscription> [-p <v>]... [-o <out>]
                 subscriptions-get <subscription> [-p <v>]... [-o <out>]
+                subscriptions-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 subscriptions-list <project> [-p <v>]... [-o <out>]
                 subscriptions-modify-ack-deadline <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-modify-push-config <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-pull <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-delete <topic> [-p <v>]... [-o <out>]
                 topics-get <topic> [-p <v>]... [-o <out>]
+                topics-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 topics-list <project> [-p <v>]... [-o <out>]
                 topics-publish <topic> (-r <kv>)... [-p <v>]... [-o <out>]
+                topics-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-subscriptions-list <topic> [-p <v>]... [-o <out>]
+                topics-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   pubsub1-beta2 --help
 
 Configuration:
