@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudresourcemanager1_beta1-cli"
-version = "0.3.0+20150603"
+version = "0.3.1+20150603"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudresourcemanager (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli"

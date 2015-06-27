@@ -4661,7 +4661,7 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150303")
+           .version("0.3.1+20150303")
            .about("Allows MDMs/EMMs and enterprises to manage the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

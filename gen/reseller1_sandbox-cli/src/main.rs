@@ -1638,7 +1638,7 @@ fn main() {
     
     let mut app = App::new("reseller1-sandbox")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150603")
+           .version("0.3.1+20150603")
            .about("Lets you create and manage your customers and their subscriptions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli")
            .arg(Arg::with_name("url")

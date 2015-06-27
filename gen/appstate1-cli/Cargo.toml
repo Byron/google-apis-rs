@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appstate1-cli"
-version = "0.3.0+20150527"
+version = "0.3.1+20150527"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with App State (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appstate1-cli"

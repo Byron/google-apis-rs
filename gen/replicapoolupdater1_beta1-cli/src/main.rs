@@ -1025,7 +1025,7 @@ fn main() {
     
     let mut app = App::new("replicapoolupdater1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150326")
+           .version("0.3.1+20150326")
            .about("The Google Compute Engine Instance Group Updater API provides services for updating groups of Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1_cli")
            .arg(Arg::with_name("url")

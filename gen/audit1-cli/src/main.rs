@@ -254,7 +254,7 @@ fn main() {
     
     let mut app = App::new("audit1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150419")
+           .version("0.3.1+20150419")
            .about("Lets you access user activities in your enterprise made through various applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_audit1_cli")
            .arg(Arg::with_name("folder")

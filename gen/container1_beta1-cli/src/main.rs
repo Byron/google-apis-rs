@@ -887,7 +887,7 @@ fn main() {
     
     let mut app = App::new("container1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150617")
+           .version("0.3.1+20150617")
            .about("The Google Container Engine API is used for building and managing container based applications, powered by the open source Kubernetes technology.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_container1_beta1_cli")
            .arg(Arg::with_name("url")

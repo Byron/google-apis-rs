@@ -1107,7 +1107,7 @@ fn main() {
     
     let mut app = App::new("webmasters3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20140908")
+           .version("0.3.1+20140908")
            .about("Lets you view Google Webmaster Tools data for your verified sites.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webmasters3_cli")
            .arg(Arg::with_name("url")

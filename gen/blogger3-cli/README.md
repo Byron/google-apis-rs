@@ -17,14 +17,14 @@ Everything else about the *blogger* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.0/ubuntu/blogger3.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.0/osx/blogger3.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.1/ubuntu/blogger3.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.1/osx/blogger3.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3-cli).
 
 # Usage
 
-This documentation was generated from the *blogger* API at revision *20150422*. The CLI is at version *0.3.0*.
+This documentation was generated from the *blogger* API at revision *20150422*. The CLI is at version *0.3.1*.
 
 ```bash
 blogger3 [options]

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-customsearch1-cli"
-version = "0.3.0+20131205"
+version = "0.3.1+20131205"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with customsearch (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/customsearch1-cli"

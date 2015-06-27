@@ -1488,7 +1488,7 @@ fn main() {
     
     let mut app = App::new("replicapool1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150311")
+           .version("0.3.1+20150311")
            .about("The Google Compute Engine Instance Group Manager API provides groups of homogenous Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli")
            .arg(Arg::with_name("url")

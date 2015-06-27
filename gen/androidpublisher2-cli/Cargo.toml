@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidpublisher2-cli"
-version = "0.3.0+20150316"
+version = "0.3.1+20150316"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Publisher (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher2-cli"

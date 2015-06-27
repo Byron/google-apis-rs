@@ -218,7 +218,7 @@ fn main() {
     
     let mut app = App::new("webfonts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20140210")
+           .version("0.3.1+20140210")
            .about("The Google Fonts Developer API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webfonts1_cli")
            .arg(Arg::with_name("folder")

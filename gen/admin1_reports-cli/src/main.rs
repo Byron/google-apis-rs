@@ -734,7 +734,7 @@ fn main() {
     
     let mut app = App::new("admin1-reports")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150429")
+           .version("0.3.1+20150429")
            .about("Allows the administrators of Google Apps customers to fetch reports about the usage, collaboration, security and risk for their users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_reports_cli")
            .arg(Arg::with_name("url")

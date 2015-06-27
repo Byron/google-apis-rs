@@ -314,7 +314,7 @@ fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20131205")
+           .version("0.3.1+20131205")
            .about("Lets you search over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")

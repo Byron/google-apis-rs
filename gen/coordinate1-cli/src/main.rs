@@ -1566,7 +1566,7 @@ fn main() {
     
     let mut app = App::new("coordinate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20141215")
+           .version("0.3.1+20141215")
            .about("Lets you view and manage jobs in a Coordinate team.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_coordinate1_cli")
            .arg(Arg::with_name("url")

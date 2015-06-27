@@ -1655,7 +1655,7 @@ fn main() {
     
     let mut app = App::new("logging1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150326")
+           .version("0.3.1+20150326")
            .about("Google Cloud Logging API lets you create logs, ingest log entries, and manage log sinks.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging1_beta3_cli")
            .arg(Arg::with_name("url")

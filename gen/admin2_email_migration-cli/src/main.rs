@@ -267,7 +267,7 @@ fn main() {
     
     let mut app = App::new("admin2-email-migration")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150303")
+           .version("0.3.1+20150303")
            .about("Email Migration API lets you migrate emails of users to Google backends.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin2_email_migration_cli")
            .arg(Arg::with_name("url")

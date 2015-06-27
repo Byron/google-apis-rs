@@ -1477,7 +1477,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.0+20150616")
+           .version("0.3.1+20150616")
            .about("The Deployment Manager API allows users to declaratively configure, deploy and run complex solutions on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_beta2_cli")
            .arg(Arg::with_name("url")
