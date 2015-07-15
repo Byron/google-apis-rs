@@ -28,4 +28,4 @@ cargo:
   dependencies:
     - strsim = "*"
     - yup-hyper-mock = ">=1.0.0"
-    - clap = ">= 0.9.1"
+    - clap = ">= 1.0.3"
