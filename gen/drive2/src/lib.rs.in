@@ -3875,7 +3875,8 @@ impl<'a, C, A> FileInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
+                    let url = upload_url.as_ref().and_then(|s| hyper::Url::parse(s).ok()).unwrap();
+                    let mut response = hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream));
                     match response {
                         Ok(ref mut res) => {
                             res.status = hyper::status::StatusCode::Ok;
