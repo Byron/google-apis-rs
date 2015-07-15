@@ -17,13 +17,13 @@ keywords = ["licensing", "google", "cli"]
 name = "licensing1"
 
 [dependencies]
-hyper = ">= 0.6.0"
+hyper = ">= 0.6.4"
 mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
 yup-hyper-mock = ">=1.0.0"
-clap = ">= 0.9.1"
+clap = ">= 1.0.3"
 
 [build-dependencies]
 syntex = { version = "*" }

@@ -4479,10 +4479,10 @@ fn main() {
                    .takes_value(false));
            
            for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
-               let mut mcmd = SubCommand::new(main_command_name).about(about);
+               let mut mcmd = SubCommand::with_name(main_command_name).about(about);
            
                for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
-                   let mut scmd = SubCommand::new(sub_command_name);
+                   let mut scmd = SubCommand::with_name(sub_command_name);
                    if let &Some(desc) = desc {
                        scmd = scmd.about(desc);
                    }

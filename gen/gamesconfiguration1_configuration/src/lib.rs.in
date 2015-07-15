@@ -965,15 +965,12 @@ impl<'a, C, A> ImageConfigurationUploadCall<'a, C, A> where C: BorrowMut<hyper::
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let mut response = hyper::client::Response::new(Box::new(cmn::DummyNetworkStream));
-                    match response {
-                        Ok(ref mut res) => {
-                            res.status = hyper::status::StatusCode::Ok;
-                            res.headers.set(Location(upload_url.as_ref().unwrap().clone()))
-                        }
-                        _ => unreachable!(),
-                    }
-                    response
+                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
+                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
+                        res.status = hyper::status::StatusCode::Ok;
+                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
+                        Ok(res)
+                    })
                 } else {
                     let mut client = &mut *self.hub.client.borrow_mut();
                     let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
