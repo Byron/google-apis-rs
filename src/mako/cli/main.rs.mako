@@ -52,7 +52,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }
