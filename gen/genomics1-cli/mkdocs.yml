@@ -1,4 +1,4 @@
-site_name: genomics v0.3.0+20150615
+site_name: genomics v0.3.1+20150716
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: Write integrating applications with bcore
 
@@ -9,6 +9,47 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['callsets_create.md', 'Callsets', 'Create']
+- ['callsets_delete.md', 'Callsets', 'Delete']
+- ['callsets_get.md', 'Callsets', 'Get']
+- ['callsets_patch.md', 'Callsets', 'Patch']
+- ['callsets_search.md', 'Callsets', 'Search']
+- ['datasets_create.md', 'Datasets', 'Create']
+- ['datasets_delete.md', 'Datasets', 'Delete']
+- ['datasets_get.md', 'Datasets', 'Get']
+- ['datasets_list.md', 'Datasets', 'List']
+- ['datasets_patch.md', 'Datasets', 'Patch']
+- ['datasets_undelete.md', 'Datasets', 'Undelete']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['readgroupsets_coveragebuckets-list.md', 'Readgroupsets', 'Coveragebuckets List']
+- ['readgroupsets_delete.md', 'Readgroupsets', 'Delete']
+- ['readgroupsets_export.md', 'Readgroupsets', 'Export']
+- ['readgroupsets_get.md', 'Readgroupsets', 'Get']
+- ['readgroupsets_import.md', 'Readgroupsets', 'Import']
+- ['readgroupsets_patch.md', 'Readgroupsets', 'Patch']
+- ['readgroupsets_search.md', 'Readgroupsets', 'Search']
+- ['reads_search.md', 'Reads', 'Search']
+- ['references_bases-list.md', 'References', 'Bases List']
+- ['references_get.md', 'References', 'Get']
+- ['references_search.md', 'References', 'Search']
+- ['referencesets_get.md', 'Referencesets', 'Get']
+- ['referencesets_search.md', 'Referencesets', 'Search']
+- ['variants_create.md', 'Variants', 'Create']
+- ['variants_delete.md', 'Variants', 'Delete']
+- ['variants_get.md', 'Variants', 'Get']
+- ['variants_import.md', 'Variants', 'Import']
+- ['variants_merge.md', 'Variants', 'Merge']
+- ['variants_patch.md', 'Variants', 'Patch']
+- ['variants_search.md', 'Variants', 'Search']
+- ['variantsets_create.md', 'Variantsets', 'Create']
+- ['variantsets_delete.md', 'Variantsets', 'Delete']
+- ['variantsets_export.md', 'Variantsets', 'Export']
+- ['variantsets_get.md', 'Variantsets', 'Get']
+- ['variantsets_patch.md', 'Variantsets', 'Patch']
+- ['variantsets_search.md', 'Variantsets', 'Search']
 
 theme: readthedocs
 

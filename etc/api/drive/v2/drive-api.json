@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/KEeW0PsH1Koyy8hFKaOTlOvpjfI\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/q8uch3ImrfylJzc7hmtPqukUei0\"",
  "discoveryVersion": "v1",
  "id": "drive:v2",
  "name": "drive",
  "version": "v2",
- "revision": "20150305",
+ "revision": "20150709",
  "title": "Drive API",
  "description": "The API to interact with Drive.",
  "ownerDomain": "google.com",
@@ -891,6 +891,10 @@
      "type": "boolean",
      "description": "Whether this file is in the Application Data folder."
     },
+    "canComment": {
+     "type": "boolean",
+     "description": "Whether the current user can comment on the file."
+    },
     "copyable": {
      "type": "boolean",
      "description": "Whether the file can be copied by the current user."
@@ -909,8 +913,7 @@
      "description": "A short description of the file."
     },
     "downloadUrl": {
-     "type": "string",
-     "description": "Short lived download URL for the file. This is only populated for files with content stored in Drive."
+     "type": "string"
     },
     "editable": {
      "type": "boolean",
@@ -926,7 +929,7 @@
     },
     "explicitlyTrashed": {
      "type": "boolean",
-     "description": "Whether this file has been explicitly trashed, as opposed to recursively trashed. This will only be populated if the file is trashed."
+     "description": "Whether this file has been explicitly trashed, as opposed to recursively trashed."
     },
     "exportLinks": {
      "type": "object",
@@ -1166,6 +1169,10 @@
      "type": "string",
      "description": "The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive."
     },
+    "ownedByMe": {
+     "type": "boolean",
+     "description": "Whether the file is owned by the current user."
+    },
     "ownerNames": {
      "type": "array",
      "description": "Name(s) of the owner(s) of this file.",
@@ -1209,6 +1216,10 @@
     "selfLink": {
      "type": "string",
      "description": "A link back to this file."
+    },
+    "shareable": {
+     "type": "boolean",
+     "description": "Whether the file's sharing settings can be modified by the current user."
     },
     "shared": {
      "type": "boolean",
@@ -2713,6 +2724,27 @@
        "required": true,
        "location": "path"
       },
+      "modifiedDateBehavior": {
+       "type": "string",
+       "description": "How the modifiedDate field should be updated. This overrides setModifiedDate.",
+       "enum": [
+        "fromBody",
+        "fromBodyIfNeeded",
+        "fromBodyOrNow",
+        "noChange",
+        "now",
+        "nowIfNeeded"
+       ],
+       "enumDescriptions": [
+        "Set modifiedDate to the value provided in the body of the request. No change if no value was provided.",
+        "Set modifiedDate to the value provided in the body of the request depending on other contents of the update.",
+        "Set modifiedDate to the value provided in the body of the request, or to the current time if no value was provided.",
+        "Maintain the previous value of modifiedDate.",
+        "Set modifiedDate to the current time.",
+        "Set modifiedDate to the current time depending on contents of the update."
+       ],
+       "location": "query"
+      },
       "newRevision": {
        "type": "boolean",
        "description": "Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous unpinned revisions are preserved for a short period of time. Pinned revisions are stored indefinitely, using additional storage quota, up to a maximum of 200 revisions.",
@@ -2889,6 +2921,27 @@
        "description": "The ID of the file to update.",
        "required": true,
        "location": "path"
+      },
+      "modifiedDateBehavior": {
+       "type": "string",
+       "description": "How the modifiedDate field should be updated. This overrides setModifiedDate.",
+       "enum": [
+        "fromBody",
+        "fromBodyIfNeeded",
+        "fromBodyOrNow",
+        "noChange",
+        "now",
+        "nowIfNeeded"
+       ],
+       "enumDescriptions": [
+        "Set modifiedDate to the value provided in the body of the request. No change if no value was provided.",
+        "Set modifiedDate to the value provided in the body of the request depending on other contents of the update.",
+        "Set modifiedDate to the value provided in the body of the request, or to the current time if no value was provided.",
+        "Maintain the previous value of modifiedDate.",
+        "Set modifiedDate to the current time.",
+        "Set modifiedDate to the current time depending on contents of the update."
+       ],
+       "location": "query"
       },
       "newRevision": {
        "type": "boolean",

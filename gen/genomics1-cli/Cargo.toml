@@ -4,7 +4,7 @@
 [package]
 
 name = "google-genomics1-cli"
-version = "0.3.0+20150615"
+version = "0.3.1+20150716"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with genomics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli"
@@ -16,13 +16,13 @@ keywords = ["genomics", "google", "cli"]
 name = "genomics1"
 
 [dependencies]
-hyper = ">= 0.5.2"
-mime = "0.0.11"
+hyper = ">= 0.6.4"
+mime = "0.0.12"
 serde = ">= 0.4.1"
 yup-oauth2 = "*"
 strsim = "*"
 yup-hyper-mock = ">=1.0.0"
-clap = ">= 0.9.1"
+clap = ">= 1.0.3"
 
 [build-dependencies]
 syntex = { version = "*" }

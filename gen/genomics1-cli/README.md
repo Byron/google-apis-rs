@@ -14,20 +14,74 @@ If data-structures are requested, these will be returned as pretty-printed JSON,
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.0/ubuntu/genomics1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.0/osx/genomics1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.1/ubuntu/genomics1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.1/osx/genomics1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1-cli).
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20150615*. The CLI is at version *0.3.0*.
+This documentation was generated from the *genomics* API at revision *20150716*. The CLI is at version *0.3.1*.
 
 ```bash
 genomics1 [options]
+        callsets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <call-set-id> [-p <v>]... [-o <out>]
+                get <call-set-id> [-p <v>]... [-o <out>]
+                patch <call-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        datasets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <dataset-id> [-p <v>]... [-o <out>]
+                get <dataset-id> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
+                patch <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                undelete <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        operations
+                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list <name> [-p <v>]... [-o <out>]
+        readgroupsets
+                coveragebuckets-list <read-group-set-id> [-p <v>]... [-o <out>]
+                delete <read-group-set-id> [-p <v>]... [-o <out>]
+                export <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <read-group-set-id> [-p <v>]... [-o <out>]
+                import (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <read-group-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        reads
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        references
+                bases-list <reference-id> [-p <v>]... [-o <out>]
+                get <reference-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        referencesets
+                get <reference-set-id> [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        variants
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <variant-id> [-p <v>]... [-o <out>]
+                get <variant-id> [-p <v>]... [-o <out>]
+                import (-r <kv>)... [-p <v>]... [-o <out>]
+                merge (-r <kv>)... [-p <v>]... [-o <out>]
+                patch <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
+        variantsets
+                create (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <variant-set-id> [-p <v>]... [-o <out>]
+                export <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <variant-set-id> [-p <v>]... [-o <out>]
+                patch <variant-set-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                search (-r <kv>)... [-p <v>]... [-o <out>]
   genomics1 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope 
+            requires the user to grant this application permission to use it. 
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to 
             a user-writable directory that we will create during the first invocation.

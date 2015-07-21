@@ -90,6 +90,8 @@ api:
     - v1management
     gan:
     - v1beta1
+    genomics:
+    - v1
     gmail:
     - v1
     groupsmigration:

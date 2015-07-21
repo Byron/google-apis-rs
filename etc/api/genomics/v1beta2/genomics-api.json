@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/5Ip5gxD2IW-n7qngRG7WOKp94TA\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/hlRrQoFUbR1DFyke-B8BPXehGzw\"",
  "discoveryVersion": "v1",
  "id": "genomics:v1beta2",
  "name": "genomics",
  "version": "v1beta2",
- "revision": "20150618",
+ "revision": "20150715",
  "title": "Genomics API",
  "description": "Provides access to Genomics data.",
  "ownerDomain": "google.com",
@@ -2925,7 +2925,7 @@
       },
       "projectNumber": {
        "type": "string",
-       "description": "The project to list datasets for.",
+       "description": "Required. The project to list datasets for.",
        "format": "int64",
        "location": "query"
       }
@@ -3644,6 +3644,18 @@
   },
   "variantsets": {
    "methods": {
+    "create": {
+     "id": "genomics.variantsets.create",
+     "path": "variantsets",
+     "httpMethod": "POST",
+     "description": "Creates a new variant set (only necessary in v1).",
+     "request": {
+      "$ref": "VariantSet"
+     },
+     "response": {
+      "$ref": "VariantSet"
+     }
+    },
     "delete": {
      "id": "genomics.variantsets.delete",
      "path": "variantsets/{variantSetId}",

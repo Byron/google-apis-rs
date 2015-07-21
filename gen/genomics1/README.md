@@ -5,11 +5,29 @@ DO NOT EDIT !
 -->
 The `google-genomics1` library allows access to all features of the *Google genomics* service.
 
-This documentation was generated from *genomics* crate version *0.1.8+20150615*, where *20150615* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *genomics* crate version *0.1.8+20150716*, where *20150716* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
 # Features
 
-It seems there is nothing you can do here ... .
+Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_genomics1/struct.Genomics.html) ... 
 
+* callsets
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.CallsetSearchCall.html)
+* [datasets](http://byron.github.io/google-apis-rs/google_genomics1/struct.Dataset.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetPatchCall.html) and [*undelete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.DatasetUndeleteCall.html)
+* [operations](http://byron.github.io/google-apis-rs/google_genomics1/struct.Operation.html)
+ * [*cancel*](http://byron.github.io/google-apis-rs/google_genomics1/struct.OperationCancelCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.OperationDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.OperationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_genomics1/struct.OperationListCall.html)
+* readgroupsets
+ * [*coveragebuckets list*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetCoveragebucketListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetDeleteCall.html), [*export*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetExportCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetImportCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadgroupsetSearchCall.html)
+* [reads](http://byron.github.io/google-apis-rs/google_genomics1/struct.Read.html)
+ * [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReadSearchCall.html)
+* [references](http://byron.github.io/google-apis-rs/google_genomics1/struct.Reference.html)
+ * [*bases list*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferenceBaseListCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferenceGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferenceSearchCall.html)
+* referencesets
+ * [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferencesetGetCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.ReferencesetSearchCall.html)
+* [variants](http://byron.github.io/google-apis-rs/google_genomics1/struct.Variant.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantImportCall.html), [*merge*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantMergeCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantSearchCall.html)
+* variantsets
+ * [*create*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetDeleteCall.html), [*export*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetExportCall.html), [*get*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetPatchCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_genomics1/struct.VariantsetSearchCall.html)
 
 
 
@@ -39,6 +57,18 @@ Generally speaking, you can invoke *Activities* like this:
 let r = hub.resource().activity(...).doit()
 ```
 
+Or specifically ...
+
+```ignore
+let r = hub.operations().delete(...).doit()
+let r = hub.operations().cancel(...).doit()
+let r = hub.variantsets().export(...).doit()
+let r = hub.readgroupsets().export(...).doit()
+let r = hub.variants().import(...).doit()
+let r = hub.readgroupsets().import(...).doit()
+let r = hub.operations().get(...).doit()
+let r = hub.operations().list(...).doit()
+```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
 supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
@@ -62,7 +92,7 @@ google-genomics1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_genomics1 as genomics1;
-
+use genomics1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 use genomics1::Genomics;
@@ -79,9 +109,33 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = Genomics::new(hyper::Client::new(), auth);
+// You can configure optional parameters by calling the respective setters at will, and
+// execute the final call using `doit()`.
+// Values shown here are possibly random and not representative !
+let result = hub.operations().list("name")
+             .page_token("sit")
+             .page_size(-65)
+             .filter("sed")
+             .doit();
+
+match result {
+    Err(e) => match e {
+        // The Error enum provides details about what exactly happened.
+        // You can also just use its `Debug`, `Display` or `Error` traits
+         Error::HttpError(_)
+        |Error::MissingAPIKey
+        |Error::MissingToken(_)
+        |Error::Cancelled
+        |Error::UploadSizeLimitExceeded(_, _)
+        |Error::Failure(_)
+        |Error::BadRequest(_)
+        |Error::FieldClash(_)
+        |Error::JsonDecodeError(_, _) => println!("{}", e),
+    },
+    Ok(res) => println!("Success: {:?}", res),
+}
 
 ```
-
 ## Handling Errors
 
 All errors produced by the system are provided either as [Result](http://byron.github.io/google-apis-rs/google_genomics1/enum.Result.html) enumeration as return value of 

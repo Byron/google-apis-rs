@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/pIrI8aSY3RlGBQ9YIIjJFeqVKF0\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/eOsxHqbqBq4G1nA6of-PTFhvOp8\"",
  "discoveryVersion": "v1",
  "id": "freebase:v1sandbox",
  "name": "freebase",
  "version": "v1sandbox",
- "revision": "20150330",
+ "revision": "20150715",
  "title": "Freebase Search",
  "description": "Find Freebase entities using textual queries and other constraints.",
  "ownerDomain": "google.com",

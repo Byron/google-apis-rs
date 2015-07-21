@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/dfyqUMrFd-mvh1ZHmWj5OJLDhTI\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/8fCXvMLivGaIg88cw7WCZo5CK_s\"",
  "discoveryVersion": "v1",
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20150526",
+ "revision": "20150720",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -678,6 +678,13 @@
      "description": "[Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified. The default value is true.",
      "default": "true"
     },
+    "userDefinedFunctionResources": {
+     "type": "array",
+     "description": "[Experimental] Describes user-defined function resources used in the query.",
+     "items": {
+      "$ref": "UserDefinedFunctionResource"
+     }
+    },
     "writeDisposition": {
      "type": "string",
      "description": "[Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion."
@@ -1128,6 +1135,10 @@
      "description": "[Output-only] The time when this table was last modified, in milliseconds since the epoch.",
      "format": "uint64"
     },
+    "location": {
+     "type": "string",
+     "description": "[Optional] The backing storage location."
+    },
     "numBytes": {
      "type": "string",
      "description": "[Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.",
@@ -1407,6 +1418,20 @@
      "items": {
       "$ref": "TableFieldSchema"
      }
+    }
+   }
+  },
+  "UserDefinedFunctionResource": {
+   "id": "UserDefinedFunctionResource",
+   "type": "object",
+   "properties": {
+    "inlineCode": {
+     "type": "string",
+     "description": "[Pick one] An inline resource that contains code for a user-defined function (UDF). Providing a inline code resource is equivalent to providing a URI for a file containing the same code."
+    },
+    "resourceUri": {
+     "type": "string",
+     "description": "[Pick one] A code resource to load from a Google Cloud Storage URI (gs://bucket/path)."
     }
    }
   },
@@ -1726,7 +1751,7 @@
       },
       "timeoutMs": {
        "type": "integer",
-       "description": "How long to wait for the query to complete, in milliseconds, before returning. Default is to return immediately. If the timeout passes before the job completes, the request will fail with a TIMEOUT error",
+       "description": "How long to wait for the query to complete, in milliseconds, before returning. Default is 10 seconds. If the timeout passes before the job completes, the 'jobComplete' field in the response will be false",
        "format": "uint32",
        "location": "query"
       }

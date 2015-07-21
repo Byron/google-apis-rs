@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/7dF_Pdkn9CaqP2VR3Xvya3Y17a8\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/qGYIx74Qi92EX9k6GZSlKoaG6o4\"",
  "discoveryVersion": "v1",
  "id": "pubsub:v1beta1a",
  "name": "pubsub",
  "version": "v1beta1a",
- "revision": "20150427",
+ "revision": "20150604",
  "title": "Google Cloud Pub/Sub API",
  "description": "Provides reliable, many-to-many, asynchronous messaging between applications.",
  "ownerDomain": "google.com",

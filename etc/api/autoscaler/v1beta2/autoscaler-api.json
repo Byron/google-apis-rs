@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/cly7KQK-fjW4wH1MBNTB5Dx6wSc\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/YGxCrQRjuiCUCTofnn3s8ciKUBM\"",
  "discoveryVersion": "v1",
  "id": "autoscaler:v1beta2",
  "name": "autoscaler",
  "version": "v1beta2",
- "revision": "20150617",
+ "revision": "20150629",
  "title": "Google Compute Engine Autoscaler API",
  "description": "The Google Compute Engine Autoscaler API provides autoscaling for groups of Cloud VMs.",
  "ownerDomain": "google.com",
