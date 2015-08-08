@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -151,7 +152,7 @@ impl<'a, C, A> Fitness<C, A>
         Fitness {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -160,7 +161,7 @@ impl<'a, C, A> Fitness<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -174,24 +175,18 @@ impl<'a, C, A> Fitness<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// The specification of which data to aggregate.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateBy {
-    /// no description provided
-    #[serde(rename="outputDataTypeName")]
-    pub output_data_type_name: Option<String>,
-    /// no description provided
+    /// A data source ID to aggregate. Mutually exclusive of dataTypeName. Only data from the specified data source ID will be included in the aggregation. The dataset in the response will have the same data source ID.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// by dataype or by datasource
+    /// The data type to aggregate. All data sources providing this data type will contribute data to the aggregation. The response will contain a single dataset for this data type name. The dataset will have a data source ID of derived:com.google.:com.google.android.gms:aggregated
     #[serde(rename="dataTypeName")]
     pub data_type_name: Option<String>,
-    /// no description provided
-    #[serde(rename="outputDataSourceId")]
-    pub output_data_source_id: Option<String>,
 }
 
 impl Part for AggregateBy {}
@@ -199,26 +194,42 @@ impl Part for AggregateBy {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sessions list users](struct.UserSessionListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListSessionsResponse {
-    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
-    #[serde(rename="deletedSession")]
-    pub deleted_session: Option<Vec<Session>>,
-    /// Sessions with an end time that is between startTime and endTime of the request.
-    pub session: Option<Vec<Session>>,
+pub struct ValueMapValEntry {
+    /// no description provided
+    pub key: Option<String>,
+    /// no description provided
+    pub value: Option<MapValue>,
 }
 
-impl ResponseResult for ListSessionsResponse {}
+impl Part for ValueMapValEntry {}
+
+
+/// Holder object for the value of a single field in a data point.
+/// 
+/// A field value has a particular format and is only ever set to one of an integer or a floating point value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Value {
+    /// Map value. The valid key space and units for the corresponding value of each entry should be documented as part of the data type definition. Keys should be kept small whenever possible. Data streams with large keys and high data frequency may be down sampled.
+    #[serde(rename="mapVal")]
+    pub map_val: Option<Vec<ValueMapValEntry>>,
+    /// Floating point value. When this is set, other values must not be set.
+    #[serde(rename="fpVal")]
+    pub fp_val: Option<f64>,
+    /// Integer value. When this is set, other values must not be set.
+    #[serde(rename="intVal")]
+    pub int_val: Option<i32>,
+    /// String value. When this is set, other values must not be set. Strings should be kept small whenever possible. Data streams with large string values and high data frequency may be down sampled.
+    #[serde(rename="stringVal")]
+    pub string_val: Option<String>,
+}
+
+impl Part for Value {}
 
 
 /// There is no detailed description.
@@ -301,23 +312,28 @@ pub struct DataPoint {
 impl Part for DataPoint {}
 
 
-/// Holder object for the value of a single field in a data point.
+/// There is no detailed description.
 /// 
-/// A field value has a particular format and is only ever set to one of an integer or a floating point value.
+/// # Activities
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sessions list users](struct.UserSessionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Value {
-    /// Floating point value. When this is set, intVal must not be set.
-    #[serde(rename="fpVal")]
-    pub fp_val: Option<f64>,
-    /// Integer value. When this is set, fpVal must not be set.
-    #[serde(rename="intVal")]
-    pub int_val: Option<i32>,
+pub struct ListSessionsResponse {
+    /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// If includeDeleted is set to true in the request, this list will contain sessions deleted with original end times that are within the startTime and endTime frame.
+    #[serde(rename="deletedSession")]
+    pub deleted_session: Option<Vec<Session>>,
+    /// Sessions with an end time that is between startTime and endTime of the request.
+    pub session: Option<Vec<Session>>,
 }
 
-impl Part for Value {}
+impl ResponseResult for ListSessionsResponse {}
 
 
 /// There is no detailed description.
@@ -326,20 +342,20 @@ impl Part for Value {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateBucket {
-    /// available for Bucket.Type.SESSION
+    /// Available for Bucket.Type.SESSION
     pub session: Option<Session>,
-    /// no description provided
+    /// The end time for the aggregated data, in milliseconds since epoch, inclusive.
     #[serde(rename="endTimeMillis")]
     pub end_time_millis: Option<String>,
-    /// available for Bucket.Type.ACTIVITY_TYPE, Bucket.Type.ACTIVITY_SEGMENT
+    /// Available for Bucket.Type.ACTIVITY_TYPE, Bucket.Type.ACTIVITY_SEGMENT
     pub activity: Option<i32>,
-    /// no description provided
+    /// The start time for the aggregated data, in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
     /// The type of a bucket signifies how the data aggregation is performed in the bucket.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// There will be one dataset per datatype/datasource
+    /// There will be one dataset per AggregateBy in the request.
     pub dataset: Option<Vec<Dataset>>,
 }
 
@@ -352,10 +368,10 @@ impl Part for AggregateBucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketByActivity {
-    /// default activity stream will be used if not specified
+    /// The default activity stream will be used if a specific activityDataSourceId is not specified.
     #[serde(rename="activityDataSourceId")]
     pub activity_data_source_id: Option<String>,
-    /// Only activity segments of duration longer than this is used
+    /// Specifies that only activity segments of duration longer than minDurationMillis are considered and used as a container for aggregated data.
     #[serde(rename="minDurationMillis")]
     pub min_duration_millis: Option<String>,
 }
@@ -374,25 +390,25 @@ impl Part for BucketByActivity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateRequest {
-    /// no description provided
+    /// The specification of data to be aggregated. At least one aggregateBy spec must be provided. All data that is specified will be aggregated using the same bucketing criteria. There will be one dataset in the response for every aggregateBy spec.
     #[serde(rename="aggregateBy")]
     pub aggregate_by: Option<Vec<AggregateBy>>,
-    /// no description provided
+    /// Specifies that data be aggregated each activity segment recored for a user. Similar to bucketByActivitySegment, but bucketing is done for each activity segment rather than all segments of the same type. Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketByActivitySegment")]
     pub bucket_by_activity_segment: Option<BucketByActivity>,
-    /// no description provided
+    /// The end of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
     #[serde(rename="endTimeMillis")]
     pub end_time_millis: Option<String>,
-    /// no description provided
+    /// Specifies that data be aggregated by user sessions. Data that does not fall within the time range of a session will not be included in the response. Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketBySession")]
     pub bucket_by_session: Option<BucketBySession>,
-    /// no description provided
+    /// Specifies that data be aggregated by the type of activity being performed when the data was recorded. All data that was recorded during a certain activity type (for the given time range) will be aggregated into the same bucket. Data that was recorded while the user was not active will not be included in the response. Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketByActivityType")]
     pub bucket_by_activity_type: Option<BucketByActivity>,
-    /// required time range
+    /// The start of a window of time. Data that intersects with this time window will be aggregated. The time is in milliseconds since epoch, inclusive.
     #[serde(rename="startTimeMillis")]
     pub start_time_millis: Option<String>,
-    /// apparently oneof is not supported by reduced_nano_proto
+    /// Specifies that data be aggregated by a single time interval. Mutually exclusive of other bucketing specifications.
     #[serde(rename="bucketByTime")]
     pub bucket_by_time: Option<BucketByTime>,
 }
@@ -458,7 +474,7 @@ impl ResponseResult for Dataset {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AggregateResponse {
-    /// no description provided
+    /// A list of buckets containing the aggregated data.
     pub bucket: Option<Vec<AggregateBucket>>,
 }
 
@@ -511,12 +527,89 @@ impl ResponseResult for Session {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BucketBySession {
-    /// Only sessions of duration longer than this is used
+    /// Specifies that only sessions of duration longer than minDurationMillis are considered and used as a container for aggregated data.
     #[serde(rename="minDurationMillis")]
     pub min_duration_millis: Option<String>,
 }
 
 impl Part for BucketBySession {}
+
+
+/// Holder object for the value of an entry in a map field of a data point.
+/// 
+/// A map value supports a subset of the formats that the regular Value supports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MapValue {
+    /// Floating point value.
+    #[serde(rename="fpVal")]
+    pub fp_val: Option<f64>,
+}
+
+impl Part for MapValue {}
+
+
+/// Representation of an integrated device (such as a phone or a wearable) that can hold sensors. Each sensor is exposed as a data source.
+/// 
+/// The main purpose of the device information contained in this class is to identify the hardware of a particular data source. This can be useful in different ways, including:  
+/// - Distinguishing two similar sensors on different devices (the step counter on two nexus 5 phones, for instance)
+/// - Display the source of data to the user (by using the device make / model)
+/// - Treat data differently depending on sensor type (accelerometers on a watch may give different patterns than those on a phone)
+/// - Build different analysis models for each device/version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Device {
+    /// End-user visible model name for the device.
+    pub model: Option<String>,
+    /// Version string for the device hardware/software.
+    pub version: Option<String>,
+    /// A constant representing the type of the device.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
+    pub uid: Option<String>,
+    /// Manufacturer of the product/hardware.
+    pub manufacturer: Option<String>,
+}
+
+impl Part for Device {}
+
+
+/// In case of multi-dimensional data (such as an accelerometer with x, y, and z axes) each field represents one dimension. Each data type field has a unique name which identifies it. The field also defines the format of the data (int, float, etc.).
+/// 
+/// This message is only instantiated in code and not used for wire comms or stored in any way.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataTypeField {
+    /// no description provided
+    pub optional: Option<bool>,
+    /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
+    pub name: Option<String>,
+    /// The different supported formats for each field in a data type.
+    pub format: Option<String>,
+}
+
+impl Part for DataTypeField {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BucketByTime {
+    /// Specifies that result buckets aggregate data by exactly durationMillis time frames. Time frames that contain no data will be included in the response with an empty dataset.
+    #[serde(rename="durationMillis")]
+    pub duration_millis: Option<String>,
+}
+
+impl Part for BucketByTime {}
 
 
 /// Definition of a unique source of sensor data. Data sources can expose raw data coming from hardware sensors on local or companion devices. They can also expose derived data, created by transforming or merging other data sources. Multiple data sources can exist for the same data type. Every data point inserted into or read from this service has an associated data source.
@@ -576,67 +669,6 @@ impl RequestValue for DataSource {}
 impl ResponseResult for DataSource {}
 
 
-/// Representation of an integrated device (such as a phone or a wearable) that can hold sensors. Each sensor is exposed as a data source.
-/// 
-/// The main purpose of the device information contained in this class is to identify the hardware of a particular data source. This can be useful in different ways, including:  
-/// - Distinguishing two similar sensors on different devices (the step counter on two nexus 5 phones, for instance)
-/// - Display the source of data to the user (by using the device make / model)
-/// - Treat data differently depending on sensor type (accelerometers on a watch may give different patterns than those on a phone)
-/// - Build different analysis models for each device/version.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Device {
-    /// End-user visible model name for the device.
-    pub model: Option<String>,
-    /// Version string for the device hardware/software.
-    pub version: Option<String>,
-    /// A constant representing the type of the device.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The serial number or other unique ID for the hardware. This field is obfuscated when read by any REST or Android client that did not create the data source. Only the data source creator will see the uid field in clear and normal form.
-    pub uid: Option<String>,
-    /// Manufacturer of the product/hardware.
-    pub manufacturer: Option<String>,
-}
-
-impl Part for Device {}
-
-
-/// In case of multi-dimensional data (such as an accelerometer with x, y, and z axes) each field represents one dimension. Each data type field has a unique name which identifies it. The field also defines the format of the data (int, float, etc.).
-/// 
-/// This message is only instantiated in code and not used for wire comms or stored in any way.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataTypeField {
-    /// no description provided
-    pub optional: Option<bool>,
-    /// Defines the name and format of data. Unlike data type names, field names are not namespaced, and only need to be unique within the data type.
-    pub name: Option<String>,
-    /// The different supported formats for each field in a data type.
-    pub format: Option<String>,
-}
-
-impl Part for DataTypeField {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BucketByTime {
-    /// no description provided
-    #[serde(rename="durationMillis")]
-    pub duration_millis: Option<String>,
-}
-
-impl Part for BucketByTime {}
-
-
 
 // ###################
 // MethodBuilders ###
@@ -680,17 +712,21 @@ impl<'a, C, A> MethodsBuilder for UserMethods<'a, C, A> {}
 
 impl<'a, C, A> UserMethods<'a, C, A> {
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userId` - No description provided.
+    /// * `userId` - Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a, C, A> {
         UserDatasetAggregateCall {
             hub: self.hub,
             _request: request,
             _user_id: user_id.to_string(),
             _delegate: Default::default(),
+            _scopes: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -958,6 +994,8 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request.
+///
 /// A builder for the *dataset.aggregate* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
 ///
@@ -1000,6 +1038,7 @@ pub struct UserDatasetAggregateCall<'a, C, A>
     _user_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
 }
 
 impl<'a, C, A> CallBuilder for UserDatasetAggregateCall<'a, C, A> {}
@@ -1033,17 +1072,8 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         params.push(("alt", "json".to_string()));
 
         let mut url = "https://www.googleapis.com/fitness/v1/users/{userId}/dataset:aggregate".to_string();
-        
-        let mut key = self.hub.auth.borrow_mut().api_key();
-        if key.is_none() {
-            key = dlg.api_key();
-        }
-        match key {
-            Some(value) => params.push(("key", value)),
-            None => {
-                dlg.finished(false);
-                return Err(Error::MissingAPIKey)
-            }
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ActivityWrite.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{userId}", "userId")].iter() {
@@ -1087,11 +1117,26 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
         loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
                     .body(&mut request_value_reader);
@@ -1154,6 +1199,7 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
+    /// Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -1196,6 +1242,22 @@ impl<'a, C, A> UserDatasetAggregateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
 
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ActivityWrite`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserDatasetAggregateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
 }
 
 

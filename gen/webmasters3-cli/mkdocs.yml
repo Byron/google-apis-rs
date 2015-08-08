@@ -1,4 +1,4 @@
-site_name: webmasters v0.3.1+20140908
+site_name: webmasters v0.3.2+20150624
 site_url: http://byron.github.io/google-apis-rs/google-webmasters3-cli
 site_description: Write integrating applications with bcore
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['searchanalytics_query.md', 'Searchanalytics', 'Query']
 - ['sitemaps_delete.md', 'Sitemaps', 'Delete']
 - ['sitemaps_get.md', 'Sitemaps', 'Get']
 - ['sitemaps_list.md', 'Sitemaps', 'List']

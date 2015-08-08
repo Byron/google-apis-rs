@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -124,18 +125,19 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().patch(req, "fileId")
-///              .use_content_as_indexable_text(false)
-///              .update_viewed_date(true)
-///              .timed_text_track_name("gubergren")
-///              .timed_text_language("sadipscing")
-///              .set_modified_date(true)
-///              .remove_parents("ea")
-///              .pinned(false)
+///              .use_content_as_indexable_text(true)
+///              .update_viewed_date(false)
+///              .timed_text_track_name("sadipscing")
+///              .timed_text_language("aliquyam")
+///              .set_modified_date(false)
+///              .remove_parents("no")
+///              .pinned(true)
 ///              .ocr_language("justo")
 ///              .ocr(true)
 ///              .new_revision(true)
-///              .convert(true)
-///              .add_parents("diam")
+///              .modified_date_behavior("diam")
+///              .convert(false)
+///              .add_parents("Lorem")
 ///              .doit();
 /// 
 /// match result {
@@ -171,7 +173,7 @@ impl<'a, C, A> Drive<C, A>
         Drive {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -216,7 +218,7 @@ impl<'a, C, A> Drive<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -468,7 +470,7 @@ pub struct File {
     /// Indexable text attributes for the file (can only be written)
     #[serde(rename="indexableText")]
     pub indexable_text: Option<FileIndexableText>,
-    /// Whether this file has been explicitly trashed, as opposed to recursively trashed. This will only be populated if the file is trashed.
+    /// Whether this file has been explicitly trashed, as opposed to recursively trashed.
     #[serde(rename="explicitlyTrashed")]
     pub explicitly_trashed: Option<bool>,
     /// ETag of the file.
@@ -479,6 +481,9 @@ pub struct File {
     /// Whether writers can share the document with other users.
     #[serde(rename="writersCanShare")]
     pub writers_can_share: Option<bool>,
+    /// Whether the file is owned by the current user.
+    #[serde(rename="ownedByMe")]
+    pub owned_by_me: Option<bool>,
     /// Time at which this file was shared with the user (formatted RFC 3339 timestamp).
     #[serde(rename="sharedWithMeDate")]
     pub shared_with_me_date: Option<String>,
@@ -534,18 +539,21 @@ pub struct File {
     pub web_content_link: Option<String>,
     /// Whether the file can be edited by the current user.
     pub editable: Option<bool>,
-    /// A link for embedding the file.
-    #[serde(rename="embedLink")]
-    pub embed_link: Option<String>,
     /// Time this file was explicitly marked viewed by the user (formatted RFC 3339 timestamp).
     #[serde(rename="markedViewedByMeDate")]
     pub marked_viewed_by_me_date: Option<String>,
+    /// A link for embedding the file.
+    #[serde(rename="embedLink")]
+    pub embed_link: Option<String>,
+    /// Whether the current user can comment on the file.
+    #[serde(rename="canComment")]
+    pub can_comment: Option<bool>,
     /// The file extension used when downloading this file. This field is read only. To set the extension, include it in the title when creating the file. This is only populated for files with content stored in Drive.
     #[serde(rename="fileExtension")]
     pub file_extension: Option<String>,
-    /// The size of the file in bytes. This is only populated for files with content stored in Drive.
-    #[serde(rename="fileSize")]
-    pub file_size: Option<String>,
+    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.
+    #[serde(rename="modifiedDate")]
+    pub modified_date: Option<String>,
     /// Create time for this file (formatted RFC 3339 timestamp).
     #[serde(rename="createdDate")]
     pub created_date: Option<String>,
@@ -569,7 +577,7 @@ pub struct File {
     /// Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.
     #[serde(rename="modifiedByMeDate")]
     pub modified_by_me_date: Option<String>,
-    /// Short lived download URL for the file. This is only populated for files with content stored in Drive.
+    /// no description provided
     #[serde(rename="downloadUrl")]
     pub download_url: Option<String>,
     /// The permissions for the authenticated user on this file.
@@ -577,6 +585,8 @@ pub struct File {
     pub user_permission: Option<Permission>,
     /// The list of spaces which contain the file. Supported values are 'drive' and 'appDataFolder'.
     pub spaces: Option<Vec<String>>,
+    /// Whether the file's sharing settings can be modified by the current user.
+    pub shareable: Option<bool>,
     /// The original filename if the file was uploaded manually, or the original title if the file was inserted through the API. Note that renames of the title will not change the original filename. This will only be populated on files with content stored in Drive.
     #[serde(rename="originalFilename")]
     pub original_filename: Option<String>,
@@ -589,9 +599,9 @@ pub struct File {
     /// A link back to this file.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.
-    #[serde(rename="modifiedDate")]
-    pub modified_date: Option<String>,
+    /// The size of the file in bytes. This is only populated for files with content stored in Drive.
+    #[serde(rename="fileSize")]
+    pub file_size: Option<String>,
 }
 
 impl RequestValue for File {}
@@ -1873,6 +1883,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr_language: Default::default(),
             _ocr: Default::default(),
             _new_revision: Default::default(),
+            _modified_date_behavior: Default::default(),
             _convert: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
@@ -1921,6 +1932,7 @@ impl<'a, C, A> FileMethods<'a, C, A> {
             _ocr_language: Default::default(),
             _ocr: Default::default(),
             _new_revision: Default::default(),
+            _modified_date_behavior: Default::default(),
             _convert: Default::default(),
             _add_parents: Default::default(),
             _delegate: Default::default(),
@@ -3405,10 +3417,10 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().watch(req, "fileId")
-///              .update_viewed_date(true)
-///              .revision_id("et")
-///              .projection("duo")
-///              .acknowledge_abuse(true)
+///              .update_viewed_date(false)
+///              .revision_id("aliquyam")
+///              .projection("sea")
+///              .acknowledge_abuse(false)
 ///              .doit();
 /// # }
 /// ```
@@ -3737,14 +3749,14 @@ impl<'a, C, A> FileWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().insert(req)
-///              .visibility("sea")
+///              .visibility("eos")
 ///              .use_content_as_indexable_text(false)
-///              .timed_text_track_name("eos")
-///              .timed_text_language("erat")
-///              .pinned(false)
-///              .ocr_language("dolor")
-///              .ocr(true)
-///              .convert(true)
+///              .timed_text_track_name("sadipscing")
+///              .timed_text_language("dolor")
+///              .pinned(true)
+///              .ocr_language("elitr")
+///              .ocr(false)
+///              .convert(false)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -4416,13 +4428,13 @@ impl<'a, C, A> FileUntrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().copy(req, "fileId")
-///              .visibility("labore")
-///              .timed_text_track_name("eirmod")
-///              .timed_text_language("dolore")
-///              .pinned(true)
-///              .ocr_language("aliquyam")
-///              .ocr(false)
-///              .convert(false)
+///              .visibility("dolore")
+///              .timed_text_track_name("invidunt")
+///              .timed_text_language("aliquyam")
+///              .pinned(false)
+///              .ocr_language("Lorem")
+///              .ocr(true)
+///              .convert(true)
 ///              .doit();
 /// # }
 /// ```
@@ -5190,10 +5202,10 @@ impl<'a, C, A> FileEmptyTrashCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().list()
 ///              .spaces("et")
-///              .q("duo")
-///              .projection("et")
-///              .page_token("eirmod")
-///              .max_results(-58)
+///              .q("eirmod")
+///              .projection("sanctus")
+///              .page_token("et")
+///              .max_results(-46)
 ///              .corpus("et")
 ///              .doit();
 /// # }
@@ -5708,17 +5720,18 @@ impl<'a, C, A> FileTouchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().update(req, "fileId")
 ///              .use_content_as_indexable_text(true)
-///              .update_viewed_date(true)
-///              .timed_text_track_name("ea")
-///              .timed_text_language("sed")
+///              .update_viewed_date(false)
+///              .timed_text_track_name("dolor")
+///              .timed_text_language("dolor")
 ///              .set_modified_date(true)
-///              .remove_parents("dolor")
-///              .pinned(true)
-///              .ocr_language("et")
-///              .ocr(false)
+///              .remove_parents("et")
+///              .pinned(false)
+///              .ocr_language("amet.")
+///              .ocr(true)
 ///              .new_revision(false)
+///              .modified_date_behavior("gubergren")
 ///              .convert(true)
-///              .add_parents("Lorem")
+///              .add_parents("sit")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -5738,6 +5751,7 @@ pub struct FileUpdateCall<'a, C, A>
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
     _new_revision: Option<bool>,
+    _modified_date_behavior: Option<String>,
     _convert: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -5762,7 +5776,7 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "drive.files.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((16 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -5794,13 +5808,16 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._new_revision {
             params.push(("newRevision", value.to_string()));
         }
+        if let Some(value) = self._modified_date_behavior {
+            params.push(("modifiedDateBehavior", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6132,6 +6149,13 @@ impl<'a, C, A> FileUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._new_revision = Some(new_value);
         self
     }
+    /// How the modifiedDate field should be updated. This overrides setModifiedDate.
+    ///
+    /// Sets the *modified date behavior* query property to the given value.
+    pub fn modified_date_behavior(mut self, new_value: &str) -> FileUpdateCall<'a, C, A> {
+        self._modified_date_behavior = Some(new_value.to_string());
+        self
+    }
     /// Whether to convert this file to the corresponding Google Docs format.
     ///
     /// Sets the *convert* query property to the given value.
@@ -6458,16 +6482,17 @@ impl<'a, C, A> FileDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// let result = hub.files().patch(req, "fileId")
 ///              .use_content_as_indexable_text(false)
 ///              .update_viewed_date(true)
-///              .timed_text_track_name("diam")
-///              .timed_text_language("rebum.")
-///              .set_modified_date(true)
-///              .remove_parents("sadipscing")
+///              .timed_text_track_name("sadipscing")
+///              .timed_text_language("vero")
+///              .set_modified_date(false)
+///              .remove_parents("invidunt")
 ///              .pinned(false)
-///              .ocr_language("sadipscing")
-///              .ocr(false)
+///              .ocr_language("dolore")
+///              .ocr(true)
 ///              .new_revision(false)
-///              .convert(false)
-///              .add_parents("duo")
+///              .modified_date_behavior("Lorem")
+///              .convert(true)
+///              .add_parents("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -6487,6 +6512,7 @@ pub struct FilePatchCall<'a, C, A>
     _ocr_language: Option<String>,
     _ocr: Option<bool>,
     _new_revision: Option<bool>,
+    _modified_date_behavior: Option<String>,
     _convert: Option<bool>,
     _add_parents: Option<String>,
     _delegate: Option<&'a mut Delegate>,
@@ -6510,7 +6536,7 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "drive.files.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((16 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         if let Some(value) = self._use_content_as_indexable_text {
             params.push(("useContentAsIndexableText", value.to_string()));
@@ -6542,13 +6568,16 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._new_revision {
             params.push(("newRevision", value.to_string()));
         }
+        if let Some(value) = self._modified_date_behavior {
+            params.push(("modifiedDateBehavior", value.to_string()));
+        }
         if let Some(value) = self._convert {
             params.push(("convert", value.to_string()));
         }
         if let Some(value) = self._add_parents {
             params.push(("addParents", value.to_string()));
         }
-        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "convert", "addParents"].iter() {
+        for &field in ["alt", "fileId", "useContentAsIndexableText", "updateViewedDate", "timedTextTrackName", "timedTextLanguage", "setModifiedDate", "removeParents", "pinned", "ocrLanguage", "ocr", "newRevision", "modifiedDateBehavior", "convert", "addParents"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6768,6 +6797,13 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._new_revision = Some(new_value);
         self
     }
+    /// How the modifiedDate field should be updated. This overrides setModifiedDate.
+    ///
+    /// Sets the *modified date behavior* query property to the given value.
+    pub fn modified_date_behavior(mut self, new_value: &str) -> FilePatchCall<'a, C, A> {
+        self._modified_date_behavior = Some(new_value.to_string());
+        self
+    }
     /// Whether to convert this file to the corresponding Google Docs format.
     ///
     /// Sets the *convert* query property to the given value.
@@ -6866,9 +6902,9 @@ impl<'a, C, A> FilePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.files().get("fileId")
-///              .update_viewed_date(true)
-///              .revision_id("et")
-///              .projection("clita")
+///              .update_viewed_date(false)
+///              .revision_id("nonumy")
+///              .projection("kasd")
 ///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
@@ -7167,8 +7203,8 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.about().get()
 ///              .start_change_id("takimata")
-///              .max_change_id_count(-40)
-///              .include_subscribed(true)
+///              .max_change_id_count(-27)
+///              .include_subscribed(false)
 ///              .doit();
 /// # }
 /// ```
@@ -7406,7 +7442,7 @@ impl<'a, C, A> AboutGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().update("fileId")
-///              .base_revision("takimata")
+///              .base_revision("ea")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -7754,7 +7790,7 @@ impl<'a, C, A> RealtimeUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.realtime().get("fileId")
-///              .revision(-86)
+///              .revision(-66)
 ///              .doit();
 /// # }
 /// ```
@@ -8227,9 +8263,9 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().list()
-///              .language_code("ea")
-///              .app_filter_mime_types("sadipscing")
-///              .app_filter_extensions("rebum.")
+///              .language_code("nonumy")
+///              .app_filter_mime_types("sed")
+///              .app_filter_extensions("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -8703,7 +8739,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().get("fileId", "commentId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9788,9 +9824,9 @@ impl<'a, C, A> CommentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .updated_min("aliquyam")
-///              .page_token("eos")
-///              .max_results(-38)
+///              .updated_min("labore")
+///              .page_token("ipsum")
+///              .max_results(-31)
 ///              .include_deleted(false)
 ///              .doit();
 /// # }
@@ -10072,9 +10108,9 @@ impl<'a, C, A> CommentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.children().list("folderId")
-///              .q("ipsum")
-///              .page_token("aliquyam")
-///              .max_results(-69)
+///              .q("diam")
+///              .page_token("ut")
+///              .max_results(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -12598,8 +12634,8 @@ impl<'a, C, A> ReplyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("voluptua.")
-///              .max_results(-19)
+///              .page_token("ea")
+///              .max_results(-17)
 ///              .include_deleted(false)
 ///              .doit();
 /// # }
@@ -14217,7 +14253,7 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().insert(req, "fileId")
 ///              .send_notification_emails(true)
-///              .email_message("sed")
+///              .email_message("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -15809,12 +15845,12 @@ impl<'a, C, A> PermissionGetIdForEmailCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req)
-///              .start_change_id("amet.")
-///              .spaces("ipsum")
-///              .page_token("ut")
-///              .max_results(-3)
+///              .start_change_id("sea")
+///              .spaces("ut")
+///              .page_token("eirmod")
+///              .max_results(-8)
 ///              .include_subscribed(true)
-///              .include_deleted(true)
+///              .include_deleted(false)
 ///              .doit();
 /// # }
 /// ```
@@ -16109,12 +16145,12 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list()
-///              .start_change_id("eirmod")
-///              .spaces("sanctus")
-///              .page_token("voluptua.")
-///              .max_results(-99)
+///              .start_change_id("et")
+///              .spaces("et")
+///              .page_token("vero")
+///              .max_results(-36)
 ///              .include_subscribed(true)
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16626,7 +16662,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().patch(req, "fileId", "propertyKey")
-///              .visibility("et")
+///              .visibility("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -16911,7 +16947,7 @@ impl<'a, C, A> PropertyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().delete("fileId", "propertyKey")
-///              .visibility("dolore")
+///              .visibility("et")
 ///              .doit();
 /// # }
 /// ```
@@ -17669,7 +17705,7 @@ impl<'a, C, A> PropertyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().update(req, "fileId", "propertyKey")
-///              .visibility("nonumy")
+///              .visibility("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -17954,7 +17990,7 @@ impl<'a, C, A> PropertyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.properties().get("fileId", "propertyKey")
-///              .visibility("no")
+///              .visibility("aliquyam")
 ///              .doit();
 /// # }
 /// ```

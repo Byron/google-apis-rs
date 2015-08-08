@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -131,7 +132,7 @@ impl<'a, C, A> AndroidEnterprise<C, A>
         AndroidEnterprise {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -170,7 +171,7 @@ impl<'a, C, A> AndroidEnterprise<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -369,16 +370,16 @@ pub struct ApprovalUrlInfo {
 impl Part for ApprovalUrlInfo {}
 
 
-/// App version represents a single APK version.
+/// This represents a single version of the app.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AppVersion {
-    /// Unique increasing identifier for the apk version.
+    /// Unique increasing identifier for the app version.
     #[serde(rename="versionCode")]
     pub version_code: Option<i32>,
-    /// The string used in the Play Store by the app developer to identify a version of an app. The string is not necessarily unique or localized (e.g. "1.4").
+    /// The string used in the Play Store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be "1.4").
     #[serde(rename="versionString")]
     pub version_string: Option<String>,
 }
@@ -595,7 +596,7 @@ impl Part for ProductPermission {}
 pub struct Product {
     /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#product".
     pub kind: Option<String>,
-    /// How and to whom the package is made available.
+    /// How and to whom the package is made available. The value publicGoogleHosted means that the package is available through the Play Store and not restricted to a specific enterprise. The value privateGoogleHosted means that the package is a private app (restricted to an enterprise) but hosted by Google. The value privateSelfHosted means that the package is a private app (restricted to an enterprise) and is privately hosted.
     #[serde(rename="distributionChannel")]
     pub distribution_channel: Option<String>,
     /// The name of the product.
@@ -603,7 +604,7 @@ pub struct Product {
     /// A link to the Google Play for Work details page for the product, for use by an Enterprise administrator.
     #[serde(rename="workDetailsUrl")]
     pub work_details_url: Option<String>,
-    /// List of app versions available for this product. The returned list contains only public versions. E.g. alpha, beta or canary versions will not be included.
+    /// App versions currently available for this product. The returned list contains only public versions. Alpha and beta versions are not included.
     #[serde(rename="appVersion")]
     pub app_version: Option<Vec<AppVersion>>,
     /// A link to an image that can be used as an icon for the product.
@@ -618,8 +619,8 @@ pub struct Product {
     /// A link to the (consumer) Google Play details page for the product.
     #[serde(rename="detailsUrl")]
     pub details_url: Option<String>,
-    /// A string of the form "app:
-    /// " - e.g. "app:com.google.android.gm" represents the GMail app.
+    /// A string of the form app:
+    /// . For example, app:com.google.android.gm represents the Gmail app.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -764,7 +765,7 @@ impl ResponseResult for Collection {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsApproveRequest {
-    /// no description provided
+    /// The approval URL that was shown to the user. Only the permissions shown to the user with that URL will be accepted, which may not be the product's entire set of permissions. For example, the URL may only display new permissions from an update after the product was approved, or not include new permissions if the product was updated since the URL was generated.
     #[serde(rename="approvalUrlInfo")]
     pub approval_url_info: Option<ApprovalUrlInfo>,
 }
@@ -808,7 +809,7 @@ impl ResponseResult for ProductPermissions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductsGenerateApprovalUrlResponse {
-    /// A iframe-able URL that displays a product's permissions (if any). This URL can be used to approve the product only once and for a limited time (1 hour), using the Products.approve call. If the product is not currently approved and has no permissions, this URL will point to an empty page. If the product is currently approved and all of its permissions (if any) are also approved, this field will not be populated.
+    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
     pub url: Option<String>,
 }
 
@@ -887,11 +888,11 @@ impl Resource for Device {}
 impl ResponseResult for Device {}
 
 
-/// A group license object indicates a product that an enterprise admin has approved for use in the enterprise. The product may be free or paid. For free products, a group license object is created in these cases: if the enterprise admin approves a product in Google Play, if the product is added to a collection, or if an entitlement for the product is created for a user via the API. For paid products, a group license object is only created as part of the first bulk purchase of that product in Google Play done by the enterprise admin.
+/// A group license object indicates a product that an enterprise admin has approved for use in the enterprise. The product may be free or paid. For free products, a group license object is created in these cases: if the enterprise admin approves a product in Google Play, if the product is added to a collection, or if an entitlement for the product is created for a user via the API. For paid products, a group license object is only created as part of the first bulk purchase of that product in Google Play by the enterprise admin.
 /// 
-/// The API can be used to query group licenses; the available information includes the total number of licenses purchased (for paid products) and the total number of licenses that have been provisioned, i.e. the total number of user entitlements in existence for the product.
+/// The API can be used to query group licenses; the available information includes the total number of licenses purchased (for paid products) and the total number of licenses that have been provisioned, that is, the total number of user entitlements in existence for the product.
 /// 
-/// Group license objects are never deleted; if e.g. a free app is added to a collection and then removed, the group license will remain, allowing to keep track of any remaining entitlements. An enterprise admin may indicate they are no longer interested in the group license by marking it as unapproved in Google Play.
+/// Group license objects are never deleted. If, for example, a free app is added to a collection and then removed, the group license will remain, allowing the enterprise admin to keep track of any remaining entitlements. An enterprise admin may indicate they are no longer interested in the group license by marking it as unapproved in Google Play.
 /// 
 /// # Activities
 /// 
@@ -2186,7 +2187,9 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Generates a URL that can be used to display an iframe to view the product's permissions (if any) and approve the product. This URL can be used to approve the product for a limited time (currently 1 hour) using the Products.approve call.
+    /// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
+    /// 
+    /// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
     /// 
     /// # Arguments
     ///
@@ -13259,7 +13262,9 @@ impl<'a, C, A> ProductUpdatePermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Generates a URL that can be used to display an iframe to view the product's permissions (if any) and approve the product. This URL can be used to approve the product for a limited time (currently 1 hour) using the Products.approve call.
+/// Generates a URL that can be rendered in an iframe to display the permissions (if any) of a product. An enterprise admin must view these permissions and accept them on behalf of their organization in order to approve that product.
+/// 
+/// Admins should accept the displayed permissions by interacting with a separate UI element in the EMM console, which in turn should trigger the use of this URL as the approvalUrlInfo.approvalUrl property in a Products.approve call to approve the product. This URL can only be used to display permissions for up to 1 day.
 ///
 /// A builder for the *generateApprovalUrl* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -13460,7 +13465,7 @@ impl<'a, C, A> ProductGenerateApprovalUrlCall<'a, C, A> where C: BorrowMut<hyper
         self._product_id = new_value.to_string();
         self
     }
-    /// The language code that will be used for permission names and descriptions in the returned iframe.
+    /// The BCP 47 language code used for permission names and descriptions in the returned iframe, for instance "en-US".
     ///
     /// Sets the *language code* query property to the given value.
     pub fn language_code(mut self, new_value: &str) -> ProductGenerateApprovalUrlCall<'a, C, A> {

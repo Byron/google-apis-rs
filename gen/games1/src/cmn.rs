@@ -16,7 +16,7 @@ use hyper::http::h1::LINE_ENDING;
 use hyper::method::Method;
 use hyper::status::StatusCode;
 
-use serde;
+use serde_json as json;
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -188,7 +188,7 @@ pub trait Delegate {
     ///
     /// * `json_encoded_value` - The json-encoded value which failed to decode.
     /// * `json_decode_error`  - The decoder error
-    fn response_json_decode_error(&mut self, json_encoded_value: &str, json_decode_error: &serde::json::Error) {
+    fn response_json_decode_error(&mut self, json_encoded_value: &str, json_decode_error: &json::Error) {
         let _ = json_encoded_value;
         let _ = json_decode_error;
     }
@@ -275,7 +275,7 @@ pub enum Error {
 
     /// Shows that we failed to decode the server response.
     /// This can happen if the protocol changes in conjunction with strict json decoding.
-    JsonDecodeError(String, serde::json::Error),
+    JsonDecodeError(String, json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
     Failure(hyper::client::Response),
@@ -718,8 +718,8 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
                         if let Retry::After(d) = self.delegate.http_failure(&res, 
-                                                        serde::json::from_str(&json_err).ok(),
-                                                        serde::json::from_str(&json_err).ok()) {
+                                                        json::from_str(&json_err).ok(),
+                                                        json::from_str(&json_err).ok()) {
                             sleep_ms(d.num_milliseconds() as u32);
                             continue;
                         }
@@ -740,9 +740,9 @@ impl<'a, A> ResumableUploadHelper<'a, A>
 
 // Copy of src/rust/cli/cmn.rs
 // TODO(ST): Allow sharing common code between program types
-pub fn remove_json_null_values(value: &mut serde::json::value::Value) {
+pub fn remove_json_null_values(value: &mut json::value::Value) {
     match *value {
-        serde::json::value::Value::Object(ref mut map) => {
+        json::value::Value::Object(ref mut map) => {
             let mut for_removal = Vec::new();
 
             for (key, mut value) in map.iter_mut() {

@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -769,6 +770,9 @@ impl<'n, 'a> Engine<'n, 'a> {
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -1418,12 +1422,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("dataset-aggregate",  
-                    None,
+                    Some(r##"Aggregates data of a certain type or stream into buckets divided by a given type of boundary. Multiple data sets of multiple types and from multiple sources can be aggreated into exactly one bucket type per request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fitness1_cli/users_dataset-aggregate",
                   vec![
                     (Some(r##"user-id"##),
                      None,
-                     None,
+                     Some(r##"Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time."##),
                      Some(true),
                      Some(false)),
         
@@ -1529,7 +1533,7 @@ fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150527")
+           .version("0.3.2+20150720")
            .about("Google Fit API")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")
@@ -1611,7 +1615,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

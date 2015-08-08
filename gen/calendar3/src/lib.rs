@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *0.1.8+20150408*, where *20150408* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *calendar* crate version *0.1.9+20150715*, where *20150715* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -136,22 +136,22 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.events().watch(req, "calendarId")
-//!              .updated_min("ut")
-//!              .time_zone("amet.")
-//!              .time_min("ipsum")
-//!              .time_max("ut")
-//!              .sync_token("dolor")
+//!              .updated_min("dolor")
+//!              .time_zone("sea")
+//!              .time_min("ut")
+//!              .time_max("eirmod")
+//!              .sync_token("sanctus")
 //!              .single_events(true)
-//!              .show_hidden_invitations(true)
+//!              .show_hidden_invitations(false)
 //!              .show_deleted(true)
-//!              .add_shared_extended_property("sanctus")
-//!              .q("voluptua.")
-//!              .add_private_extended_property("dolor")
-//!              .page_token("et")
+//!              .add_shared_extended_property("et")
+//!              .q("vero")
+//!              .add_private_extended_property("ut")
+//!              .page_token("sed")
 //!              .order_by("et")
-//!              .max_results(-26)
-//!              .max_attendees(-36)
-//!              .i_cal_uid("sed")
+//!              .max_results(-55)
+//!              .max_attendees(-20)
+//!              .i_cal_uid("dolore")
 //!              .always_include_email(true)
 //!              .doit();
 //! 

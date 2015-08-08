@@ -17,14 +17,14 @@ Everything else about the *compute* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.1/ubuntu/compute1.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.1/osx/compute1.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/compute1.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/compute1.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/compute1-cli).
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20150305*. The CLI is at version *0.3.1*.
+This documentation was generated from the *compute* API at revision *20150713*. The CLI is at version *0.3.2*.
 
 ```bash
 compute1 [options]
@@ -34,6 +34,14 @@ compute1 [options]
                 get <project> <region> <address> [-p <v>]... [-o <out>]
                 insert <project> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <region> [-p <v>]... [-o <out>]
+        autoscalers
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <zone> <autoscaler> [-p <v>]... [-o <out>]
+                get <project> <zone> <autoscaler> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                patch <project> <zone> <autoscaler> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
         backend-services
                 delete <project> <backend-service> [-p <v>]... [-o <out>]
                 get <project> <backend-service> [-p <v>]... [-o <out>]
@@ -96,6 +104,29 @@ compute1 [options]
                 get <project> <image> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+        instance-group-managers
+                abandon-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                delete-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                get <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                list-managed-instances <project> <zone> <instance-group-manager> [-p <v>]... [-o <out>]
+                recreate-instances <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                resize <project> <zone> <instance-group-manager> <size> [-p <v>]... [-o <out>]
+                set-instance-template <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-target-pools <project> <zone> <instance-group-manager> (-r <kv>)... [-p <v>]... [-o <out>]
+        instance-groups
+                add-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+                aggregated-list <project> [-p <v>]... [-o <out>]
+                delete <project> <zone> <instance-group> [-p <v>]... [-o <out>]
+                get <project> <zone> <instance-group> [-p <v>]... [-o <out>]
+                insert <project> <zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
+                list-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+                remove-instances <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-named-ports <project> <zone> <instance-group> (-r <kv>)... [-p <v>]... [-o <out>]
         instance-templates
                 delete <project> <instance-template> [-p <v>]... [-o <out>]
                 get <project> <instance-template> [-p <v>]... [-o <out>]

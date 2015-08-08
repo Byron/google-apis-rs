@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -98,8 +99,9 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().list("project")
-///              .page_token("et")
-///              .max_results(-18)
+///              .page_token("dolores")
+///              .max_results(-63)
+///              .dns_name("accusam")
 ///              .doit();
 /// 
 /// match result {
@@ -135,7 +137,7 @@ impl<'a, C, A> Dns<C, A>
         Dns {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -153,7 +155,7 @@ impl<'a, C, A> Dns<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -619,6 +621,7 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
             _project: project.to_string(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _dns_name: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1062,10 +1065,10 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("project", "managedZone")
-///              .sort_order("amet.")
-///              .sort_by("erat")
-///              .page_token("labore")
-///              .max_results(-9)
+///              .sort_order("labore")
+///              .sort_by("sea")
+///              .page_token("nonumy")
+///              .max_results(-19)
 ///              .doit();
 /// # }
 /// ```
@@ -2370,8 +2373,9 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().list("project")
-///              .page_token("et")
-///              .max_results(-17)
+///              .page_token("diam")
+///              .max_results(-55)
+///              .dns_name("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -2382,6 +2386,7 @@ pub struct ManagedZoneListCall<'a, C, A>
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
+    _dns_name: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2403,7 +2408,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "dns.managedZones.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2411,7 +2416,10 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "project", "pageToken", "maxResults"].iter() {
+        if let Some(value) = self._dns_name {
+            params.push(("dnsName", value.to_string()));
+        }
+        for &field in ["alt", "project", "pageToken", "maxResults", "dnsName"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2551,6 +2559,13 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._max_results = Some(new_value);
         self
     }
+    /// Restricts the list to return only zones with this domain name.
+    ///
+    /// Sets the *dns name* query property to the given value.
+    pub fn dns_name(mut self, new_value: &str) -> ManagedZoneListCall<'a, C, A> {
+        self._dns_name = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2630,10 +2645,10 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().list("project", "managedZone")
-///              .type_("Lorem")
-///              .page_token("et")
-///              .name("duo")
-///              .max_results(-32)
+///              .type_("aliquyam")
+///              .page_token("sea")
+///              .name("Lorem")
+///              .max_results(-75)
 ///              .doit();
 /// # }
 /// ```

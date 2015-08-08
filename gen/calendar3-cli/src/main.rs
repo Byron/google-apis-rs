@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -1929,6 +1930,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-attachments" => {
+                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1942,6 +1946,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2069,6 +2074,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-attachments" => {
+                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -2088,7 +2096,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-attendees", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments", "max-attendees", "send-notifications"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2456,6 +2464,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-attachments" => {
+                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -2478,7 +2489,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments", "max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2662,6 +2673,9 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "supports-attachments" => {
+                    call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -2684,7 +2698,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments", "max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4371,7 +4385,7 @@ fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150408")
+           .version("0.3.2+20150715")
            .about("Lets you manipulate events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")
@@ -4453,7 +4467,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

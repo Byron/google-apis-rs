@@ -17,14 +17,14 @@ Everything else about the *Deployment Manager* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.1/ubuntu/deploymentmanager2-beta2.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.1/osx/deploymentmanager2-beta2.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/deploymentmanager2-beta2.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/deploymentmanager2-beta2.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *Deployment Manager* API at revision *20150616*. The CLI is at version *0.3.1*.
+This documentation was generated from the *Deployment Manager* API at revision *20150715*. The CLI is at version *0.3.2*.
 
 ```bash
 deploymentmanager2-beta2 [options]

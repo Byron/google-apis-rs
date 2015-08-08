@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -449,6 +450,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
+                "dns-name" => {
+                    call = call.dns_name(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -462,7 +466,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "dns-name", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1021,7 +1025,7 @@ fn main() {
     
     let mut app = App::new("dns1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150218")
+           .version("0.3.2+20150624")
            .about("The Google Cloud DNS API provides services for configuring and serving authoritative DNS records.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns1_cli")
            .arg(Arg::with_name("url")
@@ -1103,7 +1107,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

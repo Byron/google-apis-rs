@@ -17,14 +17,14 @@ Everything else about the *YouTube* API can be found at the
 
 You can download the pre-compiled 64bit binaries for the following platforms:
 
-* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.1/ubuntu/youtube3.tar.gz)
-* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.1/osx/youtube3.tar.gz)
+* ![icon](http://megaicons.net/static/img/icons_sizes/6/140/16/ubuntu-icon.png) [ubuntu](http://dl.byronimo.de/google.rs/cli/0.3.2/ubuntu/youtube3.tar.gz)
+* ![icon](http://hydra-media.cursecdn.com/wow.gamepedia.com/a/a2/Apple-icon-16x16.png?version=25ddd67ac3dd3b634478e3978b76cb74) [osx](http://dl.byronimo.de/google.rs/cli/0.3.2/osx/youtube3.tar.gz)
 
 Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3-cli).
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20150529*. The CLI is at version *0.3.1*.
+This documentation was generated from the *YouTube* API at revision *20150706*. The CLI is at version *0.3.2*.
 
 ```bash
 youtube3 [options]
@@ -66,6 +66,7 @@ youtube3 [options]
                 list <part> [-p <v>]... [-o <out>]
         live-broadcasts
                 bind <id> <part> [-p <v>]... [-o <out>]
+                bind-direct <id> <part> [-p <v>]... [-o <out>]
                 control <id> <part> [-p <v>]... [-o <out>]
                 delete <id> [-p <v>]...
                 insert (-r <kv>)... [-p <v>]... [-o <out>]

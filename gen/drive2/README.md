@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-drive2` library allows access to all features of the *Google drive* service.
 
-This documentation was generated from *drive* crate version *0.1.8+20150305*, where *20150305* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *drive* crate version *0.1.9+20150709*, where *20150709* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *drive* *v2* API can be found at the
 [official documentation site](https://developers.google.com/drive/).
@@ -164,8 +164,9 @@ let result = hub.files().patch(req, "fileId")
              .ocr_language("takimata")
              .ocr(false)
              .new_revision(true)
-             .convert(false)
-             .add_parents("labore")
+             .modified_date_behavior("erat")
+             .convert(true)
+             .add_parents("sea")
              .doit();
 
 match result {

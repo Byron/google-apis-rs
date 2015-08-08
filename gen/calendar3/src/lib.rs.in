@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -152,7 +153,7 @@ impl<'a, C, A> CalendarHub<C, A>
         CalendarHub {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -182,7 +183,7 @@ impl<'a, C, A> CalendarHub<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -290,6 +291,33 @@ pub struct Settings {
 }
 
 impl ResponseResult for Settings {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventAttachment {
+    /// Internet media type (MIME type) of the attachment.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// URL link to the attachment's icon. Read-only.
+    #[serde(rename="iconLink")]
+    pub icon_link: Option<String>,
+    /// URL link to the attachment.
+    /// For adding Google Drive file attachments use the same format as in alternateLink property of the Files resource in the Drive API.
+    #[serde(rename="fileUrl")]
+    pub file_url: Option<String>,
+    /// ID of the attached file. Read-only.
+    /// E.g. for Google Drive files this is the ID of the corresponding Files resource entry in the Drive API.
+    #[serde(rename="fileId")]
+    pub file_id: Option<String>,
+    /// Attachment title.
+    pub title: Option<String>,
+}
+
+impl Part for EventAttachment {}
 
 
 /// There is no detailed description.
@@ -932,7 +960,7 @@ pub struct EventReminder {
     pub minutes: Option<i32>,
     /// The method used by this reminder. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. 
+    /// - "sms" - Reminders are sent via SMS. They are only available for Google Apps for Work, Education, and Government customers. Requests to set SMS reminders for the other accounts will be ignored. 
     /// - "popup" - Reminders are sent via a UI popup.
     pub method: Option<String>,
 }
@@ -971,7 +999,7 @@ pub struct CalendarNotification {
     pub type_: Option<String>,
     /// The method used to deliver the notification. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates.
+    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. Furthermore, SMS reminders are only available for Google Apps for Work, Education, and Government customers.
     pub method: Option<String>,
 }
 
@@ -999,6 +1027,10 @@ impl Part for CalendarNotification {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
+    /// File attachments for the event. Currently only Google Drive attachments are supported.
+    /// In order to modify attachments the supportsAttachments request parameter should be set to true.
+    /// There can be at most 25 attachments per event,
+    pub attachments: Option<Vec<EventAttachment>>,
     /// The creator of the event. Read-only.
     pub creator: Option<EventCreator>,
     /// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
@@ -1947,6 +1979,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _calendar_id: calendar_id.to_string(),
+            _supports_attachments: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
             _delegate: Default::default(),
@@ -1968,6 +2001,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _calendar_id: calendar_id.to_string(),
+            _supports_attachments: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2073,6 +2107,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
+            _supports_attachments: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
             _always_include_email: Default::default(),
@@ -2119,6 +2154,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
+            _supports_attachments: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
             _always_include_email: Default::default(),
@@ -9109,8 +9145,9 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().insert(req, "calendarId")
+///              .supports_attachments(true)
 ///              .send_notifications(true)
-///              .max_attendees(-7)
+///              .max_attendees(-58)
 ///              .doit();
 /// # }
 /// ```
@@ -9120,6 +9157,7 @@ pub struct EventInsertCall<'a, C, A>
     hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
+    _supports_attachments: Option<bool>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -9143,15 +9181,18 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
+        if let Some(value) = self._supports_attachments {
+            params.push(("supportsAttachments", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
         if let Some(value) = self._max_attendees {
             params.push(("maxAttendees", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "sendNotifications", "maxAttendees"].iter() {
+        for &field in ["alt", "calendarId", "supportsAttachments", "sendNotifications", "maxAttendees"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9301,6 +9342,13 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Whether API client performing operation supports event attachments. Optional. The default is False.
+    ///
+    /// Sets the *supports attachments* query property to the given value.
+    pub fn supports_attachments(mut self, new_value: bool) -> EventInsertCall<'a, C, A> {
+        self._supports_attachments = Some(new_value);
+        self
+    }
     /// Whether to send notifications about the creation of the new event. Optional. The default is False.
     ///
     /// Sets the *send notifications* query property to the given value.
@@ -9400,6 +9448,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().import(req, "calendarId")
+///              .supports_attachments(false)
 ///              .doit();
 /// # }
 /// ```
@@ -9409,6 +9458,7 @@ pub struct EventImportCall<'a, C, A>
     hub: &'a CalendarHub<C, A>,
     _request: Event,
     _calendar_id: String,
+    _supports_attachments: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9430,9 +9480,12 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.import", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
-        for &field in ["alt", "calendarId"].iter() {
+        if let Some(value) = self._supports_attachments {
+            params.push(("supportsAttachments", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "supportsAttachments"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9582,6 +9635,13 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Whether API client performing operation supports event attachments. Optional. The default is False.
+    ///
+    /// Sets the *supports attachments* query property to the given value.
+    pub fn supports_attachments(mut self, new_value: bool) -> EventImportCall<'a, C, A> {
+        self._supports_attachments = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9661,15 +9721,15 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().instances("calendarId", "eventId")
-///              .time_zone("invidunt")
-///              .time_min("ea")
-///              .time_max("sadipscing")
-///              .show_deleted(false)
-///              .page_token("dolore")
-///              .original_start("nonumy")
-///              .max_results(-29)
-///              .max_attendees(-82)
-///              .always_include_email(false)
+///              .time_zone("sadipscing")
+///              .time_min("rebum.")
+///              .time_max("dolore")
+///              .show_deleted(true)
+///              .page_token("sed")
+///              .original_start("aliquyam")
+///              .max_results(-53)
+///              .max_attendees(-40)
+///              .always_include_email(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10017,9 +10077,9 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().get("calendarId", "eventId")
-///              .time_zone("labore")
-///              .max_attendees(-30)
-///              .always_include_email(true)
+///              .time_zone("ea")
+///              .max_attendees(-62)
+///              .always_include_email(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10301,22 +10361,22 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list("calendarId")
-///              .updated_min("aliquyam")
-///              .time_zone("eos")
-///              .time_min("tempor")
-///              .time_max("sea")
-///              .sync_token("labore")
+///              .updated_min("tempor")
+///              .time_zone("sea")
+///              .time_min("labore")
+///              .time_max("ipsum")
+///              .sync_token("aliquyam")
 ///              .single_events(false)
-///              .show_hidden_invitations(true)
-///              .show_deleted(false)
-///              .add_shared_extended_property("sit")
-///              .q("diam")
-///              .add_private_extended_property("ut")
-///              .page_token("justo")
-///              .order_by("est")
-///              .max_results(-46)
-///              .max_attendees(-23)
-///              .i_cal_uid("clita")
+///              .show_hidden_invitations(false)
+///              .show_deleted(true)
+///              .add_shared_extended_property("ut")
+///              .q("justo")
+///              .add_private_extended_property("est")
+///              .page_token("amet")
+///              .order_by("accusam")
+///              .max_results(-13)
+///              .max_attendees(-79)
+///              .i_cal_uid("justo")
 ///              .always_include_email(false)
 ///              .doit();
 /// # }
@@ -10770,8 +10830,9 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().patch(req, "calendarId", "eventId")
-///              .send_notifications(false)
-///              .max_attendees(-37)
+///              .supports_attachments(false)
+///              .send_notifications(true)
+///              .max_attendees(-24)
 ///              .always_include_email(false)
 ///              .doit();
 /// # }
@@ -10783,6 +10844,7 @@ pub struct EventPatchCall<'a, C, A>
     _request: Event,
     _calendar_id: String,
     _event_id: String,
+    _supports_attachments: Option<bool>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
     _always_include_email: Option<bool>,
@@ -10807,9 +10869,12 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "calendar.events.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
+        if let Some(value) = self._supports_attachments {
+            params.push(("supportsAttachments", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
@@ -10819,7 +10884,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._always_include_email {
             params.push(("alwaysIncludeEmail", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "eventId", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10979,6 +11044,13 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._event_id = new_value.to_string();
         self
     }
+    /// Whether API client performing operation supports event attachments. Optional. The default is False.
+    ///
+    /// Sets the *supports attachments* query property to the given value.
+    pub fn supports_attachments(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
+        self._supports_attachments = Some(new_value);
+        self
+    }
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
     ///
     /// Sets the *send notifications* query property to the given value.
@@ -11079,7 +11151,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().move_("calendarId", "eventId", "destination")
-///              .send_notifications(true)
+///              .send_notifications(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11357,8 +11429,9 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().update(req, "calendarId", "eventId")
-///              .send_notifications(false)
-///              .max_attendees(-17)
+///              .supports_attachments(true)
+///              .send_notifications(true)
+///              .max_attendees(-62)
 ///              .always_include_email(false)
 ///              .doit();
 /// # }
@@ -11370,6 +11443,7 @@ pub struct EventUpdateCall<'a, C, A>
     _request: Event,
     _calendar_id: String,
     _event_id: String,
+    _supports_attachments: Option<bool>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
     _always_include_email: Option<bool>,
@@ -11394,9 +11468,12 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
+        if let Some(value) = self._supports_attachments {
+            params.push(("supportsAttachments", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
@@ -11406,7 +11483,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._always_include_email {
             params.push(("alwaysIncludeEmail", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "eventId", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11566,6 +11643,13 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._event_id = new_value.to_string();
         self
     }
+    /// Whether API client performing operation supports event attachments. Optional. The default is False.
+    ///
+    /// Sets the *supports attachments* query property to the given value.
+    pub fn supports_attachments(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
+        self._supports_attachments = Some(new_value);
+        self
+    }
     /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
     ///
     /// Sets the *send notifications* query property to the given value.
@@ -11672,22 +11756,22 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().watch(req, "calendarId")
-///              .updated_min("diam")
-///              .time_zone("kasd")
+///              .updated_min("Lorem")
+///              .time_zone("clita")
 ///              .time_min("invidunt")
-///              .time_max("rebum.")
-///              .sync_token("Lorem")
+///              .time_max("eirmod")
+///              .sync_token("At")
 ///              .single_events(false)
 ///              .show_hidden_invitations(true)
 ///              .show_deleted(false)
-///              .add_shared_extended_property("At")
-///              .q("consetetur")
-///              .add_private_extended_property("et")
-///              .page_token("sed")
-///              .order_by("sit")
-///              .max_results(-8)
-///              .max_attendees(-43)
-///              .i_cal_uid("nonumy")
+///              .add_shared_extended_property("sit")
+///              .q("takimata")
+///              .add_private_extended_property("elitr")
+///              .page_token("nonumy")
+///              .order_by("rebum.")
+///              .max_results(-6)
+///              .max_attendees(-50)
+///              .i_cal_uid("diam")
 ///              .always_include_email(true)
 ///              .doit();
 /// # }
@@ -12160,7 +12244,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().quick_add("calendarId", "text")
-///              .send_notifications(true)
+///              .send_notifications(false)
 ///              .doit();
 /// # }
 /// ```

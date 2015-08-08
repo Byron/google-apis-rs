@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -1671,7 +1672,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the subscription. It must have the format "projects/{project}/subscriptions/{subscription}" for Google Cloud Pub/Sub API v1beta2. {subscription} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
+                     Some(r##"The name of the subscription. It must have the format "projects/{project}/subscriptions/{subscription}" for Google Cloud Pub/Sub API v1 and v1beta2. {subscription} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
                      Some(true),
                      Some(false)),
         
@@ -1738,12 +1739,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-get-iam-policy",  
-                    Some(r##"Gets the access control policy for a resource. May be empty if no such policy or resource exists."##),
+                    Some(r##"Gets the access control policy for a resource. Is empty if the policy or the resource does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being requested. Usually some path like projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
                      Some(true),
                      Some(false)),
         
@@ -1871,7 +1872,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Usually some path like projects/{project}/zones/{zone}/disks/{disk}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Resource is usually specified as a path, such as, projects/{project}/zones/{zone}/disks/{disk}."##),
                      Some(true),
                      Some(false)),
         
@@ -1899,7 +1900,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Usually some path like projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
                      Some(true),
                      Some(false)),
         
@@ -1927,7 +1928,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the topic. It must have the format "projects/{project}/topics/{topic}" for Google Cloud Pub/Sub API v1beta2. {topic} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
+                     Some(r##"The name of the topic. It must have the format "projects/{project}/topics/{topic}" for Google Cloud Pub/Sub API v1 and v1beta2. {topic} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
                      Some(true),
                      Some(false)),
         
@@ -1950,7 +1951,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-delete",  
-                    Some(r##"Deletes the topic with the given name. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted."##),
+                    Some(r##"Deletes the topic with the given name. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted, but their `topic` field is set to `_deleted-topic_`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-delete",
                   vec![
                     (Some(r##"topic"##),
@@ -1994,12 +1995,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-get-iam-policy",  
-                    Some(r##"Gets the access control policy for a resource. May be empty if no such policy or resource exists."##),
+                    Some(r##"Gets the access control policy for a resource. Is empty if the policy or the resource does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being requested. Usually some path like projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
                      Some(true),
                      Some(false)),
         
@@ -2071,7 +2072,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Usually some path like projects/{project}/zones/{zone}/disks/{disk}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Resource is usually specified as a path, such as, projects/{project}/zones/{zone}/disks/{disk}."##),
                      Some(true),
                      Some(false)),
         
@@ -2121,7 +2122,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Usually some path like projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
                      Some(true),
                      Some(false)),
         
@@ -2149,7 +2150,7 @@ fn main() {
     
     let mut app = App::new("pubsub1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150427")
+           .version("0.3.2+20150604")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli")
            .arg(Arg::with_name("url")
@@ -2231,7 +2232,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

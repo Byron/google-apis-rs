@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -151,7 +152,7 @@ impl<'a, C, A> Bigquery<C, A>
         Bigquery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -172,7 +173,7 @@ impl<'a, C, A> Bigquery<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -474,6 +475,23 @@ pub struct DatasetListDatasets {
 
 impl NestedType for DatasetListDatasets {}
 impl Part for DatasetListDatasets {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserDefinedFunctionResource {
+    /// [Pick one] A code resource to load from a Google Cloud Storage URI (gs://bucket/path).
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// [Pick one] An inline resource that contains code for a user-defined function (UDF). Providing a inline code resource is equivalent to providing a URI for a file containing the same code.
+    #[serde(rename="inlineCode")]
+    pub inline_code: Option<String>,
+}
+
+impl Part for UserDefinedFunctionResource {}
 
 
 /// Tables in the requested dataset.
@@ -1109,6 +1127,9 @@ pub struct JobConfigurationQuery {
     /// [Experimental] If querying an external data source outside of BigQuery, describes the data format, location and other properties of the data source. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
     #[serde(rename="tableDefinitions")]
     pub table_definitions: Option<HashMap<String, ExternalDataConfiguration>>,
+    /// [Experimental] Describes user-defined function resources used in the query.
+    #[serde(rename="userDefinedFunctionResources")]
+    pub user_defined_function_resources: Option<Vec<UserDefinedFunctionResource>>,
 }
 
 impl Part for JobConfigurationQuery {}
@@ -1249,40 +1270,42 @@ impl Part for TableReference {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
-    /// [Output-only] The type of the resource.
-    pub kind: Option<String>,
-    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
-    #[serde(rename="expirationTime")]
-    pub expiration_time: Option<String>,
     /// [Optional] A user-friendly description of this table.
     pub description: Option<String>,
-    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// [Output-only] An opaque ID uniquely identifying the table.
-    pub id: Option<String>,
-    /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.
-    #[serde(rename="numRows")]
-    pub num_rows: Option<String>,
     /// [Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.
     #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,
-    /// [Output-only] A hash of this resource.
-    pub etag: Option<String>,
-    /// [Optional] A descriptive name for this table.
-    #[serde(rename="friendlyName")]
-    pub friendly_name: Option<String>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
     #[serde(rename="lastModifiedTime")]
     pub last_modified_time: Option<String>,
+    /// [Output-only] An opaque ID uniquely identifying the table.
+    pub id: Option<String>,
+    /// [Output-only] The type of the resource.
+    pub kind: Option<String>,
+    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Required] Reference describing the ID of this table.
+    #[serde(rename="tableReference")]
+    pub table_reference: Option<TableReference>,
+    /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.
+    #[serde(rename="numRows")]
+    pub num_rows: Option<String>,
+    /// [Output-only] A hash of this resource.
+    pub etag: Option<String>,
+    /// [Optional] The backing storage location.
+    pub location: Option<String>,
+    /// [Optional] A descriptive name for this table.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
+    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
+    #[serde(rename="expirationTime")]
+    pub expiration_time: Option<String>,
     /// [Optional] Describes the schema of this table.
     pub schema: Option<TableSchema>,
     /// [Output-only] Describes the table type. The following values are supported: TABLE: A normal BigQuery table. VIEW: A virtual table defined by a SQL query. The default value is TABLE.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// [Required] Reference describing the ID of this table.
-    #[serde(rename="tableReference")]
-    pub table_reference: Option<TableReference>,
     /// [Output-only] A URL that can be used to access this resource again.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
@@ -5997,7 +6020,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._job_id = new_value.to_string();
         self
     }
-    /// How long to wait for the query to complete, in milliseconds, before returning. Default is to return immediately. If the timeout passes before the job completes, the request will fail with a TIMEOUT error
+    /// How long to wait for the query to complete, in milliseconds, before returning. Default is 10 seconds. If the timeout passes before the job completes, the 'jobComplete' field in the response will be false
     ///
     /// Sets the *timeout ms* query property to the given value.
     pub fn timeout_ms(mut self, new_value: u32) -> JobGetQueryResultCall<'a, C, A> {

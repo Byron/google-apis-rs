@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-qpxexpress1` library allows access to all features of the *Google QPX Express* service.
 
-This documentation was generated from *QPX Express* crate version *0.1.8+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *QPX Express* crate version *0.1.9+20140321*, where *20140321* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *QPX Express* *v1* API can be found at the
 [official documentation site](http://developers.google.com/qpx-express).

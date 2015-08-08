@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -44,6 +45,96 @@ struct Engine<'n, 'a> {
 
 
 impl<'n, 'a> Engine<'n, 'a> {
+    fn _searchanalytics_query(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "start-date" => Some(("startDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "end-date" => Some(("endDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dimensions" => Some(("dimensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "search-type" => Some(("searchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "row-limit" => Some(("rowLimit", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "aggregation-type" => Some(("aggregationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-type", "dimensions", "end-date", "row-limit", "search-type", "start-date"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SearchAnalyticsQueryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.searchanalytics().query(request, opt.value_of("site-url").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _sitemaps_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.sitemaps().delete(opt.value_of("site-url").unwrap_or(""), opt.value_of("feedpath").unwrap_or(""));
@@ -647,6 +738,17 @@ impl<'n, 'a> Engine<'n, 'a> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("searchanalytics", Some(opt)) => {
+                match opt.subcommand() {
+                    ("query", Some(opt)) => {
+                        call_result = self._searchanalytics_query(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("searchanalytics".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("sitemaps", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -797,6 +899,41 @@ impl<'n, 'a> Engine<'n, 'a> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("searchanalytics", "methods: 'query'", vec![
+            ("query",  
+                    Some(r##"[LIMITED ACCESS]
+        
+        Query your data with filters and parameters that you define. Returns zero or more rows grouped by the row keys that you define. You must define a date range of one or more days.
+        
+        When date is one of the group by values, any days without data are omitted from the result list. If you need to know which days have data, issue a broad date range query grouped by date for any metric, and see which day rows are returned."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_webmasters3_cli/searchanalytics_query",
+                  vec![
+                    (Some(r##"site-url"##),
+                     None,
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("sitemaps", "methods: 'delete', 'get', 'list' and 'submit'", vec![
             ("delete",  
                     Some(r##"Deletes a sitemap from this site."##),
@@ -804,13 +941,13 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"feedpath"##),
                      None,
-                     Some(r##"The URL of the actual sitemap (for example http://www.example.com/sitemap.xml)."##),
+                     Some(r##"The URL of the actual sitemap. For example: http://www.example.com/sitemap.xml"##),
                      Some(true),
                      Some(false)),
         
@@ -826,13 +963,13 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"feedpath"##),
                      None,
-                     Some(r##"The URL of the actual sitemap (for example http://www.example.com/sitemap.xml)."##),
+                     Some(r##"The URL of the actual sitemap. For example: http://www.example.com/sitemap.xml"##),
                      Some(true),
                      Some(false)),
         
@@ -849,12 +986,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",  
-                    Some(r##"Lists sitemaps uploaded to the site."##),
+                    Some(r##"Lists the sitemaps-entries submitted for this site, or included in the sitemap index file (if sitemapIndex is specified in the request)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_webmasters3_cli/sitemaps_list",
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
@@ -876,13 +1013,13 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"feedpath"##),
                      None,
-                     Some(r##"The URL of the sitemap to add."##),
+                     Some(r##"The URL of the sitemap to add. For example: http://www.example.com/sitemap.xml"##),
                      Some(true),
                      Some(false)),
         
@@ -917,7 +1054,7 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/"##),
                      Some(true),
                      Some(false)),
         
@@ -933,7 +1070,7 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/"##),
                      Some(true),
                      Some(false)),
         
@@ -950,7 +1087,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",  
-                    Some(r##"Lists your Webmaster Tools sites."##),
+                    Some(r##"Lists the user's Webmaster Tools sites."##),
                     "Details at http://byron.github.io/google-apis-rs/google_webmasters3_cli/sites_list",
                   vec![
                     (Some(r##"v"##),
@@ -974,7 +1111,7 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
@@ -999,25 +1136,25 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"url"##),
                      None,
-                     Some(r##"The relative path (without the site) of the sample URL; must be one of the URLs returned by list"##),
+                     Some(r##"The relative path (without the site) of the sample URL. It must be one of the URLs returned by list(). For example, for the URL https://www.example.com/pagename on the site https://www.example.com/, the url value is pagename"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"category"##),
                      None,
-                     Some(r##"The crawl error category, for example 'authPermissions'"##),
+                     Some(r##"The crawl error category. For example: authPermissions"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"platform"##),
                      None,
-                     Some(r##"The user agent type (platform) that made the request, for example 'web'"##),
+                     Some(r##"The user agent type (platform) that made the request. For example: web"##),
                      Some(true),
                      Some(false)),
         
@@ -1039,19 +1176,19 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"category"##),
                      None,
-                     Some(r##"The crawl error category, for example 'authPermissions'"##),
+                     Some(r##"The crawl error category. For example: authPermissions"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"platform"##),
                      None,
-                     Some(r##"The user agent type (platform) that made the request, for example 'web'"##),
+                     Some(r##"The user agent type (platform) that made the request. For example: web"##),
                      Some(true),
                      Some(false)),
         
@@ -1073,25 +1210,25 @@ fn main() {
                   vec![
                     (Some(r##"site-url"##),
                      None,
-                     Some(r##"The site's URL, including protocol, for example 'http://www.example.com/'"##),
+                     Some(r##"The site's URL, including protocol. For example: http://www.example.com/"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"url"##),
                      None,
-                     Some(r##"The relative path (without the site) of the sample URL; must be one of the URLs returned by list"##),
+                     Some(r##"The relative path (without the site) of the sample URL. It must be one of the URLs returned by list(). For example, for the URL https://www.example.com/pagename on the site https://www.example.com/, the url value is pagename"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"category"##),
                      None,
-                     Some(r##"The crawl error category, for example 'authPermissions'"##),
+                     Some(r##"The crawl error category. For example: authPermissions"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"platform"##),
                      None,
-                     Some(r##"The user agent type (platform) that made the request, for example 'web'"##),
+                     Some(r##"The user agent type (platform) that made the request. For example: web"##),
                      Some(true),
                      Some(false)),
         
@@ -1107,7 +1244,7 @@ fn main() {
     
     let mut app = App::new("webmasters3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20140908")
+           .version("0.3.2+20150624")
            .about("Lets you view Google Webmaster Tools data for your verified sites.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webmasters3_cli")
            .arg(Arg::with_name("url")
@@ -1189,7 +1326,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

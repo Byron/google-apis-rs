@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dfareporting2d1` library allows access to all features of the *Google dfareporting* service.
 
-This documentation was generated from *dfareporting* crate version *0.1.8+20150326*, where *20150326* is the exact revision of the *dfareporting:v2.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *dfareporting* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *dfareporting:v2.1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *dfareporting* *v2d1* API can be found at the
 [official documentation site](https://developers.google.com/doubleclick-advertisers/reporting/).

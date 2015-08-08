@@ -2,15 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webmasters* crate version *0.1.8+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *webmasters* crate version *0.1.9+20150624*, where *20150624* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *webmasters* *v3* API can be found at the
-//! [official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
+//! [official documentation site](https://developers.google.com/webmaster-tools/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/webmasters3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Webmasters.html) ... 
 //! 
+//! * searchanalytics
+//!  * [*query*](struct.SearchanalyticQueryCall.html)
 //! * sitemaps
 //!  * [*delete*](struct.SitemapDeleteCall.html), [*get*](struct.SitemapGetCall.html), [*list*](struct.SitemapListCall.html) and [*submit*](struct.SitemapSubmitCall.html)
 //! * sites

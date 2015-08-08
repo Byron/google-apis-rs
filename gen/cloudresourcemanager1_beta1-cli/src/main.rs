@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -583,7 +584,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",  
-                    Some(r##"Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if it has a lifecycle state of [ACTIVE][cloudresourcemanager.projects.v1beta2.LifecycleState.ACTIVE] when this method is called. Otherwise this method does nothing (since all other states are phases of deletion). This method changes the project's lifecycle state from [ACTIVE][cloudresourcemanager.projects.v1beta2.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [cloudresourcemanager.projects.v1beta2.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [cloudresourcemanager.projects.v1beta2.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [cloudresourcemanager.projects.v1beta2.Projects.GetProject], and the project remains visible to [ListProjects] [cloudresourcemanager.projects.v1beta2.Projects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [cloudresourcemanager.projects.v1beta2.Projects.GetProject] and [ListProjects] [cloudresourcemanager.projects.v1beta2.Projects.ListProjects] methods. The caller must have modify permissions for this project."##),
+                    Some(r##"Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if the following criteria are met: + The project does not have a billing account associated with it. + The project has a lifecycle state of [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE]. This method changes the project's lifecycle state from [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject], and the project remains visible to [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject] and [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] methods. The caller must have modify permissions for this project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_delete",
                   vec![
                     (Some(r##"project-id"##),
@@ -643,7 +644,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("undelete",  
-                    Some(r##"Restores the project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a project that has a lifecycle state of [DELETE_REQUESTED] [cloudresourcemanager.projects.v1beta2.LifecycleState.DELETE_REQUESTED]. After deletion starts, as indicated by a lifecycle state of [DELETE_IN_PROGRESS] [cloudresourcemanager.projects.v1beta2.LifecycleState.DELETE_IN_PROGRESS], the project cannot be restored. The caller must have modify permissions for this project."##),
+                    Some(r##"Restores the project identified by the specified `project_id` (for example, `my-project-123`). You can only use this method for a project that has a lifecycle state of [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. After deletion starts, as indicated by a lifecycle state of [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS], the project cannot be restored. The caller must have modify permissions for this project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_undelete",
                   vec![
                     (Some(r##"project-id"##),
@@ -698,8 +699,8 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150603")
-           .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating of project metadata, including IAM policies, and will shortly provide the same for other high-level entities (e.g. customers and resource groups). Longer term, we expect the cloudresourcemanager API to encompass other Cloud resources as well.")
+           .version("0.3.2+20150711")
+           .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating of project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")
@@ -780,7 +781,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

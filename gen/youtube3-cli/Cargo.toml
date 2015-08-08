@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtube3-cli"
-version = "0.3.1+20150529"
+version = "0.3.2+20150706"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtube3-cli"
@@ -17,9 +17,10 @@ keywords = ["youtube", "google", "cli"]
 name = "youtube3"
 
 [dependencies]
-hyper = ">= 0.6.4"
-mime = "0.0.12"
-serde = ">= 0.4.1"
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.5.0"
+serde_json = "*"
 yup-oauth2 = "*"
 strsim = "*"
 yup-hyper-mock = ">=1.0.0"

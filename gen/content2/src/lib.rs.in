@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -96,6 +97,7 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().patch(req, "merchantId", "accountId")
+///              .dry_run(true)
 ///              .doit();
 /// 
 /// match result {
@@ -131,7 +133,7 @@ impl<'a, C, A> ShoppingContent<C, A>
         ShoppingContent {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -164,7 +166,7 @@ impl<'a, C, A> ShoppingContent<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2699,6 +2701,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
         DatafeedCustombatchCall {
             hub: self.hub,
             _request: request,
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2739,6 +2742,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _datafeed_id: datafeed_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2758,6 +2762,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _datafeed_id: datafeed_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2777,6 +2782,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2817,6 +2823,7 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _datafeed_id: datafeed_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2987,6 +2994,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3027,6 +3035,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _request: request,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3065,6 +3074,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3082,6 +3092,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
         AccountCustombatchCall {
             hub: self.hub,
             _request: request,
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3101,6 +3112,7 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _merchant_id: merchant_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3165,6 +3177,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
             _merchant_id: merchant_id.to_string(),
             _store_code: store_code.to_string(),
             _product_id: product_id.to_string(),
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3182,6 +3195,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
         InventoryCustombatchCall {
             hub: self.hub,
             _request: request,
+            _dry_run: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3847,7 +3861,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().patch(req, "merchantId", "accountId")
-///              .dry_run(true)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -4132,8 +4146,8 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounttax().list("merchantId")
-///              .page_token("justo")
-///              .max_results(100)
+///              .page_token("erat")
+///              .max_results(66)
 ///              .doit();
 /// # }
 /// ```
@@ -5177,8 +5191,8 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeedstatuses().list("merchantId")
-///              .page_token("ea")
-///              .max_results(40)
+///              .page_token("justo")
+///              .max_results(80)
 ///              .doit();
 /// # }
 /// ```
@@ -5673,6 +5687,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().custombatch(req)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -5681,6 +5696,7 @@ pub struct DatafeedCustombatchCall<'a, C, A>
 
     hub: &'a ShoppingContent<C, A>,
     _request: DatafeedsCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5702,8 +5718,11 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "content.datafeeds.custombatch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5820,6 +5839,13 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: DatafeedsCustomBatchRequest) -> DatafeedCustombatchCall<'a, C, A> {
         self._request = new_value;
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6153,6 +6179,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().patch(req, "merchantId", "datafeedId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -6163,6 +6190,7 @@ pub struct DatafeedPatchCall<'a, C, A>
     _request: Datafeed,
     _merchant_id: String,
     _datafeed_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6184,10 +6212,13 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "content.datafeeds.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("datafeedId", self._datafeed_id.to_string()));
-        for &field in ["alt", "merchantId", "datafeedId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "datafeedId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6345,6 +6376,13 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._datafeed_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedPatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6424,6 +6462,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().delete("merchantId", "datafeedId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -6433,6 +6472,7 @@ pub struct DatafeedDeleteCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _merchant_id: String,
     _datafeed_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6454,10 +6494,13 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "content.datafeeds.delete", 
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("datafeedId", self._datafeed_id.to_string()));
-        for &field in ["merchantId", "datafeedId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["merchantId", "datafeedId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6580,6 +6623,13 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._datafeed_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedDeleteCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6665,6 +6715,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().insert(req, "merchantId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -6674,6 +6725,7 @@ pub struct DatafeedInsertCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _request: Datafeed,
     _merchant_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6695,9 +6747,12 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "content.datafeeds.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
-        for &field in ["alt", "merchantId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6846,6 +6901,13 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._merchant_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedInsertCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6925,8 +6987,8 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().list("merchantId")
-///              .page_token("duo")
-///              .max_results(69)
+///              .page_token("sadipscing")
+///              .max_results(53)
 ///              .doit();
 /// # }
 /// ```
@@ -7191,6 +7253,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.datafeeds().update(req, "merchantId", "datafeedId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -7201,6 +7264,7 @@ pub struct DatafeedUpdateCall<'a, C, A>
     _request: Datafeed,
     _merchant_id: String,
     _datafeed_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7222,10 +7286,13 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "content.datafeeds.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("datafeedId", self._datafeed_id.to_string()));
-        for &field in ["alt", "merchantId", "datafeedId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "datafeedId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7381,6 +7448,13 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// we provide this method for API completeness.
     pub fn datafeed_id(mut self, new_value: &str) -> DatafeedUpdateCall<'a, C, A> {
         self._datafeed_id = new_value.to_string();
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7710,8 +7784,8 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.productstatuses().list("merchantId")
-///              .page_token("dolor")
-///              .max_results(62)
+///              .page_token("dolore")
+///              .max_results(64)
 ///              .doit();
 /// # }
 /// ```
@@ -8413,6 +8487,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().patch(req, "merchantId", "accountId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -8423,6 +8498,7 @@ pub struct AccountPatchCall<'a, C, A>
     _request: Account,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8444,10 +8520,13 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "content.accounts.patch", 
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8605,6 +8684,13 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn account_id(mut self, new_value: &str) -> AccountPatchCall<'a, C, A> {
         self._account_id = new_value.to_string();
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountPatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8940,6 +9026,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().update(req, "merchantId", "accountId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -8950,6 +9037,7 @@ pub struct AccountUpdateCall<'a, C, A>
     _request: Account,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8971,10 +9059,13 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "content.accounts.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["alt", "merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9134,6 +9225,13 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._account_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountUpdateCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9213,8 +9311,8 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().list("merchantId")
-///              .page_token("aliquyam")
-///              .max_results(28)
+///              .page_token("et")
+///              .max_results(55)
 ///              .doit();
 /// # }
 /// ```
@@ -9473,6 +9571,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().delete("merchantId", "accountId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9482,6 +9581,7 @@ pub struct AccountDeleteCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _merchant_id: String,
     _account_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9503,10 +9603,13 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "content.accounts.delete", 
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        for &field in ["merchantId", "accountId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["merchantId", "accountId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9631,6 +9734,13 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._account_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountDeleteCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9716,6 +9826,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().custombatch(req)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9724,6 +9835,7 @@ pub struct AccountCustombatchCall<'a, C, A>
 
     hub: &'a ShoppingContent<C, A>,
     _request: AccountsCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9745,8 +9857,11 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "content.accounts.custombatch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9865,6 +9980,13 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9950,6 +10072,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().insert(req, "merchantId")
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9959,6 +10082,7 @@ pub struct AccountInsertCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _request: Account,
     _merchant_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9980,9 +10104,12 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "content.accounts.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
-        for &field in ["alt", "merchantId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10132,6 +10259,13 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> AccountInsertCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10217,6 +10351,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory().set(req, "merchantId", "storeCode", "productId")
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10228,6 +10363,7 @@ pub struct InventorySetCall<'a, C, A>
     _merchant_id: String,
     _store_code: String,
     _product_id: String,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10249,11 +10385,14 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "content.inventory.set", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("storeCode", self._store_code.to_string()));
         params.push(("productId", self._product_id.to_string()));
-        for &field in ["alt", "merchantId", "storeCode", "productId"].iter() {
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "merchantId", "storeCode", "productId", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10423,6 +10562,13 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._product_id = new_value.to_string();
         self
     }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a, C, A> {
+        self._dry_run = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10508,6 +10654,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inventory().custombatch(req)
+///              .dry_run(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10516,6 +10663,7 @@ pub struct InventoryCustombatchCall<'a, C, A>
 
     hub: &'a ShoppingContent<C, A>,
     _request: InventoryCustomBatchRequest,
+    _dry_run: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10537,8 +10685,11 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "content.inventory.custombatch", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        if let Some(value) = self._dry_run {
+            params.push(("dryRun", value.to_string()));
+        }
+        for &field in ["alt", "dryRun"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10655,6 +10806,13 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// we provide this method for API completeness.
     pub fn request(mut self, new_value: InventoryCustomBatchRequest) -> InventoryCustombatchCall<'a, C, A> {
         self._request = new_value;
+        self
+    }
+    /// Flag to run the request in dry-run mode.
+    ///
+    /// Sets the *dry run* query property to the given value.
+    pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a, C, A> {
+        self._dry_run = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10984,8 +11142,8 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountstatuses().list("merchantId")
-///              .page_token("et")
-///              .max_results(56)
+///              .page_token("justo")
+///              .max_results(49)
 ///              .doit();
 /// # }
 /// ```
@@ -11476,8 +11634,8 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().list("merchantId")
-///              .page_token("ea")
-///              .max_results(21)
+///              .page_token("diam")
+///              .max_results(35)
 ///              .doit();
 /// # }
 /// ```
@@ -12485,7 +12643,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().insert(req, "merchantId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```
@@ -12758,8 +12916,8 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().list("merchantId")
-///              .page_token("justo")
-///              .max_results(49)
+///              .page_token("Lorem")
+///              .max_results(84)
 ///              .doit();
 /// # }
 /// ```
@@ -13315,7 +13473,7 @@ impl<'a, C, A> AccountshippingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accountshipping().update(req, "merchantId", "accountId")
-///              .dry_run(false)
+///              .dry_run(true)
 ///              .doit();
 /// # }
 /// ```

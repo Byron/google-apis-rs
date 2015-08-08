@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -103,7 +104,7 @@ impl<'a, C, A> Discovery<C, A>
         Discovery {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -112,7 +113,7 @@ impl<'a, C, A> Discovery<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -321,14 +322,12 @@ pub struct RestDescription {
     /// Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names.
     #[serde(rename="canonicalName")]
     pub canonical_name: Option<String>,
-    /// The name of the owner of this API. See ownerDomain.
-    #[serde(rename="ownerName")]
-    pub owner_name: Option<String>,
     /// A link to human readable documentation for the API.
     #[serde(rename="documentationLink")]
     pub documentation_link: Option<String>,
-    /// Authentication information.
-    pub auth: Option<RestDescriptionAuth>,
+    /// The name of the owner of this API. See ownerDomain.
+    #[serde(rename="ownerName")]
+    pub owner_name: Option<String>,
     /// The package of the owner of this API. See ownerDomain.
     #[serde(rename="packagePath")]
     pub package_path: Option<String>,
@@ -355,21 +354,26 @@ pub struct RestDescription {
     pub description: Option<String>,
     /// The title of this API.
     pub title: Option<String>,
+    /// Enable exponential backoff for suitable methods in the generated clients.
+    #[serde(rename="exponentialBackoffDefault")]
+    pub exponential_backoff_default: Option<bool>,
     /// [DEPRECATED] The base URL for REST requests.
     #[serde(rename="baseUrl")]
     pub base_url: Option<String>,
-    /// The ETag for this response.
-    pub etag: Option<String>,
     /// The version of this API.
     pub version: Option<String>,
-    /// The base path for all REST requests.
-    #[serde(rename="servicePath")]
-    pub service_path: Option<String>,
     /// Indicate the version of the Discovery API used to generate this doc.
     #[serde(rename="discoveryVersion")]
     pub discovery_version: Option<String>,
+    /// The base path for all REST requests.
+    #[serde(rename="servicePath")]
+    pub service_path: Option<String>,
+    /// The ETag for this response.
+    pub etag: Option<String>,
     /// The schemas for this API.
     pub schemas: Option<HashMap<String, JsonSchema>>,
+    /// Authentication information.
+    pub auth: Option<RestDescriptionAuth>,
     /// [DEPRECATED] The base path for REST requests.
     #[serde(rename="basePath")]
     pub base_path: Option<String>,

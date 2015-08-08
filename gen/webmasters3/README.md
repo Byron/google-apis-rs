@@ -5,14 +5,16 @@ DO NOT EDIT !
 -->
 The `google-webmasters3` library allows access to all features of the *Google webmasters* service.
 
-This documentation was generated from *webmasters* crate version *0.1.8+20140908*, where *20140908* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+This documentation was generated from *webmasters* crate version *0.1.9+20150624*, where *20150624* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *webmasters* *v3* API can be found at the
-[official documentation site](https://developers.google.com/webmaster-tools/v3/welcome).
+[official documentation site](https://developers.google.com/webmaster-tools/).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_webmasters3/struct.Webmasters.html) ... 
 
+* searchanalytics
+ * [*query*](http://byron.github.io/google-apis-rs/google_webmasters3/struct.SearchanalyticQueryCall.html)
 * sitemaps
  * [*delete*](http://byron.github.io/google-apis-rs/google_webmasters3/struct.SitemapDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_webmasters3/struct.SitemapGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_webmasters3/struct.SitemapListCall.html) and [*submit*](http://byron.github.io/google-apis-rs/google_webmasters3/struct.SitemapSubmitCall.html)
 * sites

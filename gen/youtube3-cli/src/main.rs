@@ -8,6 +8,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;
@@ -27,7 +28,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {
@@ -2356,6 +2357,68 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _live_broadcasts_bind_direct(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.live_broadcasts().bind_direct(opt.value_of("id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "stream-id" => {
+                    call = call.stream_id(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner-channel" => {
+                    call = call.on_behalf_of_content_owner_channel(value.unwrap_or(""));
+                },
+                "on-behalf-of-content-owner" => {
+                    call = call.on_behalf_of_content_owner(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner-channel", "on-behalf-of-content-owner", "stream-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _live_broadcasts_control(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.live_broadcasts().control(opt.value_of("id").unwrap_or(""), opt.value_of("part").unwrap_or(""));
@@ -2954,7 +3017,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 match &temp_cursor.to_string()[..] {
                     "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.health-status.status" => Some(("status.healthStatus.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.health-status.last-update-time-s" => Some(("status.healthStatus.lastUpdateTimeS", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.last-update-time-seconds" => Some(("status.healthStatus.lastUpdateTimeSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2971,7 +3034,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-s", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3134,7 +3197,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                 match &temp_cursor.to_string()[..] {
                     "status.stream-status" => Some(("status.streamStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.health-status.status" => Some(("status.healthStatus.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.health-status.last-update-time-s" => Some(("status.healthStatus.lastUpdateTimeS", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.health-status.last-update-time-seconds" => Some(("status.healthStatus.lastUpdateTimeSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.is-reusable" => Some(("contentDetails.isReusable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "content-details.closed-captions-ingestion-url" => Some(("contentDetails.closedCaptionsIngestionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3151,7 +3214,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-s", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-ingestion-address", "cdn", "channel-id", "closed-captions-ingestion-url", "content-details", "description", "etag", "format", "health-status", "id", "ingestion-address", "ingestion-info", "ingestion-type", "is-default-stream", "is-reusable", "kind", "last-update-time-seconds", "published-at", "snippet", "status", "stream-name", "stream-status", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5654,6 +5717,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     ("bind", Some(opt)) => {
                         call_result = self._live_broadcasts_bind(opt, dry_run, &mut err);
                     },
+                    ("bind-direct", Some(opt)) => {
+                        call_result = self._live_broadcasts_bind_direct(opt, dry_run, &mut err);
+                    },
                     ("control", Some(opt)) => {
                         call_result = self._live_broadcasts_control(opt, dry_run, &mut err);
                     },
@@ -6553,10 +6619,38 @@ fn main() {
                   ]),
             ]),
         
-        ("live-broadcasts", "methods: 'bind', 'control', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
+        ("live-broadcasts", "methods: 'bind', 'bind-direct', 'control', 'delete', 'insert', 'list', 'transition' and 'update'", vec![
             ("bind",  
                     Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream, though a video stream may be bound to more than one broadcast."##),
                     "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind",
+                  vec![
+                    (Some(r##"id"##),
+                     None,
+                     Some(r##"The id parameter specifies the unique ID of the broadcast that is being bound to a video stream."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"part"##),
+                     None,
+                     Some(r##"The part parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("bind-direct",  
+                    Some(r##"Binds a YouTube broadcast to a stream or removes an existing binding between a broadcast and a stream. A broadcast can only be bound to one video stream, though a video stream may be bound to more than one broadcast."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_youtube3_cli/live-broadcasts_bind-direct",
                   vec![
                     (Some(r##"id"##),
                      None,
@@ -7362,7 +7456,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.1+20150529")
+           .version("0.3.2+20150706")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")
@@ -7455,7 +7549,7 @@ fn main() {
                     },
                     DoitError::ApiError(err) => {
                         if debug {
-                            writeln!(io::stderr(), "{:?}", err).ok();
+                            writeln!(io::stderr(), "{:#?}", err).ok();
                         } else {
                             writeln!(io::stderr(), "{}", err).ok();
                         }

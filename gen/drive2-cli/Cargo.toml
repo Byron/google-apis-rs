@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive2-cli"
-version = "0.3.1+20150305"
+version = "0.3.2+20150709"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2-cli"
@@ -17,9 +17,10 @@ keywords = ["drive", "google", "cli"]
 name = "drive2"
 
 [dependencies]
-hyper = ">= 0.6.4"
-mime = "0.0.12"
-serde = ">= 0.4.1"
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.5.0"
+serde_json = "*"
 yup-oauth2 = "*"
 strsim = "*"
 yup-hyper-mock = ">=1.0.0"

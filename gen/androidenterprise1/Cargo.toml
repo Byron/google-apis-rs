@@ -4,10 +4,11 @@
 [package]
 
 name = "google-androidenterprise1"
-version = "0.1.8+20150303"
+version = "0.1.9+20150715"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Enterprise (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1"
+homepage = "https://developers.google.com/play/enterprise"
 documentation = "http://byron.github.io/google-apis-rs/google_androidenterprise1"
 license = "MIT"
 keywords = ["androidenterprise", "google", "protocol", "web", "api"]
@@ -15,9 +16,10 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.6.4"
-mime = "0.0.12"
-serde = ">= 0.4.1"
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.5.0"
+serde_json = "*"
 yup-oauth2 = "*"
 url = "*"
 

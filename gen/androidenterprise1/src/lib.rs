@@ -2,7 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Enterprise* crate version *0.1.8+20150303*, where *20150303* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *Android Enterprise* crate version *0.1.9+20150715*, where *20150715* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! 
+//! Everything else about the *Android Enterprise* *v1* API can be found at the
+//! [official documentation site](https://developers.google.com/play/enterprise).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1).
 //! # Features
 //! 

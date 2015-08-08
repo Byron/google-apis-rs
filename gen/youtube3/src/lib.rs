@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.8+20150529*, where *20150529* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.8*.
+//! This documentation was generated from *YouTube* crate version *0.1.9+20150706*, where *20150706* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -32,7 +32,7 @@
 //! * [i18n regions](struct.I18nRegion.html)
 //!  * [*list*](struct.I18nRegionListCall.html)
 //! * [live broadcasts](struct.LiveBroadcast.html)
-//!  * [*bind*](struct.LiveBroadcastBindCall.html), [*control*](struct.LiveBroadcastControlCall.html), [*delete*](struct.LiveBroadcastDeleteCall.html), [*insert*](struct.LiveBroadcastInsertCall.html), [*list*](struct.LiveBroadcastListCall.html), [*transition*](struct.LiveBroadcastTransitionCall.html) and [*update*](struct.LiveBroadcastUpdateCall.html)
+//!  * [*bind*](struct.LiveBroadcastBindCall.html), [*bind_direct*](struct.LiveBroadcastBindDirectCall.html), [*control*](struct.LiveBroadcastControlCall.html), [*delete*](struct.LiveBroadcastDeleteCall.html), [*insert*](struct.LiveBroadcastInsertCall.html), [*list*](struct.LiveBroadcastListCall.html), [*transition*](struct.LiveBroadcastTransitionCall.html) and [*update*](struct.LiveBroadcastUpdateCall.html)
 //! * [live streams](struct.LiveStream.html)
 //!  * [*delete*](struct.LiveStreamDeleteCall.html), [*insert*](struct.LiveStreamInsertCall.html), [*list*](struct.LiveStreamListCall.html) and [*update*](struct.LiveStreamUpdateCall.html)
 //! * [playlist items](struct.PlaylistItem.html)
@@ -104,13 +104,14 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.videos().rate(...).doit()
-//! let r = hub.videos().report_abuse(...).doit()
-//! let r = hub.videos().get_rating(...).doit()
-//! let r = hub.videos().list(...).doit()
-//! let r = hub.videos().insert(...).doit()
-//! let r = hub.videos().update(...).doit()
-//! let r = hub.videos().delete(...).doit()
+//! let r = hub.live_broadcasts().control(...).doit()
+//! let r = hub.live_broadcasts().insert(...).doit()
+//! let r = hub.live_broadcasts().bind_direct(...).doit()
+//! let r = hub.live_broadcasts().list(...).doit()
+//! let r = hub.live_broadcasts().transition(...).doit()
+//! let r = hub.live_broadcasts().update(...).doit()
+//! let r = hub.live_broadcasts().delete(...).doit()
+//! let r = hub.live_broadcasts().bind(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -156,18 +157,14 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.videos().list("part")
-//!              .video_category_id("dolores")
-//!              .region_code("et")
-//!              .page_token("sed")
-//!              .on_behalf_of_content_owner("et")
-//!              .my_rating("aliquyam")
-//!              .max_results(10)
-//!              .locale("sit")
-//!              .id("aliquyam")
-//!              .hl("sadipscing")
-//!              .debug_project_id_override("magna")
-//!              .chart("gubergren")
+//! let result = hub.live_broadcasts().list("part")
+//!              .page_token("erat")
+//!              .on_behalf_of_content_owner_channel("amet.")
+//!              .on_behalf_of_content_owner("dolores")
+//!              .mine(false)
+//!              .max_results(78)
+//!              .id("sed")
+//!              .broadcast_status("et")
 //!              .doit();
 //! 
 //! match result {

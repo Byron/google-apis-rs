@@ -4,6 +4,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -15,7 +16,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;
@@ -105,7 +106,7 @@ impl<'a, C, A> CivicInfo<C, A>
         CivicInfo {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/0.1.8".to_string(),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
         }
     }
 
@@ -120,7 +121,7 @@ impl<'a, C, A> CivicInfo<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/0.1.8`.
+    /// It defaults to `google-api-rust-client/0.1.9`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -257,16 +258,30 @@ impl Part for Candidate {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Contest {
+    /// The threshold of votes that the referendum needs in order to pass, e.g. "two-thirds". This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumPassageThreshold")]
+    pub referendum_passage_threshold: Option<String>,
+    /// The full text of the referendum. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumText")]
+    pub referendum_text: Option<String>,
     /// The name of the office for this contest.
     pub office: Option<String>,
+    /// Specifies a short summary of the referendum that is on the ballot below the title but above the text. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumBrief")]
+    pub referendum_brief: Option<String>,
     /// A list of sources for this contest. If multiple sources are listed, the data has been aggregated from those sources.
     pub sources: Option<Vec<Source>>,
     /// If this is a partisan election, the name of the party it is for.
     #[serde(rename="primaryParty")]
     pub primary_party: Option<String>,
+    /// A brief description of the referendum. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumSubtitle")]
+    pub referendum_subtitle: Option<String>,
     /// A description of any additional eligibility requirements for voting in this contest.
     #[serde(rename="electorateSpecifications")]
     pub electorate_specifications: Option<String>,
+    /// The roles which this office fulfills.
+    pub roles: Option<Vec<String>>,
     /// The number of candidates that will be elected to office in this contest.
     #[serde(rename="numberElected")]
     pub number_elected: Option<String>,
@@ -280,21 +295,28 @@ pub struct Contest {
     pub id: Option<String>,
     /// "Yes" or "No" depending on whether this a contest being held outside the normal election cycle.
     pub special: Option<String>,
+    /// Specifies what effect abstaining (not voting) on the proposition will have (i.e. whether abstaining is considered a vote against it). This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumEffectOfAbstain")]
+    pub referendum_effect_of_abstain: Option<String>,
     /// The number of candidates that a voter may vote for in this contest.
     #[serde(rename="numberVotingFor")]
     pub number_voting_for: Option<String>,
+    /// A statement in opposition to the referendum. It does not necessarily appear on the ballot. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumConStatement")]
+    pub referendum_con_statement: Option<String>,
     /// Information about the electoral district that this contest is in.
     pub district: Option<ElectoralDistrict>,
-    /// The roles which this office fulfills.
-    pub roles: Option<Vec<String>>,
     /// The levels of government of the office for this contest. There may be more than one in cases where a jurisdiction effectively acts at two different levels of government; for example, the mayor of the District of Columbia acts at "locality" level, but also effectively at both "administrative-area-2" and "administrative-area-1".
     pub level: Option<Vec<String>>,
     /// A number specifying the position of this contest on the voter's ballot.
     #[serde(rename="ballotPlacement")]
     pub ballot_placement: Option<String>,
-    /// A brief description of the referendum. This field is only populated for contests of type 'Referendum'.
-    #[serde(rename="referendumSubtitle")]
-    pub referendum_subtitle: Option<String>,
+    /// The set of ballot responses for the referendum. A ballot response represents a line on the ballot. Common examples might include "yes" or "no" for referenda, or a judge's name for a retention contest. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumBallotResponses")]
+    pub referendum_ballot_responses: Option<Vec<String>>,
+    /// A statement in favor of the referendum. It does not necessarily appear on the ballot. This field is only populated for contests of type 'Referendum'.
+    #[serde(rename="referendumProStatement")]
+    pub referendum_pro_statement: Option<String>,
     /// The candidate choices for this contest.
     pub candidates: Option<Vec<Candidate>>,
     /// The type of contest. Usually this will be 'General', 'Primary', or 'Run-off' for contests with candidates. For referenda this will be 'Referendum'.
@@ -622,6 +644,9 @@ pub struct VoterInfoResponse {
     /// If no election ID was specified in the query, and there was more than one election with data for the given voter, this will contain information about the other elections that could apply.
     #[serde(rename="otherElections")]
     pub other_elections: Option<Vec<Election>>,
+    /// Specifies whether voters in the precinct vote only by mailing their ballots (with the possible option of dropping off their ballots as well).
+    #[serde(rename="mailOnly")]
+    pub mail_only: Option<bool>,
     /// Identifies what kind of resource this is. Value: the fixed string "civicinfo#voterInfoResponse".
     pub kind: Option<String>,
     /// The normalized version of the requested address
