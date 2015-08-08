@@ -1,6 +1,6 @@
 use oauth2::{ApplicationSecret, ConsoleApplicationSecret, TokenStorage, Token};
-use serde::json;
-use serde::json::value::Value;
+use serde_json as json;
+use serde_json::value::Value;
 use mime::Mime;
 use clap::{App, SubCommand};
 use strsim;

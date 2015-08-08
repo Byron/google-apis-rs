@@ -39,7 +39,7 @@ use std::default::Default;
 use std::str::FromStr;
 
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate};
-use serde::json;
+use serde_json as json;
 use clap::ArgMatches;
 
 enum DoitError {

@@ -19,6 +19,7 @@ extern crate clap;
 extern crate yup_oauth2 as oauth2;
 extern crate yup_hyper_mock as mock;
 extern crate serde;
+extern crate serde_json;
 extern crate hyper;
 extern crate mime;
 extern crate strsim;

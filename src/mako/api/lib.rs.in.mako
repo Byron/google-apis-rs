@@ -21,6 +21,7 @@
 
 extern crate hyper;
 extern crate serde;
+extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
@@ -32,7 +33,7 @@ use std::cell::RefCell;
 use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
-use serde::json;
+use serde_json as json;
 use std::io;
 use std::fs;
 use std::thread::sleep_ms;

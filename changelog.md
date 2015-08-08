@@ -1,3 +1,20 @@
+<a name="cli-v0.3.2:cli-v0.1.9"></a>
+## cli-v0.3.2:cli-v0.1.9 (2015-08-08)
+
+
+#### Bug Fixes
+
+* **clap-up**  use clap 1.0.3 ([be894bec](https://github.com/Byron/google-apis-rs/commit/be894becc38296a62760a0724ea1310081e713de))
+* **deploy**  adjust linux script to target dir ([0f61fa4c](https://github.com/Byron/google-apis-rs/commit/0f61fa4c95c25c0e9f30cc10b6aa3b005d26e3ca))
+* **hyper-up**  compatibility with hyper 0.6.4 ([e129a7d3](https://github.com/Byron/google-apis-rs/commit/e129a7d3ae878a9ee78ea21fe1c0aa8b5671a5e0), closes [#123](https://github.com/Byron/google-apis-rs/issues/123))
+* **serde-up**  update to serde 0.5.0 ([2d574591](https://github.com/Byron/google-apis-rs/commit/2d574591365c4a289d1b06464da94c46a51d0037))
+
+#### Improvements
+
+* **cli**  pretty-print errors in debug mode ([152cdd84](https://github.com/Byron/google-apis-rs/commit/152cdd848a41109819d890560d26270bd08c12ae))
+
+
+
 <a name="cli-v0.3.1"></a>
 ## cli-v0.3.1 (2015-06-26)
 
