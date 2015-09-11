@@ -14,6 +14,7 @@ To find a library of your interest, you might want to proceed looking at the [AP
 # Live-Development
 
 [![Build Status](https://travis-ci.org/Byron/google-apis-rs.svg?branch=master)](https://travis-ci.org/Byron/google-apis-rs)
+[![Stackshare.io](https://img.shields.io/badge/stackshare.io-GO-blue.svg)](http://stackshare.io/Byron/google-apis-for-rust)
 
 All work done on the project is based on [github issues][issues], not only to track progress and show what's going on, but
 to have a place to link screen-recordings to. [Milestones][milestones] are used to provide a bigger picture.
