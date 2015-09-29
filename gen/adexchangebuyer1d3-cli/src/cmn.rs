@@ -120,7 +120,7 @@ pub struct FieldCursor(Vec<String>);
 
 impl ToString for  FieldCursor {
     fn to_string(&self) -> String {
-        self.0.connect(".")
+        self.0.join(".")
     }
 }
 
@@ -237,15 +237,15 @@ impl FieldCursor {
         }
     }
 
-    pub fn set_json_value(&self, mut object: &mut Value, 
+    pub fn set_json_value(&self, mut object: &mut Value,
                                  value: &str, type_info: JsonTypeInfo,
-                                 err: &mut InvalidOptionsError, 
+                                 err: &mut InvalidOptionsError,
                                  orig_cursor: &FieldCursor) {
         assert!(self.0.len() > 0);
 
         for field in &self.0[..self.0.len()-1] {
             let tmp = object;
-            object = 
+            object =
                 match *tmp {
                     Value::Object(ref mut mapping) => {
                         mapping.entry(field.to_owned()).or_insert(
@@ -259,19 +259,19 @@ impl FieldCursor {
         match *object {
             Value::Object(ref mut mapping) => {
                 let field = &self.0[self.0.len()-1];
-                let to_jval = 
-                    |value: &str, jtype: JsonType, err: &mut InvalidOptionsError| 
+                let to_jval =
+                    |value: &str, jtype: JsonType, err: &mut InvalidOptionsError|
                                                                         -> Value {
                         match jtype {
-                            JsonType::Boolean => 
+                            JsonType::Boolean =>
                                     Value::Bool(arg_from_str(value, err, &field, "boolean")),
-                            JsonType::Int => 
+                            JsonType::Int =>
                                     Value::I64(arg_from_str(value, err, &field, "int")),
-                            JsonType::Uint => 
+                            JsonType::Uint =>
                                     Value::U64(arg_from_str(value, err, &field, "uint")),
-                            JsonType::Float => 
+                            JsonType::Float =>
                                     Value::F64(arg_from_str(value, err, &field, "float")),
-                            JsonType::String => 
+                            JsonType::String =>
                                     Value::String(value.to_owned()),
                         }
                     };
@@ -338,7 +338,7 @@ pub fn calltype_from_str(name: &str, valid_protocols: Vec<String>, err: &mut Inv
         match UploadProtocol::from_str(name) {
             Ok(up) => up,
             Err(msg) => {
-                err.issues.push(CLIError::InvalidUploadProtocol(name.to_string(), valid_protocols)); 
+                err.issues.push(CLIError::InvalidUploadProtocol(name.to_string(), valid_protocols));
                 UploadProtocol::Simple
             }
         })
@@ -376,8 +376,8 @@ pub fn writer_from_opts(arg: Option<&str>) -> Result<Box<Write>, io::Error> {
 }
 
 
-pub fn arg_from_str<'a, T>(arg: &str, err: &mut InvalidOptionsError, 
-                                  arg_name: &'a str, 
+pub fn arg_from_str<'a, T>(arg: &str, err: &mut InvalidOptionsError,
+                                  arg_name: &'a str,
                                   arg_type: &'a str) -> T
                                                         where   T: FromStr + Default,
                                                              <T as FromStr>::Err: fmt::Display {
@@ -411,7 +411,7 @@ impl TokenStorage for JsonTokenStorage {
         match token {
             None => {
                 match fs::remove_file(self.path(scope_hash)) {
-                    Err(err) => 
+                    Err(err) =>
                         match err.kind() {
                             io::ErrorKind::NotFound => Ok(()),
                             _ => Err(json::Error::IoError(err))
@@ -424,7 +424,7 @@ impl TokenStorage for JsonTokenStorage {
                     Ok(mut f) => {
                         match json::to_writer_pretty(&mut f, &token) {
                             Ok(_) => Ok(()),
-                            Err(io_err) => Err(json::Error::IoError(io_err)),
+                            Err(serde_err) => Err(serde_err),
                         }
                     },
                     Err(io_err) => Err(json::Error::IoError(io_err))
@@ -455,17 +455,17 @@ impl TokenStorage for JsonTokenStorage {
 #[derive(Debug)]
 pub enum ApplicationSecretError {
     DecoderError((String, json::Error)),
-    FormatError(String),    
+    FormatError(String),
 }
 
 impl fmt::Display for ApplicationSecretError {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match *self {
             ApplicationSecretError::DecoderError((ref path, ref err))
-                => writeln!(f, "Could not decode file at '{}' with error: {}.", 
+                => writeln!(f, "Could not decode file at '{}' with error: {}.",
                             path, err),
             ApplicationSecretError::FormatError(ref path)
-                => writeln!(f, "'installed' field is unset in secret file at '{}'.", 
+                => writeln!(f, "'installed' field is unset in secret file at '{}'.",
                             path),
         }
     }
@@ -485,7 +485,7 @@ impl fmt::Display for ConfigurationError {
         match *self {
             ConfigurationError::DirectoryCreationFailed((ref dir, ref err))
                 => writeln!(f, "Directory '{}' could not be created with error: {}.", dir, err),
-            ConfigurationError::DirectoryUnset 
+            ConfigurationError::DirectoryUnset
                 => writeln!(f, "--config-dir was unset or empty."),
             ConfigurationError::HomeExpansionFailed(ref dir)
                 => writeln!(f, "Couldn't find HOME directory of current user, failed to expand '{}'.", dir),
@@ -532,10 +532,10 @@ impl fmt::Display for FieldError {
             FieldError::TrailingFieldSep(ref field)
                 => writeln!(f, "'{}': Single field separator may not be last character.", field),
             FieldError::Unknown(ref field, ref suggestion, ref value) => {
-                let suffix = 
+                let suffix =
                     match *suggestion {
                         Some(ref s) => {
-                            let kv = 
+                            let kv =
                                 match *value {
                                     Some(ref v) => format!("{}={}", s, v),
                                     None => s.clone(),
@@ -546,7 +546,7 @@ impl fmt::Display for FieldError {
                     };
                 writeln!(f, "Field '{}' does not exist.{}", field, suffix)
             },
-            FieldError::Duplicate(ref cursor) 
+            FieldError::Duplicate(ref cursor)
                 => writeln!(f, "Value at '{}' was already set", cursor),
             FieldError::Empty
                 => writeln!(f, "Field names must not be empty."),
@@ -574,13 +574,13 @@ impl fmt::Display for CLIError {
             CLIError::Configuration(ref err) => write!(f, "Configuration -> {}", err),
             CLIError::Input(ref err) => write!(f, "Input -> {}", err),
             CLIError::Field(ref err) => write!(f, "Field -> {}", err),
-            CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names) 
-                => writeln!(f, "'{}' is not a valid upload protocol. Choose from one of {}.", proto_name, valid_names.connect(", ")),
-            CLIError::ParseError(ref arg_name, ref type_name, ref value, ref err_desc) 
+            CLIError::InvalidUploadProtocol(ref proto_name, ref valid_names)
+                => writeln!(f, "'{}' is not a valid upload protocol. Choose from one of {}.", proto_name, valid_names.join(", ")),
+            CLIError::ParseError(ref arg_name, ref type_name, ref value, ref err_desc)
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}.",
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name, ref possible_values) => {
-                let mut suffix = 
+                let mut suffix =
                     match did_you_mean(param_name, &possible_values) {
                         Some(v) => format!(" Did you mean '{}' ?", v),
                         None => String::new(),
@@ -634,7 +634,7 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
         return Err(CLIError::Configuration(ConfigurationError::DirectoryUnset))
     }
 
-    let expanded_config_dir = 
+    let expanded_config_dir =
         if trdir.as_bytes()[0] == b'~' {
             match env::var("HOME").ok().or(env::var("UserProfile").ok()) {
                 None => return Err(CLIError::Configuration(ConfigurationError::HomeExpansionFailed(trdir.to_string()))),
@@ -657,8 +657,8 @@ pub fn assure_config_dir_exists(dir: &str) -> Result<String, CLIError> {
     Ok(expanded_config_dir)
 }
 
-pub fn application_secret_from_directory(dir: &str, 
-                                         secret_basename: &str, 
+pub fn application_secret_from_directory(dir: &str,
+                                         secret_basename: &str,
                                          json_console_secret: &str)
                                                         -> Result<ApplicationSecret, CLIError> {
     let secret_path = Path::new(dir).join(secret_basename);
@@ -679,10 +679,13 @@ pub fn application_secret_from_directory(dir: &str,
                         Err(cfe) => cfe,
                         Ok(mut f) => {
                             // Assure we convert 'ugly' json string into pretty one
-                            let console_secret: ConsoleApplicationSecret 
+                            let console_secret: ConsoleApplicationSecret
                                             = json::from_str(json_console_secret).unwrap();
                             match json::to_writer_pretty(&mut f, &console_secret) {
-                                Err(io_err) => io_err,
+                                Err(serde_err) => match serde_err {
+                                    json::Error::IoError(err) => err,
+                                    _ => panic!("Unexpected serde error: {:#?}", serde_err)
+                                },
                                 Ok(_) => continue,
                             }
                         }
@@ -693,15 +696,15 @@ pub fn application_secret_from_directory(dir: &str,
             },
             Ok(mut f) => {
                 match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
-                    Err(json::Error::IoError(err)) => 
+                    Err(json::Error::IoError(err)) =>
                         return secret_io_error(err),
-                    Err(json_err) => 
+                    Err(json_err) =>
                         return Err(CLIError::Configuration(
                             ConfigurationError::Secret(
                                 ApplicationSecretError::DecoderError(
                                                 (secret_str(), json_err)
                                               )))),
-                    Ok(console_secret) => 
+                    Ok(console_secret) =>
                         match console_secret.installed {
                             Some(secret) => return Ok(secret),
                             None => return Err(
