@@ -88,10 +88,10 @@ If the upload fails for whichever reason, all progress is lost.""",
     'resumable' : {
         'arg_name': 'resumeable_stream',
         'description': """Upload media in a resumable fashion.
-Even if the upload fails or is interrupted, it can be resumed for a 
+Even if the upload fails or is interrupted, it can be resumed for a
 certain amount of time as the server maintains state temporarily.
 
-The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
 that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
 may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
 `cancel_chunk_upload(...)`.""",
@@ -180,7 +180,7 @@ def indent_all_but_first_by(indent, indent_in_tabs=True):
     return prefix_all_but_first_with(spaces)
 
 # add 4 spaces to the beginning of a line.
-# useful if you have defs embedded in an unindent block - they need to counteract. 
+# useful if you have defs embedded in an unindent block - they need to counteract.
 # It's a bit itchy, but logical
 def indent(s):
     return re_linestart.sub(' ' * SPACES_PER_TAB, s)
@@ -203,7 +203,7 @@ def rust_doc_test_norun(s):
 
 # a rust code block in (github) markdown
 def markdown_rust_block(s):
-    return "```Rust\n%s```" % trailing_newline(s)    
+    return "```Rust\n%s```" % trailing_newline(s)
 
 # wraps s into an invisible doc test function.
 def rust_test_fn_invisible(s):
@@ -255,7 +255,7 @@ def camel_to_under(s):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
 # there are property descriptions from which parts can be extracted. Regex is based on youtube ... it's sufficiently
-# easy enough to add more cases ... 
+# easy enough to add more cases ...
 # return ['part', ...] or []
 def extract_parts(desc):
     res = list()
@@ -391,7 +391,7 @@ def _traverse_schema_ids(s, c):
     ids = [s.id]
     used_by = s.used_by + s.parents
 
-    seen = set() # protect against loops, just to be sure ... 
+    seen = set() # protect against loops, just to be sure ...
     while used_by:
         id = used_by.pop()
         if id in seen:
@@ -406,7 +406,7 @@ def _traverse_schema_ids(s, c):
     return ids
 
 # Return sorted type names of all markers applicable to the given schema
-# This list is transitive. Thus, if the schema is used as child of someone with a trait, it 
+# This list is transitive. Thus, if the schema is used as child of someone with a trait, it
 # inherits this trait
 def schema_markers(s, c, transitive=True):
     res = set()
@@ -449,8 +449,8 @@ def schema_markers(s, c, transitive=True):
 
 ## -- End Rust TypeSystem -- @}
 
-# NOTE: unfortunately, it turned out that sometimes fields are missing. The only way to handle this is to 
-# use optionals everywhere. If that should ever change, we can make a decision here based on the 
+# NOTE: unfortunately, it turned out that sometimes fields are missing. The only way to handle this is to
+# use optionals everywhere. If that should ever change, we can make a decision here based on the
 # non-transitive markers that we get here !
 def is_schema_with_optionals(schema_markers):
     return True
@@ -463,10 +463,10 @@ def activity_split(fqan):
     t = fqan.split('.')
     mt = t[2:]
     if not mt:
-        # make this the method, with not resource 
+        # make this the method, with not resource
         mt = [t[1]]
         t[1] = METHODS_RESOURCE
-    # end 
+    # end
     return t[0], t[1], '.'.join(mt)
 
 # Shorthand to get a type from parameters of activities
@@ -589,7 +589,7 @@ def method_media_params(m):
     mu = m.get('mediaUpload')
     assert mu is not None
 
-    # actually, one of them is required, but we can't encode that ... 
+    # actually, one of them is required, but we can't encode that ...
     # runtime will have to check
     res = list()
     for pn, proto in mu.protocols.iteritems():
@@ -602,7 +602,7 @@ def method_media_params(m):
         p = type(m)({'name': 'media_%s',
              'info': pi,
              'protocol': pn,
-             'path': proto.path, 
+             'path': proto.path,
              'type': ti,
              'description': ti.description,
              'max_size': size_to_bytes(mu.get('maxSize', '0kb'))})
@@ -620,13 +620,13 @@ def build_all_params(c, m):
         params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
     dp = type(m)({ 'name': DELEGATE_PROPERTY_NAME,
-           TREF: "&'a mut %s" % DELEGATE_TYPE, 
+           TREF: "&'a mut %s" % DELEGATE_TYPE,
           'input_type': "&'a mut %s" % DELEGATE_TYPE,
           'clone_value': '{}',
           'skip_example' : True,
           'priority': 0,
           'is_query_param': False,
-          'description': 
+          'description':
 """The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
 while executing the actual API request.
 
@@ -660,7 +660,7 @@ def new_context(schemas, resources, methods):
                 assert m.id not in fqan
                 category, resource, method = activity_split(m.id)
                 # This may be another name by which people try to find the method.
-                # As it has no resource, we put in a 'fake resource' (METHODS_RESOURCE), which 
+                # As it has no resource, we put in a 'fake resource' (METHODS_RESOURCE), which
                 # needs some special treatment only in key-spots
                 fqan_key = m.id
                 if resource == METHODS_RESOURCE:
@@ -738,10 +738,10 @@ def new_context(schemas, resources, methods):
 
                     recurse_properties(ns.id, ns, ns, append_unique(parent_ids, rs.id))
                 elif is_map_prop(p):
-                    recurse_properties(nested_type_name(prefix, pn), rs, 
+                    recurse_properties(nested_type_name(prefix, pn), rs,
                                                         p.additionalProperties, append_unique(parent_ids, rs.id))
                 elif 'items' in p:
-                    recurse_properties(nested_type_name(prefix, pn), rs, 
+                    recurse_properties(nested_type_name(prefix, pn), rs,
                                                         p.items, append_unique(parent_ids, rs.id))
                 elif 'variant' in p:
                     for enum in p.variant.map:
@@ -780,11 +780,16 @@ def new_context(schemas, resources, methods):
     # end for each data source
     return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
 
-# Expects v to be 'v\d+', throws otherwise
+def _is_special_version(v):
+    return v.endswith('alpha') or v.endswith('beta')
+
 def to_api_version(v):
     m = re.search("_?v(\d(\.\d)*)_?", v)
+    if not m and _is_special_version(v):
+        return v
     assert m, "Expected to find a version within '%s'" % v
 
+    # skip trailing zeroes
     tokens = m.group(1).split('.')
     up_to = len(tokens)
     for t in reversed(tokens[1:]):
@@ -793,9 +798,7 @@ def to_api_version(v):
         else:
             break
 
-    version = '.'.join(tokens[:up_to])
-
-    version = version.replace('.', 'd')
+    version = 'd'.join(tokens[:up_to])
     remainder = v.replace(m.group(0), '')
     if remainder:
         version = version + '_' + remainder
@@ -807,11 +810,11 @@ def normalize_library_name(name):
 # build a full library name (non-canonical)
 def library_name(name, version):
     version = to_api_version(version)
-    assert not version.startswith('v')
 
     if name[-1].isdigit():
         name += '_'
-        version = 'v' + version
+        if not _is_special_version(version):
+            version = 'v' + version
     return normalize_library_name(name) + version
 
 def target_directory_name(name, version, suffix):
@@ -897,7 +900,7 @@ _rb_type_params = ("'a", ) + HUB_TYPE_PARAMETERS
 def rb_type_params_s(resource, c):
     return _to_type_params_s(_rb_type_params)
 
-# type bounds for resource and method builder 
+# type bounds for resource and method builder
 def struct_type_bounds_s():
     return ', '.join(tp + ": 'a" for tp in HUB_TYPE_PARAMETERS)
 
@@ -950,7 +953,7 @@ def dot_sep_to_canonical_type_name(n):
 def find_fattest_resource(c):
     fr = None
     if c.schemas:
-        for candidate in sorted(c.schemas.values(), 
+        for candidate in sorted(c.schemas.values(),
                             key=lambda s: (len(c.sta_map.get(s.id, [])), len(s.get('properties', []))), reverse=True):
             if candidate.id in c.sta_map:
                 fr = candidate
@@ -986,7 +989,7 @@ def scope_url_to_variant(name, url, fully_qualified=True):
 
     assert base, name
     # special case, which works for now ... https://mail.gmail.com
-    # NO can do ! Must play safe here ... 
+    # NO can do ! Must play safe here ...
     if not base.startswith(name):
         return fqvn(dot_sep_to_canonical_type_name(repl(base)))
     base = base[len(name):]
@@ -1037,7 +1040,10 @@ if __name__ == '__main__':
                         ('v2.0.1', '2d0d1'),
                         ('v0.0', '0'),
                         ('v0.1.0', '0d1'),
-                        ('v2.0beta3', '2_beta3'),):
+                        ('v2.0beta3', '2_beta3'),
+                        ('alpha', 'alpha'),
+                        ('beta', 'beta'),
+                        ('vm_beta', 'vm_beta')):
             res = to_api_version(v)
             assert res == want, "%s == %s" % (res, want)
         # end for each pair
@@ -1054,7 +1060,10 @@ if __name__ == '__main__':
 
     def test_library_name():
         for v, want in (('v1', 'oauth2_v1'),
-                        ('v1.4', 'oauth2_v1d4'),):
+                        ('v1.4', 'oauth2_v1d4'),
+                        ('alpha', 'oauth2_alpha'),
+                        ('beta', 'oauth2_beta'),
+                        ('vm_beta', 'oauth2_vm_beta')):
             res = library_name('oauth2', v)
             assert res == want, "%s ~== %s" % (res, want)
 
