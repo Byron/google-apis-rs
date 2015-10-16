@@ -75,7 +75,7 @@ include $(API_DEPS)
 include $(CLI_DEPS)
 
 LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
-	$(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
+	$(PYPATH) $(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
 
