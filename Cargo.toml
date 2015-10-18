@@ -16,12 +16,15 @@ name = "cmn"
 path = "src/rust/lib.rs"
 
 [dependencies]
+clap = "*"
 hyper = "*"
 mime = "*"
 rustc-serialize = "*"
-yup-oauth2 = "*"
+yup-oauth2 = { version = "*", features = ["nightly"], default-features = false }
 serde = "*"
+serde_json = "*"
 serde_macros = "*"
+strsim = "*"
 
 [dev-dependencies]
 yup-hyper-mock = "*"

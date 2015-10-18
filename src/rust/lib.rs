@@ -2,12 +2,18 @@
 #![allow(dead_code, deprecated, unused_features, unused_variables, unused_imports)]
 //! library with code shared by all generated implementations
 #![plugin(serde_macros)]
+
+#[macro_use]
+extern crate clap;
+
 #[macro_use]
 extern crate hyper;
 extern crate mime;
 extern crate rustc_serialize;
 extern crate yup_oauth2 as oauth2;
 extern crate serde;
+extern crate serde_json;
+extern crate strsim;
 
 // just pull it in the check if it compiles
 mod api;
