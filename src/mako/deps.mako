@@ -11,7 +11,7 @@
 	doc_root = directories.output + '/' + directories.doc_subdir
 	doc_index = doc_root + '/index.html'
 
-	def to_doc_root(gen_root, crate_name): 
+	def to_doc_root(gen_root, crate_name):
 		if make.documentation_engine == 'mkdocs':
 			return gen_root + '/' + mkdocs.site_dir
 		else:
@@ -72,11 +72,12 @@
 	api_doc_index = api_doc_root + '/index.html'
 
 	# source, destination of individual output files
-	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' + 
+	sds = [(directories.mako_src + '/' + make.id + '/' + i.source + '.mako', gen_root + '/' +
 		   i.get('output_dir', '') + '/' + i.source.strip('../')) for i in make.templates]
 	api_json = directories.api_base + '/' + an + '/' + version + '/' + an + '-api.json'
 	api_meta_dir = os.path.dirname(api_json)
-	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version + 
+	print api_json
+	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version +
 			make.aggregated_target_suffix, json.load(open(api_json, 'r')).get('revision', '00000000'))
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.yaml'
 	type_specific_cfg = gen_type_cfg_path(make.id)
