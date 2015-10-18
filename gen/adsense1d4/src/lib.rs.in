@@ -252,6 +252,8 @@ pub struct Account {
     pub name: Option<String>,
     /// AdSense timezone of this account.
     pub timezone: Option<String>,
+    /// no description provided
+    pub creation_time: Option<String>,
     /// Unique identifier of this account.
     pub id: Option<String>,
     /// Sub accounts of the this account.

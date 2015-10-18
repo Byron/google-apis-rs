@@ -1,0 +1,35 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-script1-cli"
+version = "0.3.2+20150922"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with script (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/script1-cli"
+homepage = "https://developers.google.com/apps-script/execution/rest/v1/run"
+documentation = "http://byron.github.io/google-apis-rs/google_script1_cli"
+license = "MIT"
+keywords = ["script", "google", "cli"]
+
+[[bin]]
+name = "script1"
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+strsim = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 1.0.3"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
+
+[dependencies.google-script1]
+path = "../script1"

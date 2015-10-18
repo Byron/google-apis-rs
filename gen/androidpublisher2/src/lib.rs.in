@@ -224,7 +224,7 @@ pub struct InAppProduct {
     pub sku: Option<String>,
     /// no description provided
     pub status: Option<String>,
-    /// The period of the subscription (if any), i.e. period at which payments must happen. Defined as ISO 8601 duration, i.e. "P1M" for 1 month period.
+    /// Subscription period, specified in ISO 8601 format. Acceptable values are "P1W" (one week), "P1M" (one month) and "P1Y" (one year).
     #[serde(rename="subscriptionPeriod")]
     pub subscription_period: Option<String>,
     /// Definition of a season for a seasonal subscription. Can be defined only for yearly subscriptions.
@@ -4492,10 +4492,10 @@ impl<'a, C, A> EditImageUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -8395,10 +8395,10 @@ impl<'a, C, A> EditApkUploadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -10623,10 +10623,10 @@ impl<'a, C, A> EditExpansionfileUploadCall<'a, C, A> where C: BorrowMut<hyper::C
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.

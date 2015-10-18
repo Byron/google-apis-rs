@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-analytics3` library allows access to all features of the *Google analytics* service.
 
-This documentation was generated from *analytics* crate version *0.1.9+20150417*, where *20150417* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *analytics* crate version *0.1.9+20150901*, where *20150901* is the exact revision of the *analytics:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *analytics* *v3* API can be found at the
 [official documentation site](https://developers.google.com/analytics/).

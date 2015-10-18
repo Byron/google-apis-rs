@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-admin1_directory` library allows access to all features of the *Google directory* service.
 
-This documentation was generated from *directory* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *directory* crate version *0.1.9+20151005*, where *20151005* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *directory* *v1_directory* API can be found at the
 [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -19,6 +19,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*stop*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChannelStopCall.html)
 * chromeosdevices
  * [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdevicePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.ChromeosdeviceUpdateCall.html)
+* [customers](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Customer.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerGetCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.CustomerUpdateCall.html)
+* domain aliases
+ * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainAliaseDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainAliaseGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainAliaseInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainAliaseListCall.html)
+* domains
+ * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.DomainListCall.html)
 * [groups](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Group.html)
  * [*aliases delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupAliaseDeleteCall.html), [*aliases insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupAliaseInsertCall.html), [*aliases list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupAliaseListCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupUpdateCall.html)
 * [members](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Member.html)
@@ -29,6 +35,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.NotificationDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.NotificationGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.NotificationListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.NotificationPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.NotificationUpdateCall.html)
 * orgunits
  * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.OrgunitUpdateCall.html)
+* [privileges](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Privilege.html)
+ * [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.PrivilegeListCall.html)
+* [role assignments](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignment.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleAssignmentListCall.html)
+* [roles](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Role.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RolePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.RoleUpdateCall.html)
 * [schemas](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Schema.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.SchemaUpdateCall.html)
 * [tokens](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.Token.html)
@@ -42,9 +54,9 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 Subscription supported by ...
 
 * [*list users*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.UserListCall.html)
-* [*aliases list users*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.UserAliaseListCall.html)
 * [*watch users*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.UserWatchCall.html)
 * [*aliases watch users*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.UserAliaseWatchCall.html)
+* [*aliases list users*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.UserAliaseListCall.html)
 * [*aliases list groups*](http://byron.github.io/google-apis-rs/google_admin1_directory/struct.GroupAliaseListCall.html)
 
 

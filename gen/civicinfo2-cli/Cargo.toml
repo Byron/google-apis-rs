@@ -4,7 +4,7 @@
 [package]
 
 name = "google-civicinfo2-cli"
-version = "0.3.2+20150707"
+version = "0.3.2+20150820"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Civic Info (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/civicinfo2-cli"

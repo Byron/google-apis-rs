@@ -5,13 +5,16 @@ DO NOT EDIT !
 -->
 The `google-logging1_beta3` library allows access to all features of the *Google logging* service.
 
-This documentation was generated from *logging* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *logging* crate version *0.1.9+20151007*, where *20151007* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+
+Everything else about the *logging* *v1_beta3* API can be found at the
+[official documentation site](https://cloud.google.com/logging/docs/).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.Logging.html) ... 
 
 * projects
- * [*log services indexes list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceIndexeListCall.html), [*log services list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceListCall.html), [*log services sinks create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkCreateCall.html), [*log services sinks delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkDeleteCall.html), [*log services sinks get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkGetCall.html), [*log services sinks list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkListCall.html), [*log services sinks update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkUpdateCall.html), [*logs delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogDeleteCall.html), [*logs entries write*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogEntryWriteCall.html), [*logs list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogListCall.html), [*logs sinks create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkCreateCall.html), [*logs sinks delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkDeleteCall.html), [*logs sinks get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkGetCall.html), [*logs sinks list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkListCall.html) and [*logs sinks update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkUpdateCall.html)
+ * [*log services indexes list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceIndexeListCall.html), [*log services list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceListCall.html), [*log services sinks create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkCreateCall.html), [*log services sinks delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkDeleteCall.html), [*log services sinks get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkGetCall.html), [*log services sinks list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkListCall.html), [*log services sinks update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogServiceSinkUpdateCall.html), [*logs delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogDeleteCall.html), [*logs entries write*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogEntryWriteCall.html), [*logs list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogListCall.html), [*logs sinks create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkCreateCall.html), [*logs sinks delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkDeleteCall.html), [*logs sinks get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkGetCall.html), [*logs sinks list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkListCall.html), [*logs sinks update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectLogSinkUpdateCall.html), [*metrics create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectMetricCreateCall.html), [*metrics delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectMetricDeleteCall.html), [*metrics get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectMetricGetCall.html), [*metrics list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectMetricListCall.html), [*metrics update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectMetricUpdateCall.html), [*sinks create*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectSinkCreateCall.html), [*sinks delete*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectSinkDeleteCall.html), [*sinks get*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectSinkGetCall.html), [*sinks list*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectSinkListCall.html) and [*sinks update*](http://byron.github.io/google-apis-rs/google_logging1_beta3/struct.ProjectSinkUpdateCall.html)
 
 
 
@@ -45,11 +48,14 @@ Or specifically ...
 
 ```ignore
 let r = hub.projects().logs_sinks_get(...).doit()
+let r = hub.projects().sinks_create(...).doit()
 let r = hub.projects().log_services_sinks_update(...).doit()
+let r = hub.projects().sinks_update(...).doit()
 let r = hub.projects().logs_sinks_update(...).doit()
 let r = hub.projects().log_services_sinks_create(...).doit()
 let r = hub.projects().logs_sinks_create(...).doit()
 let r = hub.projects().log_services_sinks_get(...).doit()
+let r = hub.projects().sinks_get(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

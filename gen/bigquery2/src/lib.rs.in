@@ -38,6 +38,9 @@ pub enum Scope {
     /// Manage your data and permissions in Google Cloud Storage
     DevstorageFullControl,
 
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
+
     /// View your data in Google Cloud Storage
     DevstorageReadOnly,
 
@@ -58,6 +61,7 @@ impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::DevstorageFullControl => "https://www.googleapis.com/auth/devstorage.full_control",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
             Scope::DevstorageReadOnly => "https://www.googleapis.com/auth/devstorage.read_only",
             Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
@@ -210,7 +214,7 @@ impl Part for TableDataInsertAllRequestRows {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics4 {
-    /// [Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
+    /// [Output-only] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
     #[serde(rename="destinationUriFileCounts")]
     pub destination_uri_file_counts: Option<Vec<i64>>,
 }
@@ -234,7 +238,7 @@ pub struct QueryRequest {
     pub timeout_ms: Option<u32>,
     /// The resource type of the request.
     pub kind: Option<String>,
-    /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run.
+    /// [Optional] If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. The default value is true.
@@ -265,7 +269,13 @@ pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
-    /// [Output-only] Total bytes processed for this job.
+    /// [Output-only] Billing tier for the job.
+    #[serde(rename="billingTier")]
+    pub billing_tier: Option<i32>,
+    /// [Output-only] Total bytes billed for the job.
+    #[serde(rename="totalBytesBilled")]
+    pub total_bytes_billed: Option<String>,
+    /// [Output-only] Total bytes processed for the job.
     #[serde(rename="totalBytesProcessed")]
     pub total_bytes_processed: Option<String>,
 }
@@ -285,10 +295,10 @@ pub struct JobStatistics3 {
     /// [Output-only] Number of source files in a load job.
     #[serde(rename="inputFiles")]
     pub input_files: Option<String>,
-    /// [Output-only] Number of bytes of source data in a joad job.
+    /// [Output-only] Number of bytes of source data in a load job.
     #[serde(rename="inputFileBytes")]
     pub input_file_bytes: Option<String>,
-    /// [Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.
+    /// [Output-only] Size of the loaded data in bytes. Note that while a load job is in the running state, this value may change.
     #[serde(rename="outputBytes")]
     pub output_bytes: Option<String>,
 }
@@ -389,7 +399,7 @@ pub struct Dataset {
     pub default_table_expiration_ms: Option<String>,
     /// [Output-only] A hash of the resource.
     pub etag: Option<String>,
-    /// [Experimental] The location where the data resides. If not present, the data will be stored in the US.
+    /// [Experimental] The geographic location where the dataset should reside. Possible values include EU and US. The default value is US.
     pub location: Option<String>,
     /// [Optional] A descriptive name for the dataset.
     #[serde(rename="friendlyName")]
@@ -475,6 +485,26 @@ pub struct DatasetListDatasets {
 
 impl NestedType for DatasetListDatasets {}
 impl Part for DatasetListDatasets {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Streamingbuffer {
+    /// [Output-only] A lower-bound estimate of the number of bytes currently in the streaming buffer.
+    #[serde(rename="estimatedBytes")]
+    pub estimated_bytes: Option<String>,
+    /// [Output-only] A lower-bound estimate of the number of rows currently in the streaming buffer.
+    #[serde(rename="estimatedRows")]
+    pub estimated_rows: Option<String>,
+    /// [Output-only] Contains the timestamp of the oldest entry in the streaming buffer, in milliseconds since the epoch, if the streaming buffer is available.
+    #[serde(rename="oldestEntryTime")]
+    pub oldest_entry_time: Option<String>,
+}
+
+impl Part for Streamingbuffer {}
 
 
 /// There is no detailed description.
@@ -792,8 +822,8 @@ impl Part for JobConfigurationExtract {}
 pub struct GetQueryResultsResponse {
     /// The resource type of the response.
     pub kind: Option<String>,
-    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
-    pub rows: Option<Vec<TableRow>>,
+    /// [Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.
+    pub errors: Option<Vec<ErrorProto>>,
     /// Reference to the BigQuery Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(rename="jobReference")]
     pub job_reference: Option<JobReference>,
@@ -814,6 +844,8 @@ pub struct GetQueryResultsResponse {
     pub page_token: Option<String>,
     /// A hash of this response.
     pub etag: Option<String>,
+    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above. Present only when the query completes successfully.
+    pub rows: Option<Vec<TableRow>>,
     /// The schema of the results. Present only when the query completes successfully.
     pub schema: Option<TableSchema>,
 }
@@ -854,10 +886,10 @@ impl Part for CsvOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalDataConfiguration {
-    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns
+    /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
     #[serde(rename="ignoreUnknownValues")]
     pub ignore_unknown_values: Option<bool>,
-    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. CSV limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.
+    /// [Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
     /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE.
@@ -865,7 +897,7 @@ pub struct ExternalDataConfiguration {
     /// Additional properties to set if sourceFormat is set to CSV.
     #[serde(rename="csvOptions")]
     pub csv_options: Option<CsvOptions>,
-    /// [Optional] The data format. External data sources must be in CSV format. The default value is CSV.
+    /// [Required] The data format. For CSV files, specify "CSV". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON".
     #[serde(rename="sourceFormat")]
     pub source_format: Option<String>,
     /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
@@ -1272,7 +1304,10 @@ impl Part for TableReference {}
 pub struct Table {
     /// [Optional] A user-friendly description of this table.
     pub description: Option<String>,
-    /// [Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.
+    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
     #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
@@ -1282,18 +1317,21 @@ pub struct Table {
     pub id: Option<String>,
     /// [Output-only] The type of the resource.
     pub kind: Option<String>,
-    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
+    /// [Output-only] Contains information regarding this table's streaming buffer, if one is present. This field will be absent if the table is not being streamed to or if there is no data in the streaming buffer.
+    #[serde(rename="streamingBuffer")]
+    pub streaming_buffer: Option<Streamingbuffer>,
+    /// [Experimental] Describes the data format, location, and other properties of a table stored outside of BigQuery. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
+    #[serde(rename="externalDataConfiguration")]
+    pub external_data_configuration: Option<ExternalDataConfiguration>,
     /// [Required] Reference describing the ID of this table.
     #[serde(rename="tableReference")]
     pub table_reference: Option<TableReference>,
-    /// [Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.
+    /// [Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.
     #[serde(rename="numRows")]
     pub num_rows: Option<String>,
     /// [Output-only] A hash of this resource.
     pub etag: Option<String>,
-    /// [Optional] The backing storage location.
+    /// [Output-only] The geographic location where the table resides. This value is inherited from the dataset.
     pub location: Option<String>,
     /// [Optional] A descriptive name for this table.
     #[serde(rename="friendlyName")]
@@ -1352,8 +1390,8 @@ impl ResponseResult for TableDataInsertAllResponse {}
 pub struct QueryResponse {
     /// The resource type.
     pub kind: Option<String>,
-    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
-    pub rows: Option<Vec<TableRow>>,
+    /// [Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.
+    pub errors: Option<Vec<ErrorProto>>,
     /// Reference to the Job that was created to run the query. This field will be present even if the original request timed out, in which case GetQueryResults can be used to read the results once the query has completed. Since this API only returns the first page of results, subsequent pages can be fetched via the same mechanism (GetQueryResults).
     #[serde(rename="jobReference")]
     pub job_reference: Option<JobReference>,
@@ -1372,6 +1410,8 @@ pub struct QueryResponse {
     /// A token used for paging results.
     #[serde(rename="pageToken")]
     pub page_token: Option<String>,
+    /// An object with as many results as can be contained within the maximum permitted reply size. To get any additional rows, you can call GetQueryResults and specify the jobReference returned above.
+    pub rows: Option<Vec<TableRow>>,
     /// The schema of the results. Present only when the query completes successfully.
     pub schema: Option<TableSchema>,
 }
@@ -1782,7 +1822,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully.
+    /// Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully. Cancelled jobs may still incur costs.
     /// 
     /// # Arguments
     ///
@@ -1843,7 +1883,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all jobs that you started in the specified project. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
+    /// Lists all jobs that you started in the specified project. Job information is available for a six month period after creation. The job list is sorted in reverse chronological order, by job creation time. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
     /// 
     /// # Arguments
     ///
@@ -5289,7 +5329,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully.
+/// Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully. Cancelled jobs may still incur costs.
 ///
 /// A builder for the *cancel* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -6100,7 +6140,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists all jobs that you started in the specified project. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
+/// Lists all jobs that you started in the specified project. Job information is available for a six month period after creation. The job list is sorted in reverse chronological order, by job creation time. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
 ///
 /// A builder for the *list* method supported by a *job* resource.
 /// It is not used directly, but through a `JobMethods` instance.
@@ -6939,10 +6979,10 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.

@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-content2_sandbox"
+version = "0.1.9+20151002"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Shopping Content (protocol v2sandbox)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2_sandbox"
+homepage = "https://developers.google.com/shopping-content"
+documentation = "http://byron.github.io/google-apis-rs/google_content2_sandbox"
+license = "MIT"
+keywords = ["content", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+url = "*"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

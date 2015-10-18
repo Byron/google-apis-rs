@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-books1` library allows access to all features of the *Google books* service.
 
-This documentation was generated from *books* crate version *0.1.9+20150318*, where *20150318* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *books* crate version *0.1.9+20150921*, where *20150921* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *books* *v1* API can be found at the
 [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -25,8 +25,12 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*get user settings*](http://byron.github.io/google-apis-rs/google_books1/struct.MyconfigGetUserSettingCall.html), [*release download access*](http://byron.github.io/google-apis-rs/google_books1/struct.MyconfigReleaseDownloadAccesCall.html), [*request access*](http://byron.github.io/google-apis-rs/google_books1/struct.MyconfigRequestAccesCall.html), [*sync volume licenses*](http://byron.github.io/google-apis-rs/google_books1/struct.MyconfigSyncVolumeLicenseCall.html) and [*update user settings*](http://byron.github.io/google-apis-rs/google_books1/struct.MyconfigUpdateUserSettingCall.html)
 * mylibrary
  * [*annotations delete*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryAnnotationDeleteCall.html), [*annotations insert*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryAnnotationInsertCall.html), [*annotations list*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryAnnotationListCall.html), [*annotations summary*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryAnnotationSummaryCall.html), [*annotations update*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryAnnotationUpdateCall.html), [*bookshelves add volume*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveAddVolumeCall.html), [*bookshelves clear volumes*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveClearVolumeCall.html), [*bookshelves get*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveGetCall.html), [*bookshelves list*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveListCall.html), [*bookshelves move volume*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveMoveVolumeCall.html), [*bookshelves remove volume*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveRemoveVolumeCall.html), [*bookshelves volumes list*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryBookshelveVolumeListCall.html), [*readingpositions get*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryReadingpositionGetCall.html) and [*readingpositions set position*](http://byron.github.io/google-apis-rs/google_books1/struct.MylibraryReadingpositionSetPositionCall.html)
+* [notification](http://byron.github.io/google-apis-rs/google_books1/struct.Notification.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.NotificationGetCall.html)
 * onboarding
  * [*list categories*](http://byron.github.io/google-apis-rs/google_books1/struct.OnboardingListCategoryCall.html) and [*list category volumes*](http://byron.github.io/google-apis-rs/google_books1/struct.OnboardingListCategoryVolumeCall.html)
+* personalizedstream
+ * [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.PersonalizedstreamGetCall.html)
 * promooffer
  * [*accept*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferAcceptCall.html), [*dismiss*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferDismisCall.html) and [*get*](http://byron.github.io/google-apis-rs/google_books1/struct.PromoofferGetCall.html)
 * [volumes](http://byron.github.io/google-apis-rs/google_books1/struct.Volume.html)

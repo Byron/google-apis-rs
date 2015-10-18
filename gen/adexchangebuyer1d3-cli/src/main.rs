@@ -747,26 +747,47 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
-                    "product-categories" => Some(("productCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "video-url" => Some(("videoURL", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "agency-id" => Some(("agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "width" => Some(("width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "api-upload-timestamp" => Some(("api_upload_timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attribute" => Some(("attribute", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "height" => Some(("height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advertiser-name" => Some(("advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "html-snippet" => Some(("HTMLSnippet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "buyer-creative-id" => Some(("buyerCreativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "click-through-url" => Some(("clickThroughUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "vendor-type" => Some(("vendorType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
-                    "filtering-reasons.date" => Some(("filteringReasons.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "sensitive-categories" => Some(("sensitiveCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "impression-tracking-url" => Some(("impressionTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "video-url" => Some(("videoURL", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "click-through-url" => Some(("clickThroughUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "width" => Some(("width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.body" => Some(("nativeAd.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.advertiser" => Some(("nativeAd.advertiser", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.store" => Some(("nativeAd.store", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.headline" => Some(("nativeAd.headline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.image.url" => Some(("nativeAd.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.image.width" => Some(("nativeAd.image.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.image.height" => Some(("nativeAd.image.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.star-rating" => Some(("nativeAd.starRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "native-ad.call-to-action" => Some(("nativeAd.callToAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.logo.url" => Some(("nativeAd.logo.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.logo.width" => Some(("nativeAd.logo.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.logo.height" => Some(("nativeAd.logo.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.app-icon.url" => Some(("nativeAd.appIcon.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.app-icon.width" => Some(("nativeAd.appIcon.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.app-icon.height" => Some(("nativeAd.appIcon.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native-ad.impression-tracking-url" => Some(("nativeAd.impressionTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "native-ad.price" => Some(("nativeAd.price", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native-ad.click-tracking-url" => Some(("nativeAd.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "vendor-type" => Some(("vendorType", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "sensitive-categories" => Some(("sensitiveCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "product-categories" => Some(("productCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "agency-id" => Some(("agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "filtering-reasons.date" => Some(("filteringReasons.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "advertiser-id", "advertiser-name", "agency-id", "attribute", "buyer-creative-id", "click-through-url", "date", "filtering-reasons", "height", "kind", "product-categories", "restricted-categories", "sensitive-categories", "status", "vendor-type", "video-url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "advertiser", "advertiser-id", "advertiser-name", "agency-id", "api-upload-timestamp", "app-icon", "attribute", "body", "buyer-creative-id", "call-to-action", "click-through-url", "click-tracking-url", "date", "filtering-reasons", "headline", "height", "image", "impression-tracking-url", "kind", "logo", "native-ad", "price", "product-categories", "restricted-categories", "sensitive-categories", "star-rating", "status", "store", "url", "vendor-type", "version", "video-url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2282,7 +2303,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer1d3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150720")
+           .version("0.3.2+20150909")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d3_cli")
            .arg(Arg::with_name("url")

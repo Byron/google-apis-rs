@@ -5,10 +5,10 @@ DO NOT EDIT !
 -->
 The `google-content2` library allows access to all features of the *Google Shopping Content* service.
 
-This documentation was generated from *Shopping Content* crate version *0.1.9+20150710*, where *20150710* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *Shopping Content* crate version *0.1.9+20151002*, where *20151002* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *Shopping Content* *v2* API can be found at the
-[official documentation site](https://developers.google.com/shopping-content/v2/).
+[official documentation site](https://developers.google.com/shopping-content).
 # Features
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_content2/struct.ShoppingContent.html) ... 
@@ -27,6 +27,8 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
  * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.DatafeedstatuseListCall.html)
 * [inventory](http://byron.github.io/google-apis-rs/google_content2/struct.Inventory.html)
  * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.InventoryCustombatchCall.html) and [*set*](http://byron.github.io/google-apis-rs/google_content2/struct.InventorySetCall.html)
+* [orders](http://byron.github.io/google-apis-rs/google_content2/struct.Order.html)
+ * [*acknowledge*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderAcknowledgeCall.html), [*advancetestorder*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderAdvancetestorderCall.html), [*cancel*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderCancelCall.html), [*cancellineitem*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderCancellineitemCall.html), [*createtestorder*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderCreatetestorderCall.html), [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderCustombatchCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderGetCall.html), [*getbymerchantorderid*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderGettestordertemplateCall.html), [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderListCall.html), [*refund*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderRefundCall.html), [*returnlineitem*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderReturnlineitemCall.html), [*shiplineitems*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderShiplineitemCall.html), [*updatemerchantorderid*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](http://byron.github.io/google-apis-rs/google_content2/struct.OrderUpdateshipmentCall.html)
 * [products](http://byron.github.io/google-apis-rs/google_content2/struct.Product.html)
  * [*custombatch*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductCustombatchCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_content2/struct.ProductListCall.html)
 * productstatuses
@@ -63,14 +65,21 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.accounts().custombatch(...).doit()
-let r = hub.accounts().patch(...).doit()
-let r = hub.accounts().get(...).doit()
-let r = hub.accounts().update(...).doit()
-let r = hub.accounts().list(...).doit()
-let r = hub.accounts().authinfo(...).doit()
-let r = hub.accounts().delete(...).doit()
-let r = hub.accounts().insert(...).doit()
+let r = hub.orders().get(...).doit()
+let r = hub.orders().list(...).doit()
+let r = hub.orders().updateshipment(...).doit()
+let r = hub.orders().advancetestorder(...).doit()
+let r = hub.orders().updatemerchantorderid(...).doit()
+let r = hub.orders().returnlineitem(...).doit()
+let r = hub.orders().gettestordertemplate(...).doit()
+let r = hub.orders().createtestorder(...).doit()
+let r = hub.orders().refund(...).doit()
+let r = hub.orders().custombatch(...).doit()
+let r = hub.orders().cancellineitem(...).doit()
+let r = hub.orders().getbymerchantorderid(...).doit()
+let r = hub.orders().acknowledge(...).doit()
+let r = hub.orders().cancel(...).doit()
+let r = hub.orders().shiplineitems(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -95,7 +104,6 @@ google-content2 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_content2 as content2;
-use content2::Account;
 use content2::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -113,16 +121,17 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::new(),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = ShoppingContent::new(hyper::Client::new(), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = Account::default();
-
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.accounts().patch(req, "merchantId", "accountId")
-             .dry_run(false)
+let result = hub.orders().list("merchantId")
+             .add_statuses("sit")
+             .placed_date_start("Stet")
+             .placed_date_end("sed")
+             .page_token("et")
+             .order_by("dolores")
+             .max_results(38)
+             .acknowledged(true)
              .doit();
 
 match result {

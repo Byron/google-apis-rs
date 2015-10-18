@@ -1,4 +1,4 @@
-site_name: Android Enterprise v0.3.2+20150715
+site_name: Android Enterprise v0.3.2+20150922
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: Write integrating applications with bcore
 
@@ -29,6 +29,7 @@ pages:
 - ['enterprises_get.md', 'Enterprises', 'Get']
 - ['enterprises_insert.md', 'Enterprises', 'Insert']
 - ['enterprises_list.md', 'Enterprises', 'List']
+- ['enterprises_send-test-push-notification.md', 'Enterprises', 'Send Test Push Notification']
 - ['enterprises_set-account.md', 'Enterprises', 'Set Account']
 - ['enterprises_unenroll.md', 'Enterprises', 'Unenroll']
 - ['entitlements_delete.md', 'Entitlements', 'Delete']
@@ -53,8 +54,10 @@ pages:
 - ['products_update-permissions.md', 'Products', 'Update Permissions']
 - ['users_generate-token.md', 'Users', 'Generate Token']
 - ['users_get.md', 'Users', 'Get']
+- ['users_get-available-product-set.md', 'Users', 'Get Available Product Set']
 - ['users_list.md', 'Users', 'List']
 - ['users_revoke-token.md', 'Users', 'Revoke Token']
+- ['users_set-available-product-set.md', 'Users', 'Set Available Product Set']
 
 theme: readthedocs
 

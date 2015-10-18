@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20150326*. The CLI is at version *0.3.2*.
+This documentation was generated from the *directory* API at revision *20151005*. The CLI is at version *0.3.2*.
 
 ```bash
 admin1-directory [options]
@@ -39,6 +39,20 @@ admin1-directory [options]
                 list <customer-id> [-p <v>]... [-o <out>]
                 patch <customer-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <customer-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        customers
+                get <customer-key> [-p <v>]... [-o <out>]
+                patch <customer-key> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <customer-key> (-r <kv>)... [-p <v>]... [-o <out>]
+        domain-aliases
+                delete <customer> <domain-alias-name> [-p <v>]...
+                get <customer> <domain-alias-name> [-p <v>]... [-o <out>]
+                insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <customer> [-p <v>]... [-o <out>]
+        domains
+                delete <customer> <domain-name> [-p <v>]...
+                get <customer> <domain-name> [-p <v>]... [-o <out>]
+                insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <customer> [-p <v>]... [-o <out>]
         groups
                 aliases-delete <group-key> <alias> [-p <v>]...
                 aliases-insert <group-key> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -74,6 +88,20 @@ admin1-directory [options]
                 list <customer-id> [-p <v>]... [-o <out>]
                 patch <customer-id> <org-unit-path>... (-r <kv>)... [-p <v>]... [-o <out>]
                 update <customer-id> <org-unit-path>... (-r <kv>)... [-p <v>]... [-o <out>]
+        privileges
+                list <customer> [-p <v>]... [-o <out>]
+        role-assignments
+                delete <customer> <role-assignment-id> [-p <v>]...
+                get <customer> <role-assignment-id> [-p <v>]... [-o <out>]
+                insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <customer> [-p <v>]... [-o <out>]
+        roles
+                delete <customer> <role-id> [-p <v>]...
+                get <customer> <role-id> [-p <v>]... [-o <out>]
+                insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <customer> [-p <v>]... [-o <out>]
+                patch <customer> <role-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <customer> <role-id> (-r <kv>)... [-p <v>]... [-o <out>]
         schemas
                 delete <customer-id> <schema-key> [-p <v>]...
                 get <customer-id> <schema-key> [-p <v>]... [-o <out>]

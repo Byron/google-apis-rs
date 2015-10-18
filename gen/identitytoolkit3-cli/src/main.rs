@@ -1398,7 +1398,7 @@ fn main() {
     
     let mut app = App::new("identitytoolkit3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150710")
+           .version("0.3.2+20151008")
            .about("Help the third party sites to implement federated login.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli")
            .arg(Arg::with_name("folder")

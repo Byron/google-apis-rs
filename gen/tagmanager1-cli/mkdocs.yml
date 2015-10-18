@@ -1,4 +1,4 @@
-site_name: Tag Manager v0.3.2+20150526
+site_name: Tag Manager v0.3.2+20151008
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager1-cli
 site_description: Write integrating applications with bcore
 
@@ -11,18 +11,15 @@ pages:
 - ['index.md', 'Home']
 - ['accounts_containers-create.md', 'Accounts', 'Containers Create']
 - ['accounts_containers-delete.md', 'Accounts', 'Containers Delete']
+- ['accounts_containers-folders-create.md', 'Accounts', 'Containers Folders Create']
+- ['accounts_containers-folders-delete.md', 'Accounts', 'Containers Folders Delete']
+- ['accounts_containers-folders-entities-list.md', 'Accounts', 'Containers Folders Entities List']
+- ['accounts_containers-folders-get.md', 'Accounts', 'Containers Folders Get']
+- ['accounts_containers-folders-list.md', 'Accounts', 'Containers Folders List']
+- ['accounts_containers-folders-update.md', 'Accounts', 'Containers Folders Update']
 - ['accounts_containers-get.md', 'Accounts', 'Containers Get']
 - ['accounts_containers-list.md', 'Accounts', 'Containers List']
-- ['accounts_containers-macros-create.md', 'Accounts', 'Containers Macros Create']
-- ['accounts_containers-macros-delete.md', 'Accounts', 'Containers Macros Delete']
-- ['accounts_containers-macros-get.md', 'Accounts', 'Containers Macros Get']
-- ['accounts_containers-macros-list.md', 'Accounts', 'Containers Macros List']
-- ['accounts_containers-macros-update.md', 'Accounts', 'Containers Macros Update']
-- ['accounts_containers-rules-create.md', 'Accounts', 'Containers Rules Create']
-- ['accounts_containers-rules-delete.md', 'Accounts', 'Containers Rules Delete']
-- ['accounts_containers-rules-get.md', 'Accounts', 'Containers Rules Get']
-- ['accounts_containers-rules-list.md', 'Accounts', 'Containers Rules List']
-- ['accounts_containers-rules-update.md', 'Accounts', 'Containers Rules Update']
+- ['accounts_containers-move-folders-update.md', 'Accounts', 'Containers Move Folders Update']
 - ['accounts_containers-tags-create.md', 'Accounts', 'Containers Tags Create']
 - ['accounts_containers-tags-delete.md', 'Accounts', 'Containers Tags Delete']
 - ['accounts_containers-tags-get.md', 'Accounts', 'Containers Tags Get']

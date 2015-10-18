@@ -1,0 +1,116 @@
+// DO NOT EDIT !
+// This file was generated automatically from 'src/mako/api/lib.rs.in.mako'
+// DO NOT EDIT !
+
+extern crate hyper;
+extern crate serde;
+extern crate serde_json;
+extern crate yup_oauth2 as oauth2;
+extern crate mime;
+extern crate url;
+
+mod cmn;
+
+use std::collections::HashMap;
+use std::cell::RefCell;
+use std::borrow::BorrowMut;
+use std::default::Default;
+use std::collections::BTreeMap;
+use serde_json as json;
+use std::io;
+use std::fs;
+use std::thread::sleep_ms;
+
+pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
+              ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder, 
+              Resource, ErrorResponse, remove_json_null_values};
+
+
+// ##############
+// UTILITIES ###
+// ############
+
+
+
+
+// ########
+// HUB ###
+// ######
+
+/// Central instance to access all Logging related resource activities
+///
+/// # Examples
+///
+/// Instantiate a new hub
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_logging2_beta1 as logging2_beta1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use logging2_beta1::Logging;
+/// 
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+/// // `client_secret`, among other things.
+/// let secret: ApplicationSecret = Default::default();
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// // unless you replace  `None` with the desired Flow.
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+/// // retrieve them from storage.
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Logging::new(hyper::Client::new(), auth);
+/// # }
+/// ```
+/// 
+pub struct Logging<C, A> {
+    client: RefCell<C>,
+    auth: RefCell<A>,
+    _user_agent: String,
+}
+
+impl<'a, C, A> Hub for Logging<C, A> {}
+
+impl<'a, C, A> Logging<C, A>
+    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+    pub fn new(client: C, authenticator: A) -> Logging<C, A> {
+        Logging {
+            client: RefCell::new(client),
+            auth: RefCell::new(authenticator),
+            _user_agent: "google-api-rust-client/0.1.9".to_string(),
+        }
+    }
+
+
+    /// Set the user-agent header field to use in all requests to the server.
+    /// It defaults to `google-api-rust-client/0.1.9`.
+    ///
+    /// Returns the previously set user-agent.
+    pub fn user_agent(&mut self, agent_name: String) -> String {
+        let prev = self._user_agent.clone();
+        self._user_agent = agent_name;
+        prev
+    }
+}
+
+
+// ############
+// SCHEMAS ###
+// ##########
+
+// ###################
+// MethodBuilders ###
+// #################
+
+
+
+// ###################
+// CallBuilders   ###
+// #################
+

@@ -1,0 +1,39 @@
+site_name: classroom v0.3.2+20151013
+site_url: http://byron.github.io/google-apis-rs/google-classroom1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/classroom1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['courses_aliases-create.md', 'Courses', 'Aliases Create']
+- ['courses_aliases-delete.md', 'Courses', 'Aliases Delete']
+- ['courses_aliases-list.md', 'Courses', 'Aliases List']
+- ['courses_create.md', 'Courses', 'Create']
+- ['courses_delete.md', 'Courses', 'Delete']
+- ['courses_get.md', 'Courses', 'Get']
+- ['courses_list.md', 'Courses', 'List']
+- ['courses_patch.md', 'Courses', 'Patch']
+- ['courses_students-create.md', 'Courses', 'Students Create']
+- ['courses_students-delete.md', 'Courses', 'Students Delete']
+- ['courses_students-get.md', 'Courses', 'Students Get']
+- ['courses_students-list.md', 'Courses', 'Students List']
+- ['courses_teachers-create.md', 'Courses', 'Teachers Create']
+- ['courses_teachers-delete.md', 'Courses', 'Teachers Delete']
+- ['courses_teachers-get.md', 'Courses', 'Teachers Get']
+- ['courses_teachers-list.md', 'Courses', 'Teachers List']
+- ['courses_update.md', 'Courses', 'Update']
+- ['invitations_accept.md', 'Invitations', 'Accept']
+- ['invitations_create.md', 'Invitations', 'Create']
+- ['invitations_delete.md', 'Invitations', 'Delete']
+- ['invitations_get.md', 'Invitations', 'Get']
+- ['invitations_list.md', 'Invitations', 'List']
+- ['user-profiles_get.md', 'User Profiles', 'Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

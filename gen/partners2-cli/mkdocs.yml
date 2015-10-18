@@ -1,0 +1,22 @@
+site_name: partners v0.3.2+20151009
+site_url: http://byron.github.io/google-apis-rs/google-partners2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['client-messages_log.md', 'Client Messages', 'Log']
+- ['companies_get.md', 'Companies', 'Get']
+- ['companies_leads-create.md', 'Companies', 'Leads Create']
+- ['companies_list.md', 'Companies', 'List']
+- ['user-events_log.md', 'User Events', 'Log']
+- ['user-states_list.md', 'User States', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

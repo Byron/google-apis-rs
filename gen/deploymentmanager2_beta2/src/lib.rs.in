@@ -43,6 +43,9 @@ pub enum Scope {
 
     /// View and manage your Google Cloud Platform management resources and deployment status information
     NdevCloudman,
+
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
 }
 
 impl AsRef<str> for Scope {
@@ -51,6 +54,7 @@ impl AsRef<str> for Scope {
             Scope::NdevCloudmanReadonly => "https://www.googleapis.com/auth/ndev.cloudman.readonly",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::NdevCloudman => "https://www.googleapis.com/auth/ndev.cloudman",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
     }
 }
@@ -280,6 +284,14 @@ impl Part for OperationWarnings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Type {
+    /// [Output Only] Timestamp when the type was created, in RFC3339 text format.
+    #[serde(rename="insertTime")]
+    pub insert_time: Option<String>,
+    /// [Output Only] Unique identifier for the resource; defined by the server.
+    pub id: Option<String>,
+    /// [Output Only] Self link for the type.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
     /// Name of the type.
     pub name: Option<String>,
 }
@@ -573,7 +585,7 @@ pub struct Operation {
     pub zone: Option<String>,
     /// [Output Only] URL of the region where the operation resides. Only applicable for regional resources.
     pub region: Option<String>,
-    /// [Output Only] Server defined URL for the resource.
+    /// [Output Only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
     /// [Output Only] Type of the operation, such as insert, update, and delete.
@@ -614,7 +626,7 @@ pub struct ResourceUpdate {
     pub state: Option<String>,
     /// [Output Only] List of all errors encountered while trying to enact update.intent.
     pub errors: Option<Vec<String>>,
-    /// [Output Only] The intent of the resource, PREVIEW, UPDATE, or CANCEL.
+    /// [Output Only] The intent of the resource: PREVIEW, UPDATE, or CANCEL.
     pub intent: Option<String>,
     /// [Output Only] The set of updated properties for this resource, before references are expanded. Returned as serialized YAML.
     pub properties: Option<String>,
@@ -1593,14 +1605,11 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must contain the following:
-    /// FIELD_NAME COMPARISON_STRING LITERAL_STRING
-    ///  
-    /// - FIELD_NAME: The name of the field you want to compare. The field name must be valid for the type of resource being filtered. Only atomic field types are supported (string, number, boolean). Array and object fields are not currently supported. 
-    /// - COMPARISON_STRING: The comparison string, either eq (equals) or ne (not equals). 
-    /// - LITERAL_STRING: The literal string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.  For example, you can filter by the name of a resource:
-    /// filter=name ne example-instance
-    /// The above filter returns only results whose name field does not equal example-instance. You can also enclose your literal string in single, double, or no quotes.
+    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must be in the format: FIELD_NAME COMPARISON_STRING LITERAL_STRING.
+    /// 
+    /// The FIELD_NAME is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The COMPARISON_STRING must be either eq (equals) or ne (not equals). The LITERAL_STRING is the string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// 
+    /// For example, filter=name ne example-instance.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
@@ -1884,14 +1893,11 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must contain the following:
-    /// FIELD_NAME COMPARISON_STRING LITERAL_STRING
-    ///  
-    /// - FIELD_NAME: The name of the field you want to compare. The field name must be valid for the type of resource being filtered. Only atomic field types are supported (string, number, boolean). Array and object fields are not currently supported. 
-    /// - COMPARISON_STRING: The comparison string, either eq (equals) or ne (not equals). 
-    /// - LITERAL_STRING: The literal string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.  For example, you can filter by the name of a resource:
-    /// filter=name ne example-instance
-    /// The above filter returns only results whose name field does not equal example-instance. You can also enclose your literal string in single, double, or no quotes.
+    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must be in the format: FIELD_NAME COMPARISON_STRING LITERAL_STRING.
+    /// 
+    /// The FIELD_NAME is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The COMPARISON_STRING must be either eq (equals) or ne (not equals). The LITERAL_STRING is the string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// 
+    /// For example, filter=name ne example-instance.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ManifestListCall<'a, C, A> {
@@ -2695,14 +2701,11 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must contain the following:
-    /// FIELD_NAME COMPARISON_STRING LITERAL_STRING
-    ///  
-    /// - FIELD_NAME: The name of the field you want to compare. The field name must be valid for the type of resource being filtered. Only atomic field types are supported (string, number, boolean). Array and object fields are not currently supported. 
-    /// - COMPARISON_STRING: The comparison string, either eq (equals) or ne (not equals). 
-    /// - LITERAL_STRING: The literal string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.  For example, you can filter by the name of a resource:
-    /// filter=name ne example-instance
-    /// The above filter returns only results whose name field does not equal example-instance. You can also enclose your literal string in single, double, or no quotes.
+    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must be in the format: FIELD_NAME COMPARISON_STRING LITERAL_STRING.
+    /// 
+    /// The FIELD_NAME is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The COMPARISON_STRING must be either eq (equals) or ne (not equals). The LITERAL_STRING is the string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// 
+    /// For example, filter=name ne example-instance.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ResourceListCall<'a, C, A> {
@@ -2974,14 +2977,11 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must contain the following:
-    /// FIELD_NAME COMPARISON_STRING LITERAL_STRING
-    ///  
-    /// - FIELD_NAME: The name of the field you want to compare. The field name must be valid for the type of resource being filtered. Only atomic field types are supported (string, number, boolean). Array and object fields are not currently supported. 
-    /// - COMPARISON_STRING: The comparison string, either eq (equals) or ne (not equals). 
-    /// - LITERAL_STRING: The literal string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.  For example, you can filter by the name of a resource:
-    /// filter=name ne example-instance
-    /// The above filter returns only results whose name field does not equal example-instance. You can also enclose your literal string in single, double, or no quotes.
+    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must be in the format: FIELD_NAME COMPARISON_STRING LITERAL_STRING.
+    /// 
+    /// The FIELD_NAME is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The COMPARISON_STRING must be either eq (equals) or ne (not equals). The LITERAL_STRING is the string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// 
+    /// For example, filter=name ne example-instance.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TypeListCall<'a, C, A> {
@@ -4083,14 +4083,11 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must contain the following:
-    /// FIELD_NAME COMPARISON_STRING LITERAL_STRING
-    ///  
-    /// - FIELD_NAME: The name of the field you want to compare. The field name must be valid for the type of resource being filtered. Only atomic field types are supported (string, number, boolean). Array and object fields are not currently supported. 
-    /// - COMPARISON_STRING: The comparison string, either eq (equals) or ne (not equals). 
-    /// - LITERAL_STRING: The literal string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.  For example, you can filter by the name of a resource:
-    /// filter=name ne example-instance
-    /// The above filter returns only results whose name field does not equal example-instance. You can also enclose your literal string in single, double, or no quotes.
+    /// Sets a filter expression for filtering listed resources, in the form filter={expression}. Your {expression} must be in the format: FIELD_NAME COMPARISON_STRING LITERAL_STRING.
+    /// 
+    /// The FIELD_NAME is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The COMPARISON_STRING must be either eq (equals) or ne (not equals). The LITERAL_STRING is the string value to filter to. The literal value must be valid for the type of field (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// 
+    /// For example, filter=name ne example-instance.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> DeploymentListCall<'a, C, A> {

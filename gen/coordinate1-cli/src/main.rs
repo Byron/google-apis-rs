@@ -274,6 +274,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "omit-job-changes" => {
+                    call = call.omit_job_changes(arg_from_str(value.unwrap_or("false"), err, "omit-job-changes", "boolean"));
+                },
                 "min-modified-timestamp-ms" => {
                     call = call.min_modified_timestamp_ms(value.unwrap_or(""));
                 },
@@ -293,7 +296,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "max-results", "min-modified-timestamp-ms"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "min-modified-timestamp-ms", "max-results", "omit-job-changes"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1567,7 +1570,7 @@ fn main() {
     
     let mut app = App::new("coordinate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20141215")
+           .version("0.3.2+20150811")
            .about("Lets you view and manage jobs in a Coordinate team.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_coordinate1_cli")
            .arg(Arg::with_name("url")

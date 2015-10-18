@@ -568,7 +568,7 @@ fn main() {
     
     let mut app = App::new("appstate1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150717")
+           .version("0.3.2+20151013")
            .about("The Google App State API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appstate1_cli")
            .arg(Arg::with_name("url")

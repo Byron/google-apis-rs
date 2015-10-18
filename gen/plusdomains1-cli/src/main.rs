@@ -131,9 +131,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "object.original-content" => Some(("object.originalContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.plusoners.total-items" => Some(("object.plusoners.totalItems", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "object.plusoners.self-link" => Some(("object.plusoners.selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.actor.display-name" => Some(("object.actor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.actor.url" => Some(("object.actor.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.actor.image.url" => Some(("object.actor.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "object.actor.display-name" => Some(("object.actor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.actor.client-specific-actor-info.youtube-actor-info.channel-id" => Some(("object.actor.clientSpecificActorInfo.youtubeActorInfo.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "object.actor.verification.ad-hoc-verified" => Some(("object.actor.verification.adHocVerified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.actor.id" => Some(("object.actor.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.content" => Some(("object.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.url" => Some(("object.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -147,12 +149,14 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "object.id" => Some(("object.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.object-type" => Some(("object.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "actor.url" => Some(("actor.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "actor.image.url" => Some(("actor.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.display-name" => Some(("actor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "actor.id" => Some(("actor.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.name.given-name" => Some(("actor.name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.name.family-name" => Some(("actor.name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.url" => Some(("actor.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.image.url" => Some(("actor.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.client-specific-actor-info.youtube-actor-info.channel-id" => Some(("actor.clientSpecificActorInfo.youtubeActorInfo.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.verification.ad-hoc-verified" => Some(("actor.verification.adHocVerified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.id" => Some(("actor.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "place-id" => Some(("placeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.kind" => Some(("access.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.description" => Some(("access.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -172,7 +176,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "address" => Some(("address", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "published" => Some(("published", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "actor", "address", "annotation", "can-comment", "can-plusone", "can-update", "content", "crosspost-source", "description", "display-name", "domain-restricted", "etag", "family-name", "formatted", "geocode", "given-name", "id", "image", "is-plus-oned", "kind", "latitude", "location", "longitude", "name", "object", "object-type", "original-content", "place-id", "place-name", "plusoners", "position", "provider", "published", "radius", "replies", "resharers", "resharing-disabled", "self-link", "status-for-viewer", "title", "total-items", "updated", "url", "verb"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "actor", "ad-hoc-verified", "address", "annotation", "can-comment", "can-plusone", "can-update", "channel-id", "client-specific-actor-info", "content", "crosspost-source", "description", "display-name", "domain-restricted", "etag", "family-name", "formatted", "geocode", "given-name", "id", "image", "is-plus-oned", "kind", "latitude", "location", "longitude", "name", "object", "object-type", "original-content", "place-id", "place-name", "plusoners", "position", "provider", "published", "radius", "replies", "resharers", "resharing-disabled", "self-link", "status-for-viewer", "title", "total-items", "updated", "url", "verb", "verification", "youtube-actor-info"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -973,9 +977,11 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "object.original-content" => Some(("object.originalContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "object.object-type" => Some(("object.objectType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.display-name" => Some(("actor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.url" => Some(("actor.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.image.url" => Some(("actor.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "actor.display-name" => Some(("actor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.client-specific-actor-info.youtube-actor-info.channel-id" => Some(("actor.clientSpecificActorInfo.youtubeActorInfo.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "actor.verification.ad-hoc-verified" => Some(("actor.verification.adHocVerified", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "actor.id" => Some(("actor.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "verb" => Some(("verb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -983,7 +989,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actor", "content", "display-name", "etag", "id", "image", "kind", "object", "object-type", "original-content", "plusoners", "published", "self-link", "total-items", "updated", "url", "verb"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actor", "ad-hoc-verified", "channel-id", "client-specific-actor-info", "content", "display-name", "etag", "id", "image", "kind", "object", "object-type", "original-content", "plusoners", "published", "self-link", "total-items", "updated", "url", "verb", "verification", "youtube-actor-info"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2157,7 +2163,7 @@ fn main() {
     
     let mut app = App::new("plusdomains1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150719")
+           .version("0.3.2+20151014")
            .about("The Google+ API enables developers to build on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plusdomains1_cli")
            .arg(Arg::with_name("url")

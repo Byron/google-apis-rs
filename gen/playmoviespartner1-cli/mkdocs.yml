@@ -1,0 +1,23 @@
+site_name: playmoviespartner v0.3.2+20150812
+site_url: http://byron.github.io/google-apis-rs/google-playmoviespartner1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/playmoviespartner1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_avails-list.md', 'Accounts', 'Avails List']
+- ['accounts_experience-locales-get.md', 'Accounts', 'Experience Locales Get']
+- ['accounts_experience-locales-list.md', 'Accounts', 'Experience Locales List']
+- ['accounts_orders-get.md', 'Accounts', 'Orders Get']
+- ['accounts_orders-list.md', 'Accounts', 'Orders List']
+- ['accounts_store-infos-country-get.md', 'Accounts', 'Store Infos Country Get']
+- ['accounts_store-infos-list.md', 'Accounts', 'Store Infos List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

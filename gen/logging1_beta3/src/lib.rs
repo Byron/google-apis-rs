@@ -2,14 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *logging* crate version *0.1.9+20151007*, where *20151007* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! 
+//! Everything else about the *logging* *v1_beta3* API can be found at the
+//! [official documentation site](https://cloud.google.com/logging/docs/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Logging.html) ... 
 //! 
 //! * projects
-//!  * [*log services indexes list*](struct.ProjectLogServiceIndexeListCall.html), [*log services list*](struct.ProjectLogServiceListCall.html), [*log services sinks create*](struct.ProjectLogServiceSinkCreateCall.html), [*log services sinks delete*](struct.ProjectLogServiceSinkDeleteCall.html), [*log services sinks get*](struct.ProjectLogServiceSinkGetCall.html), [*log services sinks list*](struct.ProjectLogServiceSinkListCall.html), [*log services sinks update*](struct.ProjectLogServiceSinkUpdateCall.html), [*logs delete*](struct.ProjectLogDeleteCall.html), [*logs entries write*](struct.ProjectLogEntryWriteCall.html), [*logs list*](struct.ProjectLogListCall.html), [*logs sinks create*](struct.ProjectLogSinkCreateCall.html), [*logs sinks delete*](struct.ProjectLogSinkDeleteCall.html), [*logs sinks get*](struct.ProjectLogSinkGetCall.html), [*logs sinks list*](struct.ProjectLogSinkListCall.html) and [*logs sinks update*](struct.ProjectLogSinkUpdateCall.html)
+//!  * [*log services indexes list*](struct.ProjectLogServiceIndexeListCall.html), [*log services list*](struct.ProjectLogServiceListCall.html), [*log services sinks create*](struct.ProjectLogServiceSinkCreateCall.html), [*log services sinks delete*](struct.ProjectLogServiceSinkDeleteCall.html), [*log services sinks get*](struct.ProjectLogServiceSinkGetCall.html), [*log services sinks list*](struct.ProjectLogServiceSinkListCall.html), [*log services sinks update*](struct.ProjectLogServiceSinkUpdateCall.html), [*logs delete*](struct.ProjectLogDeleteCall.html), [*logs entries write*](struct.ProjectLogEntryWriteCall.html), [*logs list*](struct.ProjectLogListCall.html), [*logs sinks create*](struct.ProjectLogSinkCreateCall.html), [*logs sinks delete*](struct.ProjectLogSinkDeleteCall.html), [*logs sinks get*](struct.ProjectLogSinkGetCall.html), [*logs sinks list*](struct.ProjectLogSinkListCall.html), [*logs sinks update*](struct.ProjectLogSinkUpdateCall.html), [*metrics create*](struct.ProjectMetricCreateCall.html), [*metrics delete*](struct.ProjectMetricDeleteCall.html), [*metrics get*](struct.ProjectMetricGetCall.html), [*metrics list*](struct.ProjectMetricListCall.html), [*metrics update*](struct.ProjectMetricUpdateCall.html), [*sinks create*](struct.ProjectSinkCreateCall.html), [*sinks delete*](struct.ProjectSinkDeleteCall.html), [*sinks get*](struct.ProjectSinkGetCall.html), [*sinks list*](struct.ProjectSinkListCall.html) and [*sinks update*](struct.ProjectSinkUpdateCall.html)
 //! 
 //! 
 //! 
@@ -45,11 +48,14 @@
 //! 
 //! ```ignore
 //! let r = hub.projects().logs_sinks_get(...).doit()
+//! let r = hub.projects().sinks_create(...).doit()
 //! let r = hub.projects().log_services_sinks_update(...).doit()
+//! let r = hub.projects().sinks_update(...).doit()
 //! let r = hub.projects().logs_sinks_update(...).doit()
 //! let r = hub.projects().log_services_sinks_create(...).doit()
 //! let r = hub.projects().logs_sinks_create(...).doit()
 //! let r = hub.projects().log_services_sinks_get(...).doit()
+//! let r = hub.projects().sinks_get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 

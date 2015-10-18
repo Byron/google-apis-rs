@@ -301,9 +301,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -317,7 +314,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -362,9 +359,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -381,7 +375,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["tfmt", "on-behalf-of-content-owner", "on-behalf-of", "tlang", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["tfmt", "on-behalf-of-content-owner", "on-behalf-of", "tlang"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -479,9 +473,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -495,7 +486,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -548,9 +539,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "id" => {
                     call = call.id(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -564,7 +552,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "debug-project-id-override", "on-behalf-of", "id"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -661,9 +649,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "on-behalf-of" => {
                     call = call.on_behalf_of(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -677,7 +662,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync", "debug-project-id-override"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "on-behalf-of", "sync"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1467,9 +1452,6 @@ impl<'n, 'a> Engine<'n, 'a> {
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "share-on-google-plus" => {
-                    call = call.share_on_google_plus(arg_from_str(value.unwrap_or("false"), err, "share-on-google-plus", "boolean"));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1483,7 +1465,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["share-on-google-plus"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2584,6 +2565,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.live-chat-id" => Some(("snippet.liveChatId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2606,7 +2588,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2852,6 +2834,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "snippet.title" => Some(("snippet.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.channel-id" => Some(("snippet.channelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.published-at" => Some(("snippet.publishedAt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snippet.live-chat-id" => Some(("snippet.liveChatId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-start-time" => Some(("snippet.scheduledStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.actual-start-time" => Some(("snippet.actualStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snippet.scheduled-end-time" => Some(("snippet.scheduledEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2874,7 +2857,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["actual-end-time", "actual-start-time", "bound-stream-id", "broadcast-stream-delay-ms", "channel-id", "concurrent-viewers", "content-details", "default", "description", "embed-html", "enable-closed-captions", "enable-content-encryption", "enable-dvr", "enable-embed", "enable-low-latency", "enable-monitor-stream", "etag", "height", "high", "id", "is-default-broadcast", "kind", "life-cycle-status", "live-broadcast-priority", "live-chat-id", "maxres", "medium", "monitor-stream", "privacy-status", "published-at", "record-from-start", "recording-status", "scheduled-end-time", "scheduled-start-time", "snippet", "standard", "start-with-slate", "statistics", "status", "thumbnails", "title", "total-chat-count", "url", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4743,6 +4726,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "content-details.content-rating.pefilm-rating" => Some(("contentDetails.contentRating.pefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.djctq-rating-reasons" => Some(("contentDetails.contentRating.djctqRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.content-rating.incaa-rating" => Some(("contentDetails.contentRating.incaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cnc-rating" => Some(("contentDetails.contentRating.cncRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.oflc-rating" => Some(("contentDetails.contentRating.oflcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.fpb-rating" => Some(("contentDetails.contentRating.fpbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.mccaa-rating" => Some(("contentDetails.contentRating.mccaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4867,7 +4851,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4980,9 +4964,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "hl" => {
                     call = call.hl(value.unwrap_or(""));
                 },
-                "debug-project-id-override" => {
-                    call = call.debug_project_id_override(value.unwrap_or(""));
-                },
                 "chart" => {
                     call = call.chart(value.unwrap_or(""));
                 },
@@ -4999,7 +4980,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "debug-project-id-override", "hl", "my-rating", "id"].iter().map(|v|*v));
+                                                                           v.extend(["on-behalf-of-content-owner", "region-code", "page-token", "locale", "chart", "max-results", "video-category-id", "hl", "my-rating", "id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5221,6 +5202,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "content-details.content-rating.pefilm-rating" => Some(("contentDetails.contentRating.pefilmRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.djctq-rating-reasons" => Some(("contentDetails.contentRating.djctqRatingReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "content-details.content-rating.incaa-rating" => Some(("contentDetails.contentRating.incaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "content-details.content-rating.cnc-rating" => Some(("contentDetails.contentRating.cncRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.oflc-rating" => Some(("contentDetails.contentRating.oflcRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.fpb-rating" => Some(("contentDetails.contentRating.fpbRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "content-details.content-rating.mccaa-rating" => Some(("contentDetails.contentRating.mccaaRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5345,7 +5327,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "recording-details.location.longitude" => Some(("recordingDetails.location.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acb-rating", "access", "actual-end-time", "actual-start-time", "agcom-rating", "age-gating", "alcohol-content", "allowed", "altitude", "anatel-rating", "bbfc-rating", "bfvc-rating", "bitrate-bps", "blocked", "bmukk-rating", "caption", "category-id", "catv-rating", "catvfr-rating", "cbfc-rating", "ccc-rating", "cce-rating", "channel-id", "channel-title", "chfilm-rating", "chvrs-rating", "cicf-rating", "cna-rating", "cnc-rating", "comment-count", "concurrent-viewers", "container", "content-details", "content-rating", "country-restriction", "creation-time", "csa-rating", "cscf-rating", "czfilm-rating", "default", "default-audio-language", "default-language", "definition", "description", "dimension", "dislike-count", "djctq-rating", "djctq-rating-reasons", "duration", "duration-ms", "editor-suggestions", "editor-suggestions-availability", "eefilm-rating", "egfilm-rating", "eirin-rating", "embed-html", "embeddable", "etag", "exception", "failure-reason", "favorite-count", "fcbm-rating", "fco-rating", "file-details", "file-details-availability", "file-name", "file-size", "file-type", "fmoc-rating", "fpb-rating", "fsk-rating", "grfilm-rating", "height", "high", "icaa-rating", "id", "ifco-rating", "ilfilm-rating", "incaa-rating", "kfcb-rating", "kijkwijzer-rating", "kind", "kmrb-rating", "latitude", "license", "licensed-content", "like-count", "live-broadcast-content", "live-streaming-details", "localized", "location", "location-description", "longitude", "lsf-rating", "maxres", "mccaa-rating", "mccyp-rating", "mda-rating", "medietilsynet-rating", "medium", "meku-rating", "mibac-rating", "moc-rating", "moctw-rating", "monetization-details", "mpaa-rating", "mtrcb-rating", "nbc-rating", "nbcpl-rating", "nfrc-rating", "nfvcb-rating", "nkclv-rating", "oflc-rating", "parts-processed", "parts-total", "pefilm-rating", "player", "privacy-status", "processing-details", "processing-errors", "processing-failure-reason", "processing-hints", "processing-issues-availability", "processing-progress", "processing-status", "processing-warnings", "project-details", "public-stats-viewable", "publish-at", "published-at", "rcnof-rating", "recording-date", "recording-details", "recording-location", "region-restriction", "rejection-reason", "relevant-topic-ids", "resorteviolencia-rating", "restricted", "rtc-rating", "rte-rating", "russia-rating", "scheduled-end-time", "scheduled-start-time", "skfilm-rating", "smais-rating", "smsa-rating", "snippet", "standard", "statistics", "status", "suggestions", "tag-suggestions-availability", "tags", "thumbnails", "thumbnails-availability", "time-left-ms", "title", "topic-details", "topic-ids", "tvpg-rating", "upload-status", "url", "video-game-rating", "view-count", "width", "yt-rating"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7456,7 +7438,7 @@ fn main() {
     
     let mut app = App::new("youtube3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150706")
+           .version("0.3.2+20151012")
            .about("Programmatic access to YouTube features.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_youtube3_cli")
            .arg(Arg::with_name("url")

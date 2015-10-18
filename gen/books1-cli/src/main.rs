@@ -1155,11 +1155,12 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notes-export.folder-name" => Some(("notesExport.folderName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "notes-export"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "notes-export", "notification", "opted-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2187,6 +2188,65 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _notification_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.notification().get(opt.value_of("notification-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "locale" => {
+                    call = call.locale(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["locale", "source"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _onboarding_list_categories(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.onboarding().list_categories();
@@ -2278,6 +2338,68 @@ impl<'n, 'a> Engine<'n, 'a> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["locale", "page-token", "max-allowed-maturity-rating", "category-id", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _personalizedstream_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.personalizedstream().get();
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "max-allowed-maturity-rating" => {
+                    call = call.max_allowed_maturity_rating(value.unwrap_or(""));
+                },
+                "locale" => {
+                    call = call.locale(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["locale", "source", "max-allowed-maturity-rating"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3151,6 +3273,17 @@ impl<'n, 'a> Engine<'n, 'a> {
                     }
                 }
             },
+            ("notification", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._notification_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("notification".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("onboarding", Some(opt)) => {
                 match opt.subcommand() {
                     ("list-categories", Some(opt)) => {
@@ -3161,6 +3294,17 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("onboarding".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("personalizedstream", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._personalizedstream_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("personalizedstream".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -3433,7 +3577,7 @@ fn main() {
         
         ("dictionary", "methods: 'list-offline-metadata'", vec![
             ("list-offline-metadata",  
-                    Some(r##"Returns a list of offline dictionary meatadata available"##),
+                    Some(r##"Returns a list of offline dictionary metadata available"##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/dictionary_list-offline-metadata",
                   vec![
                     (Some(r##"cpksver"##),
@@ -4105,6 +4249,31 @@ fn main() {
                   ]),
             ]),
         
+        ("notification", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Returns notification details for a given notification id."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_books1_cli/notification_get",
+                  vec![
+                    (Some(r##"notification-id"##),
+                     None,
+                     Some(r##"String to identify the notification."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("onboarding", "methods: 'list-categories' and 'list-category-volumes'", vec![
             ("list-categories",  
                     Some(r##"List categories for onboarding experience."##),
@@ -4125,6 +4294,25 @@ fn main() {
             ("list-category-volumes",  
                     Some(r##"List available volumes under categories for onboarding experience."##),
                     "Details at http://byron.github.io/google-apis-rs/google_books1_cli/onboarding_list-category-volumes",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("personalizedstream", "methods: 'get'", vec![
+            ("get",  
+                    Some(r##"Returns a stream of personalized book clusters"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_books1_cli/personalizedstream_get",
                   vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4328,7 +4516,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150318")
+           .version("0.3.2+20150921")
            .about("Lets you search for books and manage your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

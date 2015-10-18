@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-androidenterprise1` library allows access to all features of the *Google Android Enterprise* service.
 
-This documentation was generated from *Android Enterprise* crate version *0.1.9+20150715*, where *20150715* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *Android Enterprise* crate version *0.1.9+20150922*, where *20150922* is the exact revision of the *androidenterprise:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *Android Enterprise* *v1* API can be found at the
 [official documentation site](https://developers.google.com/play/enterprise).
@@ -20,7 +20,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [devices](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Device.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetCall.html), [*get state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceGetStateCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceListCall.html) and [*set state*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.DeviceSetStateCall.html)
 * [enterprises](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Enterprise.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseDeleteCall.html), [*enroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseEnrollCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseListCall.html), [*send test push notification*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSendTestPushNotificationCall.html), [*set account*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseSetAccountCall.html) and [*unenroll*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EnterpriseUnenrollCall.html)
 * [entitlements](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Entitlement.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementPatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.EntitlementUpdateCall.html)
 * grouplicenses
@@ -34,7 +34,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [products](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.Product.html)
  * [*approve*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductApproveCall.html), [*generate approval url*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGenerateApprovalUrlCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetCall.html), [*get app restrictions schema*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetAppRestrictionsSchemaCall.html), [*get permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductGetPermissionCall.html) and [*update permissions*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.ProductUpdatePermissionCall.html)
 * [users](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.User.html)
- * [*generate token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateTokenCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserListCall.html) and [*revoke token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserRevokeTokenCall.html)
+ * [*generate token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGenerateTokenCall.html), [*get*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetCall.html), [*get available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserGetAvailableProductSetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserListCall.html), [*revoke token*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserRevokeTokenCall.html) and [*set available product set*](http://byron.github.io/google-apis-rs/google_androidenterprise1/struct.UserSetAvailableProductSetCall.html)
 
 
 
@@ -67,13 +67,15 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.enterprises().insert(...).doit()
-let r = hub.enterprises().list(...).doit()
-let r = hub.enterprises().unenroll(...).doit()
-let r = hub.enterprises().set_account(...).doit()
-let r = hub.enterprises().enroll(...).doit()
-let r = hub.enterprises().delete(...).doit()
-let r = hub.enterprises().get(...).doit()
+let r = hub.users().revoke_token(...).doit()
+let r = hub.collectionviewers().update(...).doit()
+let r = hub.collectionviewers().patch(...).doit()
+let r = hub.users().list(...).doit()
+let r = hub.collectionviewers().get(...).doit()
+let r = hub.users().set_available_product_set(...).doit()
+let r = hub.users().generate_token(...).doit()
+let r = hub.users().get_available_product_set(...).doit()
+let r = hub.users().get(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -98,7 +100,7 @@ google-androidenterprise1 = "*"
 extern crate hyper;
 extern crate yup_oauth2 as oauth2;
 extern crate google_androidenterprise1 as androidenterprise1;
-use androidenterprise1::Enterprise;
+use androidenterprise1::User;
 use androidenterprise1::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -119,12 +121,12 @@ let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = Enterprise::default();
+let mut req = User::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.enterprises().insert(req, "token")
+let result = hub.collectionviewers().update(req, "enterpriseId", "collectionId", "userId")
              .doit();
 
 match result {

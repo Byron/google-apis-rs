@@ -612,50 +612,6 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _moments_remove(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.moments().remove(opt.value_of("id").unwrap_or(""));
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _people_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.people().get(opt.value_of("user-id").unwrap_or(""));
@@ -935,9 +891,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                     ("list", Some(opt)) => {
                         call_result = self._moments_list(opt, dry_run, &mut err);
                     },
-                    ("remove", Some(opt)) => {
-                        call_result = self._moments_remove(opt, dry_run, &mut err);
-                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("moments".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -1168,7 +1121,7 @@ fn main() {
                   ]),
             ]),
         
-        ("moments", "methods: 'insert', 'list' and 'remove'", vec![
+        ("moments", "methods: 'insert' and 'list'", vec![
             ("insert",  
                     Some(r##"Record a moment representing a user's action such as making a purchase or commenting on a blog."##),
                     "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/moments_insert",
@@ -1230,22 +1183,6 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
-                  ]),
-            ("remove",  
-                    Some(r##"Delete a moment."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_plus1_cli/moments_remove",
-                  vec![
-                    (Some(r##"id"##),
-                     None,
-                     Some(r##"The ID of the moment to delete."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
                   ]),
             ]),
         
@@ -1356,7 +1293,7 @@ fn main() {
     
     let mut app = App::new("plus1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150719")
+           .version("0.3.2+20151014")
            .about("The Google+ API enables developers to build on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plus1_cli")
            .arg(Arg::with_name("url")

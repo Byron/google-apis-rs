@@ -2908,10 +2908,10 @@ impl<'a, C, A> TimelineInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -3806,10 +3806,10 @@ impl<'a, C, A> TimelineAttachmentInsertCall<'a, C, A> where C: BorrowMut<hyper::
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -4640,10 +4640,10 @@ impl<'a, C, A> TimelineUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.

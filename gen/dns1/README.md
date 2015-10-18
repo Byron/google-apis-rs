@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-dns1` library allows access to all features of the *Google dns* service.
 
-This documentation was generated from *dns* crate version *0.1.9+20150624*, where *20150624* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *dns* crate version *0.1.9+20150729*, where *20150729* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *dns* *v1* API can be found at the
 [official documentation site](https://developers.google.com/cloud-dns).

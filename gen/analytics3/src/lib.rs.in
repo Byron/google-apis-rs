@@ -1573,7 +1573,7 @@ impl Part for FilterSearchAndReplaceDetails {}
 pub struct Experiment {
     /// Experiment status. Possible values: "DRAFT", "READY_TO_RUN", "RUNNING", "ENDED". Experiments can be created in the "DRAFT", "READY_TO_RUN" or "RUNNING" state. This field is required when creating an experiment.
     pub status: Option<String>,
-    /// A floating-point number between 0 and 1. Specifies the fraction of the traffic that participates in the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
+    /// A floating-point number in (0, 1]. Specifies the fraction of the traffic that participates in the experiment. Can be changed for a running experiment. This field may not be changed for an experiments whose status is ENDED.
     #[serde(rename="trafficCoverage")]
     pub traffic_coverage: Option<f64>,
     /// Notes about this experiment.
@@ -1586,7 +1586,7 @@ pub struct Experiment {
     /// Internal ID for the web property to which this experiment belongs. This field is read-only.
     #[serde(rename="internalWebPropertyId")]
     pub internal_web_property_id: Option<String>,
-    /// A floating-point number between 0 and 1. Specifies the necessary confidence level to choose a winner. This field may not be changed for an experiments whose status is ENDED.
+    /// A floating-point number in (0, 1). Specifies the necessary confidence level to choose a winner. This field may not be changed for an experiments whose status is ENDED.
     #[serde(rename="winnerConfidenceLevel")]
     pub winner_confidence_level: Option<f64>,
     /// The starting time of the experiment (the time the status changed from READY_TO_RUN to RUNNING). This field is present only if the experiment has started. This field is read-only.
@@ -1861,7 +1861,7 @@ pub struct FilterExpression {
     /// - Custom dimension  
     /// - CUSTOM_DIMENSION (See accompanying field index),
     pub field: Option<String>,
-    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, MATCHES. Include and Exclude filters can use any match type. Match type is not applicable to Upper case and Lower case filters. Search and Replace expressions in the Search and Replace filter and all filter expressions in the Advanced filter default to MATCHES. User should not set match type for those filters.
+    /// Match type for this filter. Possible values are BEGINS_WITH, EQUAL, ENDS_WITH, CONTAINS, or MATCHES. GEO_DOMAIN, GEO_IP_ADDRESS, PAGE_REQUEST_URI, or PAGE_HOSTNAME filters can use any match type; all other filters must use MATCHES.
     #[serde(rename="matchType")]
     pub match_type: Option<String>,
     /// The Index of the custom dimension. Set only if the field is a is CUSTOM_DIMENSION.
@@ -2676,7 +2676,7 @@ pub struct Profile {
     /// The query parameters that are excluded from this view (profile).
     #[serde(rename="excludeQueryParameters")]
     pub exclude_query_parameters: Option<String>,
-    /// The currency type associated with this view (profile). The supported values are:
+    /// The currency type associated with this view (profile), defaults to USD. The supported values are:
     /// ARS, AUD, BGN, BRL, CAD, CHF, CNY, CZK, DKK, EUR, GBP, HKD, HUF, IDR, INR, JPY, KRW, LTL, MXN, NOK, NZD, PHP, PLN, RUB, SEK, THB, TRY, TWD, USD, VND, ZAR
     pub currency: Option<String>,
     /// Internal ID for the web property to which this view (profile) belongs.
@@ -14349,10 +14349,10 @@ impl<'a, C, A> ManagementUploadUploadDataCall<'a, C, A> where C: BorrowMut<hyper
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.

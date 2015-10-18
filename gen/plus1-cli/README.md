@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *plus* API at revision *20150719*. The CLI is at version *0.3.2*.
+This documentation was generated from the *plus* API at revision *20151014*. The CLI is at version *0.3.2*.
 
 ```bash
 plus1 [options]
@@ -38,7 +38,6 @@ plus1 [options]
         moments
                 insert <user-id> <collection> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <user-id> <collection> [-p <v>]... [-o <out>]
-                remove <id> [-p <v>]...
         people
                 get <user-id> [-p <v>]... [-o <out>]
                 list <user-id> <collection> [-p <v>]... [-o <out>]

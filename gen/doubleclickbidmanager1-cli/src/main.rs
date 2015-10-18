@@ -68,11 +68,12 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
+                    "file-spec" => Some(("fileSpec", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-type" => Some(("filterType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter-ids" => Some(("filterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["filter-ids", "filter-type", "format"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["file-spec", "filter-ids", "filter-type", "format"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -895,7 +896,7 @@ fn main() {
     
     let mut app = App::new("doubleclickbidmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150326")
+           .version("0.3.2+20150925")
            .about("API for viewing and managing your reports in DoubleClick Bid Manager.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli")
            .arg(Arg::with_name("folder")

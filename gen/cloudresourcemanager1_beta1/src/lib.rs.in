@@ -133,6 +133,9 @@ impl<'a, C, A> Cloudresourcemanager<C, A>
         }
     }
 
+    pub fn organizations(&'a self) -> OrganizationMethods<'a, C, A> {
+        OrganizationMethods { hub: &self }
+    }
     pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
@@ -159,17 +162,22 @@ impl<'a, C, A> Cloudresourcemanager<C, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [delete projects](struct.ProjectDeleteCall.html) (none)
+/// * [test iam permissions projects](struct.ProjectTestIamPermissionCall.html) (none)
 /// * [undelete projects](struct.ProjectUndeleteCall.html) (none)
+/// * [set iam policy projects](struct.ProjectSetIamPolicyCall.html) (none)
 /// * [get projects](struct.ProjectGetCall.html) (response)
 /// * [update projects](struct.ProjectUpdateCall.html) (request|response)
+/// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (none)
+/// * [delete projects](struct.ProjectDeleteCall.html) (none)
 /// * [create projects](struct.ProjectCreateCall.html) (request|response)
 /// * [list projects](struct.ProjectListCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Project {
-    /// The user-assigned name of the project. This field is optional and can remain unset. Allowed characters are: lowercase and uppercase letters, numbers, hyphen, single-quote, double-quote, space, and exclamation point. Example: My Project Read-write.
+    /// The user-assigned name of the project. It must be 4 to 30 characters. Allowed characters are: lowercase and uppercase letters, numbers, hyphen, single-quote, double-quote, space, and exclamation point. Example: My Project Read-write.
     pub name: Option<String>,
+    /// An optional reference to a parent Resource. The only supported parent type is "organization". Once set, the parent cannot be modified. Read-write.
+    pub parent: Option<ResourceId>,
     /// The unique, user-assigned ID of the project. It must be 6 to 30 lowercase letters, digits, or hyphens. It must start with a letter. Trailing hyphens are prohibited. Example: tokyo-rain-123 Read-only after creation.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
@@ -189,6 +197,187 @@ pub struct Project {
 impl RequestValue for Project {}
 impl Resource for Project {}
 impl ResponseResult for Project {}
+
+
+/// Response message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions organizations](struct.OrganizationTestIamPermissionCall.html) (response)
+/// * [test iam permissions projects](struct.ProjectTestIamPermissionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsResponse {
+    /// A subset of `TestPermissionsRequest.permissions` that the caller is allowed.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl ResponseResult for TestIamPermissionsResponse {}
+
+
+/// Request message for `GetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (request)
+/// * [get iam policy organizations](struct.OrganizationGetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIamPolicyRequest;
+
+impl RequestValue for GetIamPolicyRequest {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions organizations](struct.OrganizationTestIamPermissionCall.html) (request)
+/// * [test iam permissions projects](struct.ProjectTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
+/// Request message for `SetIamPolicy` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy projects](struct.ProjectSetIamPolicyCall.html) (request)
+/// * [set iam policy organizations](struct.OrganizationSetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Cloud Platform services (such as Projects) might reject them.
+    pub policy: Option<Policy>,
+}
+
+impl RequestValue for SetIamPolicyRequest {}
+
+
+/// A container to reference an id for any resource type. A 'resource' in Google Cloud Platform is a generic term for something you (a developer) may want to interact with through one of our API's. Some examples are an AppEngine app, a Compute Engine instance, Cloud SQL database, ...
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceId {
+    /// Required field representing the resource type this id is for. At present, the only valid type is "organization".
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Required field for the type-specific id. This should correspond to the id used in the type-specific API's.
+    pub id: Option<String>,
+}
+
+impl Part for ResourceId {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. Required
+    pub role: Option<String>,
+    /// Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following formats: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@gmail.com` or `joe@example.com`. * `serviceAccount:{emailid}`: An email address that represents a service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: A Google Apps domain name that represents all the users of that domain. For example, `google.com` or `example.com`.
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// The response returned from the ListOrganizations method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list organizations](struct.OrganizationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOrganizationsResponse {
+    /// A pagination token to be used to retrieve the next page of results. If the result is too large to fit within the page size specified in the request, this field will be set with a token that can be used to fetch the next page of results. If this field is empty, it indicates that this response contains the last page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of Organizations that matched the list query, possibly paginated.
+    pub organizations: Option<Vec<Organization>>,
+}
+
+impl ResponseResult for ListOrganizationsResponse {}
+
+
+/// Defines an Identity and Access Management (IAM) policy. It is used to specify access control policies for Cloud Platform resources. A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM. **Example** ``` { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com"] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] } ``` For a description of IAM and its features, see the [IAM developer's guide][https://cloud.google.com/iam].
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy projects](struct.ProjectSetIamPolicyCall.html) (response)
+/// * [set iam policy organizations](struct.OrganizationSetIamPolicyCall.html) (response)
+/// * [get iam policy projects](struct.ProjectGetIamPolicyCall.html) (response)
+/// * [get iam policy organizations](struct.OrganizationGetIamPolicyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Associates a list of `members` to a `role`. Multiple `bindings` must not be specified for the same `role`. `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
+    /// Version of the `Policy`. The default version is 0.
+    pub version: Option<i32>,
+    /// Can be used to perform a read-modify-write.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Policy {}
+
+
+/// The root node in the resource hierarchy to which a particular entity's (e.g., company) resources belong.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy organizations](struct.OrganizationSetIamPolicyCall.html) (none)
+/// * [get iam policy organizations](struct.OrganizationGetIamPolicyCall.html) (none)
+/// * [test iam permissions organizations](struct.OrganizationTestIamPermissionCall.html) (none)
+/// * [get organizations](struct.OrganizationGetCall.html) (response)
+/// * [update organizations](struct.OrganizationUpdateCall.html) (request|response)
+/// * [list organizations](struct.OrganizationListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Organization {
+    /// An immutable id for the Organization that is assigned on creation. This should be omitted when creating a new Organization. This field is read-only.
+    #[serde(rename="organizationId")]
+    pub organization_id: Option<String>,
+    /// The owner of this Organization. The owner should be specified upon creation. Once set, it cannot be changed. This field is required.
+    pub owner: Option<OrganizationOwner>,
+    /// A friendly string to be used to refer to the Organization in the UI. This field is required.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+}
+
+impl RequestValue for Organization {}
+impl Resource for Organization {}
+impl ResponseResult for Organization {}
 
 
 /// A page of the response received from the [ListProjects][google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] method. A paginated response where more pages are available has `next_page_token` set. This token can be used in a subsequent request to retrieve the next request page.
@@ -228,10 +417,173 @@ pub struct Empty;
 impl ResponseResult for Empty {}
 
 
+/// The entity that owns an Organization. The lifetime of the Organization and all of its descendants are bound to the OrganizationOwner. If the OrganizationOwner is deleted, the Organization and all its descendants will be deleted.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrganizationOwner {
+    /// The Google for Work customer id used in the Directory API.
+    #[serde(rename="directoryCustomerId")]
+    pub directory_customer_id: Option<String>,
+}
+
+impl Part for OrganizationOwner {}
+
+
 
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *organization* resources.
+/// It is not used directly, but through the `Cloudresourcemanager` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::new(),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)` and `update(...)`
+/// // to build up your call.
+/// let rb = hub.organizations();
+/// # }
+/// ```
+pub struct OrganizationMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for OrganizationMethods<'a, C, A> {}
+
+impl<'a, C, A> OrganizationMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the access control policy on a Organization resource. Replaces any existing policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`.
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> OrganizationSetIamPolicyCall<'a, C, A> {
+        OrganizationSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the access control policy for a Organization resource. May be empty if no such policy or resource exists.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`.
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> OrganizationGetIamPolicyCall<'a, C, A> {
+        OrganizationGetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns permissions that a caller has on the specified Organization.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`.
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> OrganizationTestIamPermissionCall<'a, C, A> {
+        OrganizationTestIamPermissionCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetches an Organization resource by id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `organizationId` - The id of the Organization resource to fetch.
+    pub fn get(&self, organization_id: &str) -> OrganizationGetCall<'a, C, A> {
+        OrganizationGetCall {
+            hub: self.hub,
+            _organization_id: organization_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an Organization resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `organizationId` - An immutable id for the Organization that is assigned on creation. This should be omitted when creating a new Organization. This field is read-only.
+    pub fn update(&self, request: Organization, organization_id: &str) -> OrganizationUpdateCall<'a, C, A> {
+        OrganizationUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _organization_id: organization_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Query Organization resources.
+    pub fn list(&self) -> OrganizationListCall<'a, C, A> {
+        OrganizationListCall {
+            hub: self.hub,
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the `Cloudresourcemanager` hub.
@@ -256,7 +608,7 @@ impl ResponseResult for Empty {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `undelete(...)` and `update(...)`
+/// // like `create(...)`, `delete(...)`, `get(...)`, `get_iam_policy(...)`, `list(...)`, `set_iam_policy(...)`, `test_iam_permissions(...)`, `undelete(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -273,15 +625,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if the following criteria are met: + The project does not have a billing account associated with it. + The project has a lifecycle state of [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE]. This method changes the project's lifecycle state from [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject], and the project remains visible to [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject] and [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] methods. The caller must have modify permissions for this project.
+    /// Tests the specified permissions against the IAM access control policy for the specified project.
     /// 
     /// # Arguments
     ///
-    /// * `projectId` - The project ID (for example, `foo-bar-123`). Required.
-    pub fn delete(&self, project_id: &str) -> ProjectDeleteCall<'a, C, A> {
-        ProjectDeleteCall {
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`.
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectTestIamPermissionCall<'a, C, A> {
+        ProjectTestIamPermissionCall {
             hub: self.hub,
-            _project_id: project_id.to_string(),
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -299,6 +653,42 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectUndeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a project resource. Initially, the project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the project. Several APIs are activated automatically for the project, including Google Cloud Storage.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: Project) -> ProjectCreateCall<'a, C, A> {
+        ProjectCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sets the IAM access control policy for the specified project. We do not currently support 'domain:' prefixed members in a Binding of a Policy. Calling this method requires enabling the App Engine Admin API.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`.
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
+        ProjectSetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -343,15 +733,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a project resource. Initially, the project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the project. Several APIs are activated automatically for the project, including Google Cloud Storage.
+    /// Returns the IAM access control policy for specified project.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Project) -> ProjectCreateCall<'a, C, A> {
-        ProjectCreateCall {
+    /// * `resource` - REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`.
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectGetIamPolicyCall<'a, C, A> {
+        ProjectGetIamPolicyCall {
             hub: self.hub,
             _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if the following criteria are met: + The project does not have a billing account associated with it. + The project has a lifecycle state of [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE]. This method changes the project's lifecycle state from [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject], and the project remains visible to [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject] and [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] methods. The caller must have modify permissions for this project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `projectId` - The project ID (for example, `foo-bar-123`). Required.
+    pub fn delete(&self, project_id: &str) -> ProjectDeleteCall<'a, C, A> {
+        ProjectDeleteCall {
+            hub: self.hub,
+            _project_id: project_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -382,10 +791,829 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if the following criteria are met: + The project does not have a billing account associated with it. + The project has a lifecycle state of [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE]. This method changes the project's lifecycle state from [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject], and the project remains visible to [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject] and [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] methods. The caller must have modify permissions for this project.
+/// Sets the access control policy on a Organization resource. Replaces any existing policy.
 ///
-/// A builder for the *delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// A builder for the *setIamPolicy* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::SetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().set_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationSetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationSetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.setIamPolicy", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations/{resource}:setIamPolicy".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> OrganizationSetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> OrganizationSetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationSetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationSetIamPolicyCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Gets the access control policy for a Organization resource. May be empty if no such policy or resource exists.
+///
+/// A builder for the *getIamPolicy* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::GetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().get_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.getIamPolicy", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations/{resource}:getIamPolicy".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> OrganizationGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> OrganizationGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationGetIamPolicyCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Returns permissions that a caller has on the specified Organization.
+///
+/// A builder for the *testIamPermissions* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.testIamPermissions", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations/{resource}:testIamPermissions".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> OrganizationTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> OrganizationTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationTestIamPermissionCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Fetches an Organization resource by id.
+///
+/// A builder for the *get* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
 ///
 /// # Example
 ///
@@ -408,27 +1636,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().delete("projectId")
+/// let result = hub.organizations().get("organizationId")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectDeleteCall<'a, C, A>
+pub struct OrganizationGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Cloudresourcemanager<C, A>,
-    _project_id: String,
+    _organization_id: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OrganizationGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Organization)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -436,11 +1664,11 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.delete", 
-                               http_method: hyper::method::Method::Delete });
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.get", 
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("projectId", self._project_id.to_string()));
-        for &field in ["alt", "projectId"].iter() {
+        params.push(("organizationId", self._organization_id.to_string()));
+        for &field in ["alt", "organizationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -452,12 +1680,12 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects/{projectId}".to_string();
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations/{organizationId}".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+        for &(find_this, param_name) in [("{organizationId}", "organizationId")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -469,7 +1697,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["projectId"].iter() {
+            for param_name in ["organizationId"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -503,7 +1731,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                                                              access_token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -556,14 +1784,14 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The project ID (for example, `foo-bar-123`). Required.
+    /// The id of the Organization resource to fetch.
     ///
-    /// Sets the *project id* path property to the given value.
+    /// Sets the *organization id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectDeleteCall<'a, C, A> {
-        self._project_id = new_value.to_string();
+    pub fn organization_id(mut self, new_value: &str) -> OrganizationGetCall<'a, C, A> {
+        self._organization_id = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -572,7 +1800,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -599,7 +1827,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -616,7 +1844,798 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectDeleteCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationGetCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Updates an Organization resource.
+///
+/// A builder for the *update* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::Organization;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Organization::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().update(req, "organizationId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: Organization,
+    _organization_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Organization)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.update", 
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("organizationId", self._organization_id.to_string()));
+        for &field in ["alt", "organizationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations/{organizationId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{organizationId}", "organizationId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["organizationId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Organization) -> OrganizationUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// An immutable id for the Organization that is assigned on creation. This should be omitted when creating a new Organization. This field is read-only.
+    ///
+    /// Sets the *organization id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn organization_id(mut self, new_value: &str) -> OrganizationUpdateCall<'a, C, A> {
+        self._organization_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationUpdateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Query Organization resources.
+///
+/// A builder for the *list* method supported by a *organization* resource.
+/// It is not used directly, but through a `OrganizationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.organizations().list()
+///              .page_token("erat")
+///              .page_size(-35)
+///              .filter("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct OrganizationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _filter: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrganizationListCall<'a, C, A> {}
+
+impl<'a, C, A> OrganizationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListOrganizationsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.list", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "pageToken", "pageSize", "filter"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/organizations".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// A pagination token returned from a previous call to ListOrganizations that indicates from where listing should continue. This field is optional.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> OrganizationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of Organizations to return in the response. This field is optional.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> OrganizationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// An optional query string used to filter the Organizations to be return in the response. Filter rules are case-insensitive. Organizations may be filtered by `owner.directoryCustomerId` or by `domain`, where the domain is a Google for Work domain, for example: |Filter|Description| |------|-----------| |owner.directorycustomerid:123456789|Organizations with `owner.directory_customer_id` equal to `123456789`.| |domain:google.com|Organizations corresponding to the domain `google.com`.| This field is optional.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> OrganizationListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrganizationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> OrganizationListCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Tests the specified permissions against the IAM access control policy for the specified project.
+///
+/// A builder for the *testIamPermissions* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::TestIamPermissionsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = TestIamPermissionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().test_iam_permissions(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectTestIamPermissionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: TestIamPermissionsRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectTestIamPermissionCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TestIamPermissionsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.testIamPermissions", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects/{resource}:testIamPermissions".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectTestIamPermissionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectTestIamPermissionCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTestIamPermissionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestIamPermissionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectTestIamPermissionCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -859,6 +2878,519 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> ProjectUndeleteCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Creates a project resource. Initially, the project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the project. Several APIs are activated automatically for the project, including Google Cloud Storage.
+///
+/// A builder for the *create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::Project;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Project::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: Project,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Project)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.create", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Project) -> ProjectCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectCreateCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Sets the IAM access control policy for the specified project. We do not currently support 'domain:' prefixed members in a Binding of a Policy. Calling this method requires enabling the App Engine Admin API.
+///
+/// A builder for the *setIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// use cloudresourcemanager1_beta1::SetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().set_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _request: SetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.setIamPolicy", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects/{resource}:setIamPolicy".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectSetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectSetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectSetIamPolicyCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1381,9 +3913,9 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Creates a project resource. Initially, the project resource is owned by its creator exclusively. The creator can later grant permission to others to read or update the project. Several APIs are activated automatically for the project, including Google Cloud Storage.
+/// Returns the IAM access control policy for specified project.
 ///
-/// A builder for the *create* method supported by a *project* resource.
+/// A builder for the *getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -1394,7 +3926,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
-/// use cloudresourcemanager1_beta1::Project;
+/// use cloudresourcemanager1_beta1::GetIamPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1408,32 +3940,33 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Project::default();
+/// let mut req = GetIamPolicyRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().create(req)
+/// let result = hub.projects().get_iam_policy(req, "resource")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectCreateCall<'a, C, A>
+pub struct ProjectGetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Cloudresourcemanager<C, A>,
-    _request: Project,
+    _request: GetIamPolicyRequest,
+    _resource: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectGetIamPolicyCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Project)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1441,10 +3974,11 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.create", 
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getIamPolicy", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1456,11 +3990,32 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects".to_string();
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects/{resource}:getIamPolicy".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
+        for &(find_this, param_name) in [("{resource}", "resource")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
         
         if params.len() > 0 {
             url.push('?');
@@ -1559,8 +4114,18 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Project) -> ProjectCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectGetIamPolicyCall<'a, C, A> {
         self._request = new_value;
+        self
+    }
+    /// REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1569,7 +4134,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectGetIamPolicyCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1596,7 +4161,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetIamPolicyCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1613,7 +4178,249 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> ProjectCreateCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectGetIamPolicyCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Marks the project identified by the specified `project_id` (for example, `my-project-123`) for deletion. This method will only affect the project if the following criteria are met: + The project does not have a billing account associated with it. + The project has a lifecycle state of [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE]. This method changes the project's lifecycle state from [ACTIVE][google.cloudresourcemanager.projects.v1beta1.LifecycleState.ACTIVE] to [DELETE_REQUESTED] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_REQUESTED]. The deletion starts at an unspecified time, at which point the lifecycle state changes to [DELETE_IN_PROGRESS] [google.cloudresourcemanager.projects.v1beta1.LifecycleState.DELETE_IN_PROGRESS]. Until the deletion completes, you can check the lifecycle state checked by retrieving the project with [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject], and the project remains visible to [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects]. However, you cannot update the project. After the deletion completes, the project is not retrievable by the [GetProject] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.GetProject] and [ListProjects] [google.cloudresourcemanager.projects.v1beta1.DeveloperProjects.ListProjects] methods. The caller must have modify permissions for this project.
+///
+/// A builder for the *delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1_beta1 as cloudresourcemanager1_beta1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1_beta1::Cloudresourcemanager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Cloudresourcemanager::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().delete("projectId")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Cloudresourcemanager<C, A>,
+    _project_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("projectId", self._project_id.to_string()));
+        for &field in ["alt", "projectId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://cloudresourcemanager.googleapis.com/v1beta1/projects/{projectId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{projectId}", "projectId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["projectId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The project ID (for example, `foo-bar-123`). Required.
+    ///
+    /// Sets the *project id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn project_id(mut self, new_value: &str) -> ProjectDeleteCall<'a, C, A> {
+        self._project_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> ProjectDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -1648,9 +4455,9 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("amet.")
-///              .page_size(-81)
-///              .filter("labore")
+///              .page_token("justo")
+///              .page_size(-21)
+///              .filter("et")
 ///              .doit();
 /// # }
 /// ```

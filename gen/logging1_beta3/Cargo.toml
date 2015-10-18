@@ -4,10 +4,11 @@
 [package]
 
 name = "google-logging1_beta3"
-version = "0.1.9+20150326"
+version = "0.1.9+20151007"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with logging (protocol v1beta3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3"
+homepage = "https://cloud.google.com/logging/docs/"
 documentation = "http://byron.github.io/google-apis-rs/google_logging1_beta3"
 license = "MIT"
 keywords = ["logging", "google", "protocol", "web", "api"]

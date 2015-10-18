@@ -202,6 +202,7 @@ impl Part for OperationErrors {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [delete backup runs](struct.BackupRunDeleteCall.html) (none)
 /// * [get backup runs](struct.BackupRunGetCall.html) (response)
 /// * [list backup runs](struct.BackupRunListCall.html) (none)
 /// 
@@ -265,6 +266,7 @@ impl Part for SslCertDetail {}
 /// * [insert ssl certs](struct.SslCertInsertCall.html) (none)
 /// * [get ssl certs](struct.SslCertGetCall.html) (response)
 /// * [list ssl certs](struct.SslCertListCall.html) (none)
+/// * [create ephemeral ssl certs](struct.SslCertCreateEphemeralCall.html) (response)
 /// * [delete ssl certs](struct.SslCertDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -381,6 +383,10 @@ impl RequestValue for InstancesCloneRequest {}
 pub struct ReplicaConfiguration {
     /// This is always sql#replicaConfiguration.
     pub kind: Option<String>,
+    /// Specifies if the replica is the failover target. If the field is set to true the replica will be designated as a failover replica. In case the master instance fails, the replica instance will be promoted as the new master instance.
+    /// Only one replica can be specified as failover target, and the replica has to be in different zone with the master instance.
+    #[serde(rename="failoverTarget")]
+    pub failover_target: Option<bool>,
     /// MySQL specific configuration when replicating from a MySQL on-premises master. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named master.info in the data directory.
     #[serde(rename="mysqlReplicaConfiguration")]
     pub mysql_replica_configuration: Option<MySqlReplicaConfiguration>,
@@ -660,7 +666,7 @@ pub struct Flag {
     /// For STRING flags, a list of strings that the value can be set to.
     #[serde(rename="allowedStringValues")]
     pub allowed_string_values: Option<Vec<String>>,
-    /// The database version this flag applies to. Currently this can only be [MYSQL_5_5].
+    /// The database version this flag applies to. Can be MYSQL_5_5, MYSQL_5_6, or both.
     #[serde(rename="appliesTo")]
     pub applies_to: Option<Vec<String>>,
     /// The type of the flag. Flags are typed to being BOOLEAN, STRING, INTEGER or NONE. NONE is used for flags which do not take a value, such as skip_grant_tables.
@@ -899,9 +905,31 @@ pub struct Settings {
     /// The location preference settings. This allows the instance to be located as near as possible to either an App Engine app or GCE zone for better performance.
     #[serde(rename="locationPreference")]
     pub location_preference: Option<LocationPreference>,
+    /// The size of data disk for the performance instance, specified in GB. Setting this value for non-performance instances will result in an error.
+    #[serde(rename="dataDiskSizeGb")]
+    pub data_disk_size_gb: Option<String>,
 }
 
 impl Part for Settings {}
+
+
+/// Instance failover request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [failover instances](struct.InstanceFailoverCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstancesFailoverRequest {
+    /// Failover Context.
+    #[serde(rename="failoverContext")]
+    pub failover_context: Option<FailoverContext>,
+}
+
+impl RequestValue for InstancesFailoverRequest {}
 
 
 /// SslCerts insert request.
@@ -961,6 +989,24 @@ pub struct AclEntry {
 }
 
 impl Part for AclEntry {}
+
+
+/// SslCerts create ephemeral certificate request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create ephemeral ssl certs](struct.SslCertCreateEphemeralCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SslCertsCreateEphemeralRequest {
+    /// PEM encoded public key to include in the signed certificate.
+    pub public_key: Option<String>,
+}
+
+impl RequestValue for SslCertsCreateEphemeralRequest {}
 
 
 /// Database instances list response.
@@ -1129,6 +1175,22 @@ pub struct InstancesImportRequest {
 impl RequestValue for InstancesImportRequest {}
 
 
+/// Database instance failover context.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FailoverContext {
+    /// This is always sql#failoverContext.
+    pub kind: Option<String>,
+    /// The current settings version of this instance. Request will be rejected if this version doesn't match the current settings version.
+    #[serde(rename="settingsVersion")]
+    pub settings_version: Option<String>,
+}
+
+impl Part for FailoverContext {}
+
+
 /// Database list response.
 /// 
 /// # Activities
@@ -1178,6 +1240,7 @@ impl Part for BinLogCoordinates {}
 /// * [delete ssl certs](struct.SslCertDeleteCall.html) (response)
 /// * [delete users](struct.UserDeleteCall.html) (response)
 /// * [delete databases](struct.DatabaseDeleteCall.html) (response)
+/// * [failover instances](struct.InstanceFailoverCall.html) (response)
 /// * [patch databases](struct.DatabasePatchCall.html) (response)
 /// * [reset ssl config instances](struct.InstanceResetSslConfigCall.html) (response)
 /// * [promote replica instances](struct.InstancePromoteReplicaCall.html) (response)
@@ -1185,6 +1248,7 @@ impl Part for BinLogCoordinates {}
 /// * [list operations](struct.OperationListCall.html) (none)
 /// * [update users](struct.UserUpdateCall.html) (response)
 /// * [insert databases](struct.DatabaseInsertCall.html) (response)
+/// * [delete backup runs](struct.BackupRunDeleteCall.html) (response)
 /// * [patch instances](struct.InstancePatchCall.html) (response)
 /// * [clone instances](struct.InstanceCloneCall.html) (response)
 /// * [delete instances](struct.InstanceDeleteCall.html) (response)
@@ -1273,6 +1337,9 @@ impl Part for LocationPreference {}
 pub struct ExportContextSqlExportOptions {
     /// Tables to export, or that were exported, from the specified database. If you specify tables, specify one and only one database.
     pub tables: Option<Vec<String>>,
+    /// Export only schemas.
+    #[serde(rename="schemaOnly")]
+    pub schema_only: Option<bool>,
 }
 
 impl NestedType for ExportContextSqlExportOptions {}
@@ -1591,7 +1658,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `clone(...)`, `delete(...)`, `export(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `patch(...)`, `promote_replica(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `start_replica(...)`, `stop_replica(...)` and `update(...)`
+/// // like `clone(...)`, `delete(...)`, `export(...)`, `failover(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `patch(...)`, `promote_replica(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `start_replica(...)`, `stop_replica(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.instances();
 /// # }
@@ -1605,6 +1672,27 @@ pub struct InstanceMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for InstanceMethods<'a, C, A> {}
 
 impl<'a, C, A> InstanceMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Failover the instance to its failover replica instance.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - ID of the project that contains the read replica.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    pub fn failover(&self, request: InstancesFailoverRequest, project: &str, instance: &str) -> InstanceFailoverCall<'a, C, A> {
+        InstanceFailoverCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1686,15 +1774,17 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Restarts a Cloud SQL instance.
+    /// Creates a Cloud SQL instance as a clone of the source instance.
     /// 
     /// # Arguments
     ///
-    /// * `project` - Project ID of the project that contains the instance to be restarted.
-    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
-    pub fn restart(&self, project: &str, instance: &str) -> InstanceRestartCall<'a, C, A> {
-        InstanceRestartCall {
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the source as well as the clone Cloud SQL instance.
+    /// * `instance` - The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
+    pub fn clone(&self, request: InstancesCloneRequest, project: &str, instance: &str) -> InstanceCloneCall<'a, C, A> {
+        InstanceCloneCall {
             hub: self.hub,
+            _request: request,
             _project: project.to_string(),
             _instance: instance.to_string(),
             _delegate: Default::default(),
@@ -1842,17 +1932,15 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Cloud SQL instance as a clone of the source instance.
+    /// Restarts a Cloud SQL instance.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `project` - Project ID of the source as well as the clone Cloud SQL instance.
-    /// * `instance` - The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
-    pub fn clone(&self, request: InstancesCloneRequest, project: &str, instance: &str) -> InstanceCloneCall<'a, C, A> {
-        InstanceCloneCall {
+    /// * `project` - Project ID of the project that contains the instance to be restarted.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    pub fn restart(&self, project: &str, instance: &str) -> InstanceRestartCall<'a, C, A> {
+        InstanceRestartCall {
             hub: self.hub,
-            _request: request,
             _project: project.to_string(),
             _instance: instance.to_string(),
             _delegate: Default::default(),
@@ -2151,7 +2239,7 @@ impl<'a, C, A> DatabaseMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
+/// // like `create_ephemeral(...)`, `delete(...)`, `get(...)`, `insert(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.ssl_certs();
 /// # }
@@ -2231,6 +2319,27 @@ impl<'a, C, A> SslCertMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Generates a short-lived X509 certificate containing the provided public key and signed by a private key specific to the target instance. Users may use the certificate to authenticate as themselves when connecting to the database.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Project ID of the Cloud SQL project.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    pub fn create_ephemeral(&self, request: SslCertsCreateEphemeralRequest, project: &str, instance: &str) -> SslCertCreateEphemeralCall<'a, C, A> {
+        SslCertCreateEphemeralCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists all of the current SSL certificates for the instance.
     /// 
     /// # Arguments
@@ -2274,7 +2383,7 @@ impl<'a, C, A> SslCertMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `list(...)`
+/// // like `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.backup_runs();
 /// # }
@@ -2321,6 +2430,27 @@ impl<'a, C, A> BackupRunMethods<'a, C, A> {
     /// * `id` - The ID of this Backup Run.
     pub fn get(&self, project: &str, instance: &str, id: &str) -> BackupRunGetCall<'a, C, A> {
         BackupRunGetCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _id: id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the backup taken by a backup run.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Project ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
+    /// * `id` - The ID of the Backup Run to delete. To find a Backup Run ID, use the list method.
+    pub fn delete(&self, project: &str, instance: &str, id: &str) -> BackupRunDeleteCall<'a, C, A> {
+        BackupRunDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
             _instance: instance.to_string(),
@@ -4198,6 +4328,285 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Failover the instance to its failover replica instance.
+///
+/// A builder for the *failover* method supported by a *instance* resource.
+/// It is not used directly, but through a `InstanceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::InstancesFailoverRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use sqladmin1_beta4::SQLAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InstancesFailoverRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.instances().failover(req, "project", "instance")
+///              .doit();
+/// # }
+/// ```
+pub struct InstanceFailoverCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SQLAdmin<C, A>,
+    _request: InstancesFailoverRequest,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for InstanceFailoverCall<'a, C, A> {}
+
+impl<'a, C, A> InstanceFailoverCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "sql.instances.failover", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/failover".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InstancesFailoverRequest) -> InstanceFailoverCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// ID of the project that contains the read replica.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> InstanceFailoverCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> InstanceFailoverCall<'a, C, A> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceFailoverCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceFailoverCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceFailoverCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Deletes all client certificates and generates a new server SSL certificate for the instance. The changes will not take effect until the instance is restarted. Existing instances without a server certificate will need to call this once to set a server certificate.
 ///
 /// A builder for the *resetSslConfig* method supported by a *instance* resource.
@@ -5221,9 +5630,9 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Restarts a Cloud SQL instance.
+/// Creates a Cloud SQL instance as a clone of the source instance.
 ///
-/// A builder for the *restart* method supported by a *instance* resource.
+/// A builder for the *clone* method supported by a *instance* resource.
 /// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
@@ -5234,6 +5643,7 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::InstancesCloneRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5244,17 +5654,23 @@ impl<'a, C, A> InstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InstancesCloneRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.instances().restart("project", "instance")
+/// let result = hub.instances().clone(req, "project", "instance")
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceRestartCall<'a, C, A>
+pub struct InstanceCloneCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a SQLAdmin<C, A>,
+    _request: InstancesCloneRequest,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -5262,9 +5678,9 @@ pub struct InstanceRestartCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for InstanceRestartCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for InstanceCloneCall<'a, C, A> {}
 
-impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -5276,9 +5692,9 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "sql.instances.restart", 
+        dlg.begin(MethodInfo { id: "sql.instances.clone", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("project", self._project.to_string()));
         params.push(("instance", self._instance.to_string()));
         for &field in ["alt", "project", "instance"].iter() {
@@ -5293,7 +5709,7 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/restart".to_string();
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/clone".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -5325,6 +5741,17 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5342,11 +5769,15 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5397,23 +5828,32 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Project ID of the project that contains the instance to be restarted.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InstancesCloneRequest) -> InstanceCloneCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Project ID of the source as well as the clone Cloud SQL instance.
     ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// Cloud SQL instance ID. This does not include the project ID.
+    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
     ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -5423,7 +5863,7 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestartCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceCloneCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5444,7 +5884,7 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestartCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceCloneCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5461,7 +5901,7 @@ impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestartCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceCloneCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -6507,8 +6947,8 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().list("project")
-///              .page_token("aliquyam")
-///              .max_results(28)
+///              .page_token("Lorem")
+///              .max_results(92)
 ///              .doit();
 /// # }
 /// ```
@@ -7298,9 +7738,9 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Creates a Cloud SQL instance as a clone of the source instance.
+/// Restarts a Cloud SQL instance.
 ///
-/// A builder for the *clone* method supported by a *instance* resource.
+/// A builder for the *restart* method supported by a *instance* resource.
 /// It is not used directly, but through a `InstanceMethods` instance.
 ///
 /// # Example
@@ -7311,7 +7751,6 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # extern crate hyper;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
-/// use sqladmin1_beta4::InstancesCloneRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7322,23 +7761,17 @@ impl<'a, C, A> InstanceUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// #                               hyper::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = InstancesCloneRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.instances().clone(req, "project", "instance")
+/// let result = hub.instances().restart("project", "instance")
 ///              .doit();
 /// # }
 /// ```
-pub struct InstanceCloneCall<'a, C, A>
+pub struct InstanceRestartCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a SQLAdmin<C, A>,
-    _request: InstancesCloneRequest,
     _project: String,
     _instance: String,
     _delegate: Option<&'a mut Delegate>,
@@ -7346,9 +7779,9 @@ pub struct InstanceCloneCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for InstanceCloneCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for InstanceRestartCall<'a, C, A> {}
 
-impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> InstanceRestartCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -7360,9 +7793,9 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "sql.instances.clone", 
+        dlg.begin(MethodInfo { id: "sql.instances.restart", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("project", self._project.to_string()));
         params.push(("instance", self._instance.to_string()));
         for &field in ["alt", "project", "instance"].iter() {
@@ -7377,7 +7810,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/clone".to_string();
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/restart".to_string();
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -7409,17 +7842,6 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
-            {
-                let mut value = json::value::to_value(&self._request);
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -7437,15 +7859,11 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             };
             let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
                                                              access_token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
                 let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -7496,32 +7914,23 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InstancesCloneRequest) -> InstanceCloneCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Project ID of the source as well as the clone Cloud SQL instance.
+    /// Project ID of the project that contains the instance to be restarted.
     ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
+    pub fn project(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
-    /// The ID of the Cloud SQL instance to be cloned (source). This does not include the project ID.
+    /// Cloud SQL instance ID. This does not include the project ID.
     ///
     /// Sets the *instance* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call, 
     /// we provide this method for API completeness.
-    pub fn instance(mut self, new_value: &str) -> InstanceCloneCall<'a, C, A> {
+    pub fn instance(mut self, new_value: &str) -> InstanceRestartCall<'a, C, A> {
         self._instance = new_value.to_string();
         self
     }
@@ -7531,7 +7940,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceCloneCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceRestartCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7552,7 +7961,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InstanceCloneCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceRestartCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7569,7 +7978,7 @@ impl<'a, C, A> InstanceCloneCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> InstanceCloneCall<'a, C, A> 
+    pub fn add_scope<T>(mut self, scope: T) -> InstanceRestartCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -10766,6 +11175,285 @@ impl<'a, C, A> SslCertGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Generates a short-lived X509 certificate containing the provided public key and signed by a private key specific to the target instance. Users may use the certificate to authenticate as themselves when connecting to the database.
+///
+/// A builder for the *createEphemeral* method supported by a *sslCert* resource.
+/// It is not used directly, but through a `SslCertMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::SslCertsCreateEphemeralRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use sqladmin1_beta4::SQLAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SslCertsCreateEphemeralRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.ssl_certs().create_ephemeral(req, "project", "instance")
+///              .doit();
+/// # }
+/// ```
+pub struct SslCertCreateEphemeralCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SQLAdmin<C, A>,
+    _request: SslCertsCreateEphemeralRequest,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SslCertCreateEphemeralCall<'a, C, A> {}
+
+impl<'a, C, A> SslCertCreateEphemeralCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SslCert)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "sql.sslCerts.createEphemeral", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/createEphemeral".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SslCertsCreateEphemeralRequest) -> SslCertCreateEphemeralCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Project ID of the Cloud SQL project.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> SslCertCreateEphemeralCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> SslCertCreateEphemeralCall<'a, C, A> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SslCertCreateEphemeralCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SslCertCreateEphemeralCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> SslCertCreateEphemeralCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Lists all of the current SSL certificates for the instance.
 ///
 /// A builder for the *list* method supported by a *sslCert* resource.
@@ -11041,7 +11729,7 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.backup_runs().list("project", "instance")
-///              .page_token("et")
+///              .page_token("nonumy")
 ///              .max_results(-13)
 ///              .doit();
 /// # }
@@ -11539,6 +12227,266 @@ impl<'a, C, A> BackupRunGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> BackupRunGetCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Deletes the backup taken by a backup run.
+///
+/// A builder for the *delete* method supported by a *backupRun* resource.
+/// It is not used directly, but through a `BackupRunMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use sqladmin1_beta4::SQLAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SQLAdmin::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.backup_runs().delete("project", "instance", "id")
+///              .doit();
+/// # }
+/// ```
+pub struct BackupRunDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SQLAdmin<C, A>,
+    _project: String,
+    _instance: String,
+    _id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for BackupRunDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> BackupRunDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "sql.backupRuns.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        params.push(("id", self._id.to_string()));
+        for &field in ["alt", "project", "instance", "id"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/sql/v1beta4/projects/{project}/instances/{instance}/backupRuns/{id}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance"), ("{id}", "id")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["id", "instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Project ID of the project that contains the instance.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> BackupRunDeleteCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance ID. This does not include the project ID.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> BackupRunDeleteCall<'a, C, A> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The ID of the Backup Run to delete. To find a Backup Run ID, use the list method.
+    ///
+    /// Sets the *id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn id(mut self, new_value: &str) -> BackupRunDeleteCall<'a, C, A> {
+        self._id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> BackupRunDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> BackupRunDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> BackupRunDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self

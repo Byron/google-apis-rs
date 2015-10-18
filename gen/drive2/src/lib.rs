@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *0.1.9+20150709*, where *20150709* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *drive* crate version *0.1.9+20151008*, where *20151008* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -24,7 +24,7 @@
 //! * [comments](struct.Comment.html)
 //!  * [*delete*](struct.CommentDeleteCall.html), [*get*](struct.CommentGetCall.html), [*insert*](struct.CommentInsertCall.html), [*list*](struct.CommentListCall.html), [*patch*](struct.CommentPatchCall.html) and [*update*](struct.CommentUpdateCall.html)
 //! * [files](struct.File.html)
-//!  * [*copy*](struct.FileCopyCall.html), [*delete*](struct.FileDeleteCall.html), [*empty trash*](struct.FileEmptyTrashCall.html), [*get*](struct.FileGetCall.html), [*insert*](struct.FileInsertCall.html), [*list*](struct.FileListCall.html), [*patch*](struct.FilePatchCall.html), [*touch*](struct.FileTouchCall.html), [*trash*](struct.FileTrashCall.html), [*untrash*](struct.FileUntrashCall.html), [*update*](struct.FileUpdateCall.html) and [*watch*](struct.FileWatchCall.html)
+//!  * [*copy*](struct.FileCopyCall.html), [*delete*](struct.FileDeleteCall.html), [*empty trash*](struct.FileEmptyTrashCall.html), [*generate ids*](struct.FileGenerateIdCall.html), [*get*](struct.FileGetCall.html), [*insert*](struct.FileInsertCall.html), [*list*](struct.FileListCall.html), [*patch*](struct.FilePatchCall.html), [*touch*](struct.FileTouchCall.html), [*trash*](struct.FileTrashCall.html), [*untrash*](struct.FileUntrashCall.html), [*update*](struct.FileUpdateCall.html) and [*watch*](struct.FileWatchCall.html)
 //! * parents
 //!  * [*delete*](struct.ParentDeleteCall.html), [*get*](struct.ParentGetCall.html), [*insert*](struct.ParentInsertCall.html) and [*list*](struct.ParentListCall.html)
 //! * [permissions](struct.Permission.html)
@@ -48,16 +48,16 @@
 //! Download supported by ...
 //! 
 //! * [*watch files*](struct.FileWatchCall.html)
-//! * [*get files*](struct.FileGetCall.html)
 //! * [*get realtime*](struct.RealtimeGetCall.html)
+//! * [*get files*](struct.FileGetCall.html)
 //! 
 //! Subscription supported by ...
 //! 
 //! * [*watch files*](struct.FileWatchCall.html)
-//! * [*get files*](struct.FileGetCall.html)
 //! * [*watch changes*](struct.ChangeWatchCall.html)
 //! * [*insert files*](struct.FileInsertCall.html)
 //! * [*list changes*](struct.ChangeListCall.html)
+//! * [*get files*](struct.FileGetCall.html)
 //! 
 //! 
 //! 
@@ -93,6 +93,7 @@
 //! ```ignore
 //! let r = hub.files().watch(...).doit()
 //! let r = hub.files().empty_trash(...).doit()
+//! let r = hub.files().generate_ids(...).doit()
 //! let r = hub.files().copy(...).doit()
 //! let r = hub.files().list(...).doit()
 //! let r = hub.files().delete(...).doit()
@@ -156,18 +157,18 @@
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.files().patch(req, "fileId")
 //!              .use_content_as_indexable_text(true)
-//!              .update_viewed_date(false)
-//!              .timed_text_track_name("aliquyam")
-//!              .timed_text_language("elitr")
-//!              .set_modified_date(true)
-//!              .remove_parents("et")
-//!              .pinned(false)
-//!              .ocr_language("sed")
+//!              .update_viewed_date(true)
+//!              .timed_text_track_name("Stet")
+//!              .timed_text_language("sed")
+//!              .set_modified_date(false)
+//!              .remove_parents("sanctus")
+//!              .pinned(true)
+//!              .ocr_language("Lorem")
 //!              .ocr(false)
 //!              .new_revision(true)
-//!              .modified_date_behavior("dolore")
+//!              .modified_date_behavior("eirmod")
 //!              .convert(true)
-//!              .add_parents("consetetur")
+//!              .add_parents("gubergren")
 //!              .doit();
 //! 
 //! match result {

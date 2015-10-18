@@ -1639,7 +1639,7 @@ fn main() {
     let arg_data = [
         ("projects", "methods: 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-pull', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-publish', 'topics-set-iam-policy', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
             ("subscriptions-acknowledge",  
-                    Some(r##"Acknowledges the messages associated with the ack tokens in the AcknowledgeRequest. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error."##),
+                    Some(r##"Acknowledges the messages associated with the `ack_ids` in the `AcknowledgeRequest`. The Pub/Sub system can remove the relevant messages from the subscription. Acknowledging a message whose ack deadline has expired may succeed, but such a message may be redelivered later. Acknowledging a message more than once will not result in an error."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-acknowledge",
                   vec![
                     (Some(r##"subscription"##),
@@ -1667,12 +1667,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-create",  
-                    Some(r##"Creates a subscription to a given topic for a given subscriber. If the subscription already exists, returns ALREADY_EXISTS. If the corresponding topic doesn't exist, returns NOT_FOUND. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic."##),
+                    Some(r##"Creates a subscription to a given topic for a given subscriber. If the subscription already exists, returns `ALREADY_EXISTS`. If the corresponding topic doesn't exist, returns `NOT_FOUND`. If the name is not provided in the request, the server will assign a random name for this subscription on the same project as the topic."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-create",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the subscription. It must have the format "projects/{project}/subscriptions/{subscription}" for Google Cloud Pub/Sub API v1 and v1beta2. {subscription} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
+                     Some(r##"The name of the subscription. It must have the format `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
         
@@ -1695,7 +1695,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-delete",  
-                    Some(r##"Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to Pull after deletion will return NOT_FOUND. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified."##),
+                    Some(r##"Deletes an existing subscription. All pending messages in the subscription are immediately dropped. Calls to `Pull` after deletion will return `NOT_FOUND`. After a subscription is deleted, a new one may be created with the same name, but the new one has no association with the old subscription, or its topic unless the same topic is specified."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-delete",
                   vec![
                     (Some(r##"subscription"##),
@@ -1739,12 +1739,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-get-iam-policy",  
-                    Some(r##"Gets the access control policy for a resource. Is empty if the policy or the resource does not exist."##),
+                    Some(r##"Gets the access control policy for a `resource`. Is empty if the policy or the resource does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1811,7 +1811,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-modify-push-config",  
-                    Some(r##"Modifies the PushConfig for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty PushConfig) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the PushConfig."##),
+                    Some(r##"Modifies the `PushConfig` for a specified subscription. This may be used to change a push subscription to a pull one (signified by an empty `PushConfig`) or vice versa, or change the endpoint URL and other attributes of a push subscription. Messages will accumulate for delivery continuously through the call regardless of changes to the `PushConfig`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-modify-push-config",
                   vec![
                     (Some(r##"subscription"##),
@@ -1839,7 +1839,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-pull",  
-                    Some(r##"Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return UNAVAILABLE if there are too many concurrent pull requests pending for the given subscription."##),
+                    Some(r##"Pulls messages from the server. Returns an empty list if there are no messages available in the backlog. The server may return `UNAVAILABLE` if there are too many concurrent pull requests pending for the given subscription."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_subscriptions-pull",
                   vec![
                     (Some(r##"subscription"##),
@@ -1872,7 +1872,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Resource is usually specified as a path, such as, projects/{project}/zones/{zone}/disks/{disk}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1900,7 +1900,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -1928,7 +1928,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the topic. It must have the format "projects/{project}/topics/{topic}" for Google Cloud Pub/Sub API v1 and v1beta2. {topic} must start with a letter, and contain only letters ([A-Za-z]), numbers ([0-9], dashes (-), underscores (_), periods (.), tildes (~), plus (+) or percent signs (%). It must be between 3 and 255 characters in length, and it must not start with "goog"."##),
+                     Some(r##"The name of the topic. It must have the format `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter, and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters in length, and it must not start with `"goog"`."##),
                      Some(true),
                      Some(false)),
         
@@ -1951,7 +1951,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-delete",  
-                    Some(r##"Deletes the topic with the given name. Returns NOT_FOUND if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted, but their `topic` field is set to `_deleted-topic_`."##),
+                    Some(r##"Deletes the topic with the given name. Returns `NOT_FOUND` if the topic does not exist. After a topic is deleted, a new topic may be created with the same name; this is an entirely new topic with none of the old configuration or subscriptions. Existing subscriptions to this topic are not deleted, but their `topic` field is set to `_deleted-topic_`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-delete",
                   vec![
                     (Some(r##"topic"##),
@@ -1995,12 +1995,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-get-iam-policy",  
-                    Some(r##"Gets the access control policy for a resource. Is empty if the policy or the resource does not exist."##),
+                    Some(r##"Gets the access control policy for a `resource`. Is empty if the policy or the resource does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being requested. Resource is usually specified as a path, such as, `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2039,7 +2039,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-publish",  
-                    Some(r##"Adds one or more messages to the topic. Returns NOT_FOUND if the topic does not exist."##),
+                    Some(r##"Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic does not exist. The message payload must not be empty; it must contain either a non-empty data field, or at least one attribute."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli/projects_topics-publish",
                   vec![
                     (Some(r##"topic"##),
@@ -2072,7 +2072,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy is being specified. Resource is usually specified as a path, such as, projects/{project}/zones/{zone}/disks/{disk}."##),
+                     Some(r##"REQUIRED: The resource for which policy is being specified. `resource` is usually specified as a path, such as, `projects/{project}/zones/{zone}/disks/{disk}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2122,7 +2122,7 @@ fn main() {
                   vec![
                     (Some(r##"resource"##),
                      None,
-                     Some(r##"REQUIRED: The resource for which policy detail is being requested. Resource is usually specified as a path, such as, projects/{project}."##),
+                     Some(r##"REQUIRED: The resource for which policy detail is being requested. `resource` is usually specified as a path, such as, `projects/{project}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2150,7 +2150,7 @@ fn main() {
     
     let mut app = App::new("pubsub1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150604")
+           .version("0.3.2+20150526")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_beta2_cli")
            .arg(Arg::with_name("url")

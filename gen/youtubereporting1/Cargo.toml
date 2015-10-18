@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-youtubereporting1"
+version = "0.1.9+20150923"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with YouTube Reporting (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1"
+homepage = "https://developers.google.com/youtube/reporting/v1/reports/"
+documentation = "http://byron.github.io/google-apis-rs/google_youtubereporting1"
+license = "MIT"
+keywords = ["youtubereporting", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+url = "*"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

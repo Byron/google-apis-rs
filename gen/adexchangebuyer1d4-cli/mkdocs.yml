@@ -1,0 +1,62 @@
+site_name: Ad Exchange Buyer v0.3.2+20150909
+site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['accounts_get.md', 'Accounts', 'Get']
+- ['accounts_list.md', 'Accounts', 'List']
+- ['accounts_patch.md', 'Accounts', 'Patch']
+- ['accounts_update.md', 'Accounts', 'Update']
+- ['billing-info_get.md', 'Billing Info', 'Get']
+- ['billing-info_list.md', 'Billing Info', 'List']
+- ['budget_get.md', 'Budget', 'Get']
+- ['budget_patch.md', 'Budget', 'Patch']
+- ['budget_update.md', 'Budget', 'Update']
+- ['clientaccess_delete.md', 'Clientaccess', 'Delete']
+- ['clientaccess_get.md', 'Clientaccess', 'Get']
+- ['clientaccess_insert.md', 'Clientaccess', 'Insert']
+- ['clientaccess_list.md', 'Clientaccess', 'List']
+- ['clientaccess_patch.md', 'Clientaccess', 'Patch']
+- ['clientaccess_update.md', 'Clientaccess', 'Update']
+- ['creatives_get.md', 'Creatives', 'Get']
+- ['creatives_insert.md', 'Creatives', 'Insert']
+- ['creatives_list.md', 'Creatives', 'List']
+- ['deals_get.md', 'Deals', 'Get']
+- ['marketplacedeals_delete.md', 'Marketplacedeals', 'Delete']
+- ['marketplacedeals_insert.md', 'Marketplacedeals', 'Insert']
+- ['marketplacedeals_list.md', 'Marketplacedeals', 'List']
+- ['marketplacedeals_update.md', 'Marketplacedeals', 'Update']
+- ['marketplacenotes_insert.md', 'Marketplacenotes', 'Insert']
+- ['marketplacenotes_list.md', 'Marketplacenotes', 'List']
+- ['marketplaceoffers_get.md', 'Marketplaceoffers', 'Get']
+- ['marketplaceoffers_search.md', 'Marketplaceoffers', 'Search']
+- ['marketplaceorders_get.md', 'Marketplaceorders', 'Get']
+- ['marketplaceorders_insert.md', 'Marketplaceorders', 'Insert']
+- ['marketplaceorders_patch.md', 'Marketplaceorders', 'Patch']
+- ['marketplaceorders_search.md', 'Marketplaceorders', 'Search']
+- ['marketplaceorders_update.md', 'Marketplaceorders', 'Update']
+- ['negotiationrounds_insert.md', 'Negotiationrounds', 'Insert']
+- ['negotiations_get.md', 'Negotiations', 'Get']
+- ['negotiations_insert.md', 'Negotiations', 'Insert']
+- ['negotiations_list.md', 'Negotiations', 'List']
+- ['offers_get.md', 'Offers', 'Get']
+- ['offers_insert.md', 'Offers', 'Insert']
+- ['offers_list.md', 'Offers', 'List']
+- ['performance-report_list.md', 'Performance Report', 'List']
+- ['pretargeting-config_delete.md', 'Pretargeting Config', 'Delete']
+- ['pretargeting-config_get.md', 'Pretargeting Config', 'Get']
+- ['pretargeting-config_insert.md', 'Pretargeting Config', 'Insert']
+- ['pretargeting-config_list.md', 'Pretargeting Config', 'List']
+- ['pretargeting-config_patch.md', 'Pretargeting Config', 'Patch']
+- ['pretargeting-config_update.md', 'Pretargeting Config', 'Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

@@ -21,7 +21,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *genomics* API at revision *20150716*. The CLI is at version *0.3.2*.
+This documentation was generated from the *genomics* API at revision *20151014*. The CLI is at version *0.3.2*.
 
 ```bash
 genomics1 [options]
@@ -35,8 +35,11 @@ genomics1 [options]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <dataset-id> [-p <v>]... [-o <out>]
                 get <dataset-id> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 undelete <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
         operations
                 cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -65,7 +68,6 @@ genomics1 [options]
                 delete <variant-id> [-p <v>]... [-o <out>]
                 get <variant-id> [-p <v>]... [-o <out>]
                 import (-r <kv>)... [-p <v>]... [-o <out>]
-                merge (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <variant-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
         variantsets

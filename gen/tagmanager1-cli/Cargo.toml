@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tagmanager1-cli"
-version = "0.3.2+20150526"
+version = "0.3.2+20151008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1-cli"

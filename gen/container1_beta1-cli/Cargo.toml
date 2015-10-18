@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1_beta1-cli"
-version = "0.3.2+20150713"
+version = "0.3.2+20151005"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with container (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1_beta1-cli"

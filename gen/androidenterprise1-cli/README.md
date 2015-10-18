@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20150715*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Android Enterprise* API at revision *20150922*. The CLI is at version *0.3.2*.
 
 ```bash
 androidenterprise1 [options]
@@ -52,6 +52,7 @@ androidenterprise1 [options]
                 get <enterprise-id> [-p <v>]... [-o <out>]
                 insert <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <domain> [-p <v>]... [-o <out>]
+                send-test-push-notification <enterprise-id> [-p <v>]... [-o <out>]
                 set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 unenroll <enterprise-id> [-p <v>]...
         entitlements
@@ -83,8 +84,10 @@ androidenterprise1 [options]
         users
                 generate-token <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 get <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                get-available-product-set <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 list <enterprise-id> <email> [-p <v>]... [-o <out>]
                 revoke-token <enterprise-id> <user-id> [-p <v>]...
+                set-available-product-set <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
   androidenterprise1 --help
 
 Configuration:

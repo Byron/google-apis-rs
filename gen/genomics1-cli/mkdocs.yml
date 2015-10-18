@@ -1,4 +1,4 @@
-site_name: genomics v0.3.2+20150716
+site_name: genomics v0.3.2+20151014
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: Write integrating applications with bcore
 
@@ -17,8 +17,11 @@ pages:
 - ['datasets_create.md', 'Datasets', 'Create']
 - ['datasets_delete.md', 'Datasets', 'Delete']
 - ['datasets_get.md', 'Datasets', 'Get']
+- ['datasets_get-iam-policy.md', 'Datasets', 'Get Iam Policy']
 - ['datasets_list.md', 'Datasets', 'List']
 - ['datasets_patch.md', 'Datasets', 'Patch']
+- ['datasets_set-iam-policy.md', 'Datasets', 'Set Iam Policy']
+- ['datasets_test-iam-permissions.md', 'Datasets', 'Test Iam Permissions']
 - ['datasets_undelete.md', 'Datasets', 'Undelete']
 - ['operations_cancel.md', 'Operations', 'Cancel']
 - ['operations_delete.md', 'Operations', 'Delete']
@@ -41,7 +44,6 @@ pages:
 - ['variants_delete.md', 'Variants', 'Delete']
 - ['variants_get.md', 'Variants', 'Get']
 - ['variants_import.md', 'Variants', 'Import']
-- ['variants_merge.md', 'Variants', 'Merge']
 - ['variants_patch.md', 'Variants', 'Patch']
 - ['variants_search.md', 'Variants', 'Search']
 - ['variantsets_create.md', 'Variantsets', 'Create']

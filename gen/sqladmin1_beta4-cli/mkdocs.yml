@@ -1,4 +1,4 @@
-site_name: SQL Admin v0.3.2+20150305
+site_name: SQL Admin v0.3.2+20151013
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: Write integrating applications with bcore
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['backup-runs_delete.md', 'Backup Runs', 'Delete']
 - ['backup-runs_get.md', 'Backup Runs', 'Get']
 - ['backup-runs_list.md', 'Backup Runs', 'List']
 - ['databases_delete.md', 'Databases', 'Delete']
@@ -21,6 +22,7 @@ pages:
 - ['instances_clone.md', 'Instances', 'Clone']
 - ['instances_delete.md', 'Instances', 'Delete']
 - ['instances_export.md', 'Instances', 'Export']
+- ['instances_failover.md', 'Instances', 'Failover']
 - ['instances_get.md', 'Instances', 'Get']
 - ['instances_import.md', 'Instances', 'Import']
 - ['instances_insert.md', 'Instances', 'Insert']
@@ -35,6 +37,7 @@ pages:
 - ['instances_update.md', 'Instances', 'Update']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['ssl-certs_create-ephemeral.md', 'Ssl Certs', 'Create Ephemeral']
 - ['ssl-certs_delete.md', 'Ssl Certs', 'Delete']
 - ['ssl-certs_get.md', 'Ssl Certs', 'Get']
 - ['ssl-certs_insert.md', 'Ssl Certs', 'Insert']

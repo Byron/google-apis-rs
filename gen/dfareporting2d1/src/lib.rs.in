@@ -835,7 +835,7 @@ pub struct TagSettings {
 impl Part for TagSettings {}
 
 
-/// Contains properties of a targetable remarketing list. Remarketing enables you to create lists of users who have performed specific actions on a site, then target ads to members of those lists. This resource is a read-only view of a remarketing list to be used to faciliate targeting ads to specific lists. Remarketing lists that are owned by your advertisers and those that are shared to your advertisers or account are accessible via this resource. To manage remarketing lists that are owned by your advertisers, use the RemarketingList resource.
+/// Contains properties of a targetable remarketing list. Remarketing enables you to create lists of users who have performed specific actions on a site, then target ads to members of those lists. This resource is a read-only view of a remarketing list to be used to faciliate targeting ads to specific lists. Remarketing lists that are owned by your advertisers and those that are shared to your advertisers or account are accessible via this resource. To manage remarketing lists that are owned by your advertisers, use the RemarketingLists resource.
 /// 
 /// # Activities
 /// 
@@ -4232,7 +4232,7 @@ pub struct SitesListResponse {
     pub next_page_token: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#sitesListResponse".
     pub kind: Option<String>,
-    /// Site collection
+    /// Site collection.
     pub sites: Option<Vec<Site>>,
 }
 
@@ -4287,7 +4287,7 @@ impl Resource for PostalCode {}
 impl ResponseResult for PostalCode {}
 
 
-/// Contains properties of a remarketing list. Remarketing enables you to create lists of users who have performed specific actions on a site, then target ads to members of those lists. This resource can be used to manage remarketing lists that are owned by your advertisers. To see all remarketing lists that are visible to your advertisers, including those that are shared to your advertiser or account, use the TargetableRemarketingList resource.
+/// Contains properties of a remarketing list. Remarketing enables you to create lists of users who have performed specific actions on a site, then target ads to members of those lists. This resource can be used to manage remarketing lists that are owned by your advertisers. To see all remarketing lists that are visible to your advertisers, including those that are shared to your advertiser or account, use the TargetableRemarketingLists resource.
 /// 
 /// # Activities
 /// 
@@ -6261,7 +6261,7 @@ pub struct EventTag {
     pub name: Option<String>,
     /// Payload URL for this event tag. The URL on a click-through event tag should have a landing page URL appended to the end of it. This field is required on insertion.
     pub url: Option<String>,
-    /// Whether this tag is SSL-compliant or not.
+    /// Whether this tag is SSL-compliant or not. This is a read-only field.
     #[serde(rename="sslCompliant")]
     pub ssl_compliant: Option<bool>,
     /// Number of times the landing page URL should be URL-escaped before being appended to the click-through event tag URL. Only applies to click-through event tags as specified by the event tag type.
@@ -21128,10 +21128,10 @@ impl<'a, C, A> CreativeAssetInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -53239,14 +53239,14 @@ impl<'a, C, A> EventTagListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._event_tag_types.push(new_value.to_string());
         self
     }
-    /// Select only enabled event tags. When definitionsOnly is set to true, only the specified advertiser or campaign's event tags' enabledByDefault field is examined. When definitionsOnly is set to false, the specified ad or specified campaign's parent advertiser's or parent campaign's event tags' enabledByDefault and status fields are examined as well.
+    /// Select only enabled event tags. What is considered enabled or disabled depends on the definitionsOnly parameter. When definitionsOnly is set to true, only the specified advertiser or campaign's event tags' enabledByDefault field is examined. When definitionsOnly is set to false, the specified ad or specified campaign's parent advertiser's or parent campaign's event tags' enabledByDefault and status fields are examined as well.
     ///
     /// Sets the *enabled* query property to the given value.
     pub fn enabled(mut self, new_value: bool) -> EventTagListCall<'a, C, A> {
         self._enabled = Some(new_value);
         self
     }
-    /// Examine only the specified ad or campaign or advertiser's event tags for matching selector criteria. When set to false, the parent advertiser and parent campaign is examined as well. In addition, when set to false, the status field is examined as well along with the enabledByDefault field.
+    /// Examine only the specified campaign or advertiser's event tags for matching selector criteria. When set to false, the parent advertiser and parent campaign of the specified ad or campaign is examined as well. In addition, when set to false, the status field is examined as well, along with the enabledByDefault field. This parameter can not be set to true when adId is specified as ads do not define their own even tags.
     ///
     /// Sets the *definitions only* query property to the given value.
     pub fn definitions_only(mut self, new_value: bool) -> EventTagListCall<'a, C, A> {

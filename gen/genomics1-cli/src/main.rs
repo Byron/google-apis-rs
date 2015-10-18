@@ -611,6 +611,90 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _datasets_get_iam_policy(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.datasets().get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _datasets_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.datasets().list();
@@ -732,6 +816,177 @@ impl<'n, 'a> Engine<'n, 'a> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _datasets_set_iam_policy(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.datasets().set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _datasets_test_iam_permissions(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.datasets().test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2355,91 +2610,6 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
-    fn _variants_merge(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-           
-            let type_info: Option<(&'static str, JsonTypeInfo)> = 
-                match &temp_cursor.to_string()[..] {
-                    "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["variant-set-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::MergeVariantsRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.variants().merge(request);
-        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema);
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _variants_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3127,11 +3297,20 @@ impl<'n, 'a> Engine<'n, 'a> {
                     ("get", Some(opt)) => {
                         call_result = self._datasets_get(opt, dry_run, &mut err);
                     },
+                    ("get-iam-policy", Some(opt)) => {
+                        call_result = self._datasets_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("list", Some(opt)) => {
                         call_result = self._datasets_list(opt, dry_run, &mut err);
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._datasets_patch(opt, dry_run, &mut err);
+                    },
+                    ("set-iam-policy", Some(opt)) => {
+                        call_result = self._datasets_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("test-iam-permissions", Some(opt)) => {
+                        call_result = self._datasets_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("undelete", Some(opt)) => {
                         call_result = self._datasets_undelete(opt, dry_run, &mut err);
@@ -3246,9 +3425,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     ("import", Some(opt)) => {
                         call_result = self._variants_import(opt, dry_run, &mut err);
-                    },
-                    ("merge", Some(opt)) => {
-                        call_result = self._variants_merge(opt, dry_run, &mut err);
                     },
                     ("patch", Some(opt)) => {
                         call_result = self._variants_patch(opt, dry_run, &mut err);
@@ -3493,7 +3669,7 @@ fn main() {
                   ]),
             ]),
         
-        ("datasets", "methods: 'create', 'delete', 'get', 'list', 'patch' and 'undelete'", vec![
+        ("datasets", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'list', 'patch', 'set-iam-policy', 'test-iam-permissions' and 'undelete'", vec![
             ("create",  
                     Some(r##"Creates a new dataset."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_create",
@@ -3560,6 +3736,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("get-iam-policy",  
+                    Some(r##"Gets the access control policy for the dataset. Is empty if the policy or the resource does not exist. See Getting a Policy for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("list",  
                     Some(r##"Lists datasets within a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_list",
@@ -3583,6 +3787,62 @@ fn main() {
                     (Some(r##"dataset-id"##),
                      None,
                      Some(r##"The ID of the dataset to be updated."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("set-iam-policy",  
+                    Some(r##"Sets the access control policy on the specified dataset. Replaces any existing policy. See Setting a Policy for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("test-iam-permissions",  
+                    Some(r##"Returns permissions that a caller has on the specified resource. See Testing Permissions for more information."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/datasets_test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which policy is being specified. Format is `datasets/`."##),
                      Some(true),
                      Some(false)),
         
@@ -3636,7 +3896,7 @@ fn main() {
         
         ("operations", "methods: 'cancel', 'delete', 'get' and 'list'", vec![
             ("cancel",  
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use [Operations.GetOperation][google.longrunning.Operations.GetOperation] or [Operations.ListOperations][google.longrunning.Operations.ListOperations] to check whether the cancellation succeeded or the operation completed despite cancellation."##),
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/operations_cancel",
                   vec![
                     (Some(r##"name"##),
@@ -3664,7 +3924,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",  
-                    Some(r##"This method is not implemented. To cancel an operation, please use [Operations.CancelOperation][google.longrunning.Operations.CancelOperation]."##),
+                    Some(r##"This method is not implemented. To cancel an operation, please use Operations.CancelOperation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/operations_delete",
                   vec![
                     (Some(r##"name"##),
@@ -3777,7 +4037,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("export",  
-                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage. Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. In particular, comments in the input file header will not be preserved, some custom tags will be converted to strings, and original reference sequence order is not necessarily preserved."##),
+                    Some(r##"Exports a read group set to a BAM file in Google Cloud Storage. Note that currently there may be some differences between exported BAM files and the original BAM file at the time of import. See [ImportReadGroupSets](google.genomics.v1.ReadServiceV1.ImportReadGroupSets) for caveats."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_export",
                   vec![
                     (Some(r##"read-group-set-id"##),
@@ -3827,7 +4087,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("import",  
-                    Some(r##"Creates read group sets by asynchronously importing the provided information. Note that currently comments in the input file header are **not** imported and some custom tags will be converted to strings, rather than preserving tag types. The caller must have WRITE permissions to the dataset."##),
+                    Some(r##"Creates read group sets by asynchronously importing the provided information. The caller must have WRITE permissions to the dataset. ## Notes on [BAM](https://samtools.github.io/hts-specs/SAMv1.pdf) import - Tags will be converted to strings - tag types are not preserved - Comments (`@CO`) in the input file header will not be preserved - Original header order of references (`@SQ`) will not be preserved - Any reverse stranded unmapped reads will be reverse complemented, and their qualities (and "BQ" tag, if any) will be reversed - Unmapped reads will be stripped of positional information (reference name and position)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/readgroupsets_import",
                   vec![
                     (Some(r##"kv"##),
@@ -4041,7 +4301,7 @@ fn main() {
                   ]),
             ]),
         
-        ("variants", "methods: 'create', 'delete', 'get', 'import', 'merge', 'patch' and 'search'", vec![
+        ("variants", "methods: 'create', 'delete', 'get', 'import', 'patch' and 'search'", vec![
             ("create",  
                     Some(r##"Creates a new variant."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_create",
@@ -4109,30 +4369,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("import",  
-                    Some(r##"Creates variant data by asynchronously importing the provided information. The variants for import will be merged with any existing data and each other according to the behavior of mergeVariants. In particular, this means for merged VCF variants that have conflicting INFO fields, some data will be arbitrarily discarded. As a special case, for single-sample VCF files, QUAL and FILTER fields will be moved to the call level; these are sometimes interpreted in a call-specific context. Imported VCF headers are appended to the metadata already in a variant set."##),
+                    Some(r##"Creates variant data by asynchronously importing the provided information. The variants for import will be merged with any existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded. In particular, this means for merged VCF variants that have conflicting INFO fields, some data will be arbitrarily discarded. As a special case, for single-sample VCF files, QUAL and FILTER fields will be moved to the call level; these are sometimes interpreted in a call-specific context. Imported VCF headers are appended to the metadata already in a variant set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_import",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("merge",  
-                    Some(r##"Merges the given variants with existing variants. Each variant will be merged with an existing variant that matches its reference sequence, start, end, reference bases, and alternative bases. If no such variant exists, a new one will be created. When variants are merged, the call information from the new variant is added to the existing variant, and other fields (such as key/value pairs) are discarded."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variants_merge",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -4206,7 +4444,7 @@ fn main() {
         
         ("variantsets", "methods: 'create', 'delete', 'export', 'get', 'patch' and 'search'", vec![
             ("create",  
-                    Some(r##"Creates a new variant set."##),
+                    Some(r##"Creates a new variant set. The provided variant set must have a valid `datasetId` set - all other fields are optional. Note that the `id` field will be ignored, as this is assigned by the server."##),
                     "Details at http://byron.github.io/google-apis-rs/google_genomics1_cli/variantsets_create",
                   vec![
                     (Some(r##"kv"##),
@@ -4355,7 +4593,7 @@ fn main() {
     
     let mut app = App::new("genomics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150716")
+           .version("0.3.2+20151014")
            .about("An API to store, process, explore, and share DNA sequence reads, reference-based alignments, and variant calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_cli")
            .arg(Arg::with_name("url")

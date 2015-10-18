@@ -4,7 +4,7 @@
 [package]
 
 name = "google-plus1"
-version = "0.1.9+20150719"
+version = "0.1.9+20151014"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plus (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plus1"

@@ -713,6 +713,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             hub: self.hub,
             _team_id: team_id.to_string(),
             _page_token: Default::default(),
+            _omit_job_changes: Default::default(),
             _min_modified_timestamp_ms: Default::default(),
             _max_results: Default::default(),
             _delegate: Default::default(),
@@ -2192,8 +2193,9 @@ impl<'a, C, A> JobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("teamId")
 ///              .page_token("et")
-///              .min_modified_timestamp_ms("eirmod")
-///              .max_results(43)
+///              .omit_job_changes(true)
+///              .min_modified_timestamp_ms("sanctus")
+///              .max_results(79)
 ///              .doit();
 /// # }
 /// ```
@@ -2203,6 +2205,7 @@ pub struct JobListCall<'a, C, A>
     hub: &'a Coordinate<C, A>,
     _team_id: String,
     _page_token: Option<String>,
+    _omit_job_changes: Option<bool>,
     _min_modified_timestamp_ms: Option<String>,
     _max_results: Option<u32>,
     _delegate: Option<&'a mut Delegate>,
@@ -2226,10 +2229,13 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "coordinate.jobs.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("teamId", self._team_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._omit_job_changes {
+            params.push(("omitJobChanges", value.to_string()));
         }
         if let Some(value) = self._min_modified_timestamp_ms {
             params.push(("minModifiedTimestampMs", value.to_string()));
@@ -2237,7 +2243,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "teamId", "pageToken", "minModifiedTimestampMs", "maxResults"].iter() {
+        for &field in ["alt", "teamId", "pageToken", "omitJobChanges", "minModifiedTimestampMs", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2370,6 +2376,13 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// Whether to omit detail job history information.
+    ///
+    /// Sets the *omit job changes* query property to the given value.
+    pub fn omit_job_changes(mut self, new_value: bool) -> JobListCall<'a, C, A> {
+        self._omit_job_changes = Some(new_value);
+        self
+    }
     /// Minimum time a job was modified in milliseconds since epoch.
     ///
     /// Sets the *min modified timestamp ms* query property to the given value.
@@ -2468,12 +2481,12 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.jobs().insert(req, "teamId", "address", 0.77599682643, 0.555410189379, "title")
-///              .note("ea")
-///              .customer_phone_number("sed")
+/// let result = hub.jobs().insert(req, "teamId", "address", 0.555410189379, 0.645756686533, "title")
+///              .note("sed")
+///              .customer_phone_number("dolor")
 ///              .customer_name("dolor")
 ///              .add_custom_field("dolor")
-///              .assignee("dolor")
+///              .assignee("et")
 ///              .doit();
 /// # }
 /// ```
@@ -2849,9 +2862,9 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.schedule().update(req, "teamId", "jobId")
-///              .start_time("amet.")
-///              .end_time("voluptua.")
-///              .duration("Lorem")
+///              .start_time("voluptua.")
+///              .end_time("Lorem")
+///              .duration("gubergren")
 ///              .all_day(true)
 ///              .doit();
 /// # }
@@ -3176,9 +3189,9 @@ impl<'a, C, A> ScheduleUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.schedule().patch(req, "teamId", "jobId")
-///              .start_time("vero")
-///              .end_time("diam")
-///              .duration("rebum.")
+///              .start_time("diam")
+///              .end_time("rebum.")
+///              .duration("consetetur")
 ///              .all_day(true)
 ///              .doit();
 /// # }
@@ -3981,8 +3994,8 @@ impl<'a, C, A> WorkerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.location().list("teamId", "workerEmail", "startTimestampMs")
-///              .page_token("duo")
-///              .max_results(19)
+///              .page_token("aliquyam")
+///              .max_results(96)
 ///              .doit();
 /// # }
 /// ```

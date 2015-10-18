@@ -399,6 +399,9 @@ pub struct ReportApiColumnSpec {
     /// Synchronous report only. Set to true to group by this column. Defaults to false.
     #[serde(rename="groupByColumn")]
     pub group_by_column: Option<bool>,
+    /// Provide different source for product items. Acceptable values are "advertised" and "sold".
+    #[serde(rename="productReportPerspective")]
+    pub product_report_perspective: Option<String>,
     /// Inclusive day in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with startDate.
     #[serde(rename="endDate")]
     pub end_date: Option<String>,
@@ -415,7 +418,7 @@ pub struct ReportApiColumnSpec {
     /// Name of a DoubleClick Search column to include in the report.
     #[serde(rename="columnName")]
     pub column_name: Option<String>,
-    /// The platform that is used to provide data for the custom dimension. Acceptable values are "Floodlight".
+    /// The platform that is used to provide data for the custom dimension. Acceptable values are "floodlight".
     #[serde(rename="platformSource")]
     pub platform_source: Option<String>,
     /// Inclusive date in YYYY-MM-DD format. When provided, this overrides the overall time range of the report for this column only. Must be provided together with endDate.

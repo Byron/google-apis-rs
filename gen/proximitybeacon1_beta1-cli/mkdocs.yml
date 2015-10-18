@@ -1,0 +1,30 @@
+site_name: proximitybeacon v0.3.2+20150729
+site_url: http://byron.github.io/google-apis-rs/google-proximitybeacon1_beta1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/proximitybeacon1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['beaconinfo_getforobserved.md', 'Beaconinfo', 'Getforobserved']
+- ['beacons_activate.md', 'Beacons', 'Activate']
+- ['beacons_attachments-batch-delete.md', 'Beacons', 'Attachments Batch Delete']
+- ['beacons_attachments-create.md', 'Beacons', 'Attachments Create']
+- ['beacons_attachments-delete.md', 'Beacons', 'Attachments Delete']
+- ['beacons_attachments-list.md', 'Beacons', 'Attachments List']
+- ['beacons_deactivate.md', 'Beacons', 'Deactivate']
+- ['beacons_decommission.md', 'Beacons', 'Decommission']
+- ['beacons_diagnostics-list.md', 'Beacons', 'Diagnostics List']
+- ['beacons_get.md', 'Beacons', 'Get']
+- ['beacons_list.md', 'Beacons', 'List']
+- ['beacons_register.md', 'Beacons', 'Register']
+- ['beacons_update.md', 'Beacons', 'Update']
+- ['namespaces_list.md', 'Namespaces', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

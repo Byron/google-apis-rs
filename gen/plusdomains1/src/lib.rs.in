@@ -411,22 +411,82 @@ impl NestedType for PersonOrganizations {}
 impl Part for PersonOrganizations {}
 
 
-/// Comments in reply to this activity.
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert activities](struct.ActivityInsertCall.html) (request|response)
+/// * [get activities](struct.ActivityGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Activity {
+    /// Name of the place where this activity occurred.
+    #[serde(rename="placeName")]
+    pub place_name: Option<String>,
+    /// The time at which this activity was last updated. Formatted as an RFC 3339 timestamp.
+    pub updated: Option<String>,
+    /// The object of this activity.
+    pub object: Option<ActivityObject>,
+    /// This activity's verb, which indicates the action that was performed. Possible values include, but are not limited to, the following values:  
+    /// - "post" - Publish content to the stream. 
+    /// - "share" - Reshare an activity.
+    pub verb: Option<String>,
+    /// Radius, in meters, of the region where this activity occurred, centered at the latitude and longitude identified in geocode.
+    pub radius: Option<String>,
+    /// ETag of this response for caching purposes.
+    pub etag: Option<String>,
+    /// Street address where this activity occurred.
+    pub address: Option<String>,
+    /// Additional content added by the person who shared this activity, applicable only when resharing an activity.
+    pub annotation: Option<String>,
+    /// Identifies this resource as an activity. Value: "plus#activity".
+    pub kind: Option<String>,
+    /// Title of this activity.
+    pub title: Option<String>,
+    /// The link to this activity.
+    pub url: Option<String>,
+    /// ID of the place where this activity occurred.
+    #[serde(rename="placeId")]
+    pub place_id: Option<String>,
+    /// The person who performed this activity.
+    pub actor: Option<ActivityActor>,
+    /// The ID of this activity.
+    pub id: Option<String>,
+    /// Identifies who has access to see this activity.
+    pub access: Option<Acl>,
+    /// Latitude and longitude where this activity occurred. Format is latitude followed by longitude, space separated.
+    pub geocode: Option<String>,
+    /// The location where this activity occurred.
+    pub location: Option<Place>,
+    /// The service provider that initially published this activity.
+    pub provider: Option<ActivityProvider>,
+    /// If this activity is a crosspost from another system, this property specifies the ID of the original activity.
+    #[serde(rename="crosspostSource")]
+    pub crosspost_source: Option<String>,
+    /// The time at which this activity was initially published. Formatted as an RFC 3339 timestamp.
+    pub published: Option<String>,
+}
+
+impl RequestValue for Activity {}
+impl ResponseResult for Activity {}
+
+
+/// Actor info specific to YouTube clients.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ActivityObjectReplies {
-    /// Total number of comments on this activity.
-    #[serde(rename="totalItems")]
-    pub total_items: Option<u32>,
-    /// The URL for the collection of comments in reply to this activity.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
+pub struct ActivityActorClientSpecificActorInfoYoutubeActorInfo {
+    /// ID of the YouTube channel owned by the Actor.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
 }
 
-impl NestedType for ActivityObjectReplies {}
-impl Part for ActivityObjectReplies {}
+impl NestedType for ActivityActorClientSpecificActorInfoYoutubeActorInfo {}
+impl Part for ActivityActorClientSpecificActorInfoYoutubeActorInfo {}
 
 
 /// An object representation of the individual components of name.
@@ -638,6 +698,21 @@ impl NestedType for CommentInReplyTo {}
 impl Part for CommentInReplyTo {}
 
 
+/// Actor info specific to particular clients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityActorClientSpecificActorInfo {
+    /// Actor info specific to YouTube clients.
+    #[serde(rename="youtubeActorInfo")]
+    pub youtube_actor_info: Option<ActivityActorClientSpecificActorInfoYoutubeActorInfo>,
+}
+
+impl NestedType for ActivityActorClientSpecificActorInfo {}
+impl Part for ActivityActorClientSpecificActorInfo {}
+
+
 /// There is no detailed description.
 /// 
 /// # Activities
@@ -679,19 +754,39 @@ impl ResponseResult for PeopleFeed {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommentActor {
+    /// The name of this actor, suitable for display.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Verification status of actor.
+    pub verification: Option<CommentActorVerification>,
     /// A link to the Person resource for this actor.
     pub url: Option<String>,
     /// The image representation of this actor.
     pub image: Option<CommentActorImage>,
-    /// The name of this actor, suitable for display.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// Actor info specific to particular clients.
+    #[serde(rename="clientSpecificActorInfo")]
+    pub client_specific_actor_info: Option<CommentActorClientSpecificActorInfo>,
     /// The ID of the actor.
     pub id: Option<String>,
 }
 
 impl NestedType for CommentActor {}
 impl Part for CommentActor {}
+
+
+/// Actor info specific to YouTube clients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo {
+    /// ID of the YouTube channel owned by the Actor.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
+}
+
+impl NestedType for ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo {}
+impl Part for ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo {}
 
 
 /// Extra information about the cover photo.
@@ -747,6 +842,21 @@ pub struct ActivityProvider {
 
 impl NestedType for ActivityProvider {}
 impl Part for ActivityProvider {}
+
+
+/// Actor info specific to particular clients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentActorClientSpecificActorInfo {
+    /// Actor info specific to YouTube clients.
+    #[serde(rename="youtubeActorInfo")]
+    pub youtube_actor_info: Option<CommentActorClientSpecificActorInfoYoutubeActorInfo>,
+}
+
+impl NestedType for CommentActorClientSpecificActorInfo {}
+impl Part for CommentActorClientSpecificActorInfo {}
 
 
 /// The position of the place.
@@ -929,19 +1039,39 @@ impl NestedType for PersonCoverCoverPhoto {}
 impl Part for PersonCoverCoverPhoto {}
 
 
+/// Verification status of actor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityObjectActorVerification {
+    /// Verification for one-time or manual processes.
+    #[serde(rename="adHocVerified")]
+    pub ad_hoc_verified: Option<String>,
+}
+
+impl NestedType for ActivityObjectActorVerification {}
+impl Part for ActivityObjectActorVerification {}
+
+
 /// If this activity's object is itself another activity, such as when a person reshares an activity, this property specifies the original activity's actor.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityObjectActor {
+    /// The original actor's name, which is suitable for display.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Verification status of actor.
+    pub verification: Option<ActivityObjectActorVerification>,
     /// A link to the original actor's Google profile.
     pub url: Option<String>,
     /// The image representation of the original actor.
     pub image: Option<ActivityObjectActorImage>,
-    /// The original actor's name, which is suitable for display.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// Actor info specific to particular clients.
+    #[serde(rename="clientSpecificActorInfo")]
+    pub client_specific_actor_info: Option<ActivityObjectActorClientSpecificActorInfo>,
     /// ID of the original actor.
     pub id: Option<String>,
 }
@@ -990,6 +1120,24 @@ pub struct PersonCover {
 
 impl NestedType for PersonCover {}
 impl Part for PersonCover {}
+
+
+/// Comments in reply to this activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityObjectReplies {
+    /// Total number of comments on this activity.
+    #[serde(rename="totalItems")]
+    pub total_items: Option<u32>,
+    /// The URL for the collection of comments in reply to this activity.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+}
+
+impl NestedType for ActivityObjectReplies {}
+impl Part for ActivityObjectReplies {}
 
 
 /// There is no detailed description.
@@ -1138,6 +1286,21 @@ pub struct Audience {
 impl Resource for Audience {}
 
 
+/// Actor info specific to YouTube clients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommentActorClientSpecificActorInfoYoutubeActorInfo {
+    /// ID of the YouTube channel owned by the Actor.
+    #[serde(rename="channelId")]
+    pub channel_id: Option<String>,
+}
+
+impl NestedType for CommentActorClientSpecificActorInfoYoutubeActorInfo {}
+impl Part for CommentActorClientSpecificActorInfoYoutubeActorInfo {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1174,67 +1337,19 @@ impl NestedType for ActivityObjectAttachmentsPreviewThumbnails {}
 impl Part for ActivityObjectAttachmentsPreviewThumbnails {}
 
 
-/// There is no detailed description.
+/// Verification status of actor.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert activities](struct.ActivityInsertCall.html) (request|response)
-/// * [get activities](struct.ActivityGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Activity {
-    /// Name of the place where this activity occurred.
-    #[serde(rename="placeName")]
-    pub place_name: Option<String>,
-    /// The time at which this activity was last updated. Formatted as an RFC 3339 timestamp.
-    pub updated: Option<String>,
-    /// The object of this activity.
-    pub object: Option<ActivityObject>,
-    /// This activity's verb, which indicates the action that was performed. Possible values include, but are not limited to, the following values:  
-    /// - "post" - Publish content to the stream. 
-    /// - "share" - Reshare an activity.
-    pub verb: Option<String>,
-    /// Radius, in meters, of the region where this activity occurred, centered at the latitude and longitude identified in geocode.
-    pub radius: Option<String>,
-    /// ETag of this response for caching purposes.
-    pub etag: Option<String>,
-    /// Street address where this activity occurred.
-    pub address: Option<String>,
-    /// Additional content added by the person who shared this activity, applicable only when resharing an activity.
-    pub annotation: Option<String>,
-    /// Identifies this resource as an activity. Value: "plus#activity".
-    pub kind: Option<String>,
-    /// Title of this activity.
-    pub title: Option<String>,
-    /// The link to this activity.
-    pub url: Option<String>,
-    /// ID of the place where this activity occurred.
-    #[serde(rename="placeId")]
-    pub place_id: Option<String>,
-    /// The person who performed this activity.
-    pub actor: Option<ActivityActor>,
-    /// The ID of this activity.
-    pub id: Option<String>,
-    /// Identifies who has access to see this activity.
-    pub access: Option<Acl>,
-    /// Latitude and longitude where this activity occurred. Format is latitude followed by longitude, space separated.
-    pub geocode: Option<String>,
-    /// The location where this activity occurred.
-    pub location: Option<Place>,
-    /// The service provider that initially published this activity.
-    pub provider: Option<ActivityProvider>,
-    /// If this activity is a crosspost from another system, this property specifies the ID of the original activity.
-    #[serde(rename="crosspostSource")]
-    pub crosspost_source: Option<String>,
-    /// The time at which this activity was initially published. Formatted as an RFC 3339 timestamp.
-    pub published: Option<String>,
+pub struct CommentActorVerification {
+    /// Verification for one-time or manual processes.
+    #[serde(rename="adHocVerified")]
+    pub ad_hoc_verified: Option<String>,
 }
 
-impl RequestValue for Activity {}
-impl ResponseResult for Activity {}
+impl NestedType for CommentActorVerification {}
+impl Part for CommentActorVerification {}
 
 
 /// The person who performed this activity.
@@ -1243,17 +1358,22 @@ impl ResponseResult for Activity {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ActivityActor {
+    /// The name of the actor, suitable for display.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// An object representation of the individual components of name.
+    pub name: Option<ActivityActorName>,
     /// The link to the actor's Google profile.
     pub url: Option<String>,
     /// The image representation of the actor.
     pub image: Option<ActivityActorImage>,
-    /// The name of the actor, suitable for display.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
+    /// Actor info specific to particular clients.
+    #[serde(rename="clientSpecificActorInfo")]
+    pub client_specific_actor_info: Option<ActivityActorClientSpecificActorInfo>,
     /// The ID of the actor's Person resource.
     pub id: Option<String>,
-    /// An object representation of the individual components of name.
-    pub name: Option<ActivityActorName>,
+    /// Verification status of actor.
+    pub verification: Option<ActivityActorVerification>,
 }
 
 impl NestedType for ActivityActor {}
@@ -1551,6 +1671,36 @@ pub struct CircleFeed {
 }
 
 impl ResponseResult for CircleFeed {}
+
+
+/// Actor info specific to particular clients.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityObjectActorClientSpecificActorInfo {
+    /// Actor info specific to YouTube clients.
+    #[serde(rename="youtubeActorInfo")]
+    pub youtube_actor_info: Option<ActivityObjectActorClientSpecificActorInfoYoutubeActorInfo>,
+}
+
+impl NestedType for ActivityObjectActorClientSpecificActorInfo {}
+impl Part for ActivityObjectActorClientSpecificActorInfo {}
+
+
+/// Verification status of actor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ActivityActorVerification {
+    /// Verification for one-time or manual processes.
+    #[serde(rename="adHocVerified")]
+    pub ad_hoc_verified: Option<String>,
+}
+
+impl NestedType for ActivityActorVerification {}
+impl Part for ActivityActorVerification {}
 
 
 
@@ -6373,10 +6523,10 @@ impl<'a, C, A> MediaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.

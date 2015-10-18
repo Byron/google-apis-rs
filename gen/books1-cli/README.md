@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *books* API at revision *20150318*. The CLI is at version *0.3.2*.
+This documentation was generated from the *books* API at revision *20150921*. The CLI is at version *0.3.2*.
 
 ```bash
 books1 [options]
@@ -66,9 +66,13 @@ books1 [options]
                 bookshelves-volumes-list <shelf> [-p <v>]... [-o <out>]
                 readingpositions-get <volume-id> [-p <v>]... [-o <out>]
                 readingpositions-set-position <volume-id> <timestamp> <position> [-p <v>]...
+        notification
+                get <notification-id> [-p <v>]... [-o <out>]
         onboarding
                 list-categories [-p <v>]... [-o <out>]
                 list-category-volumes [-p <v>]... [-o <out>]
+        personalizedstream
+                get [-p <v>]... [-o <out>]
         promooffer
                 accept [-p <v>]...
                 dismiss [-p <v>]...

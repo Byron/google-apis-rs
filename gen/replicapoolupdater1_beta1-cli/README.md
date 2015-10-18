@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *replicapoolupdater* API at revision *20150326*. The CLI is at version *0.3.2*.
+This documentation was generated from the *replicapoolupdater* API at revision *20150904*. The CLI is at version *0.3.2*.
 
 ```bash
 replicapoolupdater1-beta1 [options]
@@ -39,6 +39,7 @@ replicapoolupdater1-beta1 [options]
                 rollback <project> <zone> <rolling-update> [-p <v>]... [-o <out>]
         zone-operations
                 get <project> <zone> <operation> [-p <v>]... [-o <out>]
+                list <project> <zone> [-p <v>]... [-o <out>]
   replicapoolupdater1-beta1 --help
 
 Configuration:

@@ -412,15 +412,17 @@ pub struct VerifyAssertionResponse {
     /// The URI of the public accessible profiel picture.
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
+    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
+    #[serde(rename="originalEmail")]
+    pub original_email: Option<String>,
     /// It's the identifier param in the createAuthUri request if the identifier is an email. It can be used to check whether the user input email is different from the asserted email.
     #[serde(rename="inputEmail")]
     pub input_email: Option<String>,
     /// The scope for the OpenID OAuth extension.
     #[serde(rename="oauthScope")]
     pub oauth_scope: Option<String>,
-    /// The value is true if the IDP is also the email provider. It means the user owns the email.
-    #[serde(rename="emailVerified")]
-    pub email_verified: Option<bool>,
+    /// The language preference of the user.
+    pub language: Option<String>,
     /// Whether the assertion is from a non-trusted IDP and need account linking confirmation.
     #[serde(rename="needConfirmation")]
     pub need_confirmation: Option<bool>,
@@ -438,8 +440,9 @@ pub struct VerifyAssertionResponse {
     /// The display name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The language preference of the user.
-    pub language: Option<String>,
+    /// The OAuth2 access token.
+    #[serde(rename="oauthAccessToken")]
+    pub oauth_access_token: Option<String>,
     /// The first name of the user.
     #[serde(rename="firstName")]
     pub first_name: Option<String>,
@@ -455,18 +458,15 @@ pub struct VerifyAssertionResponse {
     /// When action is 'map', contains the idps which can be used for confirmation.
     #[serde(rename="verifiedProvider")]
     pub verified_provider: Option<Vec<String>>,
-    /// The OAuth2 access token.
-    #[serde(rename="oauthAccessToken")]
-    pub oauth_access_token: Option<String>,
+    /// Whether need client to supply email to complete the federated login flow.
+    #[serde(rename="needEmail")]
+    pub need_email: Option<bool>,
     /// The user approved request token for the OpenID OAuth extension.
     #[serde(rename="oauthRequestToken")]
     pub oauth_request_token: Option<String>,
     /// The birth date of the IdP account.
     #[serde(rename="dateOfBirth")]
     pub date_of_birth: Option<String>,
-    /// The original email stored in the mapping storage. It's returned when the federated ID is associated to a different email.
-    #[serde(rename="originalEmail")]
-    pub original_email: Option<String>,
     /// The IdP ID. For white listed IdPs it's a short domain name e.g. google.com, aol.com, live.net and yahoo.com. If the "providerId" param is set to OpenID OP identifer other than the whilte listed IdPs the OP identifier is returned. If the "identifier" param is federated ID in the createAuthUri request. The domain part of the federated ID is returned.
     #[serde(rename="providerId")]
     pub provider_id: Option<String>,
@@ -480,6 +480,9 @@ pub struct VerifyAssertionResponse {
     /// The timezone of the user.
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
+    /// The value is true if the IDP is also the email provider. It means the user owns the email.
+    #[serde(rename="emailVerified")]
+    pub email_verified: Option<bool>,
     /// The nick name of the user.
     #[serde(rename="nickName")]
     pub nick_name: Option<String>,
@@ -580,14 +583,23 @@ pub struct VerifyPasswordResponse {
     /// The RP local ID if it's already been mapped to the IdP account identified by the federated ID.
     #[serde(rename="localId")]
     pub local_id: Option<String>,
+    /// The OAuth2 access token.
+    #[serde(rename="oauthAccessToken")]
+    pub oauth_access_token: Option<String>,
     /// The URI of the user's photo at IdP
     #[serde(rename="photoUrl")]
     pub photo_url: Option<String>,
+    /// The lifetime in seconds of the OAuth2 access token.
+    #[serde(rename="oauthExpireIn")]
+    pub oauth_expire_in: Option<i32>,
     /// The GITKit token for authenticated user.
     #[serde(rename="idToken")]
     pub id_token: Option<String>,
     /// Whether the email is registered.
     pub registered: Option<bool>,
+    /// The OAuth2 authorization code.
+    #[serde(rename="oauthAuthorizationCode")]
+    pub oauth_authorization_code: Option<String>,
     /// The email returned by the IdP. NOTE: The federated login user may not own the email.
     pub email: Option<String>,
 }
@@ -862,19 +874,22 @@ impl ResponseResult for GetAccountInfoResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SetAccountInfoResponse {
-    /// The Gitkit id token to login the newly sign up user.
-    #[serde(rename="idToken")]
-    pub id_token: Option<String>,
     /// The fixed string "identitytoolkit#SetAccountInfoResponse".
     pub kind: Option<String>,
     /// The name of the user.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The email of the user.
-    pub email: Option<String>,
+    /// The new email the user attempts to change to.
+    #[serde(rename="newEmail")]
+    pub new_email: Option<String>,
     /// The user's profiles at the associated IdPs.
     #[serde(rename="providerUserInfo")]
     pub provider_user_info: Option<Vec<SetAccountInfoResponseProviderUserInfo>>,
+    /// The Gitkit id token to login the newly sign up user.
+    #[serde(rename="idToken")]
+    pub id_token: Option<String>,
+    /// The email of the user.
+    pub email: Option<String>,
 }
 
 impl ResponseResult for SetAccountInfoResponse {}

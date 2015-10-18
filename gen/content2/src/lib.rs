@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *0.1.9+20150710*, where *20150710* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *Shopping Content* crate version *0.1.9+20151002*, where *20151002* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
-//! [official documentation site](https://developers.google.com/shopping-content/v2/).
+//! [official documentation site](https://developers.google.com/shopping-content).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/content2).
 //! # Features
 //! 
@@ -25,6 +25,8 @@
 //!  * [*custombatch*](struct.DatafeedstatuseCustombatchCall.html), [*get*](struct.DatafeedstatuseGetCall.html) and [*list*](struct.DatafeedstatuseListCall.html)
 //! * [inventory](struct.Inventory.html)
 //!  * [*custombatch*](struct.InventoryCustombatchCall.html) and [*set*](struct.InventorySetCall.html)
+//! * [orders](struct.Order.html)
+//!  * [*acknowledge*](struct.OrderAcknowledgeCall.html), [*advancetestorder*](struct.OrderAdvancetestorderCall.html), [*cancel*](struct.OrderCancelCall.html), [*cancellineitem*](struct.OrderCancellineitemCall.html), [*createtestorder*](struct.OrderCreatetestorderCall.html), [*custombatch*](struct.OrderCustombatchCall.html), [*get*](struct.OrderGetCall.html), [*getbymerchantorderid*](struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](struct.OrderGettestordertemplateCall.html), [*list*](struct.OrderListCall.html), [*refund*](struct.OrderRefundCall.html), [*returnlineitem*](struct.OrderReturnlineitemCall.html), [*shiplineitems*](struct.OrderShiplineitemCall.html), [*updatemerchantorderid*](struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](struct.OrderUpdateshipmentCall.html)
 //! * [products](struct.Product.html)
 //!  * [*custombatch*](struct.ProductCustombatchCall.html), [*delete*](struct.ProductDeleteCall.html), [*get*](struct.ProductGetCall.html), [*insert*](struct.ProductInsertCall.html) and [*list*](struct.ProductListCall.html)
 //! * productstatuses
@@ -63,14 +65,21 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.accounts().custombatch(...).doit()
-//! let r = hub.accounts().patch(...).doit()
-//! let r = hub.accounts().get(...).doit()
-//! let r = hub.accounts().update(...).doit()
-//! let r = hub.accounts().list(...).doit()
-//! let r = hub.accounts().authinfo(...).doit()
-//! let r = hub.accounts().delete(...).doit()
-//! let r = hub.accounts().insert(...).doit()
+//! let r = hub.orders().get(...).doit()
+//! let r = hub.orders().list(...).doit()
+//! let r = hub.orders().updateshipment(...).doit()
+//! let r = hub.orders().advancetestorder(...).doit()
+//! let r = hub.orders().updatemerchantorderid(...).doit()
+//! let r = hub.orders().returnlineitem(...).doit()
+//! let r = hub.orders().gettestordertemplate(...).doit()
+//! let r = hub.orders().createtestorder(...).doit()
+//! let r = hub.orders().refund(...).doit()
+//! let r = hub.orders().custombatch(...).doit()
+//! let r = hub.orders().cancellineitem(...).doit()
+//! let r = hub.orders().getbymerchantorderid(...).doit()
+//! let r = hub.orders().acknowledge(...).doit()
+//! let r = hub.orders().cancel(...).doit()
+//! let r = hub.orders().shiplineitems(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -95,7 +104,6 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_content2 as content2;
-//! use content2::Account;
 //! use content2::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -114,16 +122,17 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = ShoppingContent::new(hyper::Client::new(), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = Account::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.accounts().patch(req, "merchantId", "accountId")
-//!              .dry_run(false)
+//! let result = hub.orders().list("merchantId")
+//!              .add_statuses("ea")
+//!              .placed_date_start("et")
+//!              .placed_date_end("dolor")
+//!              .page_token("diam")
+//!              .order_by("kasd")
+//!              .max_results(14)
+//!              .acknowledged(true)
 //!              .doit();
 //! 
 //! match result {

@@ -24,11 +24,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20150305*. The CLI is at version *0.3.2*.
+This documentation was generated from the *SQL Admin* API at revision *20151013*. The CLI is at version *0.3.2*.
 
 ```bash
 sqladmin1-beta4 [options]
         backup-runs
+                delete <project> <instance> <id> [-p <v>]... [-o <out>]
                 get <project> <instance> <id> [-p <v>]... [-o <out>]
                 list <project> <instance> [-p <v>]... [-o <out>]
         databases
@@ -44,6 +45,7 @@ sqladmin1-beta4 [options]
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
                 export <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                failover <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <instance> [-p <v>]... [-o <out>]
                 import <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -60,6 +62,7 @@ sqladmin1-beta4 [options]
                 get <project> <operation> [-p <v>]... [-o <out>]
                 list <project> <instance> [-p <v>]... [-o <out>]
         ssl-certs
+                create-ephemeral <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> <sha1-fingerprint> [-p <v>]... [-o <out>]
                 get <project> <instance> <sha1-fingerprint> [-p <v>]... [-o <out>]
                 insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]

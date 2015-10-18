@@ -871,7 +871,7 @@ fn main() {
     
     let mut app = App::new("datastore1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150402")
+           .version("0.3.2+20151008")
            .about("API for accessing Google Cloud Datastore.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta2_cli")
            .arg(Arg::with_name("url")

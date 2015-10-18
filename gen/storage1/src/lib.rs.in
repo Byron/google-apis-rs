@@ -46,6 +46,9 @@ pub enum Scope {
 
     /// Manage your data and permissions in Google Cloud Storage
     DevstorageFullControl,
+
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
 }
 
 impl AsRef<str> for Scope {
@@ -55,6 +58,7 @@ impl AsRef<str> for Scope {
             Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::DevstorageFullControl => "https://www.googleapis.com/auth/devstorage.full_control",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
     }
 }
@@ -400,14 +404,14 @@ pub struct Object {
     /// The link to this object.
     #[serde(rename="selfLink")]
     pub self_link: Option<String>,
-    /// The creation or modification time of the object in RFC 3339 format. For buckets with versioning enabled, changing an object's metadata does not change this property.
+    /// The modification time of the object metadata in RFC 3339 format.
     pub updated: Option<String>,
     /// Content-Type of the object data.
     #[serde(rename="contentType")]
     pub content_type: Option<String>,
-    /// Content-Language of the object data.
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
+    /// The creation time of the object in RFC 3339 format.
+    #[serde(rename="timeCreated")]
+    pub time_created: Option<String>,
     /// The content generation of this object. Used for object versioning.
     pub generation: Option<String>,
     /// Number of underlying components that make up this object. Components are accumulated by compose operations.
@@ -435,6 +439,9 @@ pub struct Object {
     pub time_deleted: Option<String>,
     /// The kind of item this is. For objects, this is always storage#object.
     pub kind: Option<String>,
+    /// Content-Language of the object data.
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
     /// The name of this object. Required if not specified by URL parameter.
     pub name: Option<String>,
     /// MD5 hash of the data; encoded using base64. For more information about using the MD5 hash, see Hashes and ETags: Best Practices.
@@ -600,7 +607,9 @@ impl Part for ComposeRequestSourceObjects {}
 pub struct Bucket {
     /// The bucket's website configuration.
     pub website: Option<BucketWebsite>,
-    /// Creation time of the bucket in RFC 3339 format.
+    /// The modification time of the bucket in RFC 3339 format.
+    pub updated: Option<String>,
+    /// The creation time of the bucket in RFC 3339 format.
     #[serde(rename="timeCreated")]
     pub time_created: Option<String>,
     /// The bucket's versioning configuration.
@@ -1323,9 +1332,9 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `sourceBucket` - Name of the bucket in which to find the source object.
-    /// * `sourceObject` - Name of the source object.
+    /// * `sourceObject` - Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
-    /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
+    /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn rewrite(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectRewriteCall<'a, C, A> {
         ObjectRewriteCall {
             hub: self.hub,
@@ -1360,7 +1369,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn get(&self, bucket: &str, object: &str) -> ObjectGetCall<'a, C, A> {
         ObjectGetCall {
             hub: self.hub,
@@ -1386,7 +1395,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn update(&self, request: Object, bucket: &str, object: &str) -> ObjectUpdateCall<'a, C, A> {
         ObjectUpdateCall {
             hub: self.hub,
@@ -1466,7 +1475,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `destinationBucket` - Name of the bucket in which to store the new object.
-    /// * `destinationObject` - Name of the new object.
+    /// * `destinationObject` - Name of the new object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn compose(&self, request: ComposeRequest, destination_bucket: &str, destination_object: &str) -> ObjectComposeCall<'a, C, A> {
         ObjectComposeCall {
             hub: self.hub,
@@ -1489,7 +1498,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn delete(&self, bucket: &str, object: &str) -> ObjectDeleteCall<'a, C, A> {
         ObjectDeleteCall {
             hub: self.hub,
@@ -1537,8 +1546,8 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `sourceBucket` - Name of the bucket in which to find the source object.
-    /// * `sourceObject` - Name of the source object.
-    /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    /// * `sourceObject` - Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
+    /// * `destinationBucket` - Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `destinationObject` - Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
     pub fn copy(&self, request: Object, source_bucket: &str, source_object: &str, destination_bucket: &str, destination_object: &str) -> ObjectCopyCall<'a, C, A> {
         ObjectCopyCall {
@@ -1573,7 +1582,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of the bucket in which the object resides.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn patch(&self, request: Object, bucket: &str, object: &str) -> ObjectPatchCall<'a, C, A> {
         ObjectPatchCall {
             hub: self.hub,
@@ -1642,7 +1651,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn insert(&self, request: ObjectAccessControl, bucket: &str, object: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
         ObjectAccessControlInsertCall {
             hub: self.hub,
@@ -1664,7 +1673,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn patch(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
         ObjectAccessControlPatchCall {
@@ -1687,7 +1696,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     pub fn list(&self, bucket: &str, object: &str) -> ObjectAccessControlListCall<'a, C, A> {
         ObjectAccessControlListCall {
             hub: self.hub,
@@ -1707,7 +1716,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn delete(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
         ObjectAccessControlDeleteCall {
@@ -1729,7 +1738,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn get(&self, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlGetCall<'a, C, A> {
         ObjectAccessControlGetCall {
@@ -1752,7 +1761,7 @@ impl<'a, C, A> ObjectAccessControlMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Name of a bucket.
-    /// * `object` - Name of the object.
+    /// * `object` - Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     /// * `entity` - The entity holding the permission. Can be user-userId, user-emailAddress, group-groupId, group-emailAddress, allUsers, or allAuthenticatedUsers.
     pub fn update(&self, request: ObjectAccessControl, bucket: &str, object: &str, entity: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
         ObjectAccessControlUpdateCall {
@@ -5573,7 +5582,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._source_bucket = new_value.to_string();
         self
     }
-    /// Name of the source object.
+    /// Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *source object* path property to the given value.
     ///
@@ -5593,7 +5602,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_bucket = new_value.to_string();
         self
     }
-    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
+    /// Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *destination object* path property to the given value.
     ///
@@ -5983,7 +5992,7 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -6360,7 +6369,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -7161,10 +7170,10 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -7210,7 +7219,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._predefined_acl = Some(new_value.to_string());
         self
     }
-    /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.
+    /// Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *name* query property to the given value.
     pub fn name(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
@@ -7557,7 +7566,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_bucket = new_value.to_string();
         self
     }
-    /// Name of the new object.
+    /// Name of the new object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *destination object* path property to the given value.
     ///
@@ -7840,7 +7849,7 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -8542,7 +8551,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._source_bucket = new_value.to_string();
         self
     }
-    /// Name of the source object.
+    /// Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *source object* path property to the given value.
     ///
@@ -8552,7 +8561,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._source_object = new_value.to_string();
         self
     }
-    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.
+    /// Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *destination bucket* path property to the given value.
     ///
@@ -8953,7 +8962,7 @@ impl<'a, C, A> ObjectPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -9286,7 +9295,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -9579,7 +9588,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -9849,7 +9858,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -10100,7 +10109,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -10372,7 +10381,7 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///
@@ -10675,7 +10684,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._bucket = new_value.to_string();
         self
     }
-    /// Name of the object.
+    /// Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.
     ///
     /// Sets the *object* path property to the given value.
     ///

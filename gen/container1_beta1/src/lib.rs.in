@@ -243,7 +243,7 @@ impl Part for MasterAuth {}
 pub struct Cluster {
     /// [Output only] The current status of this cluster.
     pub status: Option<String>,
-    /// The IP address range of the container pods in this cluster, in  CIDR notation (e.g. 10.96.0.0/14). Leave blank to have one automatically chosen or specify a /14 block in 10.0.0.0/8 or 172.16.0.0/12.
+    /// The IP address range of the container pods in this cluster, in  CIDR notation (e.g. 10.96.0.0/14). Leave blank to have one automatically chosen or specify a /14 block in 10.0.0.0/8.
     #[serde(rename="containerIpv4Cidr")]
     pub container_ipv4_cidr: Option<String>,
     /// An optional description of this cluster.

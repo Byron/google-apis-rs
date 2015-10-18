@@ -914,7 +914,7 @@ fn main() {
     
     let mut app = App::new("cloudmonitoring2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150713")
+           .version("0.3.2+20151012")
            .about("API for accessing Google Cloud and API monitoring data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudmonitoring2_beta2_cli")
            .arg(Arg::with_name("url")

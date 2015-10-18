@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *coordinate* crate version *0.1.9+20141215*, where *20141215* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *coordinate* crate version *0.1.9+20150811*, where *20150811* is the exact revision of the *coordinate:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *coordinate* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/coordinate/).
@@ -114,16 +114,16 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.jobs().update(req, "teamId", "jobId")
-//!              .title("kasd")
-//!              .progress("sanctus")
-//!              .note("takimata")
-//!              .lng(0.741081967736)
-//!              .lat(0.155564420342)
-//!              .customer_phone_number("invidunt")
-//!              .customer_name("ea")
-//!              .add_custom_field("sadipscing")
-//!              .assignee("rebum.")
-//!              .address("dolore")
+//!              .title("sanctus")
+//!              .progress("takimata")
+//!              .note("At")
+//!              .lng(0.155564420342)
+//!              .lat(0.63392024831)
+//!              .customer_phone_number("ea")
+//!              .customer_name("sadipscing")
+//!              .add_custom_field("rebum.")
+//!              .assignee("dolore")
+//!              .address("nonumy")
 //!              .doit();
 //! 
 //! match result {

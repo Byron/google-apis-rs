@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *0.1.9+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *SQL Admin* crate version *0.1.9+20151013*, where *20151013* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -12,17 +12,17 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.SQLAdmin.html) ... 
 //! 
 //! * [backup runs](struct.BackupRun.html)
-//!  * [*get*](struct.BackupRunGetCall.html) and [*list*](struct.BackupRunListCall.html)
+//!  * [*delete*](struct.BackupRunDeleteCall.html), [*get*](struct.BackupRunGetCall.html) and [*list*](struct.BackupRunListCall.html)
 //! * [databases](struct.Database.html)
 //!  * [*delete*](struct.DatabaseDeleteCall.html), [*get*](struct.DatabaseGetCall.html), [*insert*](struct.DatabaseInsertCall.html), [*list*](struct.DatabaseListCall.html), [*patch*](struct.DatabasePatchCall.html) and [*update*](struct.DatabaseUpdateCall.html)
 //! * [flags](struct.Flag.html)
 //!  * [*list*](struct.FlagListCall.html)
 //! * instances
-//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*export*](struct.InstanceExportCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html) and [*update*](struct.InstanceUpdateCall.html)
+//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*export*](struct.InstanceExportCall.html), [*failover*](struct.InstanceFailoverCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html) and [*update*](struct.InstanceUpdateCall.html)
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * [ssl certs](struct.SslCert.html)
-//!  * [*delete*](struct.SslCertDeleteCall.html), [*get*](struct.SslCertGetCall.html), [*insert*](struct.SslCertInsertCall.html) and [*list*](struct.SslCertListCall.html)
+//!  * [*create ephemeral*](struct.SslCertCreateEphemeralCall.html), [*delete*](struct.SslCertDeleteCall.html), [*get*](struct.SslCertGetCall.html), [*insert*](struct.SslCertInsertCall.html) and [*list*](struct.SslCertListCall.html)
 //! * [tiers](struct.Tier.html)
 //!  * [*list*](struct.TierListCall.html)
 //! * [users](struct.User.html)
@@ -64,6 +64,7 @@
 //! let r = hub.ssl_certs().delete(...).doit()
 //! let r = hub.users().delete(...).doit()
 //! let r = hub.databases().delete(...).doit()
+//! let r = hub.instances().failover(...).doit()
 //! let r = hub.databases().patch(...).doit()
 //! let r = hub.instances().reset_ssl_config(...).doit()
 //! let r = hub.instances().promote_replica(...).doit()
@@ -71,6 +72,7 @@
 //! let r = hub.operations().list(...).doit()
 //! let r = hub.users().update(...).doit()
 //! let r = hub.databases().insert(...).doit()
+//! let r = hub.backup_runs().delete(...).doit()
 //! let r = hub.instances().patch(...).doit()
 //! let r = hub.instances().clone(...).doit()
 //! let r = hub.instances().delete(...).doit()

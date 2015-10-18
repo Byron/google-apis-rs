@@ -446,7 +446,7 @@ fn main() {
     
     let mut app = App::new("oauth2-v2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150714")
+           .version("0.3.2+20151002")
            .about("Lets you access OAuth2 protocol related APIs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oauth2_v2_cli")
            .arg(Arg::with_name("url")

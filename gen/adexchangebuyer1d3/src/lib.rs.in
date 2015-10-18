@@ -173,12 +173,30 @@ impl<'a, C, A> AdExchangeBuyer<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Requests containing any of these placements will not match.
+/// A large image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PretargetingConfigExcludedPlacements {
+pub struct CreativeNativeAdImage {
+    /// no description provided
+    pub url: Option<String>,
+    /// no description provided
+    pub width: Option<i32>,
+    /// no description provided
+    pub height: Option<i32>,
+}
+
+impl NestedType for CreativeNativeAdImage {}
+impl Part for CreativeNativeAdImage {}
+
+
+/// Requests containing any of these placements will match.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PretargetingConfigPlacements {
     /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
     pub token: Option<String>,
     /// The type of the placement.
@@ -186,8 +204,126 @@ pub struct PretargetingConfigExcludedPlacements {
     pub type_: Option<String>,
 }
 
-impl NestedType for PretargetingConfigExcludedPlacements {}
-impl Part for PretargetingConfigExcludedPlacements {}
+impl NestedType for PretargetingConfigPlacements {}
+impl Part for PretargetingConfigPlacements {}
+
+
+/// A creative and its classification data.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert creatives](struct.CreativeInsertCall.html) (request|response)
+/// * [list creatives](struct.CreativeListCall.html) (none)
+/// * [get creatives](struct.CreativeGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Creative {
+    /// Detected product categories, if any. Read-only. This field should not be set in requests.
+    #[serde(rename="productCategories")]
+    pub product_categories: Option<Vec<i32>>,
+    /// The last upload timestamp of this creative if it was uploaded via API. Read-only. The value of this field is generated, and will be ignored for uploads. (formatted RFC 3339 timestamp).
+    pub api_upload_timestamp: Option<String>,
+    /// The agency id for this creative.
+    #[serde(rename="agencyId")]
+    pub agency_id: Option<String>,
+    /// All attributes for the ads that may be shown from this snippet.
+    pub attribute: Option<Vec<i32>>,
+    /// Ad height.
+    pub height: Option<i32>,
+    /// The name of the company being advertised in the creative.
+    #[serde(rename="advertiserName")]
+    pub advertiser_name: Option<String>,
+    /// The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.
+    #[serde(rename="HTMLSnippet")]
+    pub html_snippet: Option<String>,
+    /// A buyer-specific id identifying the creative in this ad.
+    #[serde(rename="buyerCreativeId")]
+    pub buyer_creative_id: Option<String>,
+    /// The set of urls to be called to record an impression.
+    #[serde(rename="impressionTrackingUrl")]
+    pub impression_tracking_url: Option<Vec<String>>,
+    /// Account id.
+    #[serde(rename="accountId")]
+    pub account_id: Option<i32>,
+    /// Detected advertiser id, if any. Read-only. This field should not be set in requests.
+    #[serde(rename="advertiserId")]
+    pub advertiser_id: Option<Vec<String>>,
+    /// Resource type.
+    pub kind: Option<String>,
+    /// The url to fetch a video ad. If set, HTMLSnippet should not be set.
+    #[serde(rename="videoURL")]
+    pub video_url: Option<String>,
+    /// The set of destination urls for the snippet.
+    #[serde(rename="clickThroughUrl")]
+    pub click_through_url: Option<Vec<String>>,
+    /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
+    pub corrections: Option<Vec<CreativeCorrections>>,
+    /// Ad width.
+    pub width: Option<i32>,
+    /// If nativeAd is set, HTMLSnippet and videoURL should not be set.
+    #[serde(rename="nativeAd")]
+    pub native_ad: Option<CreativeNativeAd>,
+    /// The version for this creative. Read-only. This field should not be set in requests.
+    pub version: Option<i32>,
+    /// Creative serving status. Read-only. This field should not be set in requests.
+    pub status: Option<String>,
+    /// All restricted categories for the ads that may be shown from this snippet.
+    #[serde(rename="restrictedCategories")]
+    pub restricted_categories: Option<Vec<i32>>,
+    /// All vendor types for the ads that may be shown from this snippet.
+    #[serde(rename="vendorType")]
+    pub vendor_type: Option<Vec<i32>>,
+    /// The filtering reasons for the creative. Read-only. This field should not be set in requests.
+    #[serde(rename="filteringReasons")]
+    pub filtering_reasons: Option<CreativeFilteringReasons>,
+    /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
+    #[serde(rename="disapprovalReasons")]
+    pub disapproval_reasons: Option<Vec<CreativeDisapprovalReasons>>,
+    /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.
+    #[serde(rename="sensitiveCategories")]
+    pub sensitive_categories: Option<Vec<i32>>,
+}
+
+impl RequestValue for Creative {}
+impl Resource for Creative {}
+impl ResponseResult for Creative {}
+
+
+/// The filtering reasons for the creative. Read-only. This field should not be set in requests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeFilteringReasons {
+    /// The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.
+    pub date: Option<String>,
+    /// The filtering reasons.
+    pub reasons: Option<Vec<CreativeFilteringReasonsReasons>>,
+}
+
+impl NestedType for CreativeFilteringReasons {}
+impl Part for CreativeFilteringReasons {}
+
+
+/// The app icon, for app download ads.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeNativeAdAppIcon {
+    /// no description provided
+    pub url: Option<String>,
+    /// no description provided
+    pub width: Option<i32>,
+    /// no description provided
+    pub height: Option<i32>,
+}
+
+impl NestedType for CreativeNativeAdAppIcon {}
+impl Part for CreativeNativeAdAppIcon {}
 
 
 /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
@@ -204,6 +340,189 @@ pub struct CreativeDisapprovalReasons {
 
 impl NestedType for CreativeDisapprovalReasons {}
 impl Part for CreativeDisapprovalReasons {}
+
+
+/// A smaller image, for the advertiser logo.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeNativeAdLogo {
+    /// no description provided
+    pub url: Option<String>,
+    /// no description provided
+    pub width: Option<i32>,
+    /// no description provided
+    pub height: Option<i32>,
+}
+
+impl NestedType for CreativeNativeAdLogo {}
+impl Part for CreativeNativeAdLogo {}
+
+
+/// A direct deals feed lists Direct Deals the Ad Exchange buyer account has access to. This includes direct deals set up for the buyer account as well as its merged stream seats.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list direct deals](struct.DirectDealListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DirectDealsList {
+    /// Resource type.
+    pub kind: Option<String>,
+    /// A list of direct deals relevant for your account.
+    #[serde(rename="directDeals")]
+    pub direct_deals: Option<Vec<DirectDeal>>,
+}
+
+impl ResponseResult for DirectDealsList {}
+
+
+/// An account feed lists Ad Exchange buyer accounts that the user has access to. Each entry in the feed corresponds to a single buyer account.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list accounts](struct.AccountListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccountsList {
+    /// A list of accounts.
+    pub items: Option<Vec<Account>>,
+    /// Resource type.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for AccountsList {}
+
+
+/// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeCorrections {
+    /// The type of correction that was applied to the creative.
+    pub reason: Option<String>,
+    /// Additional details about the correction.
+    pub details: Option<Vec<String>>,
+}
+
+impl NestedType for CreativeCorrections {}
+impl Part for CreativeCorrections {}
+
+
+/// The filtering reasons.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeFilteringReasonsReasons {
+    /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
+    #[serde(rename="filteringCount")]
+    pub filtering_count: Option<i64>,
+    /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
+    #[serde(rename="filteringStatus")]
+    pub filtering_status: Option<i32>,
+}
+
+impl NestedType for CreativeFilteringReasonsReasons {}
+impl Part for CreativeFilteringReasonsReasons {}
+
+
+/// The configuration data for an Ad Exchange direct deal.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get direct deals](struct.DirectDealGetCall.html) (response)
+/// * [list direct deals](struct.DirectDealListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DirectDeal {
+    /// The name of the advertiser this deal is for.
+    pub advertiser: Option<String>,
+    /// Resource type.
+    pub kind: Option<String>,
+    /// Deal name.
+    pub name: Option<String>,
+    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
+    #[serde(rename="currencyCode")]
+    pub currency_code: Option<String>,
+    /// The account id of the buyer this deal is for.
+    #[serde(rename="accountId")]
+    pub account_id: Option<i32>,
+    /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
+    #[serde(rename="fixedCpm")]
+    pub fixed_cpm: Option<String>,
+    /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.
+    #[serde(rename="publisherBlocksOverriden")]
+    pub publisher_blocks_overriden: Option<bool>,
+    /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The name of the publisher offering this direct deal.
+    #[serde(rename="sellerNetwork")]
+    pub seller_network: Option<String>,
+    /// Deal id.
+    pub id: Option<String>,
+    /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).
+    #[serde(rename="privateExchangeMinCpm")]
+    pub private_exchange_min_cpm: Option<String>,
+}
+
+impl Resource for DirectDeal {}
+impl ResponseResult for DirectDeal {}
+
+
+/// Your bidder locations that have distinct URLs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccountBidderLocation {
+    /// The URL to which the Ad Exchange will send bid requests.
+    pub url: Option<String>,
+    /// The geographical region the Ad Exchange should send requests from. Only used by some quota systems, but always setting the value is recommended. Allowed values:  
+    /// - ASIA 
+    /// - EUROPE 
+    /// - US_EAST 
+    /// - US_WEST
+    pub region: Option<String>,
+    /// The maximum queries per second the Ad Exchange will send.
+    #[serde(rename="maximumQps")]
+    pub maximum_qps: Option<i32>,
+}
+
+impl NestedType for AccountBidderLocation {}
+impl Part for AccountBidderLocation {}
+
+
+/// Requests containing any of these placements will not match.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PretargetingConfigExcludedPlacements {
+    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
+    pub token: Option<String>,
+    /// The type of the placement.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl NestedType for PretargetingConfigExcludedPlacements {}
+impl Part for PretargetingConfigExcludedPlacements {}
 
 
 /// Configuration data for an Ad Exchange buyer account.
@@ -269,22 +588,6 @@ pub struct PretargetingConfigList {
 impl ResponseResult for PretargetingConfigList {}
 
 
-/// The filtering reasons for the creative. Read-only. This field should not be set in requests.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreativeFilteringReasons {
-    /// The date in ISO 8601 format for the data. The data is collected from 00:00:00 to 23:59:59 in PST.
-    pub date: Option<String>,
-    /// The filtering reasons.
-    pub reasons: Option<Vec<CreativeFilteringReasonsReasons>>,
-}
-
-impl NestedType for CreativeFilteringReasons {}
-impl Part for CreativeFilteringReasons {}
-
-
 /// The configuration data for an Ad Exchange billing info.
 /// 
 /// # Activities
@@ -310,70 +613,6 @@ pub struct BillingInfo {
 }
 
 impl ResponseResult for BillingInfo {}
-
-
-/// A direct deals feed lists Direct Deals the Ad Exchange buyer account has access to. This includes direct deals set up for the buyer account as well as its merged stream seats.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list direct deals](struct.DirectDealListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DirectDealsList {
-    /// Resource type.
-    pub kind: Option<String>,
-    /// A list of direct deals relevant for your account.
-    #[serde(rename="directDeals")]
-    pub direct_deals: Option<Vec<DirectDeal>>,
-}
-
-impl ResponseResult for DirectDealsList {}
-
-
-/// An account feed lists Ad Exchange buyer accounts that the user has access to. Each entry in the feed corresponds to a single buyer account.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list accounts](struct.AccountListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AccountsList {
-    /// A list of accounts.
-    pub items: Option<Vec<Account>>,
-    /// Resource type.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for AccountsList {}
-
-
-/// The creatives feed lists the active creatives for the Ad Exchange buyer accounts that the user has access to. Each entry in the feed corresponds to a single creative.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list creatives](struct.CreativeListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreativesList {
-    /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of creatives.
-    pub items: Option<Vec<Creative>>,
-    /// Resource type.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for CreativesList {}
 
 
 /// The configuration data for Ad Exchange RTB - Budget API.
@@ -409,152 +648,6 @@ pub struct Budget {
 
 impl RequestValue for Budget {}
 impl ResponseResult for Budget {}
-
-
-/// A creative and its classification data.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert creatives](struct.CreativeInsertCall.html) (request|response)
-/// * [list creatives](struct.CreativeListCall.html) (none)
-/// * [get creatives](struct.CreativeGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Creative {
-    /// Detected product categories, if any. Read-only. This field should not be set in requests.
-    #[serde(rename="productCategories")]
-    pub product_categories: Option<Vec<i32>>,
-    /// Creative serving status. Read-only. This field should not be set in requests.
-    pub status: Option<String>,
-    /// The agency id for this creative.
-    #[serde(rename="agencyId")]
-    pub agency_id: Option<String>,
-    /// All attributes for the ads that may be shown from this snippet.
-    pub attribute: Option<Vec<i32>>,
-    /// Ad height.
-    pub height: Option<i32>,
-    /// The name of the company being advertised in the creative.
-    #[serde(rename="advertiserName")]
-    pub advertiser_name: Option<String>,
-    /// The HTML snippet that displays the ad when inserted in the web page. If set, videoURL should not be set.
-    #[serde(rename="HTMLSnippet")]
-    pub html_snippet: Option<String>,
-    /// A buyer-specific id identifying the creative in this ad.
-    #[serde(rename="buyerCreativeId")]
-    pub buyer_creative_id: Option<String>,
-    /// Account id.
-    #[serde(rename="accountId")]
-    pub account_id: Option<i32>,
-    /// Detected advertiser id, if any. Read-only. This field should not be set in requests.
-    #[serde(rename="advertiserId")]
-    pub advertiser_id: Option<Vec<String>>,
-    /// Resource type.
-    pub kind: Option<String>,
-    /// The url to fetch a video ad. If set, HTMLSnippet should not be set.
-    #[serde(rename="videoURL")]
-    pub video_url: Option<String>,
-    /// The set of destination urls for the snippet.
-    #[serde(rename="clickThroughUrl")]
-    pub click_through_url: Option<Vec<String>>,
-    /// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
-    pub corrections: Option<Vec<CreativeCorrections>>,
-    /// Ad width.
-    pub width: Option<i32>,
-    /// All restricted categories for the ads that may be shown from this snippet.
-    #[serde(rename="restrictedCategories")]
-    pub restricted_categories: Option<Vec<i32>>,
-    /// All vendor types for the ads that may be shown from this snippet.
-    #[serde(rename="vendorType")]
-    pub vendor_type: Option<Vec<i32>>,
-    /// The filtering reasons for the creative. Read-only. This field should not be set in requests.
-    #[serde(rename="filteringReasons")]
-    pub filtering_reasons: Option<CreativeFilteringReasons>,
-    /// The reasons for disapproval, if any. Note that not all disapproval reasons may be categorized, so it is possible for the creative to have a status of DISAPPROVED with an empty list for disapproval_reasons. In this case, please reach out to your TAM to help debug the issue. Read-only. This field should not be set in requests.
-    #[serde(rename="disapprovalReasons")]
-    pub disapproval_reasons: Option<Vec<CreativeDisapprovalReasons>>,
-    /// Detected sensitive categories, if any. Read-only. This field should not be set in requests.
-    #[serde(rename="sensitiveCategories")]
-    pub sensitive_categories: Option<Vec<i32>>,
-}
-
-impl RequestValue for Creative {}
-impl Resource for Creative {}
-impl ResponseResult for Creative {}
-
-
-/// The configuration data for an Ad Exchange performance report list. https://sites.google.com/a/google.com/adx-integration/Home/engineering/binary-releases/rtb-api-release https://cs.corp.google.com/#piper///depot/google3/contentads/adx/tools/rtb_api/adxrtb.py
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list performance report](struct.PerformanceReportListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PerformanceReportList {
-    /// Resource type.
-    pub kind: Option<String>,
-    /// A list of performance reports relevant for the account.
-    #[serde(rename="performanceReport")]
-    pub performance_report: Option<Vec<PerformanceReport>>,
-}
-
-impl ResponseResult for PerformanceReportList {}
-
-
-/// The filtering reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreativeFilteringReasonsReasons {
-    /// The number of times the creative was filtered for the status. The count is aggregated across all publishers on the exchange.
-    #[serde(rename="filteringCount")]
-    pub filtering_count: Option<i64>,
-    /// The filtering status code. Please refer to the creative-status-codes.txt file for different statuses.
-    #[serde(rename="filteringStatus")]
-    pub filtering_status: Option<i32>,
-}
-
-impl NestedType for CreativeFilteringReasonsReasons {}
-impl Part for CreativeFilteringReasonsReasons {}
-
-
-/// Requests containing any of these placements will match.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PretargetingConfigPlacements {
-    /// The value of the placement. Interpretation depends on the placement type, e.g. URL for a site placement, channel name for a channel placement, app id for a mobile app placement.
-    pub token: Option<String>,
-    /// The type of the placement.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl NestedType for PretargetingConfigPlacements {}
-impl Part for PretargetingConfigPlacements {}
-
-
-/// Requests which allow one of these (width, height) pairs will match. All pairs must be supported ad dimensions.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PretargetingConfigDimensions {
-    /// Width in pixels.
-    pub width: Option<String>,
-    /// Height in pixels.
-    pub height: Option<String>,
-}
-
-impl NestedType for PretargetingConfigDimensions {}
-impl Part for PretargetingConfigDimensions {}
 
 
 /// The configuration data for an Ad Exchange performance report list.
@@ -631,20 +724,25 @@ pub struct PerformanceReport {
 impl Part for PerformanceReport {}
 
 
-/// Shows any corrections that were applied to this creative. Read-only. This field should not be set in requests.
+/// The configuration data for an Ad Exchange performance report list. https://sites.google.com/a/google.com/adx-integration/Home/engineering/binary-releases/rtb-api-release https://cs.corp.google.com/#piper///depot/google3/contentads/adx/tools/rtb_api/adxrtb.py
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list performance report](struct.PerformanceReportListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreativeCorrections {
-    /// The type of correction that was applied to the creative.
-    pub reason: Option<String>,
-    /// Additional details about the correction.
-    pub details: Option<Vec<String>>,
+pub struct PerformanceReportList {
+    /// Resource type.
+    pub kind: Option<String>,
+    /// A list of performance reports relevant for the account.
+    #[serde(rename="performanceReport")]
+    pub performance_report: Option<Vec<PerformanceReport>>,
 }
 
-impl NestedType for CreativeCorrections {}
-impl Part for CreativeCorrections {}
+impl ResponseResult for PerformanceReportList {}
 
 
 /// A billing info feed lists Billing Info the Ad Exchange buyer account has access to. Each entry in the feed corresponds to a single billing info.
@@ -665,56 +763,6 @@ pub struct BillingInfoList {
 }
 
 impl ResponseResult for BillingInfoList {}
-
-
-/// The configuration data for an Ad Exchange direct deal.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get direct deals](struct.DirectDealGetCall.html) (response)
-/// * [list direct deals](struct.DirectDealListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DirectDeal {
-    /// The name of the advertiser this deal is for.
-    pub advertiser: Option<String>,
-    /// Resource type.
-    pub kind: Option<String>,
-    /// Deal name.
-    pub name: Option<String>,
-    /// The currency code that applies to the fixed_cpm value. If not set then assumed to be USD.
-    #[serde(rename="currencyCode")]
-    pub currency_code: Option<String>,
-    /// The account id of the buyer this deal is for.
-    #[serde(rename="accountId")]
-    pub account_id: Option<i32>,
-    /// The fixed price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the fixed price tier of buying (highest priority, pay exactly the configured fixed price).
-    #[serde(rename="fixedCpm")]
-    pub fixed_cpm: Option<String>,
-    /// Start time for when this deal becomes active. If not set then this deal is active immediately upon creation. In seconds since the epoch.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// If true, the publisher has opted to have their blocks ignored when a creative is bid with for this deal.
-    #[serde(rename="publisherBlocksOverriden")]
-    pub publisher_blocks_overriden: Option<bool>,
-    /// End time for when this deal stops being active. If not set then this deal is valid until manually disabled by the publisher. In seconds since the epoch.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The name of the publisher offering this direct deal.
-    #[serde(rename="sellerNetwork")]
-    pub seller_network: Option<String>,
-    /// Deal id.
-    pub id: Option<String>,
-    /// The minimum price for this direct deal. In cpm micros of currency according to currency_code. If set, then this deal is eligible for the private exchange tier of buying (below fixed price priority, run as a second price auction).
-    #[serde(rename="privateExchangeMinCpm")]
-    pub private_exchange_min_cpm: Option<String>,
-}
-
-impl Resource for DirectDeal {}
-impl ResponseResult for DirectDeal {}
 
 
 /// There is no detailed description.
@@ -800,27 +848,84 @@ impl RequestValue for PretargetingConfig {}
 impl ResponseResult for PretargetingConfig {}
 
 
-/// Your bidder locations that have distinct URLs.
+/// Requests which allow one of these (width, height) pairs will match. All pairs must be supported ad dimensions.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AccountBidderLocation {
-    /// The URL to which the Ad Exchange will send bid requests.
-    pub url: Option<String>,
-    /// The geographical region the Ad Exchange should send requests from. Only used by some quota systems, but always setting the value is recommended. Allowed values:  
-    /// - ASIA 
-    /// - EUROPE 
-    /// - US_EAST 
-    /// - US_WEST
-    pub region: Option<String>,
-    /// The maximum queries per second the Ad Exchange will send.
-    #[serde(rename="maximumQps")]
-    pub maximum_qps: Option<i32>,
+pub struct PretargetingConfigDimensions {
+    /// Width in pixels.
+    pub width: Option<String>,
+    /// Height in pixels.
+    pub height: Option<String>,
 }
 
-impl NestedType for AccountBidderLocation {}
-impl Part for AccountBidderLocation {}
+impl NestedType for PretargetingConfigDimensions {}
+impl Part for PretargetingConfigDimensions {}
+
+
+/// The creatives feed lists the active creatives for the Ad Exchange buyer accounts that the user has access to. Each entry in the feed corresponds to a single creative.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list creatives](struct.CreativeListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativesList {
+    /// Continuation token used to page through creatives. To retrieve the next page of results, set the next request's "pageToken" value to this.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of creatives.
+    pub items: Option<Vec<Creative>>,
+    /// Resource type.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for CreativesList {}
+
+
+/// If nativeAd is set, HTMLSnippet and videoURL should not be set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreativeNativeAd {
+    /// A long description of the ad.
+    pub body: Option<String>,
+    /// no description provided
+    pub advertiser: Option<String>,
+    /// A short title for the ad.
+    pub headline: Option<String>,
+    /// A large image.
+    pub image: Option<CreativeNativeAdImage>,
+    /// The app rating in the app store. Must be in the range [0-5].
+    #[serde(rename="starRating")]
+    pub star_rating: Option<f64>,
+    /// The URL to use for click tracking.
+    #[serde(rename="clickTrackingUrl")]
+    pub click_tracking_url: Option<String>,
+    /// A label for the button that the user is supposed to click.
+    #[serde(rename="callToAction")]
+    pub call_to_action: Option<String>,
+    /// The app icon, for app download ads.
+    #[serde(rename="appIcon")]
+    pub app_icon: Option<CreativeNativeAdAppIcon>,
+    /// A smaller image, for the advertiser logo.
+    pub logo: Option<CreativeNativeAdLogo>,
+    /// The URLs are called when the impression is rendered.
+    #[serde(rename="impressionTrackingUrl")]
+    pub impression_tracking_url: Option<Vec<String>>,
+    /// The price of the promoted app including the currency info.
+    pub price: Option<String>,
+    /// The URL to the app store to purchase/download the promoted app.
+    pub store: Option<String>,
+}
+
+impl NestedType for CreativeNativeAd {}
+impl Part for CreativeNativeAd {}
 
 
 

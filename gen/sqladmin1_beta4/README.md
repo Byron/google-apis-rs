@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-sqladmin1_beta4` library allows access to all features of the *Google SQL Admin* service.
 
-This documentation was generated from *SQL Admin* crate version *0.1.9+20150305*, where *20150305* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *SQL Admin* crate version *0.1.9+20151013*, where *20151013* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -14,17 +14,17 @@ Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SQLAdmin.html) ... 
 
 * [backup runs](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRun.html)
- * [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunListCall.html)
+ * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.BackupRunListCall.html)
 * [databases](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Database.html)
  * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabasePatchCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.DatabaseUpdateCall.html)
 * [flags](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Flag.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.FlagListCall.html)
 * instances
- * [*clone*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceCloneCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceDeleteCall.html), [*export*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceExportCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceImportCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstancePatchCall.html), [*promote replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstancePromoteReplicaCall.html), [*reset ssl config*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceResetSslConfigCall.html), [*restart*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceRestartCall.html), [*restore backup*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceRestoreBackupCall.html), [*start replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceStartReplicaCall.html), [*stop replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceStopReplicaCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceUpdateCall.html)
+ * [*clone*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceCloneCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceDeleteCall.html), [*export*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceExportCall.html), [*failover*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceFailoverCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceGetCall.html), [*import*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceImportCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceListCall.html), [*patch*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstancePatchCall.html), [*promote replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstancePromoteReplicaCall.html), [*reset ssl config*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceResetSslConfigCall.html), [*restart*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceRestartCall.html), [*restore backup*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceRestoreBackupCall.html), [*start replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceStartReplicaCall.html), [*stop replica*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceStopReplicaCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.InstanceUpdateCall.html)
 * [operations](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Operation.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.OperationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.OperationListCall.html)
 * [ssl certs](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCert.html)
- * [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertListCall.html)
+ * [*create ephemeral*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertCreateEphemeralCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.SslCertListCall.html)
 * [tiers](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.Tier.html)
  * [*list*](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.TierListCall.html)
 * [users](http://byron.github.io/google-apis-rs/google_sqladmin1_beta4/struct.User.html)
@@ -64,6 +64,7 @@ Or specifically ...
 let r = hub.ssl_certs().delete(...).doit()
 let r = hub.users().delete(...).doit()
 let r = hub.databases().delete(...).doit()
+let r = hub.instances().failover(...).doit()
 let r = hub.databases().patch(...).doit()
 let r = hub.instances().reset_ssl_config(...).doit()
 let r = hub.instances().promote_replica(...).doit()
@@ -71,6 +72,7 @@ let r = hub.databases().update(...).doit()
 let r = hub.operations().list(...).doit()
 let r = hub.users().update(...).doit()
 let r = hub.databases().insert(...).doit()
+let r = hub.backup_runs().delete(...).doit()
 let r = hub.instances().patch(...).doit()
 let r = hub.instances().clone(...).doit()
 let r = hub.instances().delete(...).doit()

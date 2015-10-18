@@ -10,6 +10,9 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
+Everything else about the *logging* API can be found at the
+[official documentation site](https://cloud.google.com/logging/docs/).
+
 # Downloads
 
 You can download the pre-compiled 64bit binaries for the following platforms:
@@ -21,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *logging* API at revision *20150326*. The CLI is at version *0.3.2*.
+This documentation was generated from the *logging* API at revision *20151007*. The CLI is at version *0.3.2*.
 
 ```bash
 logging1-beta3 [options]
@@ -41,6 +44,16 @@ logging1-beta3 [options]
                 logs-sinks-get <projects-id> <logs-id> <sinks-id> [-p <v>]... [-o <out>]
                 logs-sinks-list <projects-id> <logs-id> [-p <v>]... [-o <out>]
                 logs-sinks-update <projects-id> <logs-id> <sinks-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                metrics-create <projects-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                metrics-delete <projects-id> <metrics-id> [-p <v>]... [-o <out>]
+                metrics-get <projects-id> <metrics-id> [-p <v>]... [-o <out>]
+                metrics-list <projects-id> [-p <v>]... [-o <out>]
+                metrics-update <projects-id> <metrics-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                sinks-create <projects-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                sinks-delete <projects-id> <sinks-id> [-p <v>]... [-o <out>]
+                sinks-get <projects-id> <sinks-id> [-p <v>]... [-o <out>]
+                sinks-list <projects-id> [-p <v>]... [-o <out>]
+                sinks-update <projects-id> <sinks-id> (-r <kv>)... [-p <v>]... [-o <out>]
   logging1-beta3 --help
 
 Configuration:

@@ -1235,7 +1235,7 @@ impl Part for GuideCategorySnippet {}
 pub struct VideoSnippet {
     /// The video's description.
     pub description: Option<String>,
-    /// A list of keyword tags associated with the video. Tags may contain spaces. This field is only visible to the video's uploader.
+    /// A list of keyword tags associated with the video. Tags may contain spaces.
     pub tags: Option<Vec<String>>,
     /// The default_audio_language property specifies the language spoken in the video's default audio track.
     #[serde(rename="defaultAudioLanguage")]
@@ -2033,202 +2033,205 @@ pub struct LiveStreamStatus {
 impl Part for LiveStreamStatus {}
 
 
-/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 65
+/// Ratings schemes. The country-specific ratings are mostly for movies and shows. NEXT_ID: 66
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContentRating {
-    /// Internal YouTube rating.
+    /// A rating that YouTube uses to identify age-restricted content.
     #[serde(rename="ytRating")]
     pub yt_rating: Option<String>,
-    /// Rating system for French Canadian TV - Regie du cinema
+    /// The video's rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian French-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.
     #[serde(rename="catvfrRating")]
     pub catvfr_rating: Option<String>,
-    /// Rating system in India - Central Board of Film Certification
+    /// The video's Central Board of Film Certification (CBFC - India) rating.
     #[serde(rename="cbfcRating")]
     pub cbfc_rating: Option<String>,
-    /// Rating system for Thailand - Board of Filmand Video Censors
+    /// The video's rating from Thailand's Board of Film and Video Censors.
     #[serde(rename="bfvcRating")]
     pub bfvc_rating: Option<String>,
-    /// Rating system for Austria - Bundesministerium f�r Unterricht, Kunst und Kultur
+    /// The video's rating from the Austrian Board of Media Classification (Bundesministerium für Unterricht, Kunst und Kultur).
     #[serde(rename="bmukkRating")]
     pub bmukk_rating: Option<String>,
-    /// Rating system for Switzerland - Switzerland Rating System
+    /// The video's rating in Switzerland.
     #[serde(rename="chfilmRating")]
     pub chfilm_rating: Option<String>,
-    /// Rating system for Taiwan - Ministry of Culture - Tawan
+    /// The video's rating from Taiwan's Ministry of Culture (文化部).
     #[serde(rename="moctwRating")]
     pub moctw_rating: Option<String>,
-    /// Rating system for Canadian TV - Canadian TV Classification System
+    /// Rating system for Canadian TV - Canadian TV Classification System The video's rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian English-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.
     #[serde(rename="catvRating")]
     pub catv_rating: Option<String>,
-    /// Rating system for Peru - Peru Rating System
+    /// The video's rating in Peru.
     #[serde(rename="pefilmRating")]
     pub pefilm_rating: Option<String>,
-    /// no description provided
+    /// Reasons that explain why the video received its DJCQT (Brazil) rating.
     #[serde(rename="djctqRatingReasons")]
     pub djctq_rating_reasons: Option<Vec<String>>,
-    /// Rating system for Argentina - Instituto Nacional de Cine y Artes Audiovisuales
+    /// The video's INCAA (Instituto Nacional de Cine y Artes Audiovisuales - Argentina) rating.
     #[serde(rename="incaaRating")]
     pub incaa_rating: Option<String>,
-    /// Rating system for Israel - Israel Rating System
+    /// The video's rating in Israel.
     #[serde(rename="ilfilmRating")]
     pub ilfilm_rating: Option<String>,
-    /// Rating system for Luxembourg - Commission de surveillance de la classification des films
+    /// The video's rating from Luxembourg's Commission de surveillance de la classification des films (CSCF).
     #[serde(rename="cscfRating")]
     pub cscf_rating: Option<String>,
-    /// Rating system in Germany - Voluntary Self Regulation of the Movie Industry
+    /// The video's Freiwillige Selbstkontrolle der Filmwirtschaft (FSK - Germany) rating.
     #[serde(rename="fskRating")]
     pub fsk_rating: Option<String>,
-    /// Rating system in South Korea - Korea Media Rating Board
+    /// The video's Korea Media Rating Board (영상물등급위원회) rating. The KMRB rates videos in South Korea.
     #[serde(rename="kmrbRating")]
     pub kmrb_rating: Option<String>,
-    /// Rating system in Brazil - Department of Justice, Rating, Titles and Qualification
+    /// The video's Departamento de Justiça, Classificação, Qualificação e Títulos (DJCQT - Brazil) rating.
     #[serde(rename="djctqRating")]
     pub djctq_rating: Option<String>,
-    /// Rating system for Hong kong - Office for Film, Newspaper and Article Administration
+    /// The video's rating from Hong Kong's Office for Film, Newspaper and Article Administration.
     #[serde(rename="fcoRating")]
     pub fco_rating: Option<String>,
-    /// Rating system for Norway - Medietilsynet
+    /// The video's rating from Medietilsynet, the Norwegian Media Authority.
     #[serde(rename="medietilsynetRating")]
     pub medietilsynet_rating: Option<String>,
-    /// Rating system for Greece - Greece Rating System
+    /// The video's rating in Greece.
     #[serde(rename="grfilmRating")]
     pub grfilm_rating: Option<String>,
-    /// Rating system for Chile - Consejo de Calificaci�n Cinematogr�fica
+    /// The video's Consejo de Calificación Cinematográfica (Chile) rating.
     #[serde(rename="cccRating")]
     pub ccc_rating: Option<String>,
-    /// Rating system for Ireland - Raidi� Teilif�s �ireann
+    /// The video's rating from Ireland's Raidió Teilifís Éireann.
     #[serde(rename="rteRating")]
     pub rte_rating: Option<String>,
-    /// Rating system in France - French Minister of Culture
+    /// This property has been deprecated. Use the contentDetails.contentRating.cncRating instead.
     #[serde(rename="fmocRating")]
     pub fmoc_rating: Option<String>,
-    /// Rating system in Japan - Eiga Rinri Kanri Iinkai
+    /// The video's Eirin (映倫) rating. Eirin is the Japanese rating system.
     #[serde(rename="eirinRating")]
     pub eirin_rating: Option<String>,
-    /// Rating system for Portugal - Comiss�o de Classifica��o de Espect�culos
+    /// The video's rating from Portugal's Comissão de Classificação de Espect´culos.
     #[serde(rename="cceRating")]
     pub cce_rating: Option<String>,
-    /// Rating system for Latvia - National Film Center of Latvia
+    /// The video's rating from the Nacionãlais Kino centrs (National Film Centre of Latvia).
     #[serde(rename="nkclvRating")]
     pub nkclv_rating: Option<String>,
-    /// Rating system for South africa - Film & Publication Board
+    /// The video's rating from South Africa's Film and Publication Board.
     #[serde(rename="fpbRating")]
     pub fpb_rating: Option<String>,
-    /// Rating system for Iceland - SMAIS
+    /// The video's rating in Iceland.
     #[serde(rename="smaisRating")]
     pub smais_rating: Option<String>,
-    /// Canadian Home Video Rating System
+    /// The video's Canadian Home Video Rating System (CHVRS) rating.
     #[serde(rename="chvrsRating")]
     pub chvrs_rating: Option<String>,
-    /// Rating system for Italy - Autorit� per le Garanzie nelle Comunicazioni
+    /// The video's rating from Italy's Autorità per le Garanzie nelle Comunicazioni (AGCOM).
     #[serde(rename="agcomRating")]
     pub agcom_rating: Option<String>,
-    /// Rating system for Colombia - MoC
+    /// The video's Ministerio de Cultura (Colombia) rating.
     #[serde(rename="mocRating")]
     pub moc_rating: Option<String>,
-    /// Rating system for Hungary - Rating Committee of the National Office of Film
+    /// The video's rating from the Hungarian Nemzeti Filmiroda, the Rating Committee of the National Office of Film.
     #[serde(rename="rcnofRating")]
     pub rcnof_rating: Option<String>,
-    /// Rating system for Malaysia - Film Censorship Board of Malaysia
+    /// The video's rating from Malaysia's Film Censorship Board.
     #[serde(rename="fcbmRating")]
     pub fcbm_rating: Option<String>,
-    /// Rating system for Netherlands - Nederlands Instituut voor de Classificatie van Audiovisuele Media
+    /// voor de Classificatie van Audiovisuele Media (Netherlands).
     #[serde(rename="kijkwijzerRating")]
     pub kijkwijzer_rating: Option<String>,
-    /// Rating system for Singapore - Media Development Authority
+    /// Rating system in France - Commission de classification cinematographique
+    #[serde(rename="cncRating")]
+    pub cnc_rating: Option<String>,
+    /// The video's rating from Singapore's Media Development Authority (MDA) and, specifically, it's Board of Film Censors (BFC).
     #[serde(rename="mdaRating")]
     pub mda_rating: Option<String>,
-    /// Rating system for Nigeria - National Film and Video Censors Board
+    /// The video's rating from Nigeria's National Film and Video Censors Board.
     #[serde(rename="nfvcbRating")]
     pub nfvcb_rating: Option<String>,
-    /// Rating system for Venezuela - SiBCI
+    /// The video's rating in Venezuela.
     #[serde(rename="resorteviolenciaRating")]
     pub resorteviolencia_rating: Option<String>,
-    /// Rating system for France - Conseil sup�rieur de l?audiovisuel
+    /// The video's rating from France's Conseil supérieur de l?audiovisuel, which rates broadcast content.
     #[serde(rename="csaRating")]
     pub csa_rating: Option<String>,
-    /// Rating system in New Zealand - Office of Film and Literature Classification
+    /// The video's Office of Film and Literature Classification (OFLC - New Zealand) rating.
     #[serde(rename="oflcRating")]
     pub oflc_rating: Option<String>,
-    /// TV Parental Guidelines rating of the content.
+    /// The video's TV Parental Guidelines (TVPG) rating.
     #[serde(rename="tvpgRating")]
     pub tvpg_rating: Option<String>,
-    /// Rating system for Bulgaria - National Film Centre
+    /// The video's rating from the Bulgarian National Film Center.
     #[serde(rename="nfrcRating")]
     pub nfrc_rating: Option<String>,
-    /// Rating system for Malta - Film Age-Classification Board
+    /// The video's rating from Malta's Film Age-Classification Board.
     #[serde(rename="mccaaRating")]
     pub mccaa_rating: Option<String>,
-    /// Rating system in Mexico - General Directorate of Radio, Television and Cinematography
+    /// The video's General Directorate of Radio, Television and Cinematography (Mexico) rating.
     #[serde(rename="rtcRating")]
     pub rtc_rating: Option<String>,
-    /// Rating system in Italy - Ministero dei Beni e delle Attivita Culturali e del Turismo
+    /// The video's rating from the Ministero dei Beni e delle Attività Culturali e del Turismo (Italy).
     #[serde(rename="mibacRating")]
     pub mibac_rating: Option<String>,
-    /// British Board of Film Classification
+    /// The video's British Board of Film Classification (BBFC) rating.
     #[serde(rename="bbfcRating")]
     pub bbfc_rating: Option<String>,
-    /// Rating system for Egypt - Egypt Rating System
+    /// The video's rating in Egypt.
     #[serde(rename="egfilmRating")]
     pub egfilm_rating: Option<String>,
-    /// Rating system for Belgium - Belgium Rating System
+    /// The video's rating from the Commission de Contrôle des Films (Belgium).
     #[serde(rename="cicfRating")]
     pub cicf_rating: Option<String>,
-    /// Rating system for Poland - National Broadcasting Council
+    /// The video's rating in Poland.
     #[serde(rename="nbcplRating")]
     pub nbcpl_rating: Option<String>,
-    /// Rating system for Maldives - National Bureau of Classification
+    /// The video's rating from the Maldives National Bureau of Classification.
     #[serde(rename="nbcRating")]
     pub nbc_rating: Option<String>,
-    /// Motion Picture Association of America rating for the content.
+    /// The video's Motion Picture Association of America (MPAA) rating.
     #[serde(rename="mpaaRating")]
     pub mpaa_rating: Option<String>,
-    /// Rating system in Ireland - Irish Film Classification Office
+    /// The video's Irish Film Classification Office (IFCO - Ireland) rating. See the IFCO website for more information.
     #[serde(rename="ifcoRating")]
     pub ifco_rating: Option<String>,
-    /// Rating system in Australia - Australian Classification Board
+    /// The video's Australian Classification Board (ACB) or Australian Communications and Media Authority (ACMA) rating. ACMA ratings are used to classify children's television programming.
     #[serde(rename="acbRating")]
     pub acb_rating: Option<String>,
-    /// Rating system for Estonia - Estonia Rating System
+    /// The video's rating in Estonia.
     #[serde(rename="eefilmRating")]
     pub eefilm_rating: Option<String>,
-    /// Rating system for Czech republic - Czech republic Rating System
+    /// The video's rating in the Czech Republic.
     #[serde(rename="czfilmRating")]
     pub czfilm_rating: Option<String>,
-    /// Rating system for Indonesia - Lembaga Sensor Film
+    /// The video's rating from Indonesia's Lembaga Sensor Film.
     #[serde(rename="lsfRating")]
     pub lsf_rating: Option<String>,
-    /// Rating system in Russia
+    /// The video's National Film Registry of the Russian Federation (MKRF - Russia) rating.
     #[serde(rename="russiaRating")]
     pub russia_rating: Option<String>,
-    /// Rating system for Kenya - Kenya Film Classification Board
+    /// The video's rating from the Kenya Film Classification Board.
     #[serde(rename="kfcbRating")]
     pub kfcb_rating: Option<String>,
-    /// Rating system for Philippines - MOVIE AND TELEVISION REVIEW AND CLASSIFICATION BOARD
+    /// The video's rating from the Movie and Television Review and Classification Board (Philippines).
     #[serde(rename="mtrcbRating")]
     pub mtrcb_rating: Option<String>,
-    /// Rating system for Chile - Asociaci�n Nacional de Televisi�n
+    /// The video's Anatel (Asociación Nacional de Televisión) rating for Chilean television.
     #[serde(rename="anatelRating")]
     pub anatel_rating: Option<String>,
-    /// Rating system for Sweden - Statens medier�d (National Media Council)
+    /// The video's rating from Statens medieråd (Sweden's National Media Council).
     #[serde(rename="smsaRating")]
     pub smsa_rating: Option<String>,
-    /// Rating system for Romania - CONSILIUL NATIONAL AL AUDIOVIZUALULUI - CNA
+    /// The video's rating from Romania's CONSILIUL NATIONAL AL AUDIOVIZUALULUI (CNA).
     #[serde(rename="cnaRating")]
     pub cna_rating: Option<String>,
-    /// Rating system in Spain - Instituto de Cinematografia y de las Artes Audiovisuales
+    /// The video's Instituto de la Cinematografía y de las Artes Audiovisuales (ICAA - Spain) rating.
     #[serde(rename="icaaRating")]
     pub icaa_rating: Option<String>,
-    /// Rating system for Denmark - The Media Council for Children and Young People
+    /// The video's rating from the Danish Film Institute's (Det Danske Filminstitut) Media Council for Children and Young People.
     #[serde(rename="mccypRating")]
     pub mccyp_rating: Option<String>,
-    /// Rating system for Slovakia - Slovakia Rating System
+    /// The video's rating in Slovakia.
     #[serde(rename="skfilmRating")]
     pub skfilm_rating: Option<String>,
-    /// Rating system for Finland - Finnish Centre for Media Education and Audiovisual Media
+    /// The video's rating from Finland's Kansallinen Audiovisuaalinen Instituutti (National Audiovisual Institute).
     #[serde(rename="mekuRating")]
     pub meku_rating: Option<String>,
 }
@@ -3617,7 +3620,7 @@ pub struct Video {
     pub monetization_details: Option<VideoMonetizationDetails>,
     /// The suggestions object encapsulates suggestions that identify opportunities to improve the video quality or the metadata for the uploaded video. This data can only be retrieved by the video owner.
     pub suggestions: Option<VideoSuggestions>,
-    /// Age restriction details related to a video.
+    /// Age restriction details related to a video. This data can only be retrieved by the video owner.
     #[serde(rename="ageGating")]
     pub age_gating: Option<VideoAgeGating>,
     /// The fileDetails object encapsulates information about the video file that was uploaded to YouTube, including the file's resolution, duration, audio and video codecs, stream bitrates, and more. This data can only be retrieved by the video owner.
@@ -4530,6 +4533,9 @@ pub struct LiveBroadcastSnippet {
     /// The date and time that the broadcast was added to YouTube's live broadcast schedule. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="publishedAt")]
     pub published_at: Option<String>,
+    /// The id of the live chat for this broadcast.
+    #[serde(rename="liveChatId")]
+    pub live_chat_id: Option<String>,
     /// The date and time that the broadcast is scheduled to start. The value is specified in ISO 8601 (YYYY-MM-DDThh:mm:ss.sZ) format.
     #[serde(rename="scheduledStartTime")]
     pub scheduled_start_time: Option<String>,
@@ -5379,7 +5385,6 @@ impl<'a, C, A> VideoMethods<'a, C, A> {
             _locale: Default::default(),
             _id: Default::default(),
             _hl: Default::default(),
-            _debug_project_id_override: Default::default(),
             _chart: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -5838,7 +5843,6 @@ impl<'a, C, A> CommentThreadMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _part: parts,
-            _share_on_google_plus: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6747,7 +6751,6 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
             _sync: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _on_behalf_of: Default::default(),
-            _debug_project_id_override: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6770,7 +6773,6 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
             _on_behalf_of_content_owner: Default::default(),
             _on_behalf_of: Default::default(),
             _id: Default::default(),
-            _debug_project_id_override: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6792,7 +6794,6 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
             _tfmt: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _on_behalf_of: Default::default(),
-            _debug_project_id_override: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6812,7 +6813,6 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
             _id: id.to_string(),
             _on_behalf_of_content_owner: Default::default(),
             _on_behalf_of: Default::default(),
-            _debug_project_id_override: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -6835,7 +6835,6 @@ impl<'a, C, A> CaptionMethods<'a, C, A> {
             _sync: Default::default(),
             _on_behalf_of_content_owner: Default::default(),
             _on_behalf_of: Default::default(),
-            _debug_project_id_override: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7507,10 +7506,10 @@ impl<'a, C, A> ChannelBannerInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -10308,10 +10307,10 @@ impl<'a, C, A> ThumbnailSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -10668,7 +10667,6 @@ impl<'a, C, A> VideoReportAbuseCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 ///              .locale("ut")
 ///              .id("ea")
 ///              .hl("sed")
-///              .debug_project_id_override("dolor")
 ///              .chart("dolor")
 ///              .doit();
 /// # }
@@ -10687,7 +10685,6 @@ pub struct VideoListCall<'a, C, A>
     _locale: Option<String>,
     _id: Option<String>,
     _hl: Option<String>,
-    _debug_project_id_override: Option<String>,
     _chart: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10710,7 +10707,7 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "youtube.videos.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         if let Some(value) = self._video_category_id {
             params.push(("videoCategoryId", value.to_string()));
@@ -10739,13 +10736,10 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._hl {
             params.push(("hl", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
         if let Some(value) = self._chart {
             params.push(("chart", value.to_string()));
         }
-        for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "debugProjectIdOverride", "chart"].iter() {
+        for &field in ["alt", "part", "videoCategoryId", "regionCode", "pageToken", "onBehalfOfContentOwner", "myRating", "maxResults", "locale", "id", "hl", "chart"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10921,13 +10915,6 @@ impl<'a, C, A> VideoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Sets the *hl* query property to the given value.
     pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
         self._hl = Some(new_value.to_string());
-        self
-    }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> VideoListCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
         self
     }
     /// The chart parameter identifies the chart that you want to retrieve.
@@ -11232,7 +11219,7 @@ impl<'a, C, A> VideoRateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().get_rating("id")
-///              .on_behalf_of_content_owner("amet.")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -11461,7 +11448,7 @@ impl<'a, C, A> VideoGetRatingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().delete("id")
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -11685,7 +11672,7 @@ impl<'a, C, A> VideoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().update(req)
-///              .on_behalf_of_content_owner("gubergren")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11957,10 +11944,10 @@ impl<'a, C, A> VideoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.videos().insert(req)
 ///              .stabilize(true)
-///              .on_behalf_of_content_owner_channel("sit")
-///              .on_behalf_of_content_owner("vero")
+///              .on_behalf_of_content_owner_channel("justo")
+///              .on_behalf_of_content_owner("sit")
 ///              .notify_subscribers(true)
-///              .auto_levels(false)
+///              .auto_levels(true)
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -12223,10 +12210,10 @@ impl<'a, C, A> VideoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -12635,16 +12622,16 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.subscriptions().list("part")
-///              .page_token("sadipscing")
-///              .order("vero")
-///              .on_behalf_of_content_owner_channel("sadipscing")
-///              .on_behalf_of_content_owner("invidunt")
+///              .page_token("consetetur")
+///              .order("sadipscing")
+///              .on_behalf_of_content_owner_channel("vero")
+///              .on_behalf_of_content_owner("sadipscing")
 ///              .my_subscribers(false)
 ///              .mine(false)
-///              .max_results(82)
-///              .id("aliquyam")
-///              .for_channel_id("Lorem")
-///              .channel_id("et")
+///              .max_results(17)
+///              .id("duo")
+///              .for_channel_id("aliquyam")
+///              .channel_id("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -13182,36 +13169,36 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.search().list("part")
-///              .video_type("takimata")
-///              .video_syndicated("nonumy")
-///              .video_license("kasd")
-///              .video_embeddable("sanctus")
-///              .video_duration("takimata")
-///              .video_dimension("At")
-///              .video_definition("labore")
-///              .video_category_id("invidunt")
-///              .video_caption("ea")
-///              .type_("sadipscing")
-///              .topic_id("rebum.")
-///              .safe_search("dolore")
-///              .relevance_language("nonumy")
-///              .related_to_video_id("sed")
-///              .region_code("aliquyam")
-///              .q("sit")
-///              .published_before("eirmod")
-///              .published_after("consetetur")
-///              .page_token("labore")
-///              .order("sed")
-///              .on_behalf_of_content_owner("ea")
-///              .max_results(39)
-///              .location_radius("aliquyam")
-///              .location("eos")
+///              .video_type("consetetur")
+///              .video_syndicated("takimata")
+///              .video_license("nonumy")
+///              .video_embeddable("kasd")
+///              .video_duration("sanctus")
+///              .video_dimension("takimata")
+///              .video_definition("At")
+///              .video_category_id("labore")
+///              .video_caption("invidunt")
+///              .type_("ea")
+///              .topic_id("sadipscing")
+///              .safe_search("rebum.")
+///              .relevance_language("dolore")
+///              .related_to_video_id("nonumy")
+///              .region_code("sed")
+///              .q("aliquyam")
+///              .published_before("sit")
+///              .published_after("eirmod")
+///              .page_token("consetetur")
+///              .order("labore")
+///              .on_behalf_of_content_owner("sed")
+///              .max_results(85)
+///              .location_radius("gubergren")
+///              .location("aliquyam")
 ///              .for_mine(true)
-///              .for_developer(false)
+///              .for_developer(true)
 ///              .for_content_owner(false)
-///              .event_type("ipsum")
-///              .channel_type("aliquyam")
-///              .channel_id("dolores")
+///              .event_type("labore")
+///              .channel_type("ipsum")
+///              .channel_id("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -13771,7 +13758,7 @@ impl<'a, C, A> SearchListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.i18n_regions().list("part")
-///              .hl("diam")
+///              .hl("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -13998,16 +13985,16 @@ impl<'a, C, A> I18nRegionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comment_threads().list("part")
-///              .video_id("justo")
-///              .text_format("est")
-///              .search_terms("amet")
-///              .page_token("accusam")
-///              .order("clita")
-///              .moderation_status("diam")
-///              .max_results(30)
-///              .id("est")
-///              .channel_id("clita")
-///              .all_threads_related_to_channel_id("invidunt")
+///              .video_id("ut")
+///              .text_format("justo")
+///              .search_terms("est")
+///              .page_token("amet")
+///              .order("accusam")
+///              .moderation_status("clita")
+///              .max_results(22)
+///              .id("justo")
+///              .channel_id("est")
+///              .all_threads_related_to_channel_id("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -14601,7 +14588,6 @@ impl<'a, C, A> CommentThreadUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comment_threads().insert(req)
-///              .share_on_google_plus(false)
 ///              .doit();
 /// # }
 /// ```
@@ -14611,7 +14597,6 @@ pub struct CommentThreadInsertCall<'a, C, A>
     hub: &'a YouTube<C, A>,
     _request: CommentThread,
     _part: String,
-    _share_on_google_plus: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14633,15 +14618,12 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "youtube.commentThreads.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
         params.push(("part", self._part.to_string()));
-        if let Some(value) = self._share_on_google_plus {
-            params.push(("shareOnGooglePlus", value.to_string()));
-        }
-        for &field in ["alt", "part", "shareOnGooglePlus"].iter() {
+        for &field in ["alt", "part"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14773,13 +14755,6 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._part = new_value.to_string();
         self
     }
-    /// The shareOnGooglePlus parameter indicates whether the top-level comment and any replies that are made to that comment should also be posted to the author's Google+ profile.
-    ///
-    /// Sets the *share on google plus* query property to the given value.
-    pub fn share_on_google_plus(mut self, new_value: bool) -> CommentThreadInsertCall<'a, C, A> {
-        self._share_on_google_plus = Some(new_value);
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14879,14 +14854,14 @@ impl<'a, C, A> CommentThreadInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("dolores".to_string());
+/// req.id = Some("invidunt".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().update(req)
-///              .on_behalf_of_content_owner_channel("eos")
-///              .on_behalf_of_content_owner("voluptua.")
+///              .on_behalf_of_content_owner_channel("ut")
+///              .on_behalf_of_content_owner("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -15179,8 +15154,8 @@ impl<'a, C, A> LiveStreamUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().delete("id")
-///              .on_behalf_of_content_owner_channel("sed")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .on_behalf_of_content_owner_channel("voluptua.")
+///              .on_behalf_of_content_owner("duo")
 ///              .doit();
 /// # }
 /// ```
@@ -15430,12 +15405,12 @@ impl<'a, C, A> LiveStreamDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().list("part")
-///              .page_token("ea")
-///              .on_behalf_of_content_owner_channel("et")
-///              .on_behalf_of_content_owner("dolor")
-///              .mine(true)
-///              .max_results(39)
-///              .id("invidunt")
+///              .page_token("aliquyam")
+///              .on_behalf_of_content_owner_channel("ea")
+///              .on_behalf_of_content_owner("ea")
+///              .mine(false)
+///              .max_results(53)
+///              .id("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -15750,14 +15725,14 @@ impl<'a, C, A> LiveStreamListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// req.status = Default::default(); // is LiveStreamStatus
 /// req.snippet = Default::default(); // is LiveStreamSnippet
 /// req.cdn = Default::default(); // is CdnSettings
-/// req.id = Some("rebum.".to_string());
+/// req.id = Some("kasd".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_streams().insert(req)
-///              .on_behalf_of_content_owner_channel("Lorem")
-///              .on_behalf_of_content_owner("clita")
+///              .on_behalf_of_content_owner_channel("invidunt")
+///              .on_behalf_of_content_owner("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -16300,7 +16275,7 @@ impl<'a, C, A> CommentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().set_moderation_status("id", "moderationStatus")
-///              .ban_author(false)
+///              .ban_author(true)
 ///              .doit();
 /// # }
 /// ```
@@ -16734,11 +16709,11 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("part")
-///              .text_format("sed")
-///              .parent_id("sit")
-///              .page_token("takimata")
-///              .max_results(58)
-///              .id("nonumy")
+///              .text_format("consetetur")
+///              .parent_id("et")
+///              .page_token("sed")
+///              .max_results(54)
+///              .id("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -17477,7 +17452,7 @@ impl<'a, C, A> CommentMarkAsSpamCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().update(req)
-///              .on_behalf_of_content_owner("Lorem")
+///              .on_behalf_of_content_owner("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -17739,16 +17714,16 @@ impl<'a, C, A> ChannelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.channels().list("part")
-///              .page_token("diam")
-///              .on_behalf_of_content_owner("ut")
+///              .page_token("Lorem")
+///              .on_behalf_of_content_owner("Lorem")
 ///              .my_subscribers(true)
-///              .mine(false)
-///              .max_results(1)
+///              .mine(true)
+///              .max_results(64)
 ///              .managed_by_me(false)
-///              .id("dolor")
-///              .hl("sea")
-///              .for_username("ut")
-///              .category_id("eirmod")
+///              .id("ipsum")
+///              .hl("ut")
+///              .for_username("dolor")
+///              .category_id("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -18095,7 +18070,7 @@ impl<'a, C, A> ChannelListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_abuse_report_reasons().list("part")
-///              .hl("voluptua.")
+///              .hl("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -18333,7 +18308,7 @@ impl<'a, C, A> VideoAbuseReportReasonListCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().insert(req)
-///              .on_behalf_of_content_owner("dolor")
+///              .on_behalf_of_content_owner("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -18797,12 +18772,12 @@ impl<'a, C, A> PlaylistItemDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.playlist_items().list("part")
-///              .video_id("vero")
-///              .playlist_id("ut")
-///              .page_token("sed")
-///              .on_behalf_of_content_owner("et")
-///              .max_results(46)
-///              .id("justo")
+///              .video_id("et")
+///              .playlist_id("et")
+///              .page_token("vero")
+///              .on_behalf_of_content_owner("ut")
+///              .max_results(71)
+///              .id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -19349,7 +19324,7 @@ impl<'a, C, A> PlaylistItemUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().set(req, "channelId")
-///              .on_behalf_of_content_owner("vero")
+///              .on_behalf_of_content_owner("justo")
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -19582,10 +19557,10 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -19705,7 +19680,7 @@ impl<'a, C, A> WatermarkSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.watermarks().unset("channelId")
-///              .on_behalf_of_content_owner("takimata")
+///              .on_behalf_of_content_owner("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -19940,9 +19915,9 @@ impl<'a, C, A> WatermarkUnsetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().control("id", "part")
 ///              .walltime("et")
-///              .on_behalf_of_content_owner_channel("sed")
-///              .on_behalf_of_content_owner("no")
-///              .offset_time_ms("invidunt")
+///              .on_behalf_of_content_owner_channel("nonumy")
+///              .on_behalf_of_content_owner("et")
+///              .offset_time_ms("sed")
 ///              .display_slate(true)
 ///              .doit();
 /// # }
@@ -20259,9 +20234,9 @@ impl<'a, C, A> LiveBroadcastControlCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind_direct("id", "part")
-///              .stream_id("elitr")
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("sea")
+///              .stream_id("labore")
+///              .on_behalf_of_content_owner_channel("aliquyam")
+///              .on_behalf_of_content_owner("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -20555,14 +20530,14 @@ impl<'a, C, A> LiveBroadcastBindDirectCall<'a, C, A> where C: BorrowMut<hyper::C
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("elitr".to_string());
+/// req.id = Some("consetetur".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().update(req)
-///              .on_behalf_of_content_owner_channel("At")
-///              .on_behalf_of_content_owner("sea")
+///              .on_behalf_of_content_owner_channel("sea")
+///              .on_behalf_of_content_owner("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -20875,14 +20850,14 @@ impl<'a, C, A> LiveBroadcastUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// req.status = Default::default(); // is LiveBroadcastStatus
 /// req.content_details = Default::default(); // is LiveBroadcastContentDetails
 /// req.snippet = Default::default(); // is LiveBroadcastSnippet
-/// req.id = Some("consetetur".to_string());
+/// req.id = Some("At".to_string());
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().insert(req)
-///              .on_behalf_of_content_owner_channel("diam")
-///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of_content_owner_channel("sea")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -21190,13 +21165,13 @@ impl<'a, C, A> LiveBroadcastInsertCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().list("part")
-///              .page_token("consetetur")
-///              .on_behalf_of_content_owner_channel("dolor")
-///              .on_behalf_of_content_owner("aliquyam")
+///              .page_token("accusam")
+///              .on_behalf_of_content_owner_channel("dolores")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .mine(false)
-///              .max_results(85)
-///              .id("et")
-///              .broadcast_status("Stet")
+///              .max_results(19)
+///              .id("elitr")
+///              .broadcast_status("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -21502,8 +21477,8 @@ impl<'a, C, A> LiveBroadcastListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().delete("id")
-///              .on_behalf_of_content_owner_channel("dolor")
-///              .on_behalf_of_content_owner("sanctus")
+///              .on_behalf_of_content_owner_channel("Stet")
+///              .on_behalf_of_content_owner("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -21752,8 +21727,8 @@ impl<'a, C, A> LiveBroadcastDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().transition("broadcastStatus", "id", "part")
-///              .on_behalf_of_content_owner_channel("consetetur")
-///              .on_behalf_of_content_owner("eirmod")
+///              .on_behalf_of_content_owner_channel("Lorem")
+///              .on_behalf_of_content_owner("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -22044,9 +22019,9 @@ impl<'a, C, A> LiveBroadcastTransitionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.live_broadcasts().bind("id", "part")
-///              .stream_id("et")
-///              .on_behalf_of_content_owner_channel("sadipscing")
-///              .on_behalf_of_content_owner("accusam")
+///              .stream_id("labore")
+///              .on_behalf_of_content_owner_channel("gubergren")
+///              .on_behalf_of_content_owner("et")
 ///              .doit();
 /// # }
 /// ```
@@ -22328,9 +22303,8 @@ impl<'a, C, A> LiveBroadcastBindCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().insert(req)
 ///              .sync(true)
-///              .on_behalf_of_content_owner("Lorem")
-///              .on_behalf_of("rebum.")
-///              .debug_project_id_override("et")
+///              .on_behalf_of_content_owner("accusam")
+///              .on_behalf_of("magna")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -22343,7 +22317,6 @@ pub struct CaptionInsertCall<'a, C, A>
     _sync: Option<bool>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _debug_project_id_override: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -22366,7 +22339,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtube.captions.insert", 
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -22380,10 +22353,7 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._on_behalf_of {
             params.push(("onBehalfOf", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
-        for &field in ["alt", "part", "sync", "onBehalfOfContentOwner", "onBehalfOf", "debugProjectIdOverride"].iter() {
+        for &field in ["alt", "part", "sync", "onBehalfOfContentOwner", "onBehalfOf"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -22589,10 +22559,10 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -22650,13 +22620,6 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
-        self
-    }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionInsertCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -22752,10 +22715,9 @@ impl<'a, C, A> CaptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().list("part", "videoId")
-///              .on_behalf_of_content_owner("dolores")
-///              .on_behalf_of("vero")
-///              .id("consetetur")
-///              .debug_project_id_override("vero")
+///              .on_behalf_of_content_owner("et")
+///              .on_behalf_of("clita")
+///              .id("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -22768,7 +22730,6 @@ pub struct CaptionListCall<'a, C, A>
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
     _id: Option<String>,
-    _debug_project_id_override: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -22790,7 +22751,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "youtube.captions.list", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("part", self._part.to_string()));
         params.push(("videoId", self._video_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -22802,10 +22763,7 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._id {
             params.push(("id", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
-        for &field in ["alt", "part", "videoId", "onBehalfOfContentOwner", "onBehalfOf", "id", "debugProjectIdOverride"].iter() {
+        for &field in ["alt", "part", "videoId", "onBehalfOfContentOwner", "onBehalfOf", "id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -22948,13 +22906,6 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._id = Some(new_value.to_string());
         self
     }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionListCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -23037,11 +22988,10 @@ impl<'a, C, A> CaptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().download("id")
-///              .tlang("eos")
-///              .tfmt("justo")
-///              .on_behalf_of_content_owner("tempor")
-///              .on_behalf_of("gubergren")
-///              .debug_project_id_override("dolore")
+///              .tlang("vero")
+///              .tfmt("consetetur")
+///              .on_behalf_of_content_owner("vero")
+///              .on_behalf_of("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -23054,7 +23004,6 @@ pub struct CaptionDownloadCall<'a, C, A>
     _tfmt: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _debug_project_id_override: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -23076,7 +23025,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "youtube.captions.download", 
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._tlang {
             params.push(("tlang", value.to_string()));
@@ -23090,10 +23039,7 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._on_behalf_of {
             params.push(("onBehalfOf", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
-        for &field in ["id", "tlang", "tfmt", "onBehalfOfContentOwner", "onBehalfOf", "debugProjectIdOverride"].iter() {
+        for &field in ["id", "tlang", "tfmt", "onBehalfOfContentOwner", "onBehalfOf"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23238,13 +23184,6 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionDownloadCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -23324,9 +23263,8 @@ impl<'a, C, A> CaptionDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().delete("id")
-///              .on_behalf_of_content_owner("dolore")
-///              .on_behalf_of("magna")
-///              .debug_project_id_override("elitr")
+///              .on_behalf_of_content_owner("justo")
+///              .on_behalf_of("tempor")
 ///              .doit();
 /// # }
 /// ```
@@ -23337,7 +23275,6 @@ pub struct CaptionDeleteCall<'a, C, A>
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _debug_project_id_override: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -23359,7 +23296,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtube.captions.delete", 
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("id", self._id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
@@ -23367,10 +23304,7 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._on_behalf_of {
             params.push(("onBehalfOf", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
-        for &field in ["id", "onBehalfOfContentOwner", "onBehalfOf", "debugProjectIdOverride"].iter() {
+        for &field in ["id", "onBehalfOfContentOwner", "onBehalfOf"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23480,13 +23414,6 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionDeleteCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -23574,9 +23501,8 @@ impl<'a, C, A> CaptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.captions().update(req)
 ///              .sync(false)
-///              .on_behalf_of_content_owner("ipsum")
-///              .on_behalf_of("invidunt")
-///              .debug_project_id_override("accusam")
+///              .on_behalf_of_content_owner("dolore")
+///              .on_behalf_of("amet.")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -23589,7 +23515,6 @@ pub struct CaptionUpdateCall<'a, C, A>
     _sync: Option<bool>,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
-    _debug_project_id_override: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -23612,7 +23537,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtube.captions.update", 
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         if self._part.len() == 0 {
             self._part = self._request.to_parts();
         }
@@ -23626,10 +23551,7 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._on_behalf_of {
             params.push(("onBehalfOf", value.to_string()));
         }
-        if let Some(value) = self._debug_project_id_override {
-            params.push(("debugProjectIdOverride", value.to_string()));
-        }
-        for &field in ["alt", "part", "sync", "onBehalfOfContentOwner", "onBehalfOf", "debugProjectIdOverride"].iter() {
+        for &field in ["alt", "part", "sync", "onBehalfOfContentOwner", "onBehalfOf"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23835,10 +23757,10 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self.doit(stream, mime_type, "simple")
     }
     /// Upload media in a resumable fashion.
-    /// Even if the upload fails or is interrupted, it can be resumed for a 
+    /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
     /// 
-    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL 
+    /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
     /// `cancel_chunk_upload(...)`.
@@ -23896,13 +23818,6 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Sets the *on behalf of* query property to the given value.
     pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a, C, A> {
         self._on_behalf_of = Some(new_value.to_string());
-        self
-    }
-    /// The debugProjectIdOverride parameter should be used for mimicking a request for a certain project ID.
-    ///
-    /// Sets the *debug project id override* query property to the given value.
-    pub fn debug_project_id_override(mut self, new_value: &str) -> CaptionUpdateCall<'a, C, A> {
-        self._debug_project_id_override = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -23984,9 +23899,9 @@ impl<'a, C, A> CaptionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.video_categories().list("part")
-///              .region_code("diam")
-///              .id("nonumy")
-///              .hl("sed")
+///              .region_code("magna")
+///              .id("elitr")
+///              .hl("magna")
 ///              .doit();
 /// # }
 /// ```
@@ -24235,14 +24150,14 @@ impl<'a, C, A> VideoCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().list("part")
-///              .region_code("magna")
-///              .published_before("dolor")
-///              .published_after("Lorem")
-///              .page_token("dolor")
+///              .region_code("invidunt")
+///              .published_before("accusam")
+///              .published_after("labore")
+///              .page_token("diam")
 ///              .mine(true)
-///              .max_results(10)
-///              .home(true)
-///              .channel_id("dolores")
+///              .max_results(8)
+///              .home(false)
+///              .channel_id("magna")
 ///              .doit();
 /// # }
 /// ```

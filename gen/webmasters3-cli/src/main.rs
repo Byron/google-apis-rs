@@ -901,9 +901,7 @@ fn main() {
     let arg_data = [
         ("searchanalytics", "methods: 'query'", vec![
             ("query",  
-                    Some(r##"[LIMITED ACCESS]
-        
-        Query your data with filters and parameters that you define. Returns zero or more rows grouped by the row keys that you define. You must define a date range of one or more days.
+                    Some(r##"Query your data with filters and parameters that you define. Returns zero or more rows grouped by the row keys that you define. You must define a date range of one or more days.
         
         When date is one of the group by values, any days without data are omitted from the result list. If you need to know which days have data, issue a broad date range query grouped by date for any metric, and see which day rows are returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_webmasters3_cli/searchanalytics_query",
@@ -1244,7 +1242,7 @@ fn main() {
     
     let mut app = App::new("webmasters3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150624")
+           .version("0.3.2+20150804")
            .about("Lets you view Google Webmaster Tools data for your verified sites.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webmasters3_cli")
            .arg(Arg::with_name("url")

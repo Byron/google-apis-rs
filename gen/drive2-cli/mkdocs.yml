@@ -1,4 +1,4 @@
-site_name: drive v0.3.2+20150709
+site_name: drive v0.3.2+20151008
 site_url: http://byron.github.io/google-apis-rs/google-drive2-cli
 site_description: Write integrating applications with bcore
 
@@ -29,6 +29,7 @@ pages:
 - ['files_copy.md', 'Files', 'Copy']
 - ['files_delete.md', 'Files', 'Delete']
 - ['files_empty-trash.md', 'Files', 'Empty Trash']
+- ['files_generate-ids.md', 'Files', 'Generate Ids']
 - ['files_get.md', 'Files', 'Get']
 - ['files_insert.md', 'Files', 'Insert']
 - ['files_list.md', 'Files', 'List']

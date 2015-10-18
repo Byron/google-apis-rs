@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudresourcemanager1_beta1` library allows access to all features of the *Google cloudresourcemanager* service.
 
-This documentation was generated from *cloudresourcemanager* crate version *0.1.9+20150711*, where *20150711* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *cloudresourcemanager* crate version *0.1.9+20150909*, where *20150909* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
@@ -13,8 +13,10 @@ Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at 
 
 Handle the following *Resources* with ease from the central [hub](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Cloudresourcemanager.html) ... 
 
+* [organizations](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Organization.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationGetIamPolicyCall.html), [*list*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationListCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationSetIamPolicyCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationTestIamPermissionCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.OrganizationUpdateCall.html)
 * [projects](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.Project.html)
- * [*create*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectListCall.html), [*undelete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectUndeleteCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectUpdateCall.html)
+ * [*create*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectCreateCall.html), [*delete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectDeleteCall.html), [*get*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectGetCall.html), [*get iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectGetIamPolicyCall.html), [*list*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectListCall.html), [*set iam policy*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectTestIamPermissionCall.html), [*undelete*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectUndeleteCall.html) and [*update*](http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1/struct.ProjectUpdateCall.html)
 
 
 
@@ -47,10 +49,13 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.projects().delete(...).doit()
+let r = hub.projects().test_iam_permissions(...).doit()
 let r = hub.projects().undelete(...).doit()
+let r = hub.projects().set_iam_policy(...).doit()
 let r = hub.projects().get(...).doit()
 let r = hub.projects().update(...).doit()
+let r = hub.projects().get_iam_policy(...).doit()
+let r = hub.projects().delete(...).doit()
 let r = hub.projects().create(...).doit()
 let r = hub.projects().list(...).doit()
 ```

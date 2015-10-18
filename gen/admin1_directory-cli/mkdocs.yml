@@ -1,4 +1,4 @@
-site_name: directory v0.3.2+20150326
+site_name: directory v0.3.2+20151005
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: Write integrating applications with bcore
 
@@ -17,6 +17,17 @@ pages:
 - ['chromeosdevices_list.md', 'Chromeosdevices', 'List']
 - ['chromeosdevices_patch.md', 'Chromeosdevices', 'Patch']
 - ['chromeosdevices_update.md', 'Chromeosdevices', 'Update']
+- ['customers_get.md', 'Customers', 'Get']
+- ['customers_patch.md', 'Customers', 'Patch']
+- ['customers_update.md', 'Customers', 'Update']
+- ['domain-aliases_delete.md', 'Domain Aliases', 'Delete']
+- ['domain-aliases_get.md', 'Domain Aliases', 'Get']
+- ['domain-aliases_insert.md', 'Domain Aliases', 'Insert']
+- ['domain-aliases_list.md', 'Domain Aliases', 'List']
+- ['domains_delete.md', 'Domains', 'Delete']
+- ['domains_get.md', 'Domains', 'Get']
+- ['domains_insert.md', 'Domains', 'Insert']
+- ['domains_list.md', 'Domains', 'List']
 - ['groups_aliases-delete.md', 'Groups', 'Aliases Delete']
 - ['groups_aliases-insert.md', 'Groups', 'Aliases Insert']
 - ['groups_aliases-list.md', 'Groups', 'Aliases List']
@@ -47,6 +58,17 @@ pages:
 - ['orgunits_list.md', 'Orgunits', 'List']
 - ['orgunits_patch.md', 'Orgunits', 'Patch']
 - ['orgunits_update.md', 'Orgunits', 'Update']
+- ['privileges_list.md', 'Privileges', 'List']
+- ['role-assignments_delete.md', 'Role Assignments', 'Delete']
+- ['role-assignments_get.md', 'Role Assignments', 'Get']
+- ['role-assignments_insert.md', 'Role Assignments', 'Insert']
+- ['role-assignments_list.md', 'Role Assignments', 'List']
+- ['roles_delete.md', 'Roles', 'Delete']
+- ['roles_get.md', 'Roles', 'Get']
+- ['roles_insert.md', 'Roles', 'Insert']
+- ['roles_list.md', 'Roles', 'List']
+- ['roles_patch.md', 'Roles', 'Patch']
+- ['roles_update.md', 'Roles', 'Update']
 - ['schemas_delete.md', 'Schemas', 'Delete']
 - ['schemas_get.md', 'Schemas', 'Get']
 - ['schemas_insert.md', 'Schemas', 'Insert']

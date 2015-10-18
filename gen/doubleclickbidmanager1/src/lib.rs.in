@@ -144,6 +144,9 @@ impl<'a, C, A> DoubleClickBidManager<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadLineItemsRequest {
+    /// File specification (column names, types, order) in which the line items will be returned. Default to EWF.
+    #[serde(rename="fileSpec")]
+    pub file_spec: Option<String>,
     /// Filter type used to filter line items to fetch.
     #[serde(rename="filterType")]
     pub filter_type: Option<String>,
@@ -526,7 +529,7 @@ impl ResponseResult for Query {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DownloadLineItemsResponse {
-    /// Retrieved line items in CSV format. Refer to  Entity Write File Format for more information on file format.
+    /// Retrieved line items in CSV format. Refer to  Entity Write File Format or  Structured Data File Format for more information on file formats.
     #[serde(rename="lineItems")]
     pub line_items: Option<String>,
 }

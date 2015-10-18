@@ -43,6 +43,9 @@ pub enum Scope {
 
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
+
+    /// View your data across Google Cloud Platform services
+    CloudPlatformReadOnly,
 }
 
 impl AsRef<str> for Scope {
@@ -51,6 +54,7 @@ impl AsRef<str> for Scope {
             Scope::NdevClouddnReadonly => "https://www.googleapis.com/auth/ndev.clouddns.readonly",
             Scope::NdevClouddnReadwrite => "https://www.googleapis.com/auth/ndev.clouddns.readwrite",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
+            Scope::CloudPlatformReadOnly => "https://www.googleapis.com/auth/cloud-platform.read-only",
         }
     }
 }

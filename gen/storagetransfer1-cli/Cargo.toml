@@ -1,0 +1,35 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-storagetransfer1-cli"
+version = "0.3.2+20150811"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with storagetransfer (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1-cli"
+homepage = "https://cloud.google.com/storage/transfer"
+documentation = "http://byron.github.io/google-apis-rs/google_storagetransfer1_cli"
+license = "MIT"
+keywords = ["storagetransfer", "google", "cli"]
+
+[[bin]]
+name = "storagetransfer1"
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+strsim = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 1.0.3"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
+
+[dependencies.google-storagetransfer1]
+path = "../storagetransfer1"

@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *pubsub* API at revision *20150604*. The CLI is at version *0.3.2*.
+This documentation was generated from the *pubsub* API at revision *20150526*. The CLI is at version *0.3.2*.
 
 ```bash
 pubsub1-beta2 [options]

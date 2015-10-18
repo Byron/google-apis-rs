@@ -69,7 +69,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_androidenterprise1 as androidenterprise1;
-/// use androidenterprise1::Enterprise;
+/// use androidenterprise1::User;
 /// use androidenterprise1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -91,12 +91,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Enterprise::default();
+/// let mut req = User::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().insert(req, "token")
+/// let result = hub.collectionviewers().update(req, "enterpriseId", "collectionId", "userId")
 ///              .doit();
 /// 
 /// match result {
@@ -185,52 +185,6 @@ impl<'a, C, A> AndroidEnterprise<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Represents the list of app restrictions available to be pre-configured for the product.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get app restrictions schema products](struct.ProductGetAppRestrictionsSchemaCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppRestrictionsSchema {
-    /// The set of restrictions that make up this schema.
-    pub restrictions: Option<Vec<AppRestrictionsSchemaRestriction>>,
-}
-
-impl ResponseResult for AppRestrictionsSchema {}
-
-
-/// A restriction in the App Restriction Schema represents a piece of configuration that may be pre-applied.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppRestrictionsSchemaRestriction {
-    /// The type of the restriction.
-    #[serde(rename="restrictionType")]
-    pub restriction_type: Option<String>,
-    /// A longer description of the restriction, giving more detail of what it affects.
-    pub description: Option<String>,
-    /// The unique key that the product uses to identify the restriction, e.g. "com.google.android.gm.fieldname".
-    pub key: Option<String>,
-    /// The name of the restriction.
-    pub title: Option<String>,
-    /// For choice or multiselect restrictions, the list of possible entries' human-readable names.
-    pub entry: Option<Vec<String>>,
-    /// The default value of the restriction.
-    #[serde(rename="defaultValue")]
-    pub default_value: Option<AppRestrictionsSchemaRestrictionRestrictionValue>,
-    /// For choice or multiselect restrictions, the list of possible entries' machine-readable values.
-    #[serde(rename="entryValue")]
-    pub entry_value: Option<Vec<String>>,
-}
-
-impl Part for AppRestrictionsSchemaRestriction {}
-
-
 /// A typed value for the restriction.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -257,24 +211,47 @@ pub struct AppRestrictionsSchemaRestrictionRestrictionValue {
 impl Part for AppRestrictionsSchemaRestrictionRestrictionValue {}
 
 
-/// The matching enterprise resources.
+/// The existence of an install resource indicates that an app is installed on a particular device (or that an install is pending).
+/// 
+/// The API can be used to create an install resource using the update method. This triggers the actual install of the app on the device. If the user does not already have an entitlement for the app then an attempt is made to create one. If this fails (e.g. because the app is not free and there is no available license) then the creation of the install fails.
+/// 
+/// The API can also be used to update an installed app. If the update method is used on an existing install then the app will be updated to the latest available version.
+/// 
+/// Note that it is not possible to force the installation of a specific version of an app; the version code is read-only.
+/// 
+/// If a user installs an app themselves (as permitted by the enterprise), then again an install resource and possibly an entitlement resource are automatically created.
+/// 
+/// The API can also be used to delete an install resource, which triggers the removal of the app from the device. Note that deleting an install does not automatically remove the corresponding entitlement, even if there are no remaining installs. The install resource will also be deleted if the user uninstalls the app themselves.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list enterprises](struct.EnterpriseListCall.html) (response)
+/// * [patch installs](struct.InstallPatchCall.html) (request|response)
+/// * [list installs](struct.InstallListCall.html) (none)
+/// * [delete installs](struct.InstallDeleteCall.html) (none)
+/// * [update installs](struct.InstallUpdateCall.html) (request|response)
+/// * [get installs](struct.InstallGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnterprisesListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
+pub struct Install {
+    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
+    #[serde(rename="installState")]
+    pub install_state: Option<String>,
+    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
     pub kind: Option<String>,
-    /// An enterprise.
-    pub enterprise: Option<Vec<Enterprise>>,
+    /// The ID of the product that the install is for, e.g. "app:com.google.android.gm".
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
-impl ResponseResult for EnterprisesListResponse {}
+impl RequestValue for Install {}
+impl Resource for Install {}
+impl ResponseResult for Install {}
 
 
 /// The existence of an entitlement resource means that a user has the right to use a particular app on any of their devices. This might be because the app is free or because they have been allocated a license to the app from a group license purchased by the enterprise.
@@ -334,205 +311,27 @@ pub struct InstallsListResponse {
 impl ResponseResult for InstallsListResponse {}
 
 
-/// The user resources for the collection.
+/// A set of products.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list collectionviewers](struct.CollectionviewerListCall.html) (response)
+/// * [set available product set users](struct.UserSetAvailableProductSetCall.html) (request|response)
+/// * [get available product set users](struct.UserGetAvailableProductSetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CollectionViewersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionViewersListResponse".
+pub struct ProductSet {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#productSet".
     pub kind: Option<String>,
-    /// A user of an enterprise.
-    pub user: Option<Vec<User>>,
-}
-
-impl ResponseResult for CollectionViewersListResponse {}
-
-
-/// Information on an approval URL.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApprovalUrlInfo {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#approvalUrlInfo".
-    pub kind: Option<String>,
-    /// A URL that displays a product's permissions and that can also be used to approve the product with the Products.approve call.
-    #[serde(rename="approvalUrl")]
-    pub approval_url: Option<String>,
-}
-
-impl Part for ApprovalUrlInfo {}
-
-
-/// This represents a single version of the app.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppVersion {
-    /// Unique increasing identifier for the app version.
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// The string used in the Play Store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be "1.4").
-    #[serde(rename="versionString")]
-    pub version_string: Option<String>,
-}
-
-impl Part for AppVersion {}
-
-
-/// The grouplicense resources for the enterprise.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list grouplicenses](struct.GrouplicenseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GroupLicensesListResponse {
-    /// A group license for a product approved for use in the enterprise.
-    #[serde(rename="groupLicense")]
-    pub group_license: Option<Vec<GroupLicense>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for GroupLicensesListResponse {}
-
-
-/// The device resources for the user.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list devices](struct.DeviceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DevicesListResponse {
-    /// A managed device.
-    pub device: Option<Vec<Device>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#devicesListResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for DevicesListResponse {}
-
-
-/// The existence of an install resource indicates that an app is installed on a particular device (or that an install is pending).
-/// 
-/// The API can be used to create an install resource using the update method. This triggers the actual install of the app on the device. If the user does not already have an entitlement for the app then an attempt is made to create one. If this fails (e.g. because the app is not free and there is no available license) then the creation of the install fails.
-/// 
-/// The API can also be used to update an installed app. If the update method is used on an existing install then the app will be updated to the latest available version.
-/// 
-/// Note that it is not possible to force the installation of a specific version of an app; the version code is read-only.
-/// 
-/// If a user installs an app themselves (as permitted by the enterprise), then again an install resource and possibly an entitlement resource are automatically created.
-/// 
-/// The API can also be used to delete an install resource, which triggers the removal of the app from the device. Note that deleting an install does not automatically remove the corresponding entitlement, even if there are no remaining installs. The install resource will also be deleted if the user uninstalls the app themselves.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch installs](struct.InstallPatchCall.html) (request|response)
-/// * [list installs](struct.InstallListCall.html) (none)
-/// * [delete installs](struct.InstallDeleteCall.html) (none)
-/// * [update installs](struct.InstallUpdateCall.html) (request|response)
-/// * [get installs](struct.InstallGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Install {
-    /// Install state. The state "installPending" means that an install request has recently been made and download to the device is in progress. The state "installed" means that the app has been installed. This field is read-only.
-    #[serde(rename="installState")]
-    pub install_state: Option<String>,
-    /// The version of the installed product. Guaranteed to be set only if the install state is "installed".
-    #[serde(rename="versionCode")]
-    pub version_code: Option<i32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#install".
-    pub kind: Option<String>,
-    /// The ID of the product that the install is for, e.g. "app:com.google.android.gm".
+    /// The list of product IDs making up the set of products.
     #[serde(rename="productId")]
-    pub product_id: Option<String>,
+    pub product_id: Option<Vec<String>>,
 }
 
-impl RequestValue for Install {}
-impl Resource for Install {}
-impl ResponseResult for Install {}
-
-
-/// An enterprise resource represents a binding between an organisation and their MDM.
-/// 
-/// To create an enterprise, an admin of the enterprise must first go through a Play for Work sign-up flow. At the end of this the admin will be presented with a token (a short opaque alphanumeric string). They must then present this to the MDM, who then supplies it to the enroll method. Until this is done the MDM will not have any access to the enterprise.
-/// 
-/// After calling enroll the MDM should call setAccount to specify the service account that will be allowed to act on behalf of the enterprise, which will be required for access to the enterprise's data through this API. Only one call of setAccount is allowed for a given enterprise; the only way to change the account later is to unenroll the enterprise and enroll it again (obtaining a new token).
-/// 
-/// The MDM can unenroll an enterprise in order to sever the binding between them. Re-enrolling an enterprise is possible, but requires a new token to be retrieved. Enterprises.unenroll requires the MDM's credentials (as enroll does), not the enterprise's. Enterprises.unenroll can only be used for enterprises that were previously enrolled with the enroll call. Any enterprises that were enrolled using the (deprecated) Enterprises.insert call must be unenrolled with Enterprises.delete and can then be re-enrolled using the Enterprises.enroll call.
-/// 
-/// The ID for an enterprise is an opaque string. It is returned by insert and enroll and can also be retrieved if the enterprise's primary domain is known using the list method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert enterprises](struct.EnterpriseInsertCall.html) (request|response)
-/// * [list enterprises](struct.EnterpriseListCall.html) (none)
-/// * [unenroll enterprises](struct.EnterpriseUnenrollCall.html) (none)
-/// * [set account enterprises](struct.EnterpriseSetAccountCall.html) (none)
-/// * [enroll enterprises](struct.EnterpriseEnrollCall.html) (request|response)
-/// * [delete enterprises](struct.EnterpriseDeleteCall.html) (none)
-/// * [get enterprises](struct.EnterpriseGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Enterprise {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprise".
-    pub kind: Option<String>,
-    /// The enterprise's primary domain, e.g. "example.com".
-    #[serde(rename="primaryDomain")]
-    pub primary_domain: Option<String>,
-    /// The unique ID for the enterprise.
-    pub id: Option<String>,
-    /// The name of the enterprise, e.g. "Example Inc".
-    pub name: Option<String>,
-}
-
-impl RequestValue for Enterprise {}
-impl Resource for Enterprise {}
-impl ResponseResult for Enterprise {}
-
-
-/// A UserToken is used by a user when setting up a managed device or profile with their work account on a device. When the user enters their email address and token (activation code) the appropriate MDM app can be automatically downloaded.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [generate token users](struct.UserGenerateTokenCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserToken {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".
-    pub kind: Option<String>,
-    /// The unique ID for the user.
-    #[serde(rename="userId")]
-    pub user_id: Option<String>,
-    /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.
-    pub token: Option<String>,
-}
-
-impl ResponseResult for UserToken {}
+impl RequestValue for ProductSet {}
+impl ResponseResult for ProductSet {}
 
 
 /// The state of a user's device, as accessed by the getState and setState methods on device resources.
@@ -619,8 +418,7 @@ pub struct Product {
     /// A link to the (consumer) Google Play details page for the product.
     #[serde(rename="detailsUrl")]
     pub details_url: Option<String>,
-    /// A string of the form app:
-    /// . For example, app:com.google.android.gm represents the Gmail app.
+    /// A string of the form app:<package name>. For example, app:com.google.android.gm represents the Gmail app.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -677,46 +475,6 @@ pub struct EntitlementsListResponse {
 impl ResponseResult for EntitlementsListResponse {}
 
 
-/// The collection resources for the enterprise.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list collections](struct.CollectionListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CollectionsListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionsListResponse".
-    pub kind: Option<String>,
-    /// An ordered collection of products which can be made visible on the Google Play Store app to a selected group of users.
-    pub collection: Option<Vec<Collection>>,
-}
-
-impl ResponseResult for CollectionsListResponse {}
-
-
-/// The matching user resources.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list users](struct.UserListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".
-    pub kind: Option<String>,
-    /// A user of an enterprise.
-    pub user: Option<Vec<User>>,
-}
-
-impl ResponseResult for UsersListResponse {}
-
-
 /// A collection resource defines a named set of apps that is visible to a set of users in the Google Play Store app running on those users' managed devices. Those users can then install any of those apps if they wish (which will trigger creation of install and entitlement resources). A user cannot install an app on a managed device unless the app is listed in at least one collection that is visible to that user.
 /// 
 /// Note that the API can be used to directly install an app regardless of whether it is in any collection - so an enterprise has a choice of either directly pushing apps to users, or allowing users to install apps if they want. Which is appropriate will depend on the enterprise's policies and the purpose of the apps concerned.
@@ -742,7 +500,9 @@ pub struct Collection {
     pub collection_id: Option<String>,
     /// A user-friendly name for the collection (should be unique), e.g. "Accounting apps".
     pub name: Option<String>,
-    /// Whether this collection is visible to all users, or only to the users that have been granted access through the collection_viewers api. Even if a collection is visible to allUsers, it is possible to add and remove viewers, but this will have no effect until the collection's visibility changes to viewersOnly.
+    /// Whether this collection is visible to all users, or only to the users that have been granted access through the "Collectionviewers" API. With the launch of the "setAvailableProductSet" API, this property should always be set to "viewersOnly", as the "allUsers" option will bypass the "availableProductSet" for all users within a domain.
+    /// 
+    /// The "allUsers" setting is deprecated, and will be removed.
     pub visibility: Option<String>,
     /// The IDs of the products in the collection, in the order in which they should be displayed.
     #[serde(rename="productId")]
@@ -752,6 +512,385 @@ pub struct Collection {
 impl RequestValue for Collection {}
 impl Resource for Collection {}
 impl ResponseResult for Collection {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [send test push notification enterprises](struct.EnterpriseSendTestPushNotificationCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnterprisesSendTestPushNotificationResponse {
+    /// The name of the Cloud Pub/Sub topic to which notifications for this enterprise's enrolled account will be sent.
+    #[serde(rename="topicName")]
+    pub topic_name: Option<String>,
+    /// The message ID of the test push notification that was sent.
+    #[serde(rename="messageId")]
+    pub message_id: Option<String>,
+}
+
+impl ResponseResult for EnterprisesSendTestPushNotificationResponse {}
+
+
+/// The user resources for the group license.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list grouplicenseusers](struct.GrouplicenseuserListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GroupLicenseUsersListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".
+    pub kind: Option<String>,
+    /// A user of an enterprise.
+    pub user: Option<Vec<User>>,
+}
+
+impl ResponseResult for GroupLicenseUsersListResponse {}
+
+
+/// Information on an approval URL.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApprovalUrlInfo {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#approvalUrlInfo".
+    pub kind: Option<String>,
+    /// A URL that displays a product's permissions and that can also be used to approve the product with the Products.approve call.
+    #[serde(rename="approvalUrl")]
+    pub approval_url: Option<String>,
+}
+
+impl Part for ApprovalUrlInfo {}
+
+
+/// A device resource represents a mobile device managed by the MDM and belonging to a specific enterprise user.
+/// 
+/// This collection cannot be modified via the API; it is automatically populated as devices are set up to be managed.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get devices](struct.DeviceGetCall.html) (response)
+/// * [get state devices](struct.DeviceGetStateCall.html) (none)
+/// * [list devices](struct.DeviceListCall.html) (none)
+/// * [set state devices](struct.DeviceSetStateCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Device {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".
+    pub kind: Option<String>,
+    /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".
+    #[serde(rename="androidId")]
+    pub android_id: Option<String>,
+    /// The mechanism by which this device is managed by the MDM. "managedDevice" means that the MDM's app is a device owner. "managedProfile" means that the MDM's app is the profile owner (and there is a separate personal profile which is not managed). "containerApp" means that the MDM's app is managing the Android for Work container app on the device.
+    #[serde(rename="managementType")]
+    pub management_type: Option<String>,
+}
+
+impl Resource for Device {}
+impl ResponseResult for Device {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate approval url products](struct.ProductGenerateApprovalUrlCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductsGenerateApprovalUrlResponse {
+    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
+    pub url: Option<String>,
+}
+
+impl ResponseResult for ProductsGenerateApprovalUrlResponse {}
+
+
+/// Represents the list of app restrictions available to be pre-configured for the product.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get app restrictions schema products](struct.ProductGetAppRestrictionsSchemaCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppRestrictionsSchema {
+    /// The set of restrictions that make up this schema.
+    pub restrictions: Option<Vec<AppRestrictionsSchemaRestriction>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#appRestrictionsSchema".
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for AppRestrictionsSchema {}
+
+
+/// A restriction in the App Restriction Schema represents a piece of configuration that may be pre-applied.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppRestrictionsSchemaRestriction {
+    /// The type of the restriction.
+    #[serde(rename="restrictionType")]
+    pub restriction_type: Option<String>,
+    /// A longer description of the restriction, giving more detail of what it affects.
+    pub description: Option<String>,
+    /// The unique key that the product uses to identify the restriction, e.g. "com.google.android.gm.fieldname".
+    pub key: Option<String>,
+    /// The name of the restriction.
+    pub title: Option<String>,
+    /// For choice or multiselect restrictions, the list of possible entries' human-readable names.
+    pub entry: Option<Vec<String>>,
+    /// The default value of the restriction.
+    #[serde(rename="defaultValue")]
+    pub default_value: Option<AppRestrictionsSchemaRestrictionRestrictionValue>,
+    /// For choice or multiselect restrictions, the list of possible entries' machine-readable values.
+    #[serde(rename="entryValue")]
+    pub entry_value: Option<Vec<String>>,
+}
+
+impl Part for AppRestrictionsSchemaRestriction {}
+
+
+/// A service account that can be used to authenticate as the enterprise to API calls that require such authentication.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set account enterprises](struct.EnterpriseSetAccountCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnterpriseAccount {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterpriseAccount".
+    pub kind: Option<String>,
+    /// The email address of the service account.
+    #[serde(rename="accountEmail")]
+    pub account_email: Option<String>,
+}
+
+impl RequestValue for EnterpriseAccount {}
+impl ResponseResult for EnterpriseAccount {}
+
+
+/// This represents a single version of the app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppVersion {
+    /// Unique increasing identifier for the app version.
+    #[serde(rename="versionCode")]
+    pub version_code: Option<i32>,
+    /// The string used in the Play Store by the app developer to identify the version. The string is not necessarily unique or localized (for example, the string could be "1.4").
+    #[serde(rename="versionString")]
+    pub version_string: Option<String>,
+}
+
+impl Part for AppVersion {}
+
+
+/// The grouplicense resources for the enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list grouplicenses](struct.GrouplicenseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GroupLicensesListResponse {
+    /// A group license for a product approved for use in the enterprise.
+    #[serde(rename="groupLicense")]
+    pub group_license: Option<Vec<GroupLicense>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicensesListResponse".
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for GroupLicensesListResponse {}
+
+
+/// The device resources for the user.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list devices](struct.DeviceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DevicesListResponse {
+    /// A managed device.
+    pub device: Option<Vec<Device>>,
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#devicesListResponse".
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for DevicesListResponse {}
+
+
+/// The matching enterprise resources.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list enterprises](struct.EnterpriseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnterprisesListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprisesListResponse".
+    pub kind: Option<String>,
+    /// An enterprise.
+    pub enterprise: Option<Vec<Enterprise>>,
+}
+
+impl ResponseResult for EnterprisesListResponse {}
+
+
+/// An enterprise resource represents a binding between an organisation and their MDM.
+/// 
+/// To create an enterprise, an admin of the enterprise must first go through a Play for Work sign-up flow. At the end of this the admin will be presented with a token (a short opaque alphanumeric string). They must then present this to the MDM, who then supplies it to the enroll method. Until this is done the MDM will not have any access to the enterprise.
+/// 
+/// After calling enroll the MDM should call setAccount to specify the service account that will be allowed to act on behalf of the enterprise, which will be required for access to the enterprise's data through this API. Only one call of setAccount is allowed for a given enterprise; the only way to change the account later is to unenroll the enterprise and enroll it again (obtaining a new token).
+/// 
+/// The MDM can unenroll an enterprise in order to sever the binding between them. Re-enrolling an enterprise is possible, but requires a new token to be retrieved. Enterprises.unenroll requires the MDM's credentials (as enroll does), not the enterprise's. Enterprises.unenroll can only be used for enterprises that were previously enrolled with the enroll call. Any enterprises that were enrolled using the (deprecated) Enterprises.insert call must be unenrolled with Enterprises.delete and can then be re-enrolled using the Enterprises.enroll call.
+/// 
+/// The ID for an enterprise is an opaque string. It is returned by insert and enroll and can also be retrieved if the enterprise's primary domain is known using the list method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [send test push notification enterprises](struct.EnterpriseSendTestPushNotificationCall.html) (none)
+/// * [list enterprises](struct.EnterpriseListCall.html) (none)
+/// * [unenroll enterprises](struct.EnterpriseUnenrollCall.html) (none)
+/// * [set account enterprises](struct.EnterpriseSetAccountCall.html) (none)
+/// * [delete enterprises](struct.EnterpriseDeleteCall.html) (none)
+/// * [enroll enterprises](struct.EnterpriseEnrollCall.html) (request|response)
+/// * [insert enterprises](struct.EnterpriseInsertCall.html) (request|response)
+/// * [get enterprises](struct.EnterpriseGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Enterprise {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterprise".
+    pub kind: Option<String>,
+    /// The enterprise's primary domain, e.g. "example.com".
+    #[serde(rename="primaryDomain")]
+    pub primary_domain: Option<String>,
+    /// The unique ID for the enterprise.
+    pub id: Option<String>,
+    /// The name of the enterprise, e.g. "Example Inc".
+    pub name: Option<String>,
+}
+
+impl RequestValue for Enterprise {}
+impl Resource for Enterprise {}
+impl ResponseResult for Enterprise {}
+
+
+/// A UserToken is used by a user when setting up a managed device or profile with their work account on a device. When the user enters their email address and token (activation code) the appropriate MDM app can be automatically downloaded.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [generate token users](struct.UserGenerateTokenCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserToken {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#userToken".
+    pub kind: Option<String>,
+    /// The unique ID for the user.
+    #[serde(rename="userId")]
+    pub user_id: Option<String>,
+    /// The token (activation code) to be entered by the user. This consists of a sequence of decimal digits. Note that the leading digit may be 0.
+    pub token: Option<String>,
+}
+
+impl ResponseResult for UserToken {}
+
+
+/// The user resources for the collection.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list collectionviewers](struct.CollectionviewerListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CollectionViewersListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionViewersListResponse".
+    pub kind: Option<String>,
+    /// A user of an enterprise.
+    pub user: Option<Vec<User>>,
+}
+
+impl ResponseResult for CollectionViewersListResponse {}
+
+
+/// The collection resources for the enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list collections](struct.CollectionListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CollectionsListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#collectionsListResponse".
+    pub kind: Option<String>,
+    /// An ordered collection of products which can be made visible on the Google Play Store to a selected group of users.
+    pub collection: Option<Vec<Collection>>,
+}
+
+impl ResponseResult for CollectionsListResponse {}
+
+
+/// The matching user resources.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list users](struct.UserListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersListResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#usersListResponse".
+    pub kind: Option<String>,
+    /// A user of an enterprise.
+    pub user: Option<Vec<User>>,
+}
+
+impl ResponseResult for UsersListResponse {}
 
 
 /// There is no detailed description.
@@ -798,94 +937,41 @@ impl RequestValue for ProductPermissions {}
 impl ResponseResult for ProductPermissions {}
 
 
-/// There is no detailed description.
+/// A user resource represents an individual user within the enterprise's domain.
+/// 
+/// Note that each user is associated with a Google account based on the user's corporate email address (which must be in one of the enterprise's domains). As part of installing an MDM app to manage a device the Google account must be provisioned to the device, and so the user resource must be created before that. This can be done using the Google Admin SDK Directory API.
+/// 
+/// The ID for a user is an opaque string. It can be retrieved using the list method queried by the user's primary email address.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [generate approval url products](struct.ProductGenerateApprovalUrlCall.html) (response)
+/// * [revoke token users](struct.UserRevokeTokenCall.html) (none)
+/// * [update collectionviewers](struct.CollectionviewerUpdateCall.html) (request|response)
+/// * [patch collectionviewers](struct.CollectionviewerPatchCall.html) (request|response)
+/// * [list users](struct.UserListCall.html) (none)
+/// * [get collectionviewers](struct.CollectionviewerGetCall.html) (response)
+/// * [set available product set users](struct.UserSetAvailableProductSetCall.html) (none)
+/// * [generate token users](struct.UserGenerateTokenCall.html) (none)
+/// * [get available product set users](struct.UserGetAvailableProductSetCall.html) (none)
+/// * [get users](struct.UserGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductsGenerateApprovalUrlResponse {
-    /// A URL that can be rendered in an iframe to display the permissions (if any) of a product. This URL can be used to approve the product only once and only within 24 hours of being generated, using the Products.approve call. If the product is currently unapproved and has no permissions, this URL will point to an empty page. If the product is currently approved, a URL will only be generated if that product has added permissions since it was last approved, and the URL will only display those new permissions that have not yet been accepted.
-    pub url: Option<String>,
-}
-
-impl ResponseResult for ProductsGenerateApprovalUrlResponse {}
-
-
-/// The user resources for the group license.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list grouplicenseusers](struct.GrouplicenseuserListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GroupLicenseUsersListResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#groupLicenseUsersListResponse".
+pub struct User {
+    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#user".
     pub kind: Option<String>,
-    /// A user of an enterprise.
-    pub user: Option<Vec<User>>,
+    /// The user's primary email, e.g. "jsmith@example.com".
+    #[serde(rename="primaryEmail")]
+    pub primary_email: Option<String>,
+    /// The unique ID for the user.
+    pub id: Option<String>,
 }
 
-impl ResponseResult for GroupLicenseUsersListResponse {}
-
-
-/// A service account that can be used to authenticate as the enterprise to API calls that require such authentication.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [set account enterprises](struct.EnterpriseSetAccountCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnterpriseAccount {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#enterpriseAccount".
-    pub kind: Option<String>,
-    /// The email address of the service account.
-    #[serde(rename="accountEmail")]
-    pub account_email: Option<String>,
-}
-
-impl RequestValue for EnterpriseAccount {}
-impl ResponseResult for EnterpriseAccount {}
-
-
-/// A device resource represents a mobile device managed by the MDM and belonging to a specific enterprise user.
-/// 
-/// This collection cannot be modified via the API; it is automatically populated as devices are set up to be managed.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get devices](struct.DeviceGetCall.html) (response)
-/// * [get state devices](struct.DeviceGetStateCall.html) (none)
-/// * [list devices](struct.DeviceListCall.html) (none)
-/// * [set state devices](struct.DeviceSetStateCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Device {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#device".
-    pub kind: Option<String>,
-    /// The Google Play Services Android ID for the device encoded as a lowercase hex string, e.g. "123456789abcdef0".
-    #[serde(rename="androidId")]
-    pub android_id: Option<String>,
-    /// The mechanism by which this device is managed by the MDM. "managedDevice" means that the MDM's app is a device owner. "managedProfile" means that the MDM's app is the profile owner (and there is a separate personal profile which is not managed). "containerApp" means that the MDM's app is managing the Android for Work container app on the device.
-    #[serde(rename="managementType")]
-    pub management_type: Option<String>,
-}
-
-impl Resource for Device {}
-impl ResponseResult for Device {}
+impl RequestValue for User {}
+impl Resource for User {}
+impl ResponseResult for User {}
 
 
 /// A group license object indicates a product that an enterprise admin has approved for use in the enterprise. The product may be free or paid. For free products, a group license object is created in these cases: if the enterprise admin approves a product in Google Play, if the product is added to a collection, or if an entitlement for the product is created for a user via the API. For paid products, a group license object is only created as part of the first bulk purchase of that product in Google Play by the enterprise admin.
@@ -923,41 +1009,6 @@ pub struct GroupLicense {
 
 impl Resource for GroupLicense {}
 impl ResponseResult for GroupLicense {}
-
-
-/// A user resource represents an individual user within the enterprise's domain.
-/// 
-/// Note that each user is associated with a Google account based on the user's corporate email address (which must be in one of the enterprise's domains). As part of installing an MDM app to manage a device the Google account must be provisioned to the device, and so the user resource must be created before that. This can be done using the Google Admin SDK Directory API.
-/// 
-/// The ID for a user is an opaque string. It can be retrieved using the list method queried by the user's primary email address.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [revoke token users](struct.UserRevokeTokenCall.html) (none)
-/// * [update collectionviewers](struct.CollectionviewerUpdateCall.html) (request|response)
-/// * [patch collectionviewers](struct.CollectionviewerPatchCall.html) (request|response)
-/// * [list users](struct.UserListCall.html) (none)
-/// * [get collectionviewers](struct.CollectionviewerGetCall.html) (response)
-/// * [generate token users](struct.UserGenerateTokenCall.html) (none)
-/// * [get users](struct.UserGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct User {
-    /// Identifies what kind of resource this is. Value: the fixed string "androidenterprise#user".
-    pub kind: Option<String>,
-    /// The user's primary email, e.g. "jsmith@example.com".
-    #[serde(rename="primaryEmail")]
-    pub primary_email: Option<String>,
-    /// The unique ID for the user.
-    pub id: Option<String>,
-}
-
-impl RequestValue for User {}
-impl Resource for User {}
-impl ResponseResult for User {}
 
 
 
@@ -1136,7 +1187,7 @@ impl<'a, C, A> CollectionviewerMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `generate_token(...)`, `get(...)`, `list(...)` and `revoke_token(...)`
+/// // like `generate_token(...)`, `get(...)`, `get_available_product_set(...)`, `list(...)`, `revoke_token(...)` and `set_available_product_set(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -1218,6 +1269,46 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// * `userId` - The ID of the user.
     pub fn generate_token(&self, enterprise_id: &str, user_id: &str) -> UserGenerateTokenCall<'a, C, A> {
         UserGenerateTokenCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
+            _user_id: user_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Modifies the set of products a user is entitled to access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    pub fn set_available_product_set(&self, request: ProductSet, enterprise_id: &str, user_id: &str) -> UserSetAvailableProductSetCall<'a, C, A> {
+        UserSetAvailableProductSetCall {
+            hub: self.hub,
+            _request: request,
+            _enterprise_id: enterprise_id.to_string(),
+            _user_id: user_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the set of products a user is entitled to access.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    /// * `userId` - The ID of the user.
+    pub fn get_available_product_set(&self, enterprise_id: &str, user_id: &str) -> UserGetAvailableProductSetCall<'a, C, A> {
+        UserGetAvailableProductSetCall {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _user_id: user_id.to_string(),
@@ -1536,7 +1627,7 @@ impl<'a, C, A> DeviceMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `enroll(...)`, `get(...)`, `insert(...)`, `list(...)`, `set_account(...)` and `unenroll(...)`
+/// // like `delete(...)`, `enroll(...)`, `get(...)`, `insert(...)`, `list(...)`, `send_test_push_notification(...)`, `set_account(...)` and `unenroll(...)`
 /// // to build up your call.
 /// let rb = hub.enterprises();
 /// # }
@@ -1581,6 +1672,23 @@ impl<'a, C, A> EnterpriseMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _token: token.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise.
+    /// 
+    /// # Arguments
+    ///
+    /// * `enterpriseId` - The ID of the enterprise.
+    pub fn send_test_push_notification(&self, enterprise_id: &str) -> EnterpriseSendTestPushNotificationCall<'a, C, A> {
+        EnterpriseSendTestPushNotificationCall {
+            hub: self.hub,
+            _enterprise_id: enterprise_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1797,14 +1905,14 @@ impl<'a, C, A> CollectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the details of a collection.
+    /// Deletes a collection.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `collectionId` - The ID of the collection.
-    pub fn get(&self, enterprise_id: &str, collection_id: &str) -> CollectionGetCall<'a, C, A> {
-        CollectionGetCall {
+    pub fn delete(&self, enterprise_id: &str, collection_id: &str) -> CollectionDeleteCall<'a, C, A> {
+        CollectionDeleteCall {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _collection_id: collection_id.to_string(),
@@ -1816,14 +1924,14 @@ impl<'a, C, A> CollectionMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a collection.
+    /// Retrieves the details of a collection.
     /// 
     /// # Arguments
     ///
     /// * `enterpriseId` - The ID of the enterprise.
     /// * `collectionId` - The ID of the collection.
-    pub fn delete(&self, enterprise_id: &str, collection_id: &str) -> CollectionDeleteCall<'a, C, A> {
-        CollectionDeleteCall {
+    pub fn get(&self, enterprise_id: &str, collection_id: &str) -> CollectionGetCall<'a, C, A> {
+        CollectionGetCall {
             hub: self.hub,
             _enterprise_id: enterprise_id.to_string(),
             _collection_id: collection_id.to_string(),
@@ -4665,6 +4773,533 @@ impl<'a, C, A> UserGenerateTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> UserGenerateTokenCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Modifies the set of products a user is entitled to access.
+///
+/// A builder for the *setAvailableProductSet* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// use androidenterprise1::ProductSet;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ProductSet::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().set_available_product_set(req, "enterpriseId", "userId")
+///              .doit();
+/// # }
+/// ```
+pub struct UserSetAvailableProductSetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _request: ProductSet,
+    _enterprise_id: String,
+    _user_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserSetAvailableProductSetCall<'a, C, A> {}
+
+impl<'a, C, A> UserSetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductSet)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.users.setAvailableProductSet", 
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("userId", self._user_id.to_string()));
+        for &field in ["alt", "enterpriseId", "userId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/availableProductSet".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["userId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader = 
+            {
+                let mut value = json::value::to_value(&self._request);
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ProductSet) -> UserSetAvailableProductSetCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> UserSetAvailableProductSetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserSetAvailableProductSetCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSetAvailableProductSetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserSetAvailableProductSetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserSetAvailableProductSetCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
+/// Retrieves the set of products a user is entitled to access.
+///
+/// A builder for the *getAvailableProductSet* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().get_available_product_set("enterpriseId", "userId")
+///              .doit();
+/// # }
+/// ```
+pub struct UserGetAvailableProductSetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _user_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserGetAvailableProductSetCall<'a, C, A> {}
+
+impl<'a, C, A> UserGetAvailableProductSetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ProductSet)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.users.getAvailableProductSet", 
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("userId", self._user_id.to_string()));
+        for &field in ["alt", "enterpriseId", "userId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/availableProductSet".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{userId}", "userId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["userId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> UserGetAvailableProductSetCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the user.
+    ///
+    /// Sets the *user id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn user_id(mut self, new_value: &str) -> UserGetAvailableProductSetCall<'a, C, A> {
+        self._user_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserGetAvailableProductSetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetAvailableProductSetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> UserGetAvailableProductSetCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -7601,6 +8236,242 @@ impl<'a, C, A> EnterpriseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise.
+///
+/// A builder for the *sendTestPushNotification* method supported by a *enterprise* resource.
+/// It is not used directly, but through a `EnterpriseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().send_test_push_notification("enterpriseId")
+///              .doit();
+/// # }
+/// ```
+pub struct EnterpriseSendTestPushNotificationCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EnterpriseSendTestPushNotificationCall<'a, C, A> {}
+
+impl<'a, C, A> EnterpriseSendTestPushNotificationCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, EnterprisesSendTestPushNotificationResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.enterprises.sendTestPushNotification", 
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        for &field in ["alt", "enterpriseId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = "https://www.googleapis.com/androidenterprise/v1/enterprises/{enterpriseId}/sendTestPushNotification".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> EnterpriseSendTestPushNotificationCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EnterpriseSendTestPushNotificationCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseSendTestPushNotificationCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> EnterpriseSendTestPushNotificationCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Looks up an enterprise by domain name.
 ///
 /// A builder for the *list* method supported by a *enterprise* resource.
@@ -9851,6 +10722,243 @@ impl<'a, C, A> CollectionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Deletes a collection.
+///
+/// A builder for the *delete* method supported by a *collection* resource.
+/// It is not used directly, but through a `CollectionMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_androidenterprise1 as androidenterprise1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use androidenterprise1::AndroidEnterprise;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::new(),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.collections().delete("enterpriseId", "collectionId")
+///              .doit();
+/// # }
+/// ```
+pub struct CollectionDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a AndroidEnterprise<C, A>,
+    _enterprise_id: String,
+    _collection_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for CollectionDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> CollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "androidenterprise.collections.delete", 
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("enterpriseId", self._enterprise_id.to_string()));
+        params.push(("collectionId", self._collection_id.to_string()));
+        for &field in ["enterpriseId", "collectionId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = "https://www.googleapis.com/androidenterprise/v1/enterprises/{enterpriseId}/collections/{collectionId}".to_string();
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{collectionId}", "collectionId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["collectionId", "enterpriseId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+        
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
+                                                             access_token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep_ms(d.num_milliseconds() as u32);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep_ms(d.num_milliseconds() as u32);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The ID of the enterprise.
+    ///
+    /// Sets the *enterprise id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn enterprise_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
+        self._enterprise_id = new_value.to_string();
+        self
+    }
+    /// The ID of the collection.
+    ///
+    /// Sets the *collection id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call, 
+    /// we provide this method for API completeness.
+    pub fn collection_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
+        self._collection_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own 
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    /// 
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> CollectionDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    /// 
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// 
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T>(mut self, scope: T) -> CollectionDeleteCall<'a, C, A> 
+                                                        where T: AsRef<str> {
+        self._scopes.insert(scope.as_ref().to_string(), ());
+        self
+    }
+}
+
+
 /// Retrieves the details of a collection.
 ///
 /// A builder for the *get* method supported by a *collection* resource.
@@ -10092,243 +11200,6 @@ impl<'a, C, A> CollectionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T>(mut self, scope: T) -> CollectionGetCall<'a, C, A> 
-                                                        where T: AsRef<str> {
-        self._scopes.insert(scope.as_ref().to_string(), ());
-        self
-    }
-}
-
-
-/// Deletes a collection.
-///
-/// A builder for the *delete* method supported by a *collection* resource.
-/// It is not used directly, but through a `CollectionMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidenterprise1 as androidenterprise1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidenterprise1::AndroidEnterprise;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::new(),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidEnterprise::new(hyper::Client::new(), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.collections().delete("enterpriseId", "collectionId")
-///              .doit();
-/// # }
-/// ```
-pub struct CollectionDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidEnterprise<C, A>,
-    _enterprise_id: String,
-    _collection_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for CollectionDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> CollectionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidenterprise.collections.delete", 
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("enterpriseId", self._enterprise_id.to_string()));
-        params.push(("collectionId", self._collection_id.to_string()));
-        for &field in ["enterpriseId", "collectionId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = "https://www.googleapis.com/androidenterprise/v1/enterprises/{enterpriseId}/collections/{collectionId}".to_string();
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{enterpriseId}", "enterpriseId"), ("{collectionId}", "collectionId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["collectionId", "enterpriseId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-        
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(oauth2::Scheme { token_type: oauth2::TokenType::Bearer,
-                                                             access_token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ID of the enterprise.
-    ///
-    /// Sets the *enterprise id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn enterprise_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
-        self._enterprise_id = new_value.to_string();
-        self
-    }
-    /// The ID of the collection.
-    ///
-    /// Sets the *collection id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call, 
-    /// we provide this method for API completeness.
-    pub fn collection_id(mut self, new_value: &str) -> CollectionDeleteCall<'a, C, A> {
-        self._collection_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> CollectionDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    /// 
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> CollectionDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    /// 
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// 
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T>(mut self, scope: T) -> CollectionDeleteCall<'a, C, A> 
                                                         where T: AsRef<str> {
         self._scopes.insert(scope.as_ref().to_string(), ());
         self
@@ -11428,7 +12299,7 @@ impl<'a, C, A> EntitlementGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.entitlements().patch(req, "enterpriseId", "userId", "entitlementId")
-///              .install(true)
+///              .install(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12222,7 +13093,7 @@ impl<'a, C, A> ProductGetPermissionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get("enterpriseId", "productId")
-///              .language("At")
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -12750,7 +13621,7 @@ impl<'a, C, A> ProductApproveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().get_app_restrictions_schema("enterpriseId", "productId")
-///              .language("rebum.")
+///              .language("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -13291,7 +14162,7 @@ impl<'a, C, A> ProductUpdatePermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.products().generate_approval_url("enterpriseId", "productId")
-///              .language_code("sit")
+///              .language_code("tempor")
 ///              .doit();
 /// # }
 /// ```
@@ -14035,7 +14906,7 @@ impl<'a, C, A> GrouplicenseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("permissionId")
-///              .language("ea")
+///              .language("dolores")
 ///              .doit();
 /// # }
 /// ```

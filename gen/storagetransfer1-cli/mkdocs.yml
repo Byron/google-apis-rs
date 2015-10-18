@@ -1,0 +1,28 @@
+site_name: storagetransfer v0.3.2+20150811
+site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['google-service-accounts_get.md', 'Google Service Accounts', 'Get']
+- ['methods_get-google-service-account.md', 'Methods', 'Get Google Service Account']
+- ['transfer-jobs_create.md', 'Transfer Jobs', 'Create']
+- ['transfer-jobs_get.md', 'Transfer Jobs', 'Get']
+- ['transfer-jobs_list.md', 'Transfer Jobs', 'List']
+- ['transfer-jobs_patch.md', 'Transfer Jobs', 'Patch']
+- ['transfer-operations_cancel.md', 'Transfer Operations', 'Cancel']
+- ['transfer-operations_delete.md', 'Transfer Operations', 'Delete']
+- ['transfer-operations_get.md', 'Transfer Operations', 'Get']
+- ['transfer-operations_list.md', 'Transfer Operations', 'List']
+- ['transfer-operations_pause.md', 'Transfer Operations', 'Pause']
+- ['transfer-operations_resume.md', 'Transfer Operations', 'Resume']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

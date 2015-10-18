@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *compute* API at revision *20150713*. The CLI is at version *0.3.2*.
+This documentation was generated from the *compute* API at revision *20151015*. The CLI is at version *0.3.2*.
 
 ```bash
 compute1 [options]
@@ -98,6 +98,13 @@ compute1 [options]
                 list <project> [-p <v>]... [-o <out>]
                 patch <project> <http-health-check> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project> <http-health-check> (-r <kv>)... [-p <v>]... [-o <out>]
+        https-health-checks
+                delete <project> <https-health-check> [-p <v>]... [-o <out>]
+                get <project> <https-health-check> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                patch <project> <https-health-check> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <https-health-check> (-r <kv>)... [-p <v>]... [-o <out>]
         images
                 delete <project> <image> [-p <v>]... [-o <out>]
                 deprecate <project> <image> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -183,12 +190,24 @@ compute1 [options]
                 delete <project> <snapshot> [-p <v>]... [-o <out>]
                 get <project> <snapshot> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+        ssl-certificates
+                delete <project> <ssl-certificate> [-p <v>]... [-o <out>]
+                get <project> <ssl-certificate> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
         target-http-proxies
                 delete <project> <target-http-proxy> [-p <v>]... [-o <out>]
                 get <project> <target-http-proxy> [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
                 set-url-map <project> <target-http-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
+        target-https-proxies
+                delete <project> <target-https-proxy> [-p <v>]... [-o <out>]
+                get <project> <target-https-proxy> [-p <v>]... [-o <out>]
+                insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <project> [-p <v>]... [-o <out>]
+                set-ssl-certificates <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-url-map <project> <target-https-proxy> (-r <kv>)... [-p <v>]... [-o <out>]
         target-instances
                 aggregated-list <project> [-p <v>]... [-o <out>]
                 delete <project> <zone> <target-instance> [-p <v>]... [-o <out>]

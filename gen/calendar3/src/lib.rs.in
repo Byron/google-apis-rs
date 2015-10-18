@@ -207,11 +207,11 @@ pub struct EventGadget {
     pub preferences: Option<HashMap<String, String>>,
     /// The gadget's title.
     pub title: Option<String>,
-    /// The gadget's height in pixels. Optional.
+    /// The gadget's height in pixels. The height must be an integer greater than 0. Optional.
     pub height: Option<i32>,
-    /// The gadget's width in pixels. Optional.
+    /// The gadget's width in pixels. The width must be an integer greater than 0. Optional.
     pub width: Option<i32>,
-    /// The gadget's URL.
+    /// The gadget's URL. The URL scheme must be HTTPS.
     pub link: Option<String>,
     /// The gadget's type.
     #[serde(rename="type")]
@@ -220,7 +220,7 @@ pub struct EventGadget {
     /// - "icon" - The gadget displays next to the event's title in the calendar view. 
     /// - "chip" - The gadget displays when the event is clicked.
     pub display: Option<String>,
-    /// The gadget's icon URL.
+    /// The gadget's icon URL. The URL scheme must be HTTPS.
     #[serde(rename="iconLink")]
     pub icon_link: Option<String>,
 }
@@ -310,7 +310,7 @@ pub struct EventAttachment {
     #[serde(rename="fileUrl")]
     pub file_url: Option<String>,
     /// ID of the attached file. Read-only.
-    /// E.g. for Google Drive files this is the ID of the corresponding Files resource entry in the Drive API.
+    /// For Google Drive files, this is the ID of the corresponding Files resource entry in the Drive API.
     #[serde(rename="fileId")]
     pub file_id: Option<String>,
     /// Attachment title.
@@ -342,7 +342,7 @@ pub struct Calendar {
     pub etag: Option<String>,
     /// Description of the calendar. Optional.
     pub description: Option<String>,
-    /// Identifier of the calendar.
+    /// Identifier of the calendar. To retrieve IDs call the calendarList.list() method.
     pub id: Option<String>,
     /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.
     #[serde(rename="timeZone")]
@@ -392,13 +392,13 @@ pub struct CalendarListEntry {
     pub id: Option<String>,
     /// Type of the resource ("calendar#calendarListEntry").
     pub kind: Option<String>,
-    /// The foreground color of the calendar in the hexadecimal format "#ffffff". This property supersedes the index-based colorId property. Optional.
+    /// The foreground color of the calendar in the hexadecimal format "#ffffff". This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true in the parameters of the insert, update and patch methods. Optional.
     #[serde(rename="foregroundColor")]
     pub foreground_color: Option<String>,
     /// The default reminders that the authenticated user has for this calendar.
     #[serde(rename="defaultReminders")]
     pub default_reminders: Option<Vec<EventReminder>>,
-    /// The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). Optional.
+    /// The color of the calendar. This is an ID referring to an entry in the calendar section of the colors definition (see the colors endpoint). This property is superseded by the backgroundColor and foregroundColor properties and can be ignored when using these properties. Optional.
     #[serde(rename="colorId")]
     pub color_id: Option<String>,
     /// Whether the calendar content shows up in the calendar UI. Optional. The default is False.
@@ -409,7 +409,7 @@ pub struct CalendarListEntry {
     pub etag: Option<String>,
     /// Geographic location of the calendar as free-form text. Optional. Read-only.
     pub location: Option<String>,
-    /// The main color of the calendar in the hexadecimal format "#0088aa". This property supersedes the index-based colorId property. Optional.
+    /// The main color of the calendar in the hexadecimal format "#0088aa". This property supersedes the index-based colorId property. To set or change this property, you need to specify colorRgbFormat=true in the parameters of the insert, update and patch methods. Optional.
     #[serde(rename="backgroundColor")]
     pub background_color: Option<String>,
     /// The summary that the authenticated user has set for this calendar. Optional.
@@ -466,7 +466,7 @@ pub struct EventDateTime {
     /// The time zone in which the time is specified. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) For recurring events this field is required and specifies the time zone in which the recurrence is expanded. For single events this field is optional and indicates a custom time zone for the event start/end.
     #[serde(rename="timeZone")]
     pub time_zone: Option<String>,
-    /// The time, as a combined date-time value (formatted according to RFC 3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.
+    /// The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone.
     #[serde(rename="dateTime")]
     pub date_time: Option<String>,
 }
@@ -515,7 +515,7 @@ pub struct EventCreator {
     pub display_name: Option<String>,
     /// The creator's email address, if available.
     pub email: Option<String>,
-    /// The creator's Profile ID, if available.
+    /// The creator's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
     pub id: Option<String>,
 }
 
@@ -629,7 +629,7 @@ pub struct Events {
     pub description: Option<String>,
     /// List of events on the calendar.
     pub items: Option<Vec<Event>>,
-    /// Last modification time of the calendar (as a RFC 3339 timestamp). Read-only.
+    /// Last modification time of the calendar (as a RFC3339 timestamp). Read-only.
     pub updated: Option<String>,
     /// Title of the calendar. Read-only.
     pub summary: Option<String>,
@@ -713,9 +713,9 @@ pub struct EventAttendee {
     /// Whether this entry represents the calendar on which this copy of the event appears. Read-only. The default is False.
     #[serde(rename="self")]
     pub self_: Option<bool>,
-    /// The attendee's email address, if available. This field must be present when adding an attendee.
+    /// The attendee's email address, if available. This field must be present when adding an attendee. It must be a valid email address as per RFC5322.
     pub email: Option<String>,
-    /// The attendee's Profile ID, if available.
+    /// The attendee's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
     pub id: Option<String>,
     /// Number of additional guests. Optional. The default is 0.
     #[serde(rename="additionalGuests")]
@@ -759,7 +759,7 @@ impl Part for FreeBusyGroup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminders {
-    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event.
+    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event. The maximum number of override reminders is 5.
     pub overrides: Option<Vec<EventReminder>>,
     /// Whether the default reminders of the calendar apply to the event.
     #[serde(rename="useDefault")]
@@ -866,13 +866,13 @@ impl ResponseResult for FreeBusyResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Colors {
-    /// Palette of calendar colors, mapping from the color ID to its definition. A calendarListEntry resource refers to one of these color IDs in its color field. Read-only.
+    /// A global palette of calendar colors, mapping from the color ID to its definition. A calendarListEntry resource refers to one of these color IDs in its color field. Read-only.
     pub calendar: Option<HashMap<String, ColorDefinition>>,
-    /// Last modification time of the color palette (as a RFC 3339 timestamp). Read-only.
+    /// Last modification time of the color palette (as a RFC3339 timestamp). Read-only.
     pub updated: Option<String>,
     /// Type of the resource ("calendar#colors").
     pub kind: Option<String>,
-    /// Palette of event colors, mapping from the color ID to its definition. An event resource may refer to one of these color IDs in its color field. Read-only.
+    /// A global palette of event colors, mapping from the color ID to its definition. An event resource may refer to one of these color IDs in its color field. Read-only.
     pub event: Option<HashMap<String, ColorDefinition>>,
 }
 
@@ -912,13 +912,13 @@ pub struct FreeBusyRequest {
 impl RequestValue for FreeBusyRequest {}
 
 
-/// Source of an event from which it was created; for example a web page, an email message or any document identifiable by an URL using HTTP/HTTPS protocol. Accessible only by the creator of the event.
+/// Source from which the event was created. For example, a web page, an email message or any document identifiable by an URL with HTTP or HTTPS scheme. Can only be seen or modified by the creator of the event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventSource {
-    /// URL of the source pointing to a resource. URL's protocol must be HTTP or HTTPS.
+    /// URL of the source pointing to a resource. The URL scheme must be HTTP or HTTPS.
     pub url: Option<String>,
     /// Title of the source; for example a title of a web page or an email subject.
     pub title: Option<String>,
@@ -940,9 +940,9 @@ pub struct EventOrganizer {
     /// The organizer's name, if available.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// The organizer's email address, if available.
+    /// The organizer's email address, if available. It must be a valid email address as per RFC5322.
     pub email: Option<String>,
-    /// The organizer's Profile ID, if available.
+    /// The organizer's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
     pub id: Option<String>,
 }
 
@@ -956,11 +956,11 @@ impl Part for EventOrganizer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminder {
-    /// Number of minutes before the start of the event when the reminder should trigger.
+    /// Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes).
     pub minutes: Option<i32>,
     /// The method used by this reminder. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. They are only available for Google Apps for Work, Education, and Government customers. Requests to set SMS reminders for the other accounts will be ignored. 
+    /// - "sms" - Reminders are sent via SMS. These are only available for Google Apps for Work, Education, and Government customers. Requests to set SMS reminders for other account types are ignored. 
     /// - "popup" - Reminders are sent via a UI popup.
     pub method: Option<String>,
 }
@@ -999,7 +999,7 @@ pub struct CalendarNotification {
     pub type_: Option<String>,
     /// The method used to deliver the notification. Possible values are:  
     /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. Furthermore, SMS reminders are only available for Google Apps for Work, Education, and Government customers.
+    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS reminders are only available for Google Apps for Work, Education, and Government customers.
     pub method: Option<String>,
 }
 
@@ -1035,10 +1035,12 @@ pub struct Event {
     pub creator: Option<EventCreator>,
     /// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
     pub organizer: Option<EventOrganizer>,
-    /// Identifier of the event. When creating new single or recurring events, you can specify their IDs. Provided IDs must follow these rules:  
+    /// Opaque identifier of the event. When creating new single or recurring events, you can specify their IDs. Provided IDs must follow these rules:  
     /// - characters allowed in the ID are those used in base32hex encoding, i.e. lowercase letters a-v and digits 0-9, see section 3.1.2 in RFC2938 
     /// - the length of the ID must be between 5 and 1024 characters 
     /// - the ID must be unique per calendar  Due to the globally distributed nature of the system, we cannot guarantee that ID collisions will be detected at event creation time. To minimize the risk of collisions we recommend using an established UUID algorithm such as one described in RFC4122.
+    /// If you do not specify an ID, it will be automatically generated by the server.
+    /// Note that the icalUID and the id are not identical and only one of them should be supplied at event creation time. One difference in their semantics is that in recurring events, all occurrences of one event have different ids while they all share the same icalUIDs.
     pub id: Option<String>,
     /// An absolute link to the Google+ hangout associated with this event. Read-only.
     #[serde(rename="hangoutLink")]
@@ -1046,22 +1048,22 @@ pub struct Event {
     /// Whether attendees other than the organizer can invite others to the event. Optional. The default is True.
     #[serde(rename="guestsCanInviteOthers")]
     pub guests_can_invite_others: Option<bool>,
-    /// The attendees of the event.
+    /// The attendees of the event. See the Events with attendees guide for more information on scheduling events with other calendar users.
     pub attendees: Option<Vec<EventAttendee>>,
     /// The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.
     pub start: Option<EventDateTime>,
     /// An absolute link to this event in the Google Calendar Web UI. Read-only.
     #[serde(rename="htmlLink")]
     pub html_link: Option<String>,
-    /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event. This field is omitted for single events or instances of recurring events.
+    /// List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event, as specified in RFC5545. Note that DTSTART and DTEND lines are not allowed in this field; event start and end times are specified in the start and end fields. This field is omitted for single events or instances of recurring events.
     pub recurrence: Option<Vec<String>>,
-    /// Source of an event from which it was created; for example a web page, an email message or any document identifiable by an URL using HTTP/HTTPS protocol. Accessible only by the creator of the event.
+    /// Source from which the event was created. For example, a web page, an email message or any document identifiable by an URL with HTTP or HTTPS scheme. Can only be seen or modified by the creator of the event.
     pub source: Option<EventSource>,
     /// ETag of the resource.
     pub etag: Option<String>,
     /// Geographic location of the event as free-form text. Optional.
     pub location: Option<String>,
-    /// For an instance of a recurring event, this is the event ID of the recurring event itself. Immutable.
+    /// For an instance of a recurring event, this is the id of the recurring event to which this instance belongs. Immutable.
     #[serde(rename="recurringEventId")]
     pub recurring_event_id: Option<String>,
     /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. Immutable.
@@ -1072,11 +1074,12 @@ pub struct Event {
     /// - "tentative" - The event is tentatively confirmed. 
     /// - "cancelled" - The event is cancelled.
     pub status: Option<String>,
-    /// Last modification time of the event (as a RFC 3339 timestamp). Read-only.
+    /// Last modification time of the event (as a RFC3339 timestamp). Read-only.
     pub updated: Option<String>,
     /// Description of the event. Optional.
     pub description: Option<String>,
-    /// Event ID in the iCalendar format.
+    /// Event unique identifier as defined in RFC5545. It is used to uniquely identify events accross calendaring systems and must be supplied when importing events via the import method.
+    /// Note that the icalUID and the id are not identical and only one of them should be supplied at event creation time. One difference in their semantics is that in recurring events, all occurrences of one event have different ids while they all share the same icalUIDs.
     #[serde(rename="iCalUID")]
     pub i_cal_uid: Option<String>,
     /// A gadget that extends this event.
@@ -1104,7 +1107,7 @@ pub struct Event {
     pub kind: Option<String>,
     /// Whether this is a locked event copy where no changes can be made to the main event fields "summary", "description", "location", "start", "end" or "recurrence". The default is False. Read-Only.
     pub locked: Option<bool>,
-    /// Creation time of the event (as a RFC 3339 timestamp). Read-only.
+    /// Creation time of the event (as a RFC3339 timestamp). Read-only.
     pub created: Option<String>,
     /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
     #[serde(rename="colorId")]
@@ -1337,7 +1340,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn update(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, C, A> {
         CalendarListUpdateCall {
             hub: self.hub,
@@ -1356,7 +1359,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, C, A> {
         CalendarListDeleteCall {
             hub: self.hub,
@@ -1373,7 +1376,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, C, A> {
         CalendarListGetCall {
             hub: self.hub,
@@ -1427,7 +1430,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn patch(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, C, A> {
         CalendarListPatchCall {
             hub: self.hub,
@@ -1511,7 +1514,7 @@ impl<'a, C, A> CalendarMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn patch(&self, request: Calendar, calendar_id: &str) -> CalendarPatchCall<'a, C, A> {
         CalendarPatchCall {
             hub: self.hub,
@@ -1529,7 +1532,7 @@ impl<'a, C, A> CalendarMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, C, A> {
         CalendarDeleteCall {
             hub: self.hub,
@@ -1546,7 +1549,7 @@ impl<'a, C, A> CalendarMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, C, A> {
         CalendarGetCall {
             hub: self.hub,
@@ -1563,7 +1566,7 @@ impl<'a, C, A> CalendarMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, C, A> {
         CalendarClearCall {
             hub: self.hub,
@@ -1598,7 +1601,7 @@ impl<'a, C, A> CalendarMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn update(&self, request: Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, C, A> {
         CalendarUpdateCall {
             hub: self.hub,
@@ -1658,7 +1661,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn watch(&self, request: Channel, calendar_id: &str) -> AclWatchCall<'a, C, A> {
         AclWatchCall {
             hub: self.hub,
@@ -1681,7 +1684,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn insert(&self, request: AclRule, calendar_id: &str) -> AclInsertCall<'a, C, A> {
         AclInsertCall {
             hub: self.hub,
@@ -1700,7 +1703,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
     pub fn update(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, C, A> {
         AclUpdateCall {
@@ -1721,7 +1724,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
     pub fn patch(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, C, A> {
         AclPatchCall {
@@ -1741,7 +1744,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn list(&self, calendar_id: &str) -> AclListCall<'a, C, A> {
         AclListCall {
             hub: self.hub,
@@ -1762,7 +1765,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
     pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, C, A> {
         AclDeleteCall {
@@ -1781,7 +1784,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
     pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, C, A> {
         AclGetCall {
@@ -1952,7 +1955,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
     pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, C, A> {
         EventDeleteCall {
@@ -1973,7 +1976,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn insert(&self, request: Event, calendar_id: &str) -> EventInsertCall<'a, C, A> {
         EventInsertCall {
             hub: self.hub,
@@ -1995,7 +1998,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn import(&self, request: Event, calendar_id: &str) -> EventImportCall<'a, C, A> {
         EventImportCall {
             hub: self.hub,
@@ -2014,7 +2017,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Recurring event identifier.
     pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, C, A> {
         EventInstanceCall {
@@ -2042,7 +2045,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
     pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, C, A> {
         EventGetCall {
@@ -2064,7 +2067,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn list(&self, calendar_id: &str) -> EventListCall<'a, C, A> {
         EventListCall {
             hub: self.hub,
@@ -2099,7 +2102,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
     pub fn patch(&self, request: Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, C, A> {
         EventPatchCall {
@@ -2146,7 +2149,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
     pub fn update(&self, request: Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, C, A> {
         EventUpdateCall {
@@ -2171,7 +2174,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     pub fn watch(&self, request: Channel, calendar_id: &str) -> EventWatchCall<'a, C, A> {
         EventWatchCall {
             hub: self.hub,
@@ -2206,7 +2209,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `calendarId` - Calendar identifier.
+    /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `text` - The text describing the event to be created.
     pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, C, A> {
         EventQuickAddCall {
@@ -3424,7 +3427,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -3656,7 +3659,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -3892,7 +3895,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -4689,7 +4692,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -5273,7 +5276,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -5498,7 +5501,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -5734,7 +5737,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -5959,7 +5962,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -6460,7 +6463,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -6747,7 +6750,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -7045,7 +7048,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -7314,7 +7317,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -7593,7 +7596,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -7859,7 +7862,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -8117,7 +8120,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -8365,7 +8368,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -9033,7 +9036,7 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -9332,7 +9335,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -9625,7 +9628,7 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -9915,7 +9918,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -9942,14 +9945,14 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C, A> {
@@ -10241,7 +10244,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -10601,7 +10604,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -10611,7 +10614,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
+    /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
@@ -10625,14 +10628,14 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, e.g., 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but will be ignored.
     ///
     /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, e.g., 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but will be ignored.
     ///
     /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C, A> {
@@ -11024,7 +11027,7 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -11623,7 +11626,7 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -12021,7 +12024,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///
@@ -12031,7 +12034,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._calendar_id = new_value.to_string();
         self
     }
-    /// Lower bound for an event's last modification time (as a RFC 3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
+    /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
     pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
@@ -12045,14 +12048,14 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._time_zone = Some(new_value.to_string());
         self
     }
-    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time.
+    /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, e.g., 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but will be ignored.
     ///
     /// Sets the *time min* query property to the given value.
     pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
         self._time_min = Some(new_value.to_string());
         self
     }
-    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time.
+    /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, e.g., 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but will be ignored.
     ///
     /// Sets the *time max* query property to the given value.
     pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C, A> {
@@ -12398,7 +12401,7 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Calendar identifier.
+    /// Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     ///
     /// Sets the *calendar id* path property to the given value.
     ///

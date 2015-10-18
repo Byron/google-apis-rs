@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *webmasters* API at revision *20150624*. The CLI is at version *0.3.2*.
+This documentation was generated from the *webmasters* API at revision *20150804*. The CLI is at version *0.3.2*.
 
 ```bash
 webmasters3 [options]

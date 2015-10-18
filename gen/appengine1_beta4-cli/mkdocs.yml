@@ -1,0 +1,27 @@
+site_name: appengine v0.3.2+20150831
+site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta4-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['apps_get.md', 'Apps', 'Get']
+- ['apps_modules-delete.md', 'Apps', 'Modules Delete']
+- ['apps_modules-get.md', 'Apps', 'Modules Get']
+- ['apps_modules-list.md', 'Apps', 'Modules List']
+- ['apps_modules-patch.md', 'Apps', 'Modules Patch']
+- ['apps_modules-versions-create.md', 'Apps', 'Modules Versions Create']
+- ['apps_modules-versions-delete.md', 'Apps', 'Modules Versions Delete']
+- ['apps_modules-versions-get.md', 'Apps', 'Modules Versions Get']
+- ['apps_modules-versions-list.md', 'Apps', 'Modules Versions List']
+- ['apps_operations-get.md', 'Apps', 'Operations Get']
+- ['apps_operations-list.md', 'Apps', 'Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

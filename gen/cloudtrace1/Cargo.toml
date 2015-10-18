@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-cloudtrace1"
+version = "0.1.9+20150825"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with cloudtrace (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtrace1"
+homepage = "https://cloud.google.com/tools/cloud-trace"
+documentation = "http://byron.github.io/google-apis-rs/google_cloudtrace1"
+license = "MIT"
+keywords = ["cloudtrace", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+url = "*"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

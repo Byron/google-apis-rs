@@ -1,4 +1,4 @@
-site_name: logging v0.3.2+20150326
+site_name: logging v0.3.2+20151007
 site_url: http://byron.github.io/google-apis-rs/google-logging1_beta3-cli
 site_description: Write integrating applications with bcore
 
@@ -24,6 +24,16 @@ pages:
 - ['projects_logs-sinks-get.md', 'Projects', 'Logs Sinks Get']
 - ['projects_logs-sinks-list.md', 'Projects', 'Logs Sinks List']
 - ['projects_logs-sinks-update.md', 'Projects', 'Logs Sinks Update']
+- ['projects_metrics-create.md', 'Projects', 'Metrics Create']
+- ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
+- ['projects_metrics-get.md', 'Projects', 'Metrics Get']
+- ['projects_metrics-list.md', 'Projects', 'Metrics List']
+- ['projects_metrics-update.md', 'Projects', 'Metrics Update']
+- ['projects_sinks-create.md', 'Projects', 'Sinks Create']
+- ['projects_sinks-delete.md', 'Projects', 'Sinks Delete']
+- ['projects_sinks-get.md', 'Projects', 'Sinks Get']
+- ['projects_sinks-list.md', 'Projects', 'Sinks List']
+- ['projects_sinks-update.md', 'Projects', 'Sinks Update']
 
 theme: readthedocs
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *0.1.9+20150717*, where *20150717* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *Games* crate version *0.1.9+20151012*, where *20151012* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).

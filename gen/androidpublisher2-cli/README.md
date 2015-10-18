@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20150316*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Android Publisher* API at revision *20150910*. The CLI is at version *0.3.2*.
 
 ```bash
 androidpublisher2 [options]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *cloudresourcemanager* crate version *0.1.9+20150711*, where *20150711* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *cloudresourcemanager* crate version *0.1.9+20150909*, where *20150909* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -11,8 +11,10 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Cloudresourcemanager.html) ... 
 //! 
+//! * [organizations](struct.Organization.html)
+//!  * [*get*](struct.OrganizationGetCall.html), [*get iam policy*](struct.OrganizationGetIamPolicyCall.html), [*list*](struct.OrganizationListCall.html), [*set iam policy*](struct.OrganizationSetIamPolicyCall.html), [*test iam permissions*](struct.OrganizationTestIamPermissionCall.html) and [*update*](struct.OrganizationUpdateCall.html)
 //! * [projects](struct.Project.html)
-//!  * [*create*](struct.ProjectCreateCall.html), [*delete*](struct.ProjectDeleteCall.html), [*get*](struct.ProjectGetCall.html), [*list*](struct.ProjectListCall.html), [*undelete*](struct.ProjectUndeleteCall.html) and [*update*](struct.ProjectUpdateCall.html)
+//!  * [*create*](struct.ProjectCreateCall.html), [*delete*](struct.ProjectDeleteCall.html), [*get*](struct.ProjectGetCall.html), [*get iam policy*](struct.ProjectGetIamPolicyCall.html), [*list*](struct.ProjectListCall.html), [*set iam policy*](struct.ProjectSetIamPolicyCall.html), [*test iam permissions*](struct.ProjectTestIamPermissionCall.html), [*undelete*](struct.ProjectUndeleteCall.html) and [*update*](struct.ProjectUpdateCall.html)
 //! 
 //! 
 //! 
@@ -47,10 +49,13 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().delete(...).doit()
+//! let r = hub.projects().test_iam_permissions(...).doit()
 //! let r = hub.projects().undelete(...).doit()
+//! let r = hub.projects().set_iam_policy(...).doit()
 //! let r = hub.projects().get(...).doit()
 //! let r = hub.projects().update(...).doit()
+//! let r = hub.projects().get_iam_policy(...).doit()
+//! let r = hub.projects().delete(...).doit()
 //! let r = hub.projects().create(...).doit()
 //! let r = hub.projects().list(...).doit()
 //! ```
@@ -99,9 +104,9 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.projects().list()
-//!              .page_token("sea")
-//!              .page_size(-90)
-//!              .filter("dolores")
+//!              .page_token("et")
+//!              .page_size(-41)
+//!              .filter("ipsum")
 //!              .doit();
 //! 
 //! match result {

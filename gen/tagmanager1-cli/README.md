@@ -24,25 +24,22 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20150526*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Tag Manager* API at revision *20151008*. The CLI is at version *0.3.2*.
 
 ```bash
 tagmanager1 [options]
         accounts
                 containers-create <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-delete <account-id> <container-id> [-p <v>]...
+                containers-folders-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-folders-delete <account-id> <container-id> <folder-id> [-p <v>]...
+                containers-folders-entities-list <account-id> <container-id> <folder-id> [-p <v>]... [-o <out>]
+                containers-folders-get <account-id> <container-id> <folder-id> [-p <v>]... [-o <out>]
+                containers-folders-list <account-id> <container-id> [-p <v>]... [-o <out>]
+                containers-folders-update <account-id> <container-id> <folder-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-get <account-id> <container-id> [-p <v>]... [-o <out>]
                 containers-list <account-id> [-p <v>]... [-o <out>]
-                containers-macros-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                containers-macros-delete <account-id> <container-id> <macro-id> [-p <v>]...
-                containers-macros-get <account-id> <container-id> <macro-id> [-p <v>]... [-o <out>]
-                containers-macros-list <account-id> <container-id> [-p <v>]... [-o <out>]
-                containers-macros-update <account-id> <container-id> <macro-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                containers-rules-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                containers-rules-delete <account-id> <container-id> <rule-id> [-p <v>]...
-                containers-rules-get <account-id> <container-id> <rule-id> [-p <v>]... [-o <out>]
-                containers-rules-list <account-id> <container-id> [-p <v>]... [-o <out>]
-                containers-rules-update <account-id> <container-id> <rule-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-move-folders-update <account-id> <container-id> <folder-id> [-p <v>]...
                 containers-tags-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-tags-delete <account-id> <container-id> <tag-id> [-p <v>]...
                 containers-tags-get <account-id> <container-id> <tag-id> [-p <v>]... [-o <out>]

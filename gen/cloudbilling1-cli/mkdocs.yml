@@ -1,0 +1,21 @@
+site_name: cloudbilling v0.3.2+20150903
+site_url: http://byron.github.io/google-apis-rs/google-cloudbilling1-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbilling1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['billing-accounts_get.md', 'Billing Accounts', 'Get']
+- ['billing-accounts_list.md', 'Billing Accounts', 'List']
+- ['billing-accounts_projects-list.md', 'Billing Accounts', 'Projects List']
+- ['projects_get-billing-info.md', 'Projects', 'Get Billing Info']
+- ['projects_update-billing-info.md', 'Projects', 'Update Billing Info']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

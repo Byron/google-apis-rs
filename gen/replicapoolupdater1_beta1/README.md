@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-replicapoolupdater1_beta1` library allows access to all features of the *Google replicapoolupdater* service.
 
-This documentation was generated from *replicapoolupdater* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *replicapoolupdater* crate version *0.1.9+20150904*, where *20150904* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
@@ -16,7 +16,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [rolling updates](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdate.html)
  * [*cancel*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateCancelCall.html), [*get*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateGetCall.html), [*insert*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateListCall.html), [*list instance updates*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateListInstanceUpdateCall.html), [*pause*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdatePauseCall.html), [*resume*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateResumeCall.html) and [*rollback*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.RollingUpdateRollbackCall.html)
 * zone operations
- * [*get*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.ZoneOperationGetCall.html)
+ * [*get*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.ZoneOperationGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1/struct.ZoneOperationListCall.html)
 
 
 
@@ -101,10 +101,9 @@ let mut hub = Replicapoolupdater::new(hyper::Client::new(), auth);
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.rolling_updates().list("project", "zone")
-             .page_token("Stet")
-             .max_results(59)
-             .instance_group_manager("et")
+let result = hub.rolling_updates().list_instance_updates("project", "zone", "rollingUpdate")
+             .page_token("sed")
+             .max_results(16)
              .filter("dolores")
              .doit();
 

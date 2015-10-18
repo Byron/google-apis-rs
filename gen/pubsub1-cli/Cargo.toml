@@ -1,0 +1,35 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-pubsub1-cli"
+version = "0.3.2+20150526"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with pubsub (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pubsub1-cli"
+homepage = "https://cloud.google.com/pubsub/docs"
+documentation = "http://byron.github.io/google-apis-rs/google_pubsub1_cli"
+license = "MIT"
+keywords = ["pubsub", "google", "cli"]
+
+[[bin]]
+name = "pubsub1"
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+strsim = "*"
+yup-hyper-mock = ">=1.0.0"
+clap = ">= 1.0.3"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+
+
+[dependencies.google-pubsub1]
+path = "../pubsub1"

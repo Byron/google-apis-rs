@@ -1,4 +1,4 @@
-site_name: compute v0.3.2+20150713
+site_name: compute v0.3.2+20151015
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: Write integrating applications with bcore
 
@@ -68,6 +68,12 @@ pages:
 - ['http-health-checks_list.md', 'Http Health Checks', 'List']
 - ['http-health-checks_patch.md', 'Http Health Checks', 'Patch']
 - ['http-health-checks_update.md', 'Http Health Checks', 'Update']
+- ['https-health-checks_delete.md', 'Https Health Checks', 'Delete']
+- ['https-health-checks_get.md', 'Https Health Checks', 'Get']
+- ['https-health-checks_insert.md', 'Https Health Checks', 'Insert']
+- ['https-health-checks_list.md', 'Https Health Checks', 'List']
+- ['https-health-checks_patch.md', 'Https Health Checks', 'Patch']
+- ['https-health-checks_update.md', 'Https Health Checks', 'Update']
 - ['images_delete.md', 'Images', 'Delete']
 - ['images_deprecate.md', 'Images', 'Deprecate']
 - ['images_get.md', 'Images', 'Get']
@@ -140,11 +146,21 @@ pages:
 - ['snapshots_delete.md', 'Snapshots', 'Delete']
 - ['snapshots_get.md', 'Snapshots', 'Get']
 - ['snapshots_list.md', 'Snapshots', 'List']
+- ['ssl-certificates_delete.md', 'Ssl Certificates', 'Delete']
+- ['ssl-certificates_get.md', 'Ssl Certificates', 'Get']
+- ['ssl-certificates_insert.md', 'Ssl Certificates', 'Insert']
+- ['ssl-certificates_list.md', 'Ssl Certificates', 'List']
 - ['target-http-proxies_delete.md', 'Target Http Proxies', 'Delete']
 - ['target-http-proxies_get.md', 'Target Http Proxies', 'Get']
 - ['target-http-proxies_insert.md', 'Target Http Proxies', 'Insert']
 - ['target-http-proxies_list.md', 'Target Http Proxies', 'List']
 - ['target-http-proxies_set-url-map.md', 'Target Http Proxies', 'Set Url Map']
+- ['target-https-proxies_delete.md', 'Target Https Proxies', 'Delete']
+- ['target-https-proxies_get.md', 'Target Https Proxies', 'Get']
+- ['target-https-proxies_insert.md', 'Target Https Proxies', 'Insert']
+- ['target-https-proxies_list.md', 'Target Https Proxies', 'List']
+- ['target-https-proxies_set-ssl-certificates.md', 'Target Https Proxies', 'Set Ssl Certificates']
+- ['target-https-proxies_set-url-map.md', 'Target Https Proxies', 'Set Url Map']
 - ['target-instances_aggregated-list.md', 'Target Instances', 'Aggregated List']
 - ['target-instances_delete.md', 'Target Instances', 'Delete']
 - ['target-instances_get.md', 'Target Instances', 'Get']

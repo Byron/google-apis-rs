@@ -1,4 +1,4 @@
-site_name: Shopping Content v0.3.2+20150710
+site_name: Shopping Content v0.3.2+20151002
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: Write integrating applications with bcore
 
@@ -42,6 +42,21 @@ pages:
 - ['datafeedstatuses_list.md', 'Datafeedstatuses', 'List']
 - ['inventory_custombatch.md', 'Inventory', 'Custombatch']
 - ['inventory_set.md', 'Inventory', 'Set']
+- ['orders_acknowledge.md', 'Orders', 'Acknowledge']
+- ['orders_advancetestorder.md', 'Orders', 'Advancetestorder']
+- ['orders_cancel.md', 'Orders', 'Cancel']
+- ['orders_cancellineitem.md', 'Orders', 'Cancellineitem']
+- ['orders_createtestorder.md', 'Orders', 'Createtestorder']
+- ['orders_custombatch.md', 'Orders', 'Custombatch']
+- ['orders_get.md', 'Orders', 'Get']
+- ['orders_getbymerchantorderid.md', 'Orders', 'Getbymerchantorderid']
+- ['orders_gettestordertemplate.md', 'Orders', 'Gettestordertemplate']
+- ['orders_list.md', 'Orders', 'List']
+- ['orders_refund.md', 'Orders', 'Refund']
+- ['orders_returnlineitem.md', 'Orders', 'Returnlineitem']
+- ['orders_shiplineitems.md', 'Orders', 'Shiplineitems']
+- ['orders_updatemerchantorderid.md', 'Orders', 'Updatemerchantorderid']
+- ['orders_updateshipment.md', 'Orders', 'Updateshipment']
 - ['products_custombatch.md', 'Products', 'Custombatch']
 - ['products_delete.md', 'Products', 'Delete']
 - ['products_get.md', 'Products', 'Get']

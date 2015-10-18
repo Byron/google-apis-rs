@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *storage* API at revision *20150710*. The CLI is at version *0.3.2*.
+This documentation was generated from the *storage* API at revision *20151007*. The CLI is at version *0.3.2*.
 
 ```bash
 storage1 [options]

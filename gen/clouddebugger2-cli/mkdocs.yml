@@ -1,0 +1,24 @@
+site_name: clouddebugger v0.3.2+20150725
+site_url: http://byron.github.io/google-apis-rs/google-clouddebugger2-cli
+site_description: Write integrating applications with bcore
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/clouddebugger2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['controller_debuggees-breakpoints-list.md', 'Controller', 'Debuggees Breakpoints List']
+- ['controller_debuggees-breakpoints-update.md', 'Controller', 'Debuggees Breakpoints Update']
+- ['controller_debuggees-register.md', 'Controller', 'Debuggees Register']
+- ['debugger_debuggees-breakpoints-delete.md', 'Debugger', 'Debuggees Breakpoints Delete']
+- ['debugger_debuggees-breakpoints-get.md', 'Debugger', 'Debuggees Breakpoints Get']
+- ['debugger_debuggees-breakpoints-list.md', 'Debugger', 'Debuggees Breakpoints List']
+- ['debugger_debuggees-breakpoints-set.md', 'Debugger', 'Debuggees Breakpoints Set']
+- ['debugger_debuggees-list.md', 'Debugger', 'Debuggees List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015, `Sebastian Thiel`
+

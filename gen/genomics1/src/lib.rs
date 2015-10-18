@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *0.1.9+20150716*, where *20150716* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *genomics* crate version *0.1.9+20151014*, where *20151014* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/genomics1).
 //! # Features
 //! 
@@ -11,7 +11,7 @@
 //! * callsets
 //!  * [*create*](struct.CallsetCreateCall.html), [*delete*](struct.CallsetDeleteCall.html), [*get*](struct.CallsetGetCall.html), [*patch*](struct.CallsetPatchCall.html) and [*search*](struct.CallsetSearchCall.html)
 //! * [datasets](struct.Dataset.html)
-//!  * [*create*](struct.DatasetCreateCall.html), [*delete*](struct.DatasetDeleteCall.html), [*get*](struct.DatasetGetCall.html), [*list*](struct.DatasetListCall.html), [*patch*](struct.DatasetPatchCall.html) and [*undelete*](struct.DatasetUndeleteCall.html)
+//!  * [*create*](struct.DatasetCreateCall.html), [*delete*](struct.DatasetDeleteCall.html), [*get*](struct.DatasetGetCall.html), [*get iam policy*](struct.DatasetGetIamPolicyCall.html), [*list*](struct.DatasetListCall.html), [*patch*](struct.DatasetPatchCall.html), [*set iam policy*](struct.DatasetSetIamPolicyCall.html), [*test iam permissions*](struct.DatasetTestIamPermissionCall.html) and [*undelete*](struct.DatasetUndeleteCall.html)
 //! * [operations](struct.Operation.html)
 //!  * [*cancel*](struct.OperationCancelCall.html), [*delete*](struct.OperationDeleteCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * readgroupsets
@@ -23,7 +23,7 @@
 //! * referencesets
 //!  * [*get*](struct.ReferencesetGetCall.html) and [*search*](struct.ReferencesetSearchCall.html)
 //! * [variants](struct.Variant.html)
-//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*merge*](struct.VariantMergeCall.html), [*patch*](struct.VariantPatchCall.html) and [*search*](struct.VariantSearchCall.html)
+//!  * [*create*](struct.VariantCreateCall.html), [*delete*](struct.VariantDeleteCall.html), [*get*](struct.VariantGetCall.html), [*import*](struct.VariantImportCall.html), [*patch*](struct.VariantPatchCall.html) and [*search*](struct.VariantSearchCall.html)
 //! * variantsets
 //!  * [*create*](struct.VariantsetCreateCall.html), [*delete*](struct.VariantsetDeleteCall.html), [*export*](struct.VariantsetExportCall.html), [*get*](struct.VariantsetGetCall.html), [*patch*](struct.VariantsetPatchCall.html) and [*search*](struct.VariantsetSearchCall.html)
 //! 
@@ -60,14 +60,15 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.operations().delete(...).doit()
-//! let r = hub.operations().cancel(...).doit()
-//! let r = hub.variantsets().export(...).doit()
-//! let r = hub.readgroupsets().export(...).doit()
-//! let r = hub.variants().import(...).doit()
-//! let r = hub.readgroupsets().import(...).doit()
-//! let r = hub.operations().get(...).doit()
-//! let r = hub.operations().list(...).doit()
+//! let r = hub.datasets().set_iam_policy(...).doit()
+//! let r = hub.datasets().delete(...).doit()
+//! let r = hub.datasets().get_iam_policy(...).doit()
+//! let r = hub.datasets().test_iam_permissions(...).doit()
+//! let r = hub.datasets().get(...).doit()
+//! let r = hub.datasets().undelete(...).doit()
+//! let r = hub.datasets().create(...).doit()
+//! let r = hub.datasets().patch(...).doit()
+//! let r = hub.datasets().list(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -92,6 +93,7 @@
 //! extern crate hyper;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_genomics1 as genomics1;
+//! use genomics1::Dataset;
 //! use genomics1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -110,13 +112,16 @@
 //!                               hyper::Client::new(),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Genomics::new(hyper::Client::new(), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Dataset::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.operations().list("name")
-//!              .page_token("et")
-//!              .page_size(-45)
-//!              .filter("ut")
+//! let result = hub.datasets().patch(req, "datasetId")
+//!              .update_mask("amet")
 //!              .doit();
 //! 
 //! match result {

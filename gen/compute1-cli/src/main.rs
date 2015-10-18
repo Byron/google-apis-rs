@@ -4176,6 +4176,463 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _https_health_checks_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.https_health_checks().delete(opt.value_of("project").unwrap_or(""), opt.value_of("https-health-check").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _https_health_checks_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.https_health_checks().get(opt.value_of("project").unwrap_or(""), opt.value_of("https-health-check").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _https_health_checks_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout-sec" => Some(("timeoutSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "check-interval-sec" => Some(("checkIntervalSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-path" => Some(("requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "id", "kind", "name", "port", "request-path", "self-link", "timeout-sec", "unhealthy-threshold"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpsHealthCheck = json::value::from_value(object).unwrap();
+        let mut call = self.hub.https_health_checks().insert(request, opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _https_health_checks_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.https_health_checks().list(opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _https_health_checks_patch(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout-sec" => Some(("timeoutSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "check-interval-sec" => Some(("checkIntervalSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-path" => Some(("requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "id", "kind", "name", "port", "request-path", "self-link", "timeout-sec", "unhealthy-threshold"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpsHealthCheck = json::value::from_value(object).unwrap();
+        let mut call = self.hub.https_health_checks().patch(request, opt.value_of("project").unwrap_or(""), opt.value_of("https-health-check").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _https_health_checks_update(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timeout-sec" => Some(("timeoutSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "check-interval-sec" => Some(("checkIntervalSec", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "unhealthy-threshold" => Some(("unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "healthy-threshold" => Some(("healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "host" => Some(("host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-path" => Some(("requestPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["check-interval-sec", "creation-timestamp", "description", "healthy-threshold", "host", "id", "kind", "name", "port", "request-path", "self-link", "timeout-sec", "unhealthy-threshold"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HttpsHealthCheck = json::value::from_value(object).unwrap();
+        let mut call = self.hub.https_health_checks().update(request, opt.value_of("project").unwrap_or(""), opt.value_of("https-health-check").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _images_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.images().delete(opt.value_of("project").unwrap_or(""), opt.value_of("image").unwrap_or(""));
@@ -4895,10 +5352,6 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
-                    "target-size" => Some(("targetSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "instance-group" => Some(("instanceGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "current-actions.none" => Some(("currentActions.none", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-actions.recreating" => Some(("currentActions.recreating", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-actions.creating" => Some(("currentActions.creating", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -4906,6 +5359,10 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "current-actions.abandoning" => Some(("currentActions.abandoning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-actions.deleting" => Some(("currentActions.deleting", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "current-actions.refreshing" => Some(("currentActions.refreshing", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instance-group" => Some(("instanceGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-size" => Some(("targetSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-pools" => Some(("targetPools", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "base-instance-name" => Some(("baseInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5828,10 +6285,9 @@ impl<'n, 'a> Engine<'n, 'a> {
            
             let type_info: Option<(&'static str, JsonTypeInfo)> = 
                 match &temp_cursor.to_string()[..] {
-                    "port-name" => Some(("portName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "instance-state" => Some(("instanceState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-state", "port-name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9066,6 +9522,264 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _ssl_certificates_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.ssl_certificates().delete(opt.value_of("project").unwrap_or(""), opt.value_of("ssl-certificate").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _ssl_certificates_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.ssl_certificates().get(opt.value_of("project").unwrap_or(""), opt.value_of("ssl-certificate").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _ssl_certificates_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "certificate" => Some(("certificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-key" => Some(("privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate", "creation-timestamp", "description", "id", "kind", "name", "private-key", "self-link"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SslCertificate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.ssl_certificates().insert(request, opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _ssl_certificates_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.ssl_certificates().list(opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _target_http_proxies_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.target_http_proxies().delete(opt.value_of("project").unwrap_or(""), opt.value_of("target-http-proxy").unwrap_or(""));
@@ -9359,6 +10073,434 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
         let mut request: api::UrlMapReference = json::value::from_value(object).unwrap();
         let mut call = self.hub.target_http_proxies().set_url_map(request, opt.value_of("project").unwrap_or(""), opt.value_of("target-http-proxy").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_delete(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.target_https_proxies().delete(opt.value_of("project").unwrap_or(""), opt.value_of("target-https-proxy").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_get(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.target_https_proxies().get(opt.value_of("project").unwrap_or(""), opt.value_of("target-https-proxy").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_insert(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssl-certificates" => Some(("sslCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "url-map" => Some(("urlMap", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "id", "kind", "name", "self-link", "ssl-certificates", "url-map"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TargetHttpsProxy = json::value::from_value(object).unwrap();
+        let mut call = self.hub.target_https_proxies().insert(request, opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.target_https_proxies().list(opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_set_ssl_certificates(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "ssl-certificates" => Some(("sslCertificates", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ssl-certificates"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TargetHttpsProxiesSetSslCertificatesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.target_https_proxies().set_ssl_certificates(request, opt.value_of("project").unwrap_or(""), opt.value_of("target-https-proxy").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _target_https_proxies_set_url_map(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "url-map" => Some(("urlMap", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["url-map"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UrlMapReference = json::value::from_value(object).unwrap();
+        let mut call = self.hub.target_https_proxies().set_url_map(request, opt.value_of("project").unwrap_or(""), opt.value_of("target-https-proxy").unwrap_or(""));
         for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -11615,7 +12757,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "peer-ip" => Some(("peerIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "region" => Some(("region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shared-secret-hash" => Some(("sharedSecretHash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-vpn-gateway" => Some(("targetVpnGateway", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11623,9 +12764,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "ike-networks" => Some(("ikeNetworks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "detailed-status", "id", "ike-networks", "ike-version", "kind", "name", "peer-ip", "region", "self-link", "shared-secret", "shared-secret-hash", "status", "target-vpn-gateway"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-timestamp", "description", "detailed-status", "id", "ike-version", "kind", "name", "peer-ip", "region", "self-link", "shared-secret", "shared-secret-hash", "status", "target-vpn-gateway"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12289,6 +13430,32 @@ impl<'n, 'a> Engine<'n, 'a> {
                     }
                 }
             },
+            ("https-health-checks", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._https_health_checks_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._https_health_checks_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._https_health_checks_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._https_health_checks_list(opt, dry_run, &mut err);
+                    },
+                    ("patch", Some(opt)) => {
+                        call_result = self._https_health_checks_patch(opt, dry_run, &mut err);
+                    },
+                    ("update", Some(opt)) => {
+                        call_result = self._https_health_checks_update(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("https-health-checks".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("images", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -12609,6 +13776,26 @@ impl<'n, 'a> Engine<'n, 'a> {
                     }
                 }
             },
+            ("ssl-certificates", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._ssl_certificates_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._ssl_certificates_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._ssl_certificates_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._ssl_certificates_list(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("ssl-certificates".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("target-http-proxies", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -12628,6 +13815,32 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("target-http-proxies".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("target-https-proxies", Some(opt)) => {
+                match opt.subcommand() {
+                    ("delete", Some(opt)) => {
+                        call_result = self._target_https_proxies_delete(opt, dry_run, &mut err);
+                    },
+                    ("get", Some(opt)) => {
+                        call_result = self._target_https_proxies_get(opt, dry_run, &mut err);
+                    },
+                    ("insert", Some(opt)) => {
+                        call_result = self._target_https_proxies_insert(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._target_https_proxies_list(opt, dry_run, &mut err);
+                    },
+                    ("set-ssl-certificates", Some(opt)) => {
+                        call_result = self._target_https_proxies_set_ssl_certificates(opt, dry_run, &mut err);
+                    },
+                    ("set-url-map", Some(opt)) => {
+                        call_result = self._target_https_proxies_set_url_map(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("target-https-proxies".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -14659,6 +15872,183 @@ fn main() {
                   ]),
             ]),
         
+        ("https-health-checks", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("delete",  
+                    Some(r##"Deletes the specified HttpsHealthCheck resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_delete",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"https-health-check"##),
+                     None,
+                     Some(r##"Name of the HttpsHealthCheck resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns the specified HttpsHealthCheck resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"https-health-check"##),
+                     None,
+                     Some(r##"Name of the HttpsHealthCheck resource to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates a HttpsHealthCheck resource in the specified project using the data included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves the list of HttpsHealthCheck resources available to the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("patch",  
+                    Some(r##"Updates a HttpsHealthCheck resource in the specified project using the data included in the request. This method supports patch semantics."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_patch",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"https-health-check"##),
+                     None,
+                     Some(r##"Name of the HttpsHealthCheck resource to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("update",  
+                    Some(r##"Updates a HttpsHealthCheck resource in the specified project using the data included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/https-health-checks_update",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"https-health-check"##),
+                     None,
+                     Some(r##"Name of the HttpsHealthCheck resource to update."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("images", "methods: 'delete', 'deprecate', 'get', 'insert' and 'list'", vec![
             ("delete",  
                     Some(r##"Deletes the specified image resource."##),
@@ -14781,7 +16171,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",  
-                    Some(r##"Retrieves the list of image resources available to the specified project."##),
+                    Some(r##"Retrieves the list of private images available to the specified project. Private images are images you create that belong to your project. This method does not get any images that belong to other projects, including publicly-available images, like Debian 7. If you want to get a list of publicly-available images, use this method to make a request to the respective image project, such as debian-cloud or windows-cloud.
+        
+        See Accessing images for more information."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/images_list",
                   vec![
                     (Some(r##"project"##),
@@ -14806,7 +16198,7 @@ fn main() {
         
         ("instance-group-managers", "methods: 'abandon-instances', 'aggregated-list', 'delete', 'delete-instances', 'get', 'insert', 'list', 'list-managed-instances', 'recreate-instances', 'resize', 'set-instance-template' and 'set-target-pools'", vec![
             ("abandon-instances",  
-                    Some(r##"Removes the specified instances from the managed instance group, and from any target pools where they are a member. The instances are not deleted. The managed instance group automatically reduces its targetSize value by the number of instances that you abandon from the group."##),
+                    Some(r##"Schedules a group action to remove the specified instances from the managed instance group. Abandoning an instance does not delete the instance, but it does remove the instance from any target pools that are applied by the managed instance group. This method reduces the targetSize of the managed instance group by the number of instances that you abandon. This operation is marked as DONE when the action is scheduled even if the instances have not yet been removed from the group. You must separately verify the status of the abandoning action with the listmanagedinstances method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_abandon-instances",
                   vec![
                     (Some(r##"project"##),
@@ -14817,13 +16209,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -14846,7 +16238,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("aggregated-list",  
-                    Some(r##"Retrieves the list of managed instance groups, and groups them by project and zone."##),
+                    Some(r##"Retrieves the list of managed instance groups and groups them by zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -14868,7 +16260,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",  
-                    Some(r##"Deletes the specified managed instance group resource."##),
+                    Some(r##"Deletes the specified managed instance group and all of the instances in that group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_delete",
                   vec![
                     (Some(r##"project"##),
@@ -14879,13 +16271,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager to delete."##),
+                     Some(r##"The name of the managed instance group to delete."##),
                      Some(true),
                      Some(false)),
         
@@ -14902,7 +16294,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete-instances",  
-                    Some(r##"Deletes the specified instances. The instances are deleted and removed from the instance group and any target pools where they are a member. The managed instance group automatically reduces its targetSize value by the number of instances that you delete."##),
+                    Some(r##"Schedules a group action to delete the specified instances in the managed instance group. The instances are also removed from any target pools of which they were a member. This method reduces the targetSize of the managed instance group by the number of instances that you delete. This operation is marked as DONE when the action is scheduled even if the instances are still being deleted. You must separately verify the status of the deleting action with the listmanagedinstances method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_delete-instances",
                   vec![
                     (Some(r##"project"##),
@@ -14913,13 +16305,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -14942,7 +16334,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",  
-                    Some(r##"Returns the specified managed instance group resource."##),
+                    Some(r##"Returns all of the details about the specified managed instance group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_get",
                   vec![
                     (Some(r##"project"##),
@@ -14953,13 +16345,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager resource."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -14976,7 +16368,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",  
-                    Some(r##"Creates a managed instance group resource in the specified project using the data that is included in the request."##),
+                    Some(r##"Creates a managed instance group using the information that you specify in the request. After the group is created, it schedules an action to create instances in the group using the specified instance template. This operation is marked as DONE when the group is created even if the instances in the group have not yet been created. You must separately verify the status of the individual instances with the listmanagedinstances method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_insert",
                   vec![
                     (Some(r##"project"##),
@@ -14987,7 +16379,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where you want to create the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15021,7 +16413,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15038,7 +16430,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-managed-instances",  
-                    Some(r##"Lists managed instances."##),
+                    Some(r##"Lists all of the instances in the managed instance group. Each instance in the list has a currentAction, which indicates the action that the managed instance group is performing on the instance. For example, if the group is still creating an instance, the currentAction is CREATING. If a previous action failed, the list displays the errors for that failed action."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_list-managed-instances",
                   vec![
                     (Some(r##"project"##),
@@ -15049,7 +16441,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15072,7 +16464,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("recreate-instances",  
-                    Some(r##"Recreates the specified instances. The instances are deleted, then recreated using the managed instance group's current instance template."##),
+                    Some(r##"Schedules a group action to recreate the specified instances in the managed instance group. The instances are deleted and recreated using the current instance template for the managed instance group. This operation is marked as DONE when the action is scheduled even if the instances have not yet been recreated. You must separately verify the status of the recreating action with the listmanagedinstances method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_recreate-instances",
                   vec![
                     (Some(r##"project"##),
@@ -15083,13 +16475,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15112,7 +16504,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("resize",  
-                    Some(r##"Resizes the managed instance group. If you increase the size, the group creates new instances using the current instance template. If you decrease the size, the group removes instances in the order that is outlined in Resizing a managed instance group."##),
+                    Some(r##"Resizes the managed instance group. If you increase the size, the group creates new instances using the current instance template. If you decrease the size, the group deletes instances. The resize operation is marked DONE when the resize actions are scheduled even if the group has not yet added or deleted any instances. You must separately verify the status of the creating or deleting actions with the listmanagedinstances method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_resize",
                   vec![
                     (Some(r##"project"##),
@@ -15123,13 +16515,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15163,13 +16555,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15192,7 +16584,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-target-pools",  
-                    Some(r##"Modifies the target pools to which all new instances in this group are assigned. The target pools for existing instances in the group do not change unless you recreate them."##),
+                    Some(r##"Modifies the target pools to which all instances in this managed instance group are assigned. The target pools automatically apply to all of the instances in the managed instance group. This operation is marked DONE when you make the request even if the instances have not yet been added to their target pools. The change might take some time to apply to all of the instances in the group depending on the size of the group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-group-managers_set-target-pools",
                   vec![
                     (Some(r##"project"##),
@@ -15203,13 +16595,13 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the managed instance group is located."##),
+                     Some(r##"The name of the zone where the managed instance group is located."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"instance-group-manager"##),
                      None,
-                     Some(r##"The name of the instance group manager."##),
+                     Some(r##"The name of the managed instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15235,7 +16627,7 @@ fn main() {
         
         ("instance-groups", "methods: 'add-instances', 'aggregated-list', 'delete', 'get', 'insert', 'list', 'list-instances', 'remove-instances' and 'set-named-ports'", vec![
             ("add-instances",  
-                    Some(r##"Adds a list of instances to an instance group. All of the instances in the instance group must be in the same network."##),
+                    Some(r##"Adds a list of instances to the specified instance group. All of the instances in the instance group must be in the same network/subnetwork. TODO: Change to comment to state "if IG is load balanced.""##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_add-instances",
                   vec![
                     (Some(r##"project"##),
@@ -15246,7 +16638,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15275,7 +16667,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("aggregated-list",  
-                    Some(r##"Retrieves the list of instance groups, and sorts them by zone."##),
+                    Some(r##"Retrieves the list of instance groups and sorts them by zone."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -15297,7 +16689,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("delete",  
-                    Some(r##"Deletes the specified instance group."##),
+                    Some(r##"Deletes the specified instance group. The instances in the group are not deleted."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_delete",
                   vec![
                     (Some(r##"project"##),
@@ -15308,7 +16700,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15342,7 +16734,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15376,7 +16768,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where you want to create the instance group."##),
                      Some(true),
                      Some(false)),
         
@@ -15410,7 +16802,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15427,7 +16819,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list-instances",  
-                    Some(r##"Lists instances in an instance group. The parameters for this method specify whether the list filters instances by state and named ports information."##),
+                    Some(r##"Lists the instances in the specified instance group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_list-instances",
                   vec![
                     (Some(r##"project"##),
@@ -15438,7 +16830,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15467,7 +16859,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("remove-instances",  
-                    Some(r##"Removes a list of instances from an instance group."##),
+                    Some(r##"Removes one or more instances from the specified instance group, but does not delete those instances."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_remove-instances",
                   vec![
                     (Some(r##"project"##),
@@ -15478,7 +16870,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15507,7 +16899,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-named-ports",  
-                    Some(r##"Sets the named ports in an instance group."##),
+                    Some(r##"Sets the named ports for the specified instance group."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instance-groups_set-named-ports",
                   vec![
                     (Some(r##"project"##),
@@ -15518,7 +16910,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The URL of the zone where the instance group is located."##),
+                     Some(r##"The name of the zone where the instance group is located."##),
                      Some(true),
                      Some(false)),
         
@@ -15705,7 +17097,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("aggregated-list",  
-                    None,
+                    Some(r##"Retrieves aggregated list of instance resources."##),
                     "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/instances_aggregated-list",
                   vec![
                     (Some(r##"project"##),
@@ -15898,7 +17290,7 @@ fn main() {
         
                     (Some(r##"zone"##),
                      None,
-                     Some(r##"The name of the The name of the zone for this request.."##),
+                     Some(r##"The name of the zone for this request."##),
                      Some(true),
                      Some(false)),
         
@@ -16988,6 +18380,115 @@ fn main() {
                   ]),
             ]),
         
+        ("ssl-certificates", "methods: 'delete', 'get', 'insert' and 'list'", vec![
+            ("delete",  
+                    Some(r##"Deletes the specified SslCertificate resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/ssl-certificates_delete",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ssl-certificate"##),
+                     None,
+                     Some(r##"Name of the SslCertificate resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns the specified SslCertificate resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/ssl-certificates_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ssl-certificate"##),
+                     None,
+                     Some(r##"Name of the SslCertificate resource to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates a SslCertificate resource in the specified project using the data included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/ssl-certificates_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves the list of SslCertificate resources available to the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/ssl-certificates_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("target-http-proxies", "methods: 'delete', 'get', 'insert', 'list' and 'set-url-map'", vec![
             ("delete",  
                     Some(r##"Deletes the specified TargetHttpProxy resource."##),
@@ -17108,6 +18609,183 @@ fn main() {
                     (Some(r##"target-http-proxy"##),
                      None,
                      Some(r##"Name of the TargetHttpProxy resource whose URL map is to be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("target-https-proxies", "methods: 'delete', 'get', 'insert', 'list', 'set-ssl-certificates' and 'set-url-map'", vec![
+            ("delete",  
+                    Some(r##"Deletes the specified TargetHttpsProxy resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_delete",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"target-https-proxy"##),
+                     None,
+                     Some(r##"Name of the TargetHttpsProxy resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",  
+                    Some(r##"Returns the specified TargetHttpsProxy resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_get",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"target-https-proxy"##),
+                     None,
+                     Some(r##"Name of the TargetHttpsProxy resource to return."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("insert",  
+                    Some(r##"Creates a TargetHttpsProxy resource in the specified project using the data included in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_insert",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list",  
+                    Some(r##"Retrieves the list of TargetHttpsProxy resources available to the specified project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("set-ssl-certificates",  
+                    Some(r##"Replaces SslCertificates for TargetHttpsProxy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_set-ssl-certificates",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"target-https-proxy"##),
+                     None,
+                     Some(r##"Name of the TargetHttpsProxy resource whose URL map is to be set."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("set-url-map",  
+                    Some(r##"Changes the URL map for TargetHttpsProxy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_compute1_cli/target-https-proxies_set-url-map",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"target-https-proxy"##),
+                     None,
+                     Some(r##"Name of the TargetHttpsProxy resource whose URL map is to be set."##),
                      Some(true),
                      Some(false)),
         
@@ -18352,7 +20030,7 @@ fn main() {
     
     let mut app = App::new("compute1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150713")
+           .version("0.3.2+20151015")
            .about("API for the Google Compute Engine service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_compute1_cli")
            .arg(Arg::with_name("url")

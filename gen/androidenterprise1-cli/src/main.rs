@@ -1348,6 +1348,58 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _enterprises_send_test_push_notification(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.enterprises().send_test_push_notification(opt.value_of("enterprise-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _enterprises_set_account(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2832,6 +2884,58 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _users_get_available_product_set(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().get_available_product_set(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _users_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().list(opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("email").unwrap_or(""));
@@ -2928,6 +3032,92 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _users_set_available_product_set(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+           
+            let type_info: Option<(&'static str, JsonTypeInfo)> = 
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-id" => Some(("productId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "product-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ProductSet = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().set_available_product_set(request, opt.value_of("enterprise-id").unwrap_or(""), opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -3018,6 +3208,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     },
                     ("list", Some(opt)) => {
                         call_result = self._enterprises_list(opt, dry_run, &mut err);
+                    },
+                    ("send-test-push-notification", Some(opt)) => {
+                        call_result = self._enterprises_send_test_push_notification(opt, dry_run, &mut err);
                     },
                     ("set-account", Some(opt)) => {
                         call_result = self._enterprises_set_account(opt, dry_run, &mut err);
@@ -3147,11 +3340,17 @@ impl<'n, 'a> Engine<'n, 'a> {
                     ("get", Some(opt)) => {
                         call_result = self._users_get(opt, dry_run, &mut err);
                     },
+                    ("get-available-product-set", Some(opt)) => {
+                        call_result = self._users_get_available_product_set(opt, dry_run, &mut err);
+                    },
                     ("list", Some(opt)) => {
                         call_result = self._users_list(opt, dry_run, &mut err);
                     },
                     ("revoke-token", Some(opt)) => {
                         call_result = self._users_revoke_token(opt, dry_run, &mut err);
+                    },
+                    ("set-available-product-set", Some(opt)) => {
+                        call_result = self._users_set_available_product_set(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("users".to_string()));
@@ -3724,7 +3923,7 @@ fn main() {
                   ]),
             ]),
         
-        ("enterprises", "methods: 'delete', 'enroll', 'get', 'insert', 'list', 'set-account' and 'unenroll'", vec![
+        ("enterprises", "methods: 'delete', 'enroll', 'get', 'insert', 'list', 'send-test-push-notification', 'set-account' and 'unenroll'", vec![
             ("delete",  
                     Some(r##"Deletes the binding between the MDM and enterprise. This is now deprecated; use this to unenroll customers that were previously enrolled with the 'insert' call, then enroll them again with the 'enroll' call."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_delete",
@@ -3826,6 +4025,28 @@ fn main() {
                     (Some(r##"domain"##),
                      None,
                      Some(r##"The exact primary domain name of the enterprise to look up."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("send-test-push-notification",  
+                    Some(r##"Sends a test push notification to validate the MDM integration with the Google Cloud Pub/Sub service for this enterprise."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_send-test-push-notification",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"The ID of the enterprise."##),
                      Some(true),
                      Some(false)),
         
@@ -4551,7 +4772,7 @@ fn main() {
                   ]),
             ]),
         
-        ("users", "methods: 'generate-token', 'get', 'list' and 'revoke-token'", vec![
+        ("users", "methods: 'generate-token', 'get', 'get-available-product-set', 'list', 'revoke-token' and 'set-available-product-set'", vec![
             ("generate-token",  
                     Some(r##"Generates a token (activation code) to allow this user to configure their work account in the Android Setup Wizard. Revokes any previously generated token."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_generate-token",
@@ -4583,6 +4804,34 @@ fn main() {
             ("get",  
                     Some(r##"Retrieves a user's details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_get",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The ID of the user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-available-product-set",  
+                    Some(r##"Retrieves the set of products a user is entitled to access."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_get-available-product-set",
                   vec![
                     (Some(r##"enterprise-id"##),
                      None,
@@ -4658,13 +4907,47 @@ fn main() {
                      Some(false),
                      Some(true)),
                   ]),
+            ("set-available-product-set",  
+                    Some(r##"Modifies the set of products a user is entitled to access."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/users_set-available-product-set",
+                  vec![
+                    (Some(r##"enterprise-id"##),
+                     None,
+                     Some(r##"The ID of the enterprise."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"The ID of the user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150715")
+           .version("0.3.2+20150922")
            .about("Allows MDMs/EMMs and enterprises to manage the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

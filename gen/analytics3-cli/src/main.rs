@@ -9223,7 +9223,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150417")
+           .version("0.3.2+20150901")
            .about("View and manage your Google Analytics data")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

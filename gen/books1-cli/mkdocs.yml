@@ -1,4 +1,4 @@
-site_name: books v0.3.2+20150318
+site_name: books v0.3.2+20150921
 site_url: http://byron.github.io/google-apis-rs/google-books1-cli
 site_description: Write integrating applications with bcore
 
@@ -41,8 +41,10 @@ pages:
 - ['mylibrary_bookshelves-volumes-list.md', 'Mylibrary', 'Bookshelves Volumes List']
 - ['mylibrary_readingpositions-get.md', 'Mylibrary', 'Readingpositions Get']
 - ['mylibrary_readingpositions-set-position.md', 'Mylibrary', 'Readingpositions Set Position']
+- ['notification_get.md', 'Notification', 'Get']
 - ['onboarding_list-categories.md', 'Onboarding', 'List Categories']
 - ['onboarding_list-category-volumes.md', 'Onboarding', 'List Category Volumes']
+- ['personalizedstream_get.md', 'Personalizedstream', 'Get']
 - ['promooffer_accept.md', 'Promooffer', 'Accept']
 - ['promooffer_dismiss.md', 'Promooffer', 'Dismiss']
 - ['promooffer_get.md', 'Promooffer', 'Get']

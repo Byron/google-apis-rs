@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Ad Exchange Seller* API at revision *20150719*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Ad Exchange Seller* API at revision *20151013*. The CLI is at version *0.3.2*.
 
 ```bash
 adexchangeseller2 [options]

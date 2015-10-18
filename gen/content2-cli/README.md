@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Shopping Content* API can be found at the
-[official documentation site](https://developers.google.com/shopping-content/v2/).
+[official documentation site](https://developers.google.com/shopping-content).
 
 # Downloads
 
@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20150710*. The CLI is at version *0.3.2*.
+This documentation was generated from the *Shopping Content* API at revision *20151002*. The CLI is at version *0.3.2*.
 
 ```bash
 content2 [options]
@@ -68,6 +68,22 @@ content2 [options]
         inventory
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 set <merchant-id> <store-code> <product-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        orders
+                acknowledge <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                advancetestorder <merchant-id> <order-id> [-p <v>]... [-o <out>]
+                cancel <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                cancellineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                createtestorder <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                custombatch (-r <kv>)... [-p <v>]... [-o <out>]
+                get <merchant-id> <order-id> [-p <v>]... [-o <out>]
+                getbymerchantorderid <merchant-id> <merchant-order-id> [-p <v>]... [-o <out>]
+                gettestordertemplate <merchant-id> <template-name> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
+                refund <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                returnlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                shiplineitems <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                updatemerchantorderid <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                updateshipment <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
         products
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <merchant-id> <product-id> [-p <v>]...

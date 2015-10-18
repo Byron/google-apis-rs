@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *0.1.9+20150326*, where *20150326* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *directory* crate version *0.1.9+20151005*, where *20151005* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -17,6 +17,12 @@
 //!  * [*stop*](struct.ChannelStopCall.html)
 //! * chromeosdevices
 //!  * [*get*](struct.ChromeosdeviceGetCall.html), [*list*](struct.ChromeosdeviceListCall.html), [*patch*](struct.ChromeosdevicePatchCall.html) and [*update*](struct.ChromeosdeviceUpdateCall.html)
+//! * [customers](struct.Customer.html)
+//!  * [*get*](struct.CustomerGetCall.html), [*patch*](struct.CustomerPatchCall.html) and [*update*](struct.CustomerUpdateCall.html)
+//! * domain aliases
+//!  * [*delete*](struct.DomainAliaseDeleteCall.html), [*get*](struct.DomainAliaseGetCall.html), [*insert*](struct.DomainAliaseInsertCall.html) and [*list*](struct.DomainAliaseListCall.html)
+//! * domains
+//!  * [*delete*](struct.DomainDeleteCall.html), [*get*](struct.DomainGetCall.html), [*insert*](struct.DomainInsertCall.html) and [*list*](struct.DomainListCall.html)
 //! * [groups](struct.Group.html)
 //!  * [*aliases delete*](struct.GroupAliaseDeleteCall.html), [*aliases insert*](struct.GroupAliaseInsertCall.html), [*aliases list*](struct.GroupAliaseListCall.html), [*delete*](struct.GroupDeleteCall.html), [*get*](struct.GroupGetCall.html), [*insert*](struct.GroupInsertCall.html), [*list*](struct.GroupListCall.html), [*patch*](struct.GroupPatchCall.html) and [*update*](struct.GroupUpdateCall.html)
 //! * [members](struct.Member.html)
@@ -27,6 +33,12 @@
 //!  * [*delete*](struct.NotificationDeleteCall.html), [*get*](struct.NotificationGetCall.html), [*list*](struct.NotificationListCall.html), [*patch*](struct.NotificationPatchCall.html) and [*update*](struct.NotificationUpdateCall.html)
 //! * orgunits
 //!  * [*delete*](struct.OrgunitDeleteCall.html), [*get*](struct.OrgunitGetCall.html), [*insert*](struct.OrgunitInsertCall.html), [*list*](struct.OrgunitListCall.html), [*patch*](struct.OrgunitPatchCall.html) and [*update*](struct.OrgunitUpdateCall.html)
+//! * [privileges](struct.Privilege.html)
+//!  * [*list*](struct.PrivilegeListCall.html)
+//! * [role assignments](struct.RoleAssignment.html)
+//!  * [*delete*](struct.RoleAssignmentDeleteCall.html), [*get*](struct.RoleAssignmentGetCall.html), [*insert*](struct.RoleAssignmentInsertCall.html) and [*list*](struct.RoleAssignmentListCall.html)
+//! * [roles](struct.Role.html)
+//!  * [*delete*](struct.RoleDeleteCall.html), [*get*](struct.RoleGetCall.html), [*insert*](struct.RoleInsertCall.html), [*list*](struct.RoleListCall.html), [*patch*](struct.RolePatchCall.html) and [*update*](struct.RoleUpdateCall.html)
 //! * [schemas](struct.Schema.html)
 //!  * [*delete*](struct.SchemaDeleteCall.html), [*get*](struct.SchemaGetCall.html), [*insert*](struct.SchemaInsertCall.html), [*list*](struct.SchemaListCall.html), [*patch*](struct.SchemaPatchCall.html) and [*update*](struct.SchemaUpdateCall.html)
 //! * [tokens](struct.Token.html)
@@ -40,9 +52,9 @@
 //! Subscription supported by ...
 //! 
 //! * [*list users*](struct.UserListCall.html)
-//! * [*aliases list users*](struct.UserAliaseListCall.html)
 //! * [*watch users*](struct.UserWatchCall.html)
 //! * [*aliases watch users*](struct.UserAliaseWatchCall.html)
+//! * [*aliases list users*](struct.UserAliaseListCall.html)
 //! * [*aliases list groups*](struct.GroupAliaseListCall.html)
 //! 
 //! 
@@ -146,18 +158,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.users().watch(req)
-//!              .view_type("sanctus")
-//!              .sort_order("voluptua.")
-//!              .show_deleted("dolor")
-//!              .query("et")
-//!              .projection("et")
-//!              .page_token("vero")
-//!              .order_by("ut")
-//!              .max_results(-30)
-//!              .event("et")
-//!              .domain("ipsum")
-//!              .customer("justo")
-//!              .custom_field_mask("dolore")
+//!              .view_type("et")
+//!              .sort_order("Stet")
+//!              .show_deleted("sed")
+//!              .query("dolor")
+//!              .projection("sanctus")
+//!              .page_token("dolore")
+//!              .order_by("Lorem")
+//!              .max_results(-96)
+//!              .event("consetetur")
+//!              .domain("eirmod")
+//!              .customer("labore")
+//!              .custom_field_mask("gubergren")
 //!              .doit();
 //! 
 //! match result {

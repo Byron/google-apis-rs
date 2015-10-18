@@ -24,7 +24,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube Analytics* API at revision *20150304*. The CLI is at version *0.3.2*.
+This documentation was generated from the *YouTube Analytics* API at revision *20150921*. The CLI is at version *0.3.2*.
 
 ```bash
 youtubeanalytics1 [options]

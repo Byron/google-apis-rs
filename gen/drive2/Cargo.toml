@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive2"
-version = "0.1.9+20150709"
+version = "0.1.9+20151008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive2"

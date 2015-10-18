@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-plus1` library allows access to all features of the *Google plus* service.
 
-This documentation was generated from *plus* crate version *0.1.9+20150719*, where *20150719* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *plus* crate version *0.1.9+20151014*, where *20151014* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 
 Everything else about the *plus* *v1* API can be found at the
 [official documentation site](https://developers.google.com/+/api/).
@@ -18,7 +18,7 @@ Handle the following *Resources* with ease from the central [hub](http://byron.g
 * [comments](http://byron.github.io/google-apis-rs/google_plus1/struct.Comment.html)
  * [*get*](http://byron.github.io/google-apis-rs/google_plus1/struct.CommentGetCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_plus1/struct.CommentListCall.html)
 * [moments](http://byron.github.io/google-apis-rs/google_plus1/struct.Moment.html)
- * [*insert*](http://byron.github.io/google-apis-rs/google_plus1/struct.MomentInsertCall.html), [*list*](http://byron.github.io/google-apis-rs/google_plus1/struct.MomentListCall.html) and [*remove*](http://byron.github.io/google-apis-rs/google_plus1/struct.MomentRemoveCall.html)
+ * [*insert*](http://byron.github.io/google-apis-rs/google_plus1/struct.MomentInsertCall.html) and [*list*](http://byron.github.io/google-apis-rs/google_plus1/struct.MomentListCall.html)
 * people
  * [*get*](http://byron.github.io/google-apis-rs/google_plus1/struct.PeopleGetCall.html), [*list*](http://byron.github.io/google-apis-rs/google_plus1/struct.PeopleListCall.html), [*list by activity*](http://byron.github.io/google-apis-rs/google_plus1/struct.PeopleListByActivityCall.html) and [*search*](http://byron.github.io/google-apis-rs/google_plus1/struct.PeopleSearchCall.html)
 

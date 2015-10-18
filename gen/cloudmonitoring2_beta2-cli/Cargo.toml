@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2-cli"
-version = "0.3.2+20150713"
+version = "0.3.2+20151012"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli"

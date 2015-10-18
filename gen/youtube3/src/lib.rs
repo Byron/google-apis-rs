@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *0.1.9+20150706*, where *20150706* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *YouTube* crate version *0.1.9+20151012*, where *20151012* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -158,13 +158,13 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.live_broadcasts().list("part")
-//!              .page_token("erat")
-//!              .on_behalf_of_content_owner_channel("amet.")
-//!              .on_behalf_of_content_owner("dolores")
+//!              .page_token("Lorem")
+//!              .on_behalf_of_content_owner_channel("dolor")
+//!              .on_behalf_of_content_owner("vero")
 //!              .mine(false)
-//!              .max_results(78)
-//!              .id("sed")
-//!              .broadcast_status("et")
+//!              .max_results(93)
+//!              .id("dolores")
+//!              .broadcast_status("consetetur")
 //!              .doit();
 //! 
 //! match result {

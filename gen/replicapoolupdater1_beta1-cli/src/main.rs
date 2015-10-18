@@ -190,8 +190,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                     "creation-timestamp" => Some(("creationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "old-instance-template" => Some(("oldInstanceTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "auto-pause-after-instances", "creation-timestamp", "description", "id", "instance-group", "instance-group-manager", "instance-startup-timeout-sec", "instance-template", "kind", "max-num-concurrent-instances", "max-num-failed-instances", "min-instance-update-time-sec", "policy", "progress", "self-link", "status", "status-message", "user"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action-type", "auto-pause-after-instances", "creation-timestamp", "description", "id", "instance-group", "instance-group-manager", "instance-startup-timeout-sec", "instance-template", "kind", "max-num-concurrent-instances", "max-num-failed-instances", "min-instance-update-time-sec", "old-instance-template", "policy", "progress", "self-link", "status", "status-message", "user"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -263,9 +264,6 @@ impl<'n, 'a> Engine<'n, 'a> {
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
-                "instance-group-manager" => {
-                    call = call.instance_group_manager(value.unwrap_or(""));
-                },
                 "filter" => {
                     call = call.filter(value.unwrap_or(""));
                 },
@@ -282,7 +280,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(), 
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-token", "max-results", "instance-group-manager"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -586,6 +584,68 @@ impl<'n, 'a> Engine<'n, 'a> {
         }
     }
 
+    fn _zone_operations_list(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.zone_operations().list(opt.value_of("project").unwrap_or(""), opt.value_of("zone").unwrap_or(""));
+        for parg in opt.values_of("v").unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "max-results"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema);
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -627,6 +687,9 @@ impl<'n, 'a> Engine<'n, 'a> {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
                         call_result = self._zone_operations_get(opt, dry_run, &mut err);
+                    },
+                    ("list", Some(opt)) => {
+                        call_result = self._zone_operations_list(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("zone-operations".to_string()));
@@ -985,7 +1048,7 @@ fn main() {
                   ]),
             ]),
         
-        ("zone-operations", "methods: 'get'", vec![
+        ("zone-operations", "methods: 'get' and 'list'", vec![
             ("get",  
                     Some(r##"Retrieves the specified zone-specific operation resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1_cli/zone-operations_get",
@@ -1020,13 +1083,41 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("list",  
+                    Some(r##"Retrieves the list of Operation resources contained within the specified zone."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1_cli/zone-operations_list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"Name of the project scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"zone"##),
+                     None,
+                     Some(r##"Name of the zone scoping this request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("replicapoolupdater1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150326")
+           .version("0.3.2+20150904")
            .about("The Google Compute Engine Instance Group Updater API provides services for updating groups of Compute Engine Instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_replicapoolupdater1_beta1_cli")
            .arg(Arg::with_name("url")

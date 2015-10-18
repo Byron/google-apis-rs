@@ -1,0 +1,29 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-adexchangebuyer1d4"
+version = "0.1.9+20150909"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Ad Exchange Buyer (protocol v1.4)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer1d4"
+homepage = "https://developers.google.com/ad-exchange/buyer-rest"
+documentation = "http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4"
+license = "MIT"
+keywords = ["adexchangebuyer", "google", "protocol", "web", "api"]
+build = "src/build.rs"
+
+
+[dependencies]
+hyper = ">= 0.6.8"
+mime = "0.1.0"
+serde = ">= 0.6.0"
+serde_json = ">= 0.6.0"
+yup-oauth2 = "*"
+url = "*"
+
+[build-dependencies]
+syntex = { version = "*" }
+serde_codegen = { version = "*" }
+

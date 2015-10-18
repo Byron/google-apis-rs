@@ -3454,7 +3454,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3476,7 +3476,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3504,7 +3504,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3532,7 +3532,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3554,7 +3554,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3588,7 +3588,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3622,7 +3622,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3653,7 +3653,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3669,7 +3669,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3729,7 +3729,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3757,7 +3757,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3810,7 +3810,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3826,7 +3826,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3842,7 +3842,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3886,7 +3886,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3914,7 +3914,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -3983,7 +3983,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4005,7 +4005,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4033,7 +4033,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4061,7 +4061,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4089,7 +4089,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4117,7 +4117,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4173,7 +4173,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4207,7 +4207,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4235,7 +4235,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4269,7 +4269,7 @@ fn main() {
                   vec![
                     (Some(r##"calendar-id"##),
                      None,
-                     Some(r##"Calendar identifier."##),
+                     Some(r##"Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword."##),
                      Some(true),
                      Some(false)),
         
@@ -4385,7 +4385,7 @@ fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("0.3.2+20150715")
+           .version("0.3.2+20151011")
            .about("Lets you manipulate events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *0.1.9+20150318*, where *20150318* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *books* crate version *0.1.9+20150921*, where *20150921* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -23,8 +23,12 @@
 //!  * [*get user settings*](struct.MyconfigGetUserSettingCall.html), [*release download access*](struct.MyconfigReleaseDownloadAccesCall.html), [*request access*](struct.MyconfigRequestAccesCall.html), [*sync volume licenses*](struct.MyconfigSyncVolumeLicenseCall.html) and [*update user settings*](struct.MyconfigUpdateUserSettingCall.html)
 //! * mylibrary
 //!  * [*annotations delete*](struct.MylibraryAnnotationDeleteCall.html), [*annotations insert*](struct.MylibraryAnnotationInsertCall.html), [*annotations list*](struct.MylibraryAnnotationListCall.html), [*annotations summary*](struct.MylibraryAnnotationSummaryCall.html), [*annotations update*](struct.MylibraryAnnotationUpdateCall.html), [*bookshelves add volume*](struct.MylibraryBookshelveAddVolumeCall.html), [*bookshelves clear volumes*](struct.MylibraryBookshelveClearVolumeCall.html), [*bookshelves get*](struct.MylibraryBookshelveGetCall.html), [*bookshelves list*](struct.MylibraryBookshelveListCall.html), [*bookshelves move volume*](struct.MylibraryBookshelveMoveVolumeCall.html), [*bookshelves remove volume*](struct.MylibraryBookshelveRemoveVolumeCall.html), [*bookshelves volumes list*](struct.MylibraryBookshelveVolumeListCall.html), [*readingpositions get*](struct.MylibraryReadingpositionGetCall.html) and [*readingpositions set position*](struct.MylibraryReadingpositionSetPositionCall.html)
+//! * [notification](struct.Notification.html)
+//!  * [*get*](struct.NotificationGetCall.html)
 //! * onboarding
 //!  * [*list categories*](struct.OnboardingListCategoryCall.html) and [*list category volumes*](struct.OnboardingListCategoryVolumeCall.html)
+//! * personalizedstream
+//!  * [*get*](struct.PersonalizedstreamGetCall.html)
 //! * promooffer
 //!  * [*accept*](struct.PromoofferAcceptCall.html), [*dismiss*](struct.PromoofferDismisCall.html) and [*get*](struct.PromoofferGetCall.html)
 //! * [volumes](struct.Volume.html)
@@ -117,18 +121,18 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.volumes().list("q")
-//!              .start_index(80)
-//!              .source("tempor")
+//!              .start_index(18)
+//!              .source("elitr")
 //!              .show_preorders(false)
-//!              .projection("dolore")
-//!              .print_type("amet.")
-//!              .partner("dolore")
-//!              .order_by("magna")
-//!              .max_results(7)
-//!              .library_restrict("magna")
-//!              .lang_restrict("ipsum")
-//!              .filter("invidunt")
-//!              .download("accusam")
+//!              .projection("ipsum")
+//!              .print_type("invidunt")
+//!              .partner("accusam")
+//!              .order_by("labore")
+//!              .max_results(22)
+//!              .library_restrict("nonumy")
+//!              .lang_restrict("sed")
+//!              .filter("diam")
+//!              .download("magna")
 //!              .doit();
 //! 
 //! match result {
