@@ -433,7 +433,7 @@ impl TokenStorage for JsonTokenStorage {
 
     fn get(&self, scope_hash: u64, _: &Vec<&str>) -> Result<Option<Token>, json::Error> {
         match fs::File::open(&self.path(scope_hash)) {
-            Ok(mut f) => {
+            Ok(f) => {
                 match json::de::from_reader(f) {
                     Ok(token) => Ok(Some(token)),
                     Err(err)  => Err(err),
@@ -578,7 +578,7 @@ impl fmt::Display for CLIError {
                 => writeln!(f, "Failed to parse argument '{}' with value '{}' as {} with error: {}.",
                             arg_name, value, type_name, err_desc),
             CLIError::UnknownParameter(ref param_name, ref possible_values) => {
-                let mut suffix =
+                let suffix =
                     match did_you_mean(param_name, &possible_values) {
                         Some(v) => format!(" Did you mean '{}' ?", v),
                         None => String::new(),
@@ -692,7 +692,7 @@ pub fn application_secret_from_directory(dir: &str,
                 }
                 return secret_io_error(err)
             },
-            Ok(mut f) => {
+            Ok(f) => {
                 match json::de::from_reader::<_, ConsoleApplicationSecret>(f) {
                     Err(json::Error::IoError(err)) =>
                         return secret_io_error(err),
