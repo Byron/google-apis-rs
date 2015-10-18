@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/o6fIbxE4MR_Z46vbs1q1tFmo4DI\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/N6tKJW3LYMQm0Iy7CDmwkEgtf6o\"",
  "discoveryVersion": "v1",
  "id": "storage:v1",
  "name": "storage",
  "version": "v1",
- "revision": "20150710",
- "title": "Cloud Storage API",
+ "revision": "20151007",
+ "title": "Cloud Storage JSON API",
  "description": "Lets you store and retrieve potentially-large, immutable data objects.",
  "ownerDomain": "google.com",
  "ownerName": "Google",
@@ -74,6 +74,9 @@
    "scopes": {
     "https://www.googleapis.com/auth/cloud-platform": {
      "description": "View and manage your data across Google Cloud Platform services"
+    },
+    "https://www.googleapis.com/auth/cloud-platform.read-only": {
+     "description": "View your data across Google Cloud Platform services"
     },
     "https://www.googleapis.com/auth/devstorage.full_control": {
      "description": "Manage your data and permissions in Google Cloud Storage"
@@ -271,7 +274,12 @@
     },
     "timeCreated": {
      "type": "string",
-     "description": "Creation time of the bucket in RFC 3339 format.",
+     "description": "The creation time of the bucket in RFC 3339 format.",
+     "format": "date-time"
+    },
+    "updated": {
+     "type": "string",
+     "description": "The modification time of the bucket in RFC 3339 format.",
      "format": "date-time"
     },
     "versioning": {
@@ -648,6 +656,11 @@
      "type": "string",
      "description": "Storage class of the object."
     },
+    "timeCreated": {
+     "type": "string",
+     "description": "The creation time of the object in RFC 3339 format.",
+     "format": "date-time"
+    },
     "timeDeleted": {
      "type": "string",
      "description": "The deletion time of the object in RFC 3339 format. Will be returned if and only if this version of the object has been deleted.",
@@ -655,7 +668,7 @@
     },
     "updated": {
      "type": "string",
-     "description": "The creation or modification time of the object in RFC 3339 format. For buckets with versioning enabled, changing an object's metadata does not change this property.",
+     "description": "The modification time of the object metadata in RFC 3339 format.",
      "format": "date-time"
     }
    }
@@ -1074,6 +1087,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"
@@ -1211,6 +1225,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"
@@ -1417,6 +1432,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"
@@ -1640,7 +1656,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1680,7 +1696,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1717,7 +1733,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1756,7 +1772,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1798,7 +1814,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1844,7 +1860,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -1882,7 +1898,7 @@
       },
       "destinationObject": {
        "type": "string",
-       "description": "Name of the new object.",
+       "description": "Name of the new object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -1945,7 +1961,7 @@
      "parameters": {
       "destinationBucket": {
        "type": "string",
-       "description": "Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.",
+       "description": "Name of the bucket in which to store the new object. Overrides the provided object metadata's bucket value, if any.For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -2051,7 +2067,7 @@
       },
       "sourceObject": {
        "type": "string",
-       "description": "Name of the source object.",
+       "description": "Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -2119,7 +2135,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -2178,7 +2194,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -2205,6 +2221,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"
@@ -2254,7 +2271,7 @@
       },
       "name": {
        "type": "string",
-       "description": "Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.",
+       "description": "Name of the object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "location": "query"
       },
       "predefinedAcl": {
@@ -2385,6 +2402,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"
@@ -2435,7 +2453,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -2504,7 +2522,7 @@
       },
       "destinationObject": {
        "type": "string",
-       "description": "Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any.",
+       "description": "Name of the new object. Required when the object metadata is not otherwise provided. Overrides the object metadata's name value, if any. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -2615,7 +2633,7 @@
       },
       "sourceObject": {
        "type": "string",
-       "description": "Name of the source object.",
+       "description": "Name of the source object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       }
@@ -2682,7 +2700,7 @@
       },
       "object": {
        "type": "string",
-       "description": "Name of the object.",
+       "description": "Name of the object. For information about how to URL encode object names to be path safe, see Encoding URI Path Parts.",
        "required": true,
        "location": "path"
       },
@@ -2803,6 +2821,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
       "https://www.googleapis.com/auth/devstorage.read_write"

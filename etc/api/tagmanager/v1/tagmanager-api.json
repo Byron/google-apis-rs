@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/RYltSVORyo-2lH4YNllLHLLyJN4\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/-5hQwJsgwNQCq1DK1Ud7--ggMIg\"",
  "discoveryVersion": "v1",
  "id": "tagmanager:v1",
  "name": "tagmanager",
  "canonicalName": "Tag Manager",
  "version": "v1",
- "revision": "20150526",
+ "revision": "20151008",
  "title": "Tag Manager API",
  "description": "API for accessing Tag Manager accounts and containers.",
  "ownerDomain": "google.com",
@@ -158,14 +158,14 @@
    "properties": {
     "parameter": {
      "type": "array",
-     "description": "A list of named parameters (key/value), depending on the condition's type. Notes: \n- For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. \n- At this time, the left operand (arg0) must be a reference to a macro. \n- For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. \n- To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.",
+     "description": "A list of named parameters (key/value), depending on the condition's type. Notes: \n- For binary operators, include parameters named arg0 and arg1 for specifying the left and right operands, respectively. \n- At this time, the left operand (arg0) must be a reference to a variable. \n- For case-insensitive Regex matching, include a boolean parameter named ignore_case that is set to true. If not specified or set to any other value, the matching will be case sensitive. \n- To negate an operator, include a boolean parameter named negate boolean parameter that is set to true.",
      "items": {
       "$ref": "Parameter"
      },
      "annotations": {
       "required": [
-       "tagmanager.accounts.containers.rules.create",
-       "tagmanager.accounts.containers.rules.update"
+       "tagmanager.accounts.containers.triggers.create",
+       "tagmanager.accounts.containers.triggers.update"
       ]
      }
     },
@@ -182,9 +182,11 @@
       "less",
       "lessOrEquals",
       "matchRegex",
-      "startsWith"
+      "startsWith",
+      "urlMatches"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       "",
@@ -198,8 +200,8 @@
      ],
      "annotations": {
       "required": [
-       "tagmanager.accounts.containers.rules.create",
-       "tagmanager.accounts.containers.rules.update"
+       "tagmanager.accounts.containers.triggers.create",
+       "tagmanager.accounts.containers.triggers.update"
       ]
      }
     }
@@ -258,6 +260,7 @@
        "formText",
        "formUrl",
        "historySource",
+       "htmlId",
        "language",
        "newHistoryFragment",
        "newHistoryState",
@@ -274,6 +277,7 @@
        "sdkVersion"
       ],
       "enumDescriptions": [
+       "",
        "",
        "",
        "",
@@ -364,10 +368,14 @@
       "type": "string",
       "enum": [
        "android",
+       "androidSdk5",
        "ios",
+       "iosSdk5",
        "web"
       ],
       "enumDescriptions": [
+       "",
+       "",
        "",
        "",
        ""
@@ -441,6 +449,13 @@
     "fingerprint": {
      "type": "string",
      "description": "The fingerprint of the GTM Container Version as computed at storage time. This value is recomputed whenever the container version is modified."
+    },
+    "folder": {
+     "type": "array",
+     "description": "The folders in the container that this version was taken from.",
+     "items": {
+      "$ref": "Folder"
+     }
     },
     "macro": {
      "type": "array",
@@ -568,6 +583,66 @@
     }
    }
   },
+  "Folder": {
+   "id": "Folder",
+   "type": "object",
+   "description": "Represents a Google Tag Manager Folder.",
+   "properties": {
+    "accountId": {
+     "type": "string",
+     "description": "GTM Account ID."
+    },
+    "containerId": {
+     "type": "string",
+     "description": "GTM Container ID."
+    },
+    "fingerprint": {
+     "type": "string",
+     "description": "The fingerprint of the GTM Folder as computed at storage time. This value is recomputed whenever the folder is modified."
+    },
+    "folderId": {
+     "type": "string",
+     "description": "The Folder ID uniquely identifies the GTM Folder."
+    },
+    "name": {
+     "type": "string",
+     "description": "Folder display name.",
+     "annotations": {
+      "required": [
+       "tagmanager.accounts.containers.folders.create"
+      ]
+     }
+    }
+   }
+  },
+  "FolderEntities": {
+   "id": "FolderEntities",
+   "type": "object",
+   "description": "Represents a Google Tag Manager Folder's contents.",
+   "properties": {
+    "tag": {
+     "type": "array",
+     "description": "The list of tags inside the folder.",
+     "items": {
+      "$ref": "Tag"
+     }
+    },
+    "trigger": {
+     "type": "array",
+     "description": "The list of triggers inside the folder.",
+     "items": {
+      "$ref": "Trigger"
+     }
+    },
+    "variable": {
+     "type": "array",
+     "description": "The list of variables inside the folder.",
+     "items": {
+      "$ref": "Variable"
+     }
+    }
+   }
+  },
   "ListAccountUsersResponse": {
    "id": "ListAccountUsersResponse",
    "type": "object",
@@ -631,30 +706,16 @@
     }
    }
   },
-  "ListMacrosResponse": {
-   "id": "ListMacrosResponse",
+  "ListFoldersResponse": {
+   "id": "ListFoldersResponse",
    "type": "object",
-   "description": "List Macros Response.",
+   "description": "List Folders Response.",
    "properties": {
-    "macros": {
+    "folders": {
      "type": "array",
-     "description": "All GTM Macros of a GTM Container.",
+     "description": "All GTM Folders of a GTM Container.",
      "items": {
-      "$ref": "Macro"
-     }
-    }
-   }
-  },
-  "ListRulesResponse": {
-   "id": "ListRulesResponse",
-   "type": "object",
-   "description": "List Rules Response.",
-   "properties": {
-    "rules": {
-     "type": "array",
-     "description": "All GTM Rules of a GTM Container.",
-     "items": {
-      "$ref": "Rule"
+      "$ref": "Folder"
      }
     }
    }
@@ -738,12 +799,7 @@
     },
     "name": {
      "type": "string",
-     "description": "Macro display name.",
-     "annotations": {
-      "required": [
-       "tagmanager.accounts.containers.macros.create"
-      ]
-     }
+     "description": "Macro display name."
     },
     "notes": {
      "type": "string",
@@ -755,6 +811,10 @@
      "items": {
       "$ref": "Parameter"
      }
+    },
+    "parentFolderId": {
+     "type": "string",
+     "description": "Parent folder id."
     },
     "scheduleEndMs": {
      "type": "string",
@@ -768,13 +828,7 @@
     },
     "type": {
      "type": "string",
-     "description": "GTM Macro Type.",
-     "annotations": {
-      "required": [
-       "tagmanager.accounts.containers.macros.create",
-       "tagmanager.accounts.containers.macros.update"
-      ]
-     }
+     "description": "GTM Macro Type."
     }
    }
   },
@@ -803,7 +857,7 @@
     },
     "type": {
      "type": "string",
-     "description": "The parameter type. Valid values are: \n- boolean: The value represents a boolean, represented as 'true' or 'false' \n- integer: The value represents a 64-bit signed integer value, in base 10 \n- list: A list of parameters should be specified \n- map: A map of parameters should be specified \n- template: The value represents any text; this can include macro references (even macro references that might return non-string types)",
+     "description": "The parameter type. Valid values are: \n- boolean: The value represents a boolean, represented as 'true' or 'false' \n- integer: The value represents a 64-bit signed integer value, in base 10 \n- list: A list of parameters should be specified \n- map: A map of parameters should be specified \n- template: The value represents any text; this can include variable references (even variable references that might return non-string types)",
      "enum": [
       "boolean",
       "integer",
@@ -820,18 +874,18 @@
      ],
      "annotations": {
       "required": [
-       "tagmanager.accounts.containers.macros.create",
-       "tagmanager.accounts.containers.macros.update",
-       "tagmanager.accounts.containers.rules.create",
-       "tagmanager.accounts.containers.rules.update",
        "tagmanager.accounts.containers.tags.create",
-       "tagmanager.accounts.containers.tags.update"
+       "tagmanager.accounts.containers.tags.update",
+       "tagmanager.accounts.containers.triggers.create",
+       "tagmanager.accounts.containers.triggers.update",
+       "tagmanager.accounts.containers.variables.create",
+       "tagmanager.accounts.containers.variables.update"
       ]
      }
     },
     "value": {
      "type": "string",
-     "description": "A parameter's value (may contain macro references such as \"{{myMacro}}\") as appropriate to the specified type."
+     "description": "A parameter's value (may contain variable references such as \"{{myVariable}}\") as appropriate to the specified type."
     }
    }
   },
@@ -876,12 +930,7 @@
     },
     "name": {
      "type": "string",
-     "description": "Rule display name.",
-     "annotations": {
-      "required": [
-       "tagmanager.accounts.containers.rules.create"
-      ]
-     }
+     "description": "Rule display name."
     },
     "notes": {
      "type": "string",
@@ -890,6 +939,20 @@
     "ruleId": {
      "type": "string",
      "description": "The Rule ID uniquely identifies the GTM Rule."
+    }
+   }
+  },
+  "SetupTag": {
+   "id": "SetupTag",
+   "type": "object",
+   "properties": {
+    "stopOnSetupFailure": {
+     "type": "boolean",
+     "description": "If true, fire the main tag if and only if the setup tag fires successfully. If false, fire the main tag regardless of setup tag firing status."
+    },
+    "tagName": {
+     "type": "string",
+     "description": "The name of the setup tag."
     }
    }
   },
@@ -962,6 +1025,10 @@
       "$ref": "Parameter"
      }
     },
+    "parentFolderId": {
+     "type": "string",
+     "description": "Parent folder id."
+    },
     "priority": {
      "$ref": "Parameter",
      "description": "User defined numeric priority of the tag. Tags are fired asynchronously in order of priority. Tags with higher numeric value fire first. A tag's priority can be a positive or negative value. The default value is 0."
@@ -976,9 +1043,37 @@
      "description": "The start timestamp in milliseconds to schedule a tag.",
      "format": "int64"
     },
+    "setupTag": {
+     "type": "array",
+     "description": "The list of setup tags. Currently we only allow one.",
+     "items": {
+      "$ref": "SetupTag"
+     }
+    },
+    "tagFiringOption": {
+     "type": "string",
+     "description": "Option to fire this tag.",
+     "enum": [
+      "oncePerEvent",
+      "oncePerLoad",
+      "unlimited"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      ""
+     ]
+    },
     "tagId": {
      "type": "string",
      "description": "The Tag ID uniquely identifies the GTM Tag."
+    },
+    "teardownTag": {
+     "type": "array",
+     "description": "The list of teardown tags. Currently we only allow one.",
+     "items": {
+      "$ref": "TeardownTag"
+     }
     },
     "type": {
      "type": "string",
@@ -988,6 +1083,20 @@
        "tagmanager.accounts.containers.tags.create"
       ]
      }
+    }
+   }
+  },
+  "TeardownTag": {
+   "id": "TeardownTag",
+   "type": "object",
+   "properties": {
+    "stopTeardownOnFailure": {
+     "type": "boolean",
+     "description": "If true, fire the teardown tag if and only if the main tag fires successfully. If false, fire the teardown tag regardless of main tag firing status."
+    },
+    "tagName": {
+     "type": "string",
+     "description": "The name of the teardown tag."
     }
    }
   },
@@ -1057,6 +1166,10 @@
        "tagmanager.accounts.containers.triggers.create"
       ]
      }
+    },
+    "parentFolderId": {
+     "type": "string",
+     "description": "Parent folder id."
     },
     "triggerId": {
      "type": "string",
@@ -1209,6 +1322,10 @@
      "items": {
       "$ref": "Parameter"
      }
+    },
+    "parentFolderId": {
+     "type": "string",
+     "description": "Parent folder id."
     },
     "scheduleEndMs": {
      "type": "string",
@@ -1462,13 +1579,13 @@
       }
      },
      "resources": {
-      "macros": {
+      "folders": {
        "methods": {
         "create": {
-         "id": "tagmanager.accounts.containers.macros.create",
-         "path": "accounts/{accountId}/containers/{containerId}/macros",
+         "id": "tagmanager.accounts.containers.folders.create",
+         "path": "accounts/{accountId}/containers/{containerId}/folders",
          "httpMethod": "POST",
-         "description": "Creates a GTM Macro.",
+         "description": "Creates a GTM Folder.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1488,20 +1605,20 @@
           "containerId"
          ],
          "request": {
-          "$ref": "Macro"
+          "$ref": "Folder"
          },
          "response": {
-          "$ref": "Macro"
+          "$ref": "Folder"
          },
          "scopes": [
           "https://www.googleapis.com/auth/tagmanager.edit.containers"
          ]
         },
         "delete": {
-         "id": "tagmanager.accounts.containers.macros.delete",
-         "path": "accounts/{accountId}/containers/{containerId}/macros/{macroId}",
+         "id": "tagmanager.accounts.containers.folders.delete",
+         "path": "accounts/{accountId}/containers/{containerId}/folders/{folderId}",
          "httpMethod": "DELETE",
-         "description": "Deletes a GTM Macro.",
+         "description": "Deletes a GTM Folder.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1515,9 +1632,9 @@
            "required": true,
            "location": "path"
           },
-          "macroId": {
+          "folderId": {
            "type": "string",
-           "description": "The GTM Macro ID.",
+           "description": "The GTM Folder ID.",
            "required": true,
            "location": "path"
           }
@@ -1525,17 +1642,17 @@
          "parameterOrder": [
           "accountId",
           "containerId",
-          "macroId"
+          "folderId"
          ],
          "scopes": [
           "https://www.googleapis.com/auth/tagmanager.edit.containers"
          ]
         },
         "get": {
-         "id": "tagmanager.accounts.containers.macros.get",
-         "path": "accounts/{accountId}/containers/{containerId}/macros/{macroId}",
+         "id": "tagmanager.accounts.containers.folders.get",
+         "path": "accounts/{accountId}/containers/{containerId}/folders/{folderId}",
          "httpMethod": "GET",
-         "description": "Gets a GTM Macro.",
+         "description": "Gets a GTM Folder.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1549,9 +1666,9 @@
            "required": true,
            "location": "path"
           },
-          "macroId": {
+          "folderId": {
            "type": "string",
-           "description": "The GTM Macro ID.",
+           "description": "The GTM Folder ID.",
            "required": true,
            "location": "path"
           }
@@ -1559,10 +1676,10 @@
          "parameterOrder": [
           "accountId",
           "containerId",
-          "macroId"
+          "folderId"
          ],
          "response": {
-          "$ref": "Macro"
+          "$ref": "Folder"
          },
          "scopes": [
           "https://www.googleapis.com/auth/tagmanager.edit.containers",
@@ -1570,10 +1687,10 @@
          ]
         },
         "list": {
-         "id": "tagmanager.accounts.containers.macros.list",
-         "path": "accounts/{accountId}/containers/{containerId}/macros",
+         "id": "tagmanager.accounts.containers.folders.list",
+         "path": "accounts/{accountId}/containers/{containerId}/folders",
          "httpMethod": "GET",
-         "description": "Lists all GTM Macros of a Container.",
+         "description": "Lists all GTM Folders of a Container.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1593,7 +1710,7 @@
           "containerId"
          ],
          "response": {
-          "$ref": "ListMacrosResponse"
+          "$ref": "ListFoldersResponse"
          },
          "scopes": [
           "https://www.googleapis.com/auth/tagmanager.edit.containers",
@@ -1601,10 +1718,10 @@
          ]
         },
         "update": {
-         "id": "tagmanager.accounts.containers.macros.update",
-         "path": "accounts/{accountId}/containers/{containerId}/macros/{macroId}",
+         "id": "tagmanager.accounts.containers.folders.update",
+         "path": "accounts/{accountId}/containers/{containerId}/folders/{folderId}",
          "httpMethod": "PUT",
-         "description": "Updates a GTM Macro.",
+         "description": "Updates a GTM Folder.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1620,12 +1737,12 @@
           },
           "fingerprint": {
            "type": "string",
-           "description": "When provided, this fingerprint must match the fingerprint of the macro in storage.",
+           "description": "When provided, this fingerprint must match the fingerprint of the folder in storage.",
            "location": "query"
           },
-          "macroId": {
+          "folderId": {
            "type": "string",
-           "description": "The GTM Macro ID.",
+           "description": "The GTM Folder ID.",
            "required": true,
            "location": "path"
           }
@@ -1633,163 +1750,71 @@
          "parameterOrder": [
           "accountId",
           "containerId",
-          "macroId"
+          "folderId"
          ],
          "request": {
-          "$ref": "Macro"
+          "$ref": "Folder"
          },
          "response": {
-          "$ref": "Macro"
+          "$ref": "Folder"
          },
          "scopes": [
           "https://www.googleapis.com/auth/tagmanager.edit.containers"
          ]
         }
+       },
+       "resources": {
+        "entities": {
+         "methods": {
+          "list": {
+           "id": "tagmanager.accounts.containers.folders.entities.list",
+           "path": "accounts/{accountId}/containers/{containerId}/folders/{folderId}/entities",
+           "httpMethod": "GET",
+           "description": "List all entities in a GTM Folder.",
+           "parameters": {
+            "accountId": {
+             "type": "string",
+             "description": "The GTM Account ID.",
+             "required": true,
+             "location": "path"
+            },
+            "containerId": {
+             "type": "string",
+             "description": "The GTM Container ID.",
+             "required": true,
+             "location": "path"
+            },
+            "folderId": {
+             "type": "string",
+             "description": "The GTM Folder ID.",
+             "required": true,
+             "location": "path"
+            }
+           },
+           "parameterOrder": [
+            "accountId",
+            "containerId",
+            "folderId"
+           ],
+           "response": {
+            "$ref": "FolderEntities"
+           },
+           "scopes": [
+            "https://www.googleapis.com/auth/tagmanager.edit.containers",
+            "https://www.googleapis.com/auth/tagmanager.readonly"
+           ]
+          }
+         }
+        }
        }
       },
-      "rules": {
+      "move_folders": {
        "methods": {
-        "create": {
-         "id": "tagmanager.accounts.containers.rules.create",
-         "path": "accounts/{accountId}/containers/{containerId}/rules",
-         "httpMethod": "POST",
-         "description": "Creates a GTM Rule.",
-         "parameters": {
-          "accountId": {
-           "type": "string",
-           "description": "The GTM Account ID.",
-           "required": true,
-           "location": "path"
-          },
-          "containerId": {
-           "type": "string",
-           "description": "The GTM Container ID.",
-           "required": true,
-           "location": "path"
-          }
-         },
-         "parameterOrder": [
-          "accountId",
-          "containerId"
-         ],
-         "request": {
-          "$ref": "Rule"
-         },
-         "response": {
-          "$ref": "Rule"
-         },
-         "scopes": [
-          "https://www.googleapis.com/auth/tagmanager.edit.containers"
-         ]
-        },
-        "delete": {
-         "id": "tagmanager.accounts.containers.rules.delete",
-         "path": "accounts/{accountId}/containers/{containerId}/rules/{ruleId}",
-         "httpMethod": "DELETE",
-         "description": "Deletes a GTM Rule.",
-         "parameters": {
-          "accountId": {
-           "type": "string",
-           "description": "The GTM Account ID.",
-           "required": true,
-           "location": "path"
-          },
-          "containerId": {
-           "type": "string",
-           "description": "The GTM Container ID.",
-           "required": true,
-           "location": "path"
-          },
-          "ruleId": {
-           "type": "string",
-           "description": "The GTM Rule ID.",
-           "required": true,
-           "location": "path"
-          }
-         },
-         "parameterOrder": [
-          "accountId",
-          "containerId",
-          "ruleId"
-         ],
-         "scopes": [
-          "https://www.googleapis.com/auth/tagmanager.edit.containers"
-         ]
-        },
-        "get": {
-         "id": "tagmanager.accounts.containers.rules.get",
-         "path": "accounts/{accountId}/containers/{containerId}/rules/{ruleId}",
-         "httpMethod": "GET",
-         "description": "Gets a GTM Rule.",
-         "parameters": {
-          "accountId": {
-           "type": "string",
-           "description": "The GTM Account ID.",
-           "required": true,
-           "location": "path"
-          },
-          "containerId": {
-           "type": "string",
-           "description": "The GTM Container ID.",
-           "required": true,
-           "location": "path"
-          },
-          "ruleId": {
-           "type": "string",
-           "description": "The GTM Rule ID.",
-           "required": true,
-           "location": "path"
-          }
-         },
-         "parameterOrder": [
-          "accountId",
-          "containerId",
-          "ruleId"
-         ],
-         "response": {
-          "$ref": "Rule"
-         },
-         "scopes": [
-          "https://www.googleapis.com/auth/tagmanager.edit.containers",
-          "https://www.googleapis.com/auth/tagmanager.readonly"
-         ]
-        },
-        "list": {
-         "id": "tagmanager.accounts.containers.rules.list",
-         "path": "accounts/{accountId}/containers/{containerId}/rules",
-         "httpMethod": "GET",
-         "description": "Lists all GTM Rules of a Container.",
-         "parameters": {
-          "accountId": {
-           "type": "string",
-           "description": "The GTM Account ID.",
-           "required": true,
-           "location": "path"
-          },
-          "containerId": {
-           "type": "string",
-           "description": "The GTM Container ID.",
-           "required": true,
-           "location": "path"
-          }
-         },
-         "parameterOrder": [
-          "accountId",
-          "containerId"
-         ],
-         "response": {
-          "$ref": "ListRulesResponse"
-         },
-         "scopes": [
-          "https://www.googleapis.com/auth/tagmanager.edit.containers",
-          "https://www.googleapis.com/auth/tagmanager.readonly"
-         ]
-        },
         "update": {
-         "id": "tagmanager.accounts.containers.rules.update",
-         "path": "accounts/{accountId}/containers/{containerId}/rules/{ruleId}",
+         "id": "tagmanager.accounts.containers.move_folders.update",
+         "path": "accounts/{accountId}/containers/{containerId}/move_folders/{folderId}",
          "httpMethod": "PUT",
-         "description": "Updates a GTM Rule.",
+         "description": "Moves entities to a GTM Folder.",
          "parameters": {
           "accountId": {
            "type": "string",
@@ -1803,31 +1828,35 @@
            "required": true,
            "location": "path"
           },
-          "fingerprint": {
+          "folderId": {
            "type": "string",
-           "description": "When provided, this fingerprint must match the fingerprint of the rule in storage.",
+           "description": "The GTM Folder ID.",
+           "required": true,
+           "location": "path"
+          },
+          "tagId": {
+           "type": "string",
+           "description": "The tags to be moved to the folder.",
+           "repeated": true,
            "location": "query"
           },
-          "ruleId": {
+          "triggerId": {
            "type": "string",
-           "description": "The GTM Rule ID.",
-           "required": true,
-           "location": "path"
+           "description": "The triggers to be moved to the folder.",
+           "repeated": true,
+           "location": "query"
+          },
+          "variableId": {
+           "type": "string",
+           "description": "The variables to be moved to the folder.",
+           "repeated": true,
+           "location": "query"
           }
          },
          "parameterOrder": [
           "accountId",
           "containerId",
-          "ruleId"
-         ],
-         "request": {
-          "$ref": "Rule"
-         },
-         "response": {
-          "$ref": "Rule"
-         },
-         "scopes": [
-          "https://www.googleapis.com/auth/tagmanager.edit.containers"
+          "folderId"
          ]
         }
        }
@@ -2579,7 +2608,7 @@
          "id": "tagmanager.accounts.containers.versions.restore",
          "path": "accounts/{accountId}/containers/{containerId}/versions/{containerVersionId}/restore",
          "httpMethod": "POST",
-         "description": "Restores a Container Version. This will overwrite the container's current configuration (including its macros, rules and tags). The operation will not have any effect on the version that is being served (i.e. the published version).",
+         "description": "Restores a Container Version. This will overwrite the container's current configuration (including its variables, triggers and tags). The operation will not have any effect on the version that is being served (i.e. the published version).",
          "parameters": {
           "accountId": {
            "type": "string",

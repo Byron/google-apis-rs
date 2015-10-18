@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/cQvoowMiSr7N8G8JWSVMnopHtSU\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/zGXHhFNf_BjX91GfOIqcxzMz9hQ\"",
  "discoveryVersion": "v1",
  "id": "resourceviews:v1beta1",
  "name": "resourceviews",
@@ -74,6 +74,9 @@
    "scopes": {
     "https://www.googleapis.com/auth/cloud-platform": {
      "description": "View and manage your data across Google Cloud Platform services"
+    },
+    "https://www.googleapis.com/auth/cloud-platform.read-only": {
+     "description": "View your data across Google Cloud Platform services"
     },
     "https://www.googleapis.com/auth/compute": {
      "description": "View and manage your Google Compute Engine resources"
@@ -425,6 +428,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",
@@ -508,6 +512,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",
@@ -563,6 +568,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",
@@ -722,6 +728,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",
@@ -805,6 +812,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",
@@ -860,6 +868,7 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly",
       "https://www.googleapis.com/auth/ndev.cloudman",

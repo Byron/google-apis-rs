@@ -5,6 +5,7 @@ api:
   list:
     adexchangebuyer:
     - v1.3
+    - v1.4
     adexchangeseller:
     - v2.0
     admin:
@@ -21,6 +22,8 @@ api:
     - v1
     androidpublisher:
     - v2
+    appengine:
+    - v1beta4
     appsactivity:
     - v1
     appstate:
@@ -39,6 +42,12 @@ api:
     - v3
     civicinfo:
     - v2
+    classroom:
+    - v1
+    cloudbilling:
+    - v1
+    clouddebugger:
+    - v2
     cloudlatencytest:
     - v2
     cloudmonitoring:
@@ -47,12 +56,18 @@ api:
     - v1beta1
     cloudsearch:
     - v1
+    cloudtrace:
+    - v1
+    clouduseraccounts:
+    - vm_beta
     compute:
     - v1
     container:
+    - v1
     - v1beta1
     content:
     - v2
+    - v2sandbox
     coordinate:
     - v1
     customsearch:
@@ -62,9 +77,11 @@ api:
     datastore:
     - v1beta2
     deploymentmanager:
+    - v2
     - v2beta2
     dfareporting:
     - v2.1
+    - v2.2
     discovery:
     - v1
     dns:
@@ -104,6 +121,7 @@ api:
     - v1
     logging:
     - v1beta3
+    - v2beta1
     manager:
     - v1beta2
     mapsengine:
@@ -114,13 +132,20 @@ api:
     - v2
     pagespeedonline:
     - v2
+    partners:
+    - v2
+    playmoviespartner:
+    - v1
     plus:
     - v1
     plusdomains:
     - v1
     prediction:
     - v1.6
+    proximitybeacon:
+    - v1beta1
     pubsub:
+    - v1
     - v1beta2
     qpxexpress:
     - v1
@@ -132,6 +157,8 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
+    script:
+    - v1
     siteverification:
     - v1
     spectrum:
@@ -139,6 +166,8 @@ api:
     sqladmin:
     - v1beta4
     storage:
+    - v1
+    storagetransfer:
     - v1
     tagmanager:
     - v1
@@ -157,4 +186,6 @@ api:
     youtube:
     - v3
     youtubeanalytics:
+    - v1
+    youtubereporting:
     - v1

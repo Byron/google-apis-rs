@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/GjMYVSVyLqOyv-ANl0uM1bR0w3c\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/VJrCHXHaMQfXi6fEi9qa_MKwS3Y\"",
  "discoveryVersion": "v1",
  "id": "identitytoolkit:v3",
  "name": "identitytoolkit",
  "canonicalName": "Identity Toolkit",
  "version": "v3",
- "revision": "20150710",
+ "revision": "20151008",
  "title": "Google Identity Toolkit API",
  "description": "Help the third party sites to implement federated login.",
  "ownerDomain": "google.com",
@@ -549,6 +549,10 @@
      "description": "The fixed string \"identitytoolkit#SetAccountInfoResponse\".",
      "default": "identitytoolkit#SetAccountInfoResponse"
     },
+    "newEmail": {
+     "type": "string",
+     "description": "The new email the user attempts to change to."
+    },
     "providerUserInfo": {
      "type": "array",
      "description": "The user's profiles at the associated IdPs.",
@@ -765,6 +769,10 @@
      "type": "boolean",
      "description": "Whether the assertion is from a non-trusted IDP and need account linking confirmation."
     },
+    "needEmail": {
+     "type": "boolean",
+     "description": "Whether need client to supply email to complete the federated login flow."
+    },
     "nickName": {
      "type": "string",
      "description": "The nick name of the user."
@@ -840,6 +848,19 @@
     "localId": {
      "type": "string",
      "description": "The RP local ID if it's already been mapped to the IdP account identified by the federated ID."
+    },
+    "oauthAccessToken": {
+     "type": "string",
+     "description": "The OAuth2 access token."
+    },
+    "oauthAuthorizationCode": {
+     "type": "string",
+     "description": "The OAuth2 authorization code."
+    },
+    "oauthExpireIn": {
+     "type": "integer",
+     "description": "The lifetime in seconds of the OAuth2 access token.",
+     "format": "int32"
     },
     "photoUrl": {
      "type": "string",

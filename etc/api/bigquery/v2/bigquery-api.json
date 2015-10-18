@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/8fCXvMLivGaIg88cw7WCZo5CK_s\"",
+ "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/k_BSN0ZnNv70IWVfokIVycD-7po\"",
  "discoveryVersion": "v1",
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20150720",
+ "revision": "20151009",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -79,6 +79,9 @@
     },
     "https://www.googleapis.com/auth/cloud-platform": {
      "description": "View and manage your data across Google Cloud Platform services"
+    },
+    "https://www.googleapis.com/auth/cloud-platform.read-only": {
+     "description": "View your data across Google Cloud Platform services"
     },
     "https://www.googleapis.com/auth/devstorage.full_control": {
      "description": "Manage your data and permissions in Google Cloud Storage"
@@ -205,7 +208,7 @@
     },
     "location": {
      "type": "string",
-     "description": "[Experimental] The location where the data resides. If not present, the data will be stored in the US."
+     "description": "[Experimental] The geographic location where the dataset should reside. Possible values include EU and US. The default value is US."
     },
     "selfLink": {
      "type": "string",
@@ -318,7 +321,7 @@
     },
     "ignoreUnknownValues": {
      "type": "boolean",
-     "description": "[Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns"
+     "description": "[Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names"
     },
     "maxBadRecords": {
      "type": "integer",
@@ -331,11 +334,11 @@
     },
     "sourceFormat": {
      "type": "string",
-     "description": "[Optional] The data format. External data sources must be in CSV format. The default value is CSV."
+     "description": "[Required] The data format. For CSV files, specify \"CSV\". For newline-delimited JSON, specify \"NEWLINE_DELIMITED_JSON\"."
     },
     "sourceUris": {
      "type": "array",
-     "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. CSV limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.",
+     "description": "[Required] The fully-qualified URIs that point to your data in Google Cloud Storage. Each URI can contain one '*' wildcard character and it must come after the 'bucket' name. Size limits related to load jobs apply to external data sources, plus an additional limit of 10 GB maximum size across all URIs.",
      "items": {
       "type": "string"
      }
@@ -349,6 +352,13 @@
     "cacheHit": {
      "type": "boolean",
      "description": "Whether the query result was fetched from the query cache."
+    },
+    "errors": {
+     "type": "array",
+     "description": "[Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
+     "items": {
+      "$ref": "ErrorProto"
+     }
     },
     "etag": {
      "type": "string",
@@ -851,13 +861,23 @@
    "id": "JobStatistics2",
    "type": "object",
    "properties": {
+    "billingTier": {
+     "type": "integer",
+     "description": "[Output-only] Billing tier for the job.",
+     "format": "int32"
+    },
     "cacheHit": {
      "type": "boolean",
      "description": "[Output-only] Whether the query result was fetched from the query cache."
     },
+    "totalBytesBilled": {
+     "type": "string",
+     "description": "[Output-only] Total bytes billed for the job.",
+     "format": "int64"
+    },
     "totalBytesProcessed": {
      "type": "string",
-     "description": "[Output-only] Total bytes processed for this job.",
+     "description": "[Output-only] Total bytes processed for the job.",
      "format": "int64"
     }
    }
@@ -868,7 +888,7 @@
    "properties": {
     "inputFileBytes": {
      "type": "string",
-     "description": "[Output-only] Number of bytes of source data in a joad job.",
+     "description": "[Output-only] Number of bytes of source data in a load job.",
      "format": "int64"
     },
     "inputFiles": {
@@ -878,7 +898,7 @@
     },
     "outputBytes": {
      "type": "string",
-     "description": "[Output-only] Size of the loaded data in bytes. Note that while an import job is in the running state, this value may change.",
+     "description": "[Output-only] Size of the loaded data in bytes. Note that while a load job is in the running state, this value may change.",
      "format": "int64"
     },
     "outputRows": {
@@ -894,7 +914,7 @@
    "properties": {
     "destinationUriFileCounts": {
      "type": "array",
-     "description": "[Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.",
+     "description": "[Output-only] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.",
      "items": {
       "type": "string",
       "format": "int64"
@@ -1010,7 +1030,7 @@
     },
     "dryRun": {
      "type": "boolean",
-     "description": "[Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run."
+     "description": "[Optional] If set to true, BigQuery doesn't run the job. Instead, if the query is valid, BigQuery returns statistics about the job such as how many bytes would be processed. If the query is invalid, an error returns. The default value is false."
     },
     "kind": {
      "type": "string",
@@ -1055,6 +1075,13 @@
      "type": "boolean",
      "description": "Whether the query result was fetched from the query cache."
     },
+    "errors": {
+     "type": "array",
+     "description": "[Output-only] All errors and warnings encountered during the running of the job. Errors here do not necessarily mean that the job has completed or was unsuccessful.",
+     "items": {
+      "$ref": "ErrorProto"
+     }
+    },
     "jobComplete": {
      "type": "boolean",
      "description": "Whether the query has completed or not. If rows or totalRows are present, this will always be true. If this is false, totalRows will not be available."
@@ -1095,6 +1122,27 @@
     }
    }
   },
+  "Streamingbuffer": {
+   "id": "Streamingbuffer",
+   "type": "object",
+   "properties": {
+    "estimatedBytes": {
+     "type": "string",
+     "description": "[Output-only] A lower-bound estimate of the number of bytes currently in the streaming buffer.",
+     "format": "uint64"
+    },
+    "estimatedRows": {
+     "type": "string",
+     "description": "[Output-only] A lower-bound estimate of the number of rows currently in the streaming buffer.",
+     "format": "uint64"
+    },
+    "oldestEntryTime": {
+     "type": "string",
+     "description": "[Output-only] Contains the timestamp of the oldest entry in the streaming buffer, in milliseconds since the epoch, if the streaming buffer is available.",
+     "format": "uint64"
+    }
+   }
+  },
   "Table": {
    "id": "Table",
    "type": "object",
@@ -1117,6 +1165,10 @@
      "description": "[Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.",
      "format": "int64"
     },
+    "externalDataConfiguration": {
+     "$ref": "ExternalDataConfiguration",
+     "description": "[Experimental] Describes the data format, location, and other properties of a table stored outside of BigQuery. By defining these properties, the data source can then be queried as if it were a standard BigQuery table."
+    },
     "friendlyName": {
      "type": "string",
      "description": "[Optional] A descriptive name for this table."
@@ -1137,16 +1189,16 @@
     },
     "location": {
      "type": "string",
-     "description": "[Optional] The backing storage location."
+     "description": "[Output-only] The geographic location where the table resides. This value is inherited from the dataset."
     },
     "numBytes": {
      "type": "string",
-     "description": "[Output-only] The size of the table in bytes. This property is unavailable for tables that are actively receiving streaming inserts.",
+     "description": "[Output-only] The size of this table in bytes, excluding any data in the streaming buffer.",
      "format": "int64"
     },
     "numRows": {
      "type": "string",
-     "description": "[Output-only] The number of rows of data in this table. This property is unavailable for tables that are actively receiving streaming inserts.",
+     "description": "[Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.",
      "format": "uint64"
     },
     "schema": {
@@ -1156,6 +1208,10 @@
     "selfLink": {
      "type": "string",
      "description": "[Output-only] A URL that can be used to access this resource again."
+    },
+    "streamingBuffer": {
+     "$ref": "Streamingbuffer",
+     "description": "[Output-only] Contains information regarding this table's streaming buffer, if one is present. This field will be absent if the table is not being streamed to or if there is no data in the streaming buffer."
     },
     "tableReference": {
      "$ref": "TableReference",
@@ -1510,7 +1566,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "insert": {
@@ -1577,7 +1634,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "patch": {
@@ -1656,7 +1714,7 @@
      "id": "bigquery.jobs.cancel",
      "path": "project/{projectId}/jobs/{jobId}/cancel",
      "httpMethod": "POST",
-     "description": "Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully.",
+     "description": "Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully. Cancelled jobs may still incur costs.",
      "parameters": {
       "jobId": {
        "type": "string",
@@ -1711,7 +1769,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "getQueryResults": {
@@ -1765,7 +1824,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "insert": {
@@ -1818,7 +1878,7 @@
      "id": "bigquery.jobs.list",
      "path": "projects/{projectId}/jobs",
      "httpMethod": "GET",
-     "description": "Lists all jobs that you started in the specified project. The job list returns in reverse chronological order of when the jobs were created, starting with the most recent job created. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.",
+     "description": "Lists all jobs that you started in the specified project. Job information is available for a six month period after creation. The job list is sorted in reverse chronological order, by job creation time. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.",
      "parameters": {
       "allUsers": {
        "type": "boolean",
@@ -1880,7 +1940,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "query": {
@@ -1907,7 +1968,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     }
    }
@@ -1937,7 +1999,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     }
    }
@@ -2038,7 +2101,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     }
    }
@@ -2115,7 +2179,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "insert": {
@@ -2191,7 +2256,8 @@
      },
      "scopes": [
       "https://www.googleapis.com/auth/bigquery",
-      "https://www.googleapis.com/auth/cloud-platform"
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/cloud-platform.read-only"
      ]
     },
     "patch": {
