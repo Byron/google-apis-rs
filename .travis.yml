@@ -1,8 +1,10 @@
 language: rust
 rust:
 - stable
+- nightly
 script:
   - make docs-all gen-all-cli cargo-api ARGS=test
+  - [[ $TRAVIS_RUST_VERSION = nightly ]] && cargo test
 env:
   global:
     secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
