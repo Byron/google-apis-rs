@@ -26,7 +26,7 @@ name = "${util.program_name()}"
 % endif
 
 [dependencies]
-hyper = ">= 0.6.8"
+hyper = "0.7.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "0.1.0"
 serde = ">= 0.6.0"

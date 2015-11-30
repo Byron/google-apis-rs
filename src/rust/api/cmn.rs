@@ -112,6 +112,14 @@ impl hyper::net::NetworkStream for DummyNetworkStream {
     fn peer_addr(&mut self) -> io::Result<std::net::SocketAddr> {
         Ok("127.0.0.1:1337".parse().unwrap())
     }
+
+    fn set_read_timeout(&self, _dur: Option<std::time::Duration>) -> io::Result<()> {
+        Ok(())
+    }
+
+    fn set_write_timeout(&self, _dur: Option<std::time::Duration>) -> io::Result<()> {
+        Ok(())
+    }
 }
 
 
