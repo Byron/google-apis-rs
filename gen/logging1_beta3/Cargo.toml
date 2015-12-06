@@ -4,7 +4,7 @@
 [package]
 
 name = "google-logging1_beta3"
-version = "0.1.9+20151007"
+version = "0.1.10+20151007"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with logging (protocol v1beta3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/logging1_beta3"
@@ -16,7 +16,7 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.6.8"
+hyper = "0.7.0"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"

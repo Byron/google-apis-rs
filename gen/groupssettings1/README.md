@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-groupssettings1` library allows access to all features of the *Google groupssettings* service.
 
-This documentation was generated from *groupssettings* crate version *0.1.9+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *groupssettings* crate version *0.1.10+20140428*, where *20140428* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *groupssettings* *v1* API can be found at the
 [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).

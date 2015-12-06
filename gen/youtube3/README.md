@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-youtube3` library allows access to all features of the *Google YouTube* service.
 
-This documentation was generated from *YouTube* crate version *0.1.9+20151012*, where *20151012* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *YouTube* crate version *0.1.10+20151012*, where *20151012* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *YouTube* *v3* API can be found at the
 [official documentation site](https://developers.google.com/youtube/v3).

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-plus1` library allows access to all features of the *Google plus* service.
 
-This documentation was generated from *plus* crate version *0.1.9+20151014*, where *20151014* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *plus* crate version *0.1.10+20151014*, where *20151014* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *plus* *v1* API can be found at the
 [official documentation site](https://developers.google.com/+/api/).

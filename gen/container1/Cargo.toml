@@ -4,7 +4,7 @@
 [package]
 
 name = "google-container1"
-version = "0.1.9+20150603"
+version = "0.1.10+20150603"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with container (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/container1"
@@ -16,7 +16,7 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = ">= 0.6.8"
+hyper = "0.7.0"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"

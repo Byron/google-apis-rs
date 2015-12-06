@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *0.1.9+20150831*, where *20150831* is the exact revision of the *deploymentmanager:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *Deployment Manager* crate version *0.1.10+20150831*, where *20150831* is the exact revision of the *deploymentmanager:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 //! 
 //! Everything else about the *Deployment Manager* *v2_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).

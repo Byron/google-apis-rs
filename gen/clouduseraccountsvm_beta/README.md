@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-clouduseraccountsvm_beta` library allows access to all features of the *Google Cloud User Accounts* service.
 
-This documentation was generated from *Cloud User Accounts* crate version *0.1.9+20150924*, where *20150924* is the exact revision of the *clouduseraccounts:vm_beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *Cloud User Accounts* crate version *0.1.10+20150924*, where *20150924* is the exact revision of the *clouduseraccounts:vm_beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *Cloud User Accounts* *vm_beta* API can be found at the
 [official documentation site](https://cloud.google.com/compute/docs/access/user-accounts/api/latest/).

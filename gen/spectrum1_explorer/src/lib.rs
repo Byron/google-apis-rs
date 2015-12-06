@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *spectrum* crate version *0.1.9+20150716*, where *20150716* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *spectrum* crate version *0.1.10+20150716*, where *20150716* is the exact revision of the *spectrum:v1explorer* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 //! 
 //! Everything else about the *spectrum* *v1_explorer* API can be found at the
 //! [official documentation site](http://developers.google.com/spectrum).

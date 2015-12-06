@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-logging2_beta1` library allows access to all features of the *Google logging* service.
 
-This documentation was generated from *logging* crate version *0.1.9+20151007*, where *20151007* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *logging* crate version *0.1.10+20151007*, where *20151007* is the exact revision of the *logging:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *logging* *v2_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/logging/docs/).

@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudbilling1` library allows access to all features of the *Google cloudbilling* service.
 
-This documentation was generated from *cloudbilling* crate version *0.1.9+20150903*, where *20150903* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *cloudbilling* crate version *0.1.10+20150903*, where *20150903* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *cloudbilling* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/billing/).

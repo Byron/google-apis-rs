@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *admin* crate version *0.1.9+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *admin* crate version *0.1.10+20150303*, where *20150303* is the exact revision of the *admin:email_migration_v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 //! 
 //! Everything else about the *admin* *v2_email_migration* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/email-migration/v2/).

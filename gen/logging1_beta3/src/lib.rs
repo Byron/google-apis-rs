@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *logging* crate version *0.1.9+20151007*, where *20151007* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+//! This documentation was generated from *logging* crate version *0.1.10+20151007*, where *20151007* is the exact revision of the *logging:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 //! 
 //! Everything else about the *logging* *v1_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/logging/docs/).

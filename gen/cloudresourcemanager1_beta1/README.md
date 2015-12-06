@@ -5,7 +5,7 @@ DO NOT EDIT !
 -->
 The `google-cloudresourcemanager1_beta1` library allows access to all features of the *Google cloudresourcemanager* service.
 
-This documentation was generated from *cloudresourcemanager* crate version *0.1.9+20150909*, where *20150909* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.9*.
+This documentation was generated from *cloudresourcemanager* crate version *0.1.10+20150909*, where *20150909* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v0.1.10*.
 
 Everything else about the *cloudresourcemanager* *v1_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/resource-manager).
