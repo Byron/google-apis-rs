@@ -17,18 +17,18 @@ keywords = ["plusDomains", "google", "cli"]
 name = "plusdomains1"
 
 [dependencies]
-hyper = ">= 0.6.8"
+hyper = "0.7"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"
-yup-oauth2 = "*"
-strsim = "*"
-yup-hyper-mock = ">=1.0.0"
-clap = ">= 1.0.3"
+yup-oauth2 = "0.5"
+strsim = "0.4"
+yup-hyper-mock = "1.0"
+clap = "1.5"
 
 [build-dependencies]
-syntex = { version = "*" }
-serde_codegen = { version = "*" }
+syntex = { version = ">= 0.23" }
+serde_codegen = { version = ">= 0.6" }
 
 
 [dependencies.google-plusdomains1]

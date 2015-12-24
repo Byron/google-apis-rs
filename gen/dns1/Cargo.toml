@@ -16,14 +16,14 @@ build = "src/build.rs"
 
 
 [dependencies]
-hyper = "0.7.0"
+hyper = "0.7"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"
-yup-oauth2 = "*"
-url = "*"
+yup-oauth2 = "0.5"
+url = ">= 0.5"
 
 [build-dependencies]
-syntex = { version = "*" }
-serde_codegen = { version = "*" }
+syntex = { version = ">= 0.23" }
+serde_codegen = { version = ">= 0.6" }
 
