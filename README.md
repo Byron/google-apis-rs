@@ -47,7 +47,7 @@ To generate the APIs yourself, you will need to meet the following prerequisites
 * **an internet connection and wget**
  * Make will download all other prerequisites automatically into hidden directories within this repository, which requires it to make some downloads via wget.
 * **Rust Stable**
- * This project compiles on *stable* Rust only. You might consider using [Multirust][multirust] to control 
+ * This project compiles on *stable* Rust only. You might consider using [Multirust][multirust] to control
    the toolchain on a per-project basis
 
 ## Using Make
@@ -120,8 +120,8 @@ to obtain a release build on various platforms and deploy them.
 
 ## Setup API and CLI version numbers
 
-The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves 
-to the supported program types, being *cli* and *api* at the time of writing. You can change the 
+The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves
+to the supported program types, being *cli* and *api* at the time of writing. You can change the
 version for all expected artifacts by editing the respective key inside of the yaml (*cargo.build_version*
 at the time of writing).
 
@@ -129,7 +129,7 @@ The following script would regenerate all higher-level programs (*CLI*), add the
 
 ```bash
 $ make gen-all-cli
-# Use the version you are comfortable with in the changelog - sometimes you only want to 
+# Use the version you are comfortable with in the changelog - sometimes you only want to
 # update one program type. Here we go with a multi-version, containing all version strings
 # in one heading. It's just for the visuals, after all.
 $ clog --setversion=api-v<api-version>
@@ -151,7 +151,7 @@ $ make publish-api
 # all clear ? Please proceed ... .
 ```
 
-The previous call will have created plenty of marker files, which need to be committed to the repository to prevent to 
+The previous call will have created plenty of marker files, which need to be committed to the repository to prevent to
 attempt multiple publishes of the same version.
 
 ```bash
@@ -171,9 +171,9 @@ Please apply the following script to your build-systems. Currently it differenti
 # Also adjust -j to suit the capabilities of your machine.
 $ make cargo-cli ARGS="build --release" -j4 -k
 
-# Finally, gather the build result by executing the respective utility script, 
+# Finally, gather the build result by executing the respective utility script,
 # depending on the platform you build on
-$ src/bash/linux-deploy.bash ... # OR 
+$ src/bash/linux-deploy.bash ... # OR
 
 $ src/bash/osx-deploy.bash ...
 ```
@@ -194,7 +194,7 @@ On the CDN, you want to execute the deployment script - the following example as
 with sufficient rights to write the files.
 
 ```bash
-# This script requires you to type in information already contained in the tar file - it's easy to 
+# This script requires you to type in information already contained in the tar file - it's easy to
 # do though ;).
 $ src/bash/linux-deployment-to-downloads.bash ...
 ```
@@ -205,11 +205,11 @@ which is built next.
 ## Build Documentation and post it onto GitHub
 
 The last step will update the documentation index to point to the latest program versions.
-For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be 
+For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be
 hosted statically anywhere if required.
 
-Please note that the generated download URLs are based on the `url_info.download_base_url` key in the 
-`etc/api/shared.yaml` file, in case you want to host the downloads anywhere else. In the latter case, you may 
+Please note that the generated download URLs are based on the `url_info.download_base_url` key in the
+`etc/api/shared.yaml` file, in case you want to host the downloads anywhere else. In the latter case, you may
 want to adjust other base-urls as well.
 
 ```bash
@@ -233,7 +233,6 @@ The license of everything not explicitly under a different license are licensed 
 [playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
 [playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
 [milestones]: https://github.com/Byron/google-apis-rs/milestones
-[multirust]: https://github.com/brson/multirust
 
 ## License
 
@@ -249,3 +248,4 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
+[multirust]: https://github.com/Diggsey/multirust-rs
