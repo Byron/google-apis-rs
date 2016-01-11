@@ -7,7 +7,7 @@ version = "0.0.1"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A library to facilitate interacting with your youtube account"
 repository = "https://github.com/Byron/google-apis-rs"
-license = "MIT"
+license = "MIT/Apache-2.0"
 keywords = ["youtube", "google", "protocol", "not-for-use"]
 
 [lib]
