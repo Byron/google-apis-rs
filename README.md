@@ -233,7 +233,9 @@ The license of everything not explicitly under a different license are licensed 
 [playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
 [playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
 [milestones]: https://github.com/Byron/google-apis-rs/milestones
-[multirust]: https://github.com/brson/multirust## License
+[multirust]: https://github.com/brson/multirust
+
+## License
 
 Licensed under either of
 
