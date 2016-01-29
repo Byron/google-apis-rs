@@ -2,9 +2,9 @@
     from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
                       method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
-                      split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST, 
+                      split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST,
                       schema_to_required_property, rust_copy_value_s, is_required_property,
-                      hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params, 
+                      hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params,
                       indent_by, to_rust_type, rnd_arg_val_for_type, extract_parts, mb_type_params_s,
                       hub_type_params_s, method_media_params, enclose_in, mb_type_bounds, method_response,
                       CALL_BUILDER_MARKERT_TRAIT, pass_through, markdown_rust_block, parts_from_params,
@@ -19,7 +19,7 @@
         return extract_parts(part_prop.get('description', ''))
 
     def make_parts_desc(part_prop):
-        
+
         parts = get_parts(part_prop)
         if not parts:
             return None
@@ -35,7 +35,7 @@
 ###############################################################################################
 ###############################################################################################
 <%def name="new(resource, method, c)">\
-<% 
+<%
     hub_type_name = hub_type(schemas,util.canonical_name())
     m = c.fqan_map[to_fqan(c.rtc_map[resource], resource, method)]
     response_schema = method_response(c, m)
@@ -90,14 +90,14 @@ ${part_desc | rust_doc_comment}
 /// You will need authorization for \
 % if len(m.scopes) > 1:
 at least one of the following scopes to make a valid call, possibly depending on *parts*:
-/// 
+///
 % for s in m.scopes:
 /// * *${s}*
 % endfor
 % else:
 the *${m.scopes[0]}* scope to make a valid call.
 % endif # len(scopes) > 1
-/// 
+///
 /// The default scope will be `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
 % endif # have scopes
 ///
@@ -142,13 +142,13 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 % endfor
 
     /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own 
+    /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
     /// Please note that this method must not be used to set any of the known paramters
     /// which have their own setter method. If done anyway, the request will fail.
     % if parameters:
-    /// 
+    ///
     /// # Additional Parameters
     ///
     % for opn, op in list((opn, op) for (opn, op) in parameters.iteritems() if opn not in [p.name for p in params]):
@@ -163,17 +163,17 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 
     % if method_default_scope(m):
     /// Identifies the authorization scope for the method you are building.
-    /// 
+    ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
     /// `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
-    /// 
+    ///
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn ${ADD_SCOPE_FN}<T>(mut self, scope: T) -> ${ThisType} 
+    pub fn ${ADD_SCOPE_FN}<T>(mut self, scope: T) -> ${ThisType}
                                                         where T: AsRef<str> {
         self.${api.properties.scopes}.insert(scope.as_ref().to_string(), ());
         self
@@ -225,14 +225,14 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     % endif
     % if show_part_info(m, p):
     ///
-    /// Even though the *parts* list is automatically derived from *Resource* passed in 
+    /// Even though the *parts* list is automatically derived from *Resource* passed in
     /// during instantiation and indicates which values you are passing, the response would contain the very same parts.
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
-    /// like statistics that are generated server side. Therefore you should use this method to specify 
+    /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
     % elif is_required_property(p):
     ///
-    /// Even though the property as already been set when instantiating this call, 
+    /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
     % endif
     % if part_desc:
@@ -459,7 +459,7 @@ match result {
             sn = s[1:-1]
 
             # NOTE: We only handle the cases that are actually used in the schemas. If this shouldn't
-            # be worth it anymore (i.e. too many cases), then we should use a uri-template library 
+            # be worth it anymore (i.e. too many cases), then we should use a uri-template library
             # to handle this at runtime, possibly, or use a python uri-template library, to more easily
             # handle the required cases. Whatever is less work, I guess.
             if sn.startswith('/') and sn.endswith('*'):
@@ -490,7 +490,7 @@ match result {
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "${m.id}", 
+        dlg.begin(MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
 <%
@@ -571,7 +571,7 @@ match result {
         % endif ## response schema
 
         % if media_params:
-        let (mut url, upload_type) = 
+        let (mut url, upload_type) =
             % for mp in media_params:
             % if loop.first:
             if \
@@ -582,8 +582,8 @@ protocol == "${mp.protocol}" {
                 ("${join_url(rootUrl, mp.path)}".to_string(), "${upload_type_map.get(mp.protocol, mp.protocol)}")
             } \
             % endfor
-else { 
-                unreachable!() 
+else {
+                unreachable!()
             };
         params.push(("uploadType", upload_type.to_string()));
         % else:
@@ -591,7 +591,7 @@ else {
         % endif
         % if not default_scope:
         % if no_auth is UNDEFINED:
-        <% 
+        <%
             assert 'key' in parameters, "Expected 'key' parameter if there are no scopes"
         %>
         let mut key = ${auth_call}.api_key();
@@ -619,7 +619,7 @@ else {
     replace_init = ': Option<&str> = None'
     replace_assign = 'Some(value)'
     url_replace_arg = 'replace_with.expect("to find substitution value in params")'
-    if URL_ENCODE in special_cases:  
+    if URL_ENCODE in special_cases:
         replace_init = ' = String::new()'
         replace_assign = 'value.to_string()'
         url_replace_arg = '&replace_with'
@@ -652,7 +652,7 @@ else {
             }
         }
         % endif
-        
+
         if params.len() > 0 {
             url.push('?');
             url.push_str(&url::form_urlencoded::serialize(params));
@@ -660,7 +660,7 @@ else {
 
         % if request_value:
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader = 
+        let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self.${property(REQUEST_VALUE_PROPERTY_NAME)});
                 remove_json_null_values(&mut value);
@@ -772,7 +772,7 @@ else {
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep_ms(d.num_milliseconds() as u32);
+                        sleep(Duration::from_millis(d.num_milliseconds() as u64));
                         continue;
                     }
                     ${delegate_finish}(false);
@@ -782,10 +782,10 @@ else {
                     if !res.status.is_success() {
                         let mut json_err = String::new();
                         res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res, 
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep_ms(d.num_milliseconds() as u32);
+                            sleep(Duration::from_millis(d.num_milliseconds() as u64));
                             continue;
                         }
                         ${delegate_finish}(false);
@@ -827,7 +827,7 @@ else {
                                 ${delegate_finish}(false);
                                 return Err(Error::HttpError(err))
                             }
-                            ## Now the result contains the actual resource, if any ... it will be 
+                            ## Now the result contains the actual resource, if any ... it will be
                             ## decoded next
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
