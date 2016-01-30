@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/jn2m36Cyj5Ei-KQXTI8Znl-wUic\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/C2w1FBSA95uk1-Zjy2Ye2MYY6qU\"",
  "discoveryVersion": "v1",
  "id": "discovery:v1",
  "name": "discovery",
@@ -457,6 +457,9 @@
     "version": {
      "type": "string",
      "description": "The version of this API."
+    },
+    "version_module": {
+     "type": "boolean"
     }
    }
   },

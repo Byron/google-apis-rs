@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/P7g-a3C968F6LpsV-dK3V_5H2MQ\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/dadzq60iAtGqkBsDw6XsI82tB8k\"",
  "discoveryVersion": "v1",
  "id": "games:v1",
  "name": "games",
  "canonicalName": "Games",
  "version": "v1",
- "revision": "20151012",
+ "revision": "20160126",
  "title": "Google Play Game Services API",
  "description": "The API for Google Play Game Services.",
  "ownerDomain": "google.com",
@@ -482,6 +482,22 @@
     "secondary": {
      "type": "string",
      "description": "The secondary category."
+    }
+   }
+  },
+  "ApplicationVerifyResponse": {
+   "id": "ApplicationVerifyResponse",
+   "type": "object",
+   "description": "This is a JSON template for a third party application verification response resource.",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "description": "Uniquely identifies the type of this resource. Value is always the fixed string games#applicationVerifyResponse.",
+     "default": "games#applicationVerifyResponse"
+    },
+    "player_id": {
+     "type": "string",
+     "description": "The ID of the player that was issued the auth token used in this request."
     }
    }
   },
@@ -1332,6 +1348,14 @@
      "type": "string",
      "description": "The base URL for the image that represents the player."
     },
+    "bannerUrlLandscape": {
+     "type": "string",
+     "description": "The url to the landscape mode player banner image."
+    },
+    "bannerUrlPortrait": {
+     "type": "string",
+     "description": "The url to the portrait mode player banner image."
+    },
     "displayName": {
      "type": "string",
      "description": "The name to display for the player."
@@ -1362,6 +1386,10 @@
        "description": "The given name of this player. In some places, this is known as the first name."
       }
      }
+    },
+    "originalPlayerId": {
+     "type": "string",
+     "description": "The player ID that was used for this player the first time they signed into the game in question. This is only populated for calls to player.get for the requesting player, only if the player ID has subsequently changed, and only to clients that support remapping player IDs."
     },
     "playerId": {
      "type": "string",
@@ -3263,6 +3291,30 @@
       "https://www.googleapis.com/auth/games",
       "https://www.googleapis.com/auth/plus.login"
      ]
+    },
+    "verify": {
+     "id": "games.applications.verify",
+     "path": "applications/{applicationId}/verify",
+     "httpMethod": "GET",
+     "description": "Verifies the auth token provided with this request is for the application with the specified ID, and returns the ID of the player it was granted for.",
+     "parameters": {
+      "applicationId": {
+       "type": "string",
+       "description": "The application ID from the Google Play developer console.",
+       "required": true,
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "applicationId"
+     ],
+     "response": {
+      "$ref": "ApplicationVerifyResponse"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/games",
+      "https://www.googleapis.com/auth/plus.login"
+     ]
     }
    }
   },
@@ -3541,12 +3593,14 @@
        "enum": [
         "connected",
         "playedWith",
-        "played_with"
+        "played_with",
+        "visible"
        ],
        "enumDescriptions": [
         "Retrieve a list of players that are also playing this game in reverse chronological order.",
         "(DEPRECATED: please use played_with!) Retrieve a list of players you have played a multiplayer game (realtime or turn-based) with recently.",
-        "Retrieve a list of players you have played a multiplayer game (realtime or turn-based) with recently."
+        "Retrieve a list of players you have played a multiplayer game (realtime or turn-based) with recently.",
+        "Retrieve a list of players in the user's social graph that are visible to this game."
        ],
        "location": "path"
       },

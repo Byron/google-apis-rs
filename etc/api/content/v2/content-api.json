@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/9a0Kcwe-I_RuYTkvOCAf5DnBIRE\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/WzxFI4GBYGkZGJCfKJi51ODdQOI\"",
  "discoveryVersion": "v1",
  "id": "content:v2",
  "name": "content",
  "canonicalName": "Shopping Content",
  "version": "v2",
- "revision": "20151002",
+ "revision": "20160115",
  "title": "Content API for Shopping",
  "description": "Manage product items, inventory, and Merchant Center accounts for Google Shopping.",
  "ownerDomain": "google.com",
@@ -1137,7 +1137,7 @@
     },
     "contentLanguage": {
      "type": "string",
-     "description": "The two-letter ISO 639-1 language of the items in the feed.",
+     "description": "The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targetCountry.",
      "annotations": {
       "required": [
        "content.datafeeds.insert"
@@ -1231,7 +1231,7 @@
     },
     "hour": {
      "type": "integer",
-     "description": "The hour of the day the feed file should be fetched (0-24).",
+     "description": "The hour of the day the feed file should be fetched (0-23).",
      "format": "uint32"
     },
     "password": {
@@ -1606,6 +1606,21 @@
     }
    }
   },
+  "Installment": {
+   "id": "Installment",
+   "type": "object",
+   "properties": {
+    "amount": {
+     "$ref": "Price",
+     "description": "The amount the buyer has to pay per month."
+    },
+    "months": {
+     "type": "string",
+     "description": "The number of installments the buyer has to pay.",
+     "format": "int64"
+    }
+   }
+  },
   "Inventory": {
    "id": "Inventory",
    "type": "object",
@@ -1614,10 +1629,18 @@
      "type": "string",
      "description": "The availability of the product."
     },
+    "installment": {
+     "$ref": "Installment",
+     "description": "Number and amount of installments to pay for an item. Brazil only."
+    },
     "kind": {
      "type": "string",
      "description": "Identifies what kind of resource this is. Value: the fixed string \"content#inventory\".",
      "default": "content#inventory"
+    },
+    "loyaltyPoints": {
+     "$ref": "LoyaltyPoints",
+     "description": "Loyalty points that users receive after purchasing the item. Japan only."
     },
     "price": {
      "$ref": "Price",
@@ -1731,6 +1754,14 @@
     "availability": {
      "type": "string",
      "description": "The availability of the product."
+    },
+    "installment": {
+     "$ref": "Installment",
+     "description": "Number and amount of installments to pay for an item. Brazil only."
+    },
+    "loyaltyPoints": {
+     "$ref": "LoyaltyPoints",
+     "description": "Loyalty points that users receive after purchasing the item. Japan only."
     },
     "price": {
      "$ref": "Price",
@@ -2418,6 +2449,10 @@
    "id": "OrdersCancelLineItemRequest",
    "type": "object",
    "properties": {
+    "amount": {
+     "$ref": "Price",
+     "description": "Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order."
+    },
     "lineItemId": {
      "type": "string",
      "description": "The ID of the line item to cancel."
@@ -2605,6 +2640,10 @@
    "id": "OrdersCustomBatchRequestEntryCancelLineItem",
    "type": "object",
    "properties": {
+    "amount": {
+     "$ref": "Price",
+     "description": "Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order."
+    },
     "lineItemId": {
      "type": "string",
      "description": "The ID of the line item to cancel."
@@ -3198,7 +3237,7 @@
      "description": "URL of an image of the item."
     },
     "installment": {
-     "$ref": "ProductInstallment",
+     "$ref": "Installment",
      "description": "Number and amount of installments to pay for an item. Brazil only."
     },
     "isBundle": {
@@ -3431,21 +3470,6 @@
     "intention": {
      "type": "string",
      "description": "Whether the destination is required, excluded or should be validated."
-    }
-   }
-  },
-  "ProductInstallment": {
-   "id": "ProductInstallment",
-   "type": "object",
-   "properties": {
-    "amount": {
-     "$ref": "Price",
-     "description": "The amount the buyer has to pay per month."
-    },
-    "months": {
-     "type": "string",
-     "description": "The number of installments the buyer has to pay.",
-     "format": "int64"
     }
    }
   },
@@ -5927,6 +5951,11 @@
      "httpMethod": "GET",
      "description": "Lists the products in your Merchant Center account.",
      "parameters": {
+      "includeInvalidInsertedItems": {
+       "type": "boolean",
+       "description": "Flag to include the invalid inserted items in the result of the list request. By default the invalid items are not shown (the default value is false).",
+       "location": "query"
+      },
       "maxResults": {
        "type": "integer",
        "description": "The maximum number of products to return in the response, used for paging.",
@@ -6012,6 +6041,11 @@
      "httpMethod": "GET",
      "description": "Lists the statuses of the products in your Merchant Center account.",
      "parameters": {
+      "includeInvalidInsertedItems": {
+       "type": "boolean",
+       "description": "Flag to include the invalid inserted items in the result of the list request. By default the invalid items are not shown (the default value is false).",
+       "location": "query"
+      },
       "maxResults": {
        "type": "integer",
        "description": "The maximum number of product statuses to return in the response, used for paging.",

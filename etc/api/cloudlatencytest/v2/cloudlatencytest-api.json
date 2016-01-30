@@ -1,6 +1,6 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/-PbBjCBr5ChXewUXbKSMo5aP4BY\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/PW6HfcHDC5AsDXJubg0JwdKPyYo\"",
  "discoveryVersion": "v1",
  "id": "cloudlatencytest:v2",
  "name": "cloudlatencytest",

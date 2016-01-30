@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"ye6orv2F-1npMW3u9suM3a7C5Bo/lMIvHESSjSJESC3z65mkw4Xo3pI\"",
+ "etag": "\"bRFOOrZKfO9LweMbPqu0kcu6De8/ZAaGjSDatxyE_oBWtgco_gXf7hY\"",
  "discoveryVersion": "v1",
  "id": "gamesManagement:v1management",
  "name": "gamesManagement",
  "canonicalName": "Games Management",
  "version": "v1management",
- "revision": "20151012",
+ "revision": "20160126",
  "title": "Google Play Game Services Management API",
  "description": "The Management API for Google Play Game Services.",
  "ownerDomain": "google.com",
@@ -277,6 +277,14 @@
      "type": "string",
      "description": "The base URL for the image that represents the player."
     },
+    "bannerUrlLandscape": {
+     "type": "string",
+     "description": "The url to the landscape mode player banner image."
+    },
+    "bannerUrlPortrait": {
+     "type": "string",
+     "description": "The url to the portrait mode player banner image."
+    },
     "displayName": {
      "type": "string",
      "description": "The name to display for the player."
@@ -307,6 +315,10 @@
        "description": "The given name of this player. In some places, this is known as the first name."
       }
      }
+    },
+    "originalPlayerId": {
+     "type": "string",
+     "description": "The player ID that was used for this player the first time they signed into the game in question. This is only populated for calls to player.get for the requesting player, only if the player ID has subsequently changed, and only to clients that support remapping player IDs."
     },
     "playerId": {
      "type": "string",
