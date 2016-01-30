@@ -166,8 +166,6 @@ api:
     - v1sandbox
     resourceviews:
     - v1beta2
-    script:
-    - v1
     serviceregistry:
     - alpha
     siteverification:
