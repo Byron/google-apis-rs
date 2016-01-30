@@ -4,11 +4,11 @@
                       upload_action_fn, is_schema_with_optionals, schema_markers, indent_by, method_default_scope,
                       ADD_SCOPE_FN, TREF, enclose_in)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
                      call_method_ident, POD_TYPES, opt_value, ident, JSON_TYPE_VALUE_MAP,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
-                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG, 
-                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP, 
+                     application_secret_path, DEBUG_FLAG, DEBUG_AUTH_FLAG, CONFIG_DIR_FLAG, req_value, MODE_ARG,
+                     opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP,
                      CTYPE_TO_ENUM_MAP)
 
     v_arg = '<%s>' % VALUE_ARG
@@ -31,7 +31,7 @@
 <%
     hub_type_name = 'api::' + hub_type(c.schemas, util.canonical_name())
 %>\
-use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg, 
+use cmn::{InvalidOptionsError, CLIError, JsonTokenStorage, arg_from_str, writer_from_opts, parse_kv_arg,
           input_file_from_opts, input_mime_from_opts, FieldCursor, FieldError, CallType, UploadProtocol,
           calltype_from_str, remove_json_null_values, ComplexType, JsonType, JsonTypeInfo};
 
@@ -47,24 +47,24 @@ enum DoitError {
     ApiError(api::Error),
 }
 
-struct Engine<'n, 'a> {
-    opt: ArgMatches<'n, 'a>,
+struct Engine<'n> {
+    opt: ArgMatches<'n>,
     hub: ${hub_type_name}<hyper::Client, Authenticator<DefaultAuthenticatorDelegate, JsonTokenStorage, hyper::Client>>,
     gp: ${"Vec<&'static str>"},
     gpm: Vec<(&'static str, &'static str)>,
 }
 
 
-impl<'n, 'a> Engine<'n, 'a> {
+impl<'n> Engine<'n> {
 % for resource in sorted(c.rta_map.keys()):
     % for method in sorted(c.rta_map[resource]):
-    fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n, 'a>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn ${call_method_ident(resource, method)}(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         ${self._method_call_impl(c, resource, method) | indent_all_but_first_by(2)}
     }
 
     % endfor # each method
-% endfor 
+% endfor
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -103,14 +103,14 @@ impl<'n, 'a> Engine<'n, 'a> {
     }
 
     // Please note that this call will fail if any part of the opt can't be handled
-    fn new(opt: ArgMatches<'a, 'n>) -> Result<Engine<'a, 'n>, InvalidOptionsError> {
+    fn new(opt: ArgMatches<'n>) -> Result<Engine<'n>, InvalidOptionsError> {
         let (config_dir, secret) = {
             let config_dir = match cmn::assure_config_dir_exists(opt.value_of("${CONFIG_DIR_ARG}").unwrap_or("${CONFIG_DIR}")) {
                 Err(e) => return Err(InvalidOptionsError::single(e, 3)),
                 Ok(p) => p,
             };
 
-            match cmn::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}", 
+            match cmn::application_secret_from_directory(&config_dir, "${application_secret_path(util.program_name())}",
                                                          "${api.credentials.replace('"', r'\"')}") {
                 Ok(secret) => (config_dir, secret),
                 Err(e) => return Err(InvalidOptionsError::single(e, 4))
@@ -124,7 +124,7 @@ impl<'n, 'a> Engine<'n, 'a> {
                                           db_dir: config_dir.clone(),
                                         }, None);
 
-        let client = 
+        let client =
             ${self._debug_client(DEBUG_FLAG) | indent_all_but_first_by(3)};
 <% gpm = gen_global_parameter_names(parameters) %>\
         let engine = Engine {
@@ -173,7 +173,7 @@ if opt.is_present("${flag_name}") {
     optional_prop_names = set(p.name for p in optional_props)
 
     track_download_flag = (not mc.media_params and
-                           supports_media_download and 
+                           supports_media_download and
                           (parameters is not UNDEFINED and 'alt' in parameters) or ('alt' in optional_prop_names))
     handle_props = optional_props or parameters is not UNDEFINED
     if mc.request_value:
@@ -184,7 +184,7 @@ if opt.is_present("${flag_name}") {
 %>\
     ## REQUIRED PARAMETERS
 % for p in mc.required_props:
-<% 
+<%
     prop_name = mangle_ident(p.name)
     prop_type = activity_rust_type(c.schemas, p, allow_optionals=False)
 %>\
@@ -192,7 +192,7 @@ if opt.is_present("${flag_name}") {
 <% request_prop_type = prop_type %>\
 ${self._request_value_impl(c, request_cli_schema, prop_name, request_prop_type)}\
     % elif p.type != 'string':
-    % if p.get('repeated', False): 
+    % if p.get('repeated', False):
 let ${prop_name}: Vec<${prop_type} = Vec::new();
 for (arg_id, arg) in ${opt_values(mangle_subcommand(p.name))}.enumerate() {
     ${prop_name}.push(arg_from_str(&arg, err, "<${mangle_subcommand(p.name)}>", arg_id), "${p.type}"));
@@ -226,7 +226,7 @@ for parg in ${opt_values(VALUE_ARG)} {
     let (key, value) = parse_kv_arg(&*parg, err, false);
     match key {
 % for p in optional_props:
-<% 
+<%
     ptype = actual_json_type(p.name, p.type)
     value_unwrap = 'value.unwrap_or("%s")' % JSON_TYPE_VALUE_MAP[ptype]
 %>\
@@ -263,7 +263,7 @@ ${value_unwrap}\
                 }
             }
             if !found {
-                err.issues.push(CLIError::UnknownParameter(key.to_string(), 
+                err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                           {let mut v = Vec::new();
                                                                    v.extend(self.gp.iter().map(|v|*v));
 % if comma_sep_fields(optional_prop_names):
@@ -276,7 +276,7 @@ ${value_unwrap}\
 }
 % endif # handle call parameters
 % if mc.media_params:
-let vals = opt.values_of("${MODE_ARG}").unwrap();
+let vals = opt.values_of("${MODE_ARG}").unwrap().collect::<Vec<${'&'}str>>();
 let protocol = calltype_from_str(vals[0], [${', '.join('"%s"' % mp.protocol for mp in mc.media_params)}].iter().map(|&v| v.to_string()).collect(), err);
 let mut input_file = input_file_from_opts(vals[1], err);
 let mime_type = input_mime_from_opts(${opt_value(MIME_ARG, default=DEFAULT_MIME)}, err);
@@ -390,10 +390,10 @@ for kvarg in ${opt_values(KEY_VALUE_ARG)} {
         }
         continue;
     }
-   
+
     ## This type-annotation is not required in nightly (or newer rustc)
     ## TODO(ST): try to remove it once there is a newer stable
-    let type_info: Option<(&'static str, JsonTypeInfo)> = 
+    let type_info: Option<(&'static str, JsonTypeInfo)> =
         match &temp_cursor.to_string()[..] {
     % for schema, fe, f in schema_fields:
 <%

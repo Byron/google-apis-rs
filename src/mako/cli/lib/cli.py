@@ -39,8 +39,8 @@ POD_TYPES = set(('boolean', 'integer', 'number', 'uint32', 'double', 'float', 'i
 
 re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE|re.DOTALL)
 
-MethodContext = collections.namedtuple('MethodContext', ['m', 'response_schema', 'params', 'request_value', 
-                                                         'media_params' ,'required_props', 'optional_props', 
+MethodContext = collections.namedtuple('MethodContext', ['m', 'response_schema', 'params', 'request_value',
+                                                         'media_params' ,'required_props', 'optional_props',
                                                          'part_prop'])
 
 CTYPE_POD = 'pod'
@@ -93,9 +93,9 @@ def new_method_context(resource, method, c):
     response_schema = util.method_response(c, m)
     params, request_value = util.build_all_params(c, m)
     media_params = util.method_media_params(m)
-    required_props, optional_props, part_prop = util.organize_params(params, request_value) 
+    required_props, optional_props, part_prop = util.organize_params(params, request_value)
 
-    return MethodContext(m, response_schema, params, request_value, media_params, 
+    return MethodContext(m, response_schema, params, request_value, media_params,
                          required_props, optional_props, part_prop)
 
 def comma_sep_fields(fields):
@@ -129,7 +129,7 @@ def opt_value(name, opt='opt', default=''):
     return opt + '.value_of("' + mangle_subcommand(name) + ('").unwrap_or("%s")' % default)
 
 def opt_values(name, opt='opt'):
-    return opt + '.values_of("' + mangle_subcommand(name) + '").unwrap_or(Vec::new()).iter()'
+    return opt + '.values_of("' + mangle_subcommand(name) + '").map(|i|i.collect()).unwrap_or(Vec::new()).iter()'
 
 def application_secret_path(program_name):
     return program_name + '-secret.json'
@@ -149,7 +149,7 @@ def docopt_mode(protocols):
     return mode
 
 # Returns a possibly remapped type, based on its name.
-# Useful to map strings to more suitable types, i.e. counts 
+# Useful to map strings to more suitable types, i.e. counts
 def actual_json_type(name, type):
     if type == 'string' and 'Count' in name:
         return 'int64'
@@ -209,7 +209,7 @@ def to_cli_schema(c, schema):
     return res
 
 
-# Convert the given cli-schema (result from to_cli_schema(schema)) to a yaml-like string. It's suitable for 
+# Convert the given cli-schema (result from to_cli_schema(schema)) to a yaml-like string. It's suitable for
 # documentation only
 def cli_schema_to_yaml(schema, prefix=''):
     if not prefix:

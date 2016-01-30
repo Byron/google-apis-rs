@@ -4,8 +4,8 @@
 
     from util import (put_and, supports_scopes, api_index, indent_by, enclose_in, put_and)
     from cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, UPLOAD_FLAG, OUTPUT_FLAG, VALUE_ARG,
-                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG, 
-                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG, 
+                     CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
+                     CONFIG_DIR_FLAG, KEY_VALUE_ARG, to_docopt_arg, DEBUG_FLAG, DEBUG_AUTH_FLAG, MODE_ARG, SCOPE_ARG,
                      CONFIG_DIR_ARG, FILE_FLAG, MIME_FLAG, subcommand_md_filename)
 
     def rust_boolean(v):
@@ -50,7 +50,7 @@ ${util.program_name()} [options]
     if mc.optional_props or parameters is not UNDEFINED:
         args.append('[-%s %s]...' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
     # end paramters
-    
+
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append('[-%s <%s>]' % (OUTPUT_FLAG, OUT_ARG))
     # handle output
@@ -63,19 +63,19 @@ ${util.program_name()} [options]
 Configuration:
 % if supports_scopes(auth):
   [--${SCOPE_FLAG} <${SCOPE_ARG}>]...
-            Specify the authentication a method should be executed in. Each scope 
-            requires the user to grant this application permission to use it. 
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
             If unset, it defaults to the shortest scope url for a particular method.
 % endif scopes
   --${CONFIG_DIR_FLAG} <${CONFIG_DIR_ARG}>
-            A directory into which we will store our persistent data. Defaults to 
+            A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.
             [default: ${CONFIG_DIR}]
   --${DEBUG_FLAG}
-            Output all server communication to standard error. `tx` and `rx` are placed 
+            Output all server communication to standard error. `tx` and `rx` are placed
             into the same stream.
   --${DEBUG_AUTH_FLAG}
-            Output all communication related to authentication to standard error. `tx` 
+            Output all communication related to authentication to standard error. `tx`
             and `rx` are placed into the same stream.
 </%def>
 
@@ -83,7 +83,7 @@ Configuration:
 
 <%def name="new(c)" buffered="True">\
 <%
-    doc_url_base = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name, 
+    doc_url_base = cargo.doc_base_url + '/' + os.path.dirname(api_index(cargo.doc_base_url, name,
                                                                         version, make, check_exists=False))
     url_info = "All documentation details can be found at " + doc_url_base
 
@@ -113,7 +113,7 @@ Configuration:
     ))
 
     global_args.append((
-        DEBUG_FLAG,  
+        DEBUG_FLAG,
         "Output all server communication to standard error. `tx` and `rx` are placed "
         "into the same stream.",
         None,
@@ -145,7 +145,7 @@ let upload_value_names = ["${MODE_ARG}", "${FILE_ARG}"];
 % endif
 let arg_data = [
 % for resource in sorted(c.rta_map.keys()):
-<% 
+<%
     methods = sorted(c.rta_map[resource])
 %>\
 <%block filter="indent_by(4)">\
@@ -202,7 +202,7 @@ let arg_data = [
                 True,
             ))
     # end paramters
-    
+
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append((
                 OUTPUT_FLAG,
@@ -213,7 +213,7 @@ let arg_data = [
             ))
     # handle output
 %>\
-    ("${mangle_subcommand(method)}",  
+    ("${mangle_subcommand(method)}",
             ${rust_optional(mc.m.get('description'))},
             "Details at ${doc_url_base}/${os.path.splitext(subcommand_md_filename(resource, method))[0]}",
           vec![
@@ -255,7 +255,7 @@ let mut app = App::new("${util.program_name()}")
 % endif
 % endfor
 
-for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
+for &(main_command_name, about, ref subcommands) in arg_data.iter() {
     let mut mcmd = SubCommand::with_name(main_command_name).about(about);
 
     for &(sub_command_name, ref desc, url_info, ref args) in subcommands {
@@ -266,7 +266,7 @@ for &(main_command_name, ref about, ref subcommands) in arg_data.iter() {
         scmd = scmd.after_help(url_info);
 
         for &(ref arg_name, ref flag, ref desc, ref required, ref multi) in args {
-            let arg_name_str = 
+            let arg_name_str =
                 match (arg_name, flag) {
                         (&Some(an), _       ) => an,
                         (_        , &Some(f)) => f,
