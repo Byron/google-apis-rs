@@ -656,7 +656,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                         Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
                         None|Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
-                                sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                                sleep(d);
                                 continue;
                             }
                             return Err(Ok(r))
@@ -666,7 +666,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 }
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                        sleep(d);
                         continue;
                     }
                     return Err(Err(err))
@@ -727,7 +727,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                         if let Retry::After(d) = self.delegate.http_failure(&res,
                                                         json::from_str(&json_err).ok(),
                                                         json::from_str(&json_err).ok()) {
-                            sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                            sleep(d);
                             continue;
                         }
                     }
@@ -735,7 +735,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 },
                 Err(err) => {
                     if let Retry::After(d) = self.delegate.http_error(&err) {
-                        sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                        sleep(d);
                         continue;
                     }
                     return Some(Err(err))

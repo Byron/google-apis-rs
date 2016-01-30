@@ -31,7 +31,7 @@ hyper = "0.7"
 mime = "0.1.0"
 serde = ">= 0.6.0"
 serde_json = ">= 0.6.0"
-yup-oauth2 = "0.5"
+yup-oauth2 = ">= 0.5.4"
 % for dep in cargo.get('dependencies', list()):
 ${dep}
 % endfor

@@ -772,7 +772,7 @@ else {
             match req_result {
                 Err(err) => {
                     if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                        sleep(d);
                         continue;
                     }
                     ${delegate_finish}(false);
@@ -785,7 +785,7 @@ else {
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
-                            sleep(Duration::from_millis(d.num_milliseconds() as u64));
+                            sleep(d);
                             continue;
                         }
                         ${delegate_finish}(false);

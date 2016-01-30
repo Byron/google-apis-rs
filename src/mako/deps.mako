@@ -184,7 +184,7 @@ help${agsuffix}:
 %>\
 ${fake_target}:
 	@mkdir -p ${target_dir}
-	@wget -nv ${info['discoveryRestUrl']} -O ${target}
+	@-wget -nv ${info['discoveryRestUrl']} -O ${target}
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
