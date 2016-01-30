@@ -1,3 +1,26 @@
+<a name=""></a>
+## cli-v0.3.3:cli-v0.1.11 (2016-01-30)
+
+
+#### Bug Fixes
+
+* **cmn:**  get cmn compiling on nightly rust ([8179f3bf](https://github.com/Byron/google-apis-rs/commit/8179f3bf89991d83f6cb5689618f8ee90b3f9a5b), closes [#131](https://github.com/Byron/google-apis-rs/issues/131))
+* **deps:**  assure license can be generated ([9a2d2b57](https://github.com/Byron/google-apis-rs/commit/9a2d2b576c84536a7a93deedcba68544bf4a10eb))
+* **makefile:**  use PYTHONPATH for mako invocation ([0bd7f200](https://github.com/Byron/google-apis-rs/commit/0bd7f2004843b4e9dcd8af366e7ffc6632fb9e41))
+* **mako:**  use new discoveryRestUrl field for json download ([ef9e7f1b](https://github.com/Byron/google-apis-rs/commit/ef9e7f1bae2bff1629530fde14ca19ad424fc653))
+* **rustup:**  use std::Thread::sleep ([b54acb7c](https://github.com/Byron/google-apis-rs/commit/b54acb7c96c842228a7ec65ff6b6edaf2b19b0bd))
+* **serde:**  update to latest serde/rust ([8dab8c01](https://github.com/Byron/google-apis-rs/commit/8dab8c01249a9f54e43aebe8a009f60935279de8))
+* **travis:**  improve handling of error code if stable is tested ([78c7d46f](https://github.com/Byron/google-apis-rs/commit/78c7d46f9ddb7b102fd59135cac5d1033f090b0a))
+* **util.py:**  improve version and library name handling ([53c27da2](https://github.com/Byron/google-apis-rs/commit/53c27da2e786e12a29037addde15d571c3b53b39))
+* **versionup:**  use latest oauth2 lib ([a2c6b58d](https://github.com/Byron/google-apis-rs/commit/a2c6b58d5b8525110a5386e93c2de4f6851b95c6))
+
+#### Features
+
+* **json:**  updated API descriptions ([8f01e8e9](https://github.com/Byron/google-apis-rs/commit/8f01e8e91837b76092507b9313d914dce4fb1c49))
+* **version-up:**  clap-rs v1.5 -> 2.0 ([ab1aa55d](https://github.com/Byron/google-apis-rs/commit/ab1aa55d395286e96a6508a6afcc5b8d723572f5))
+
+
+
 <a name="cli-v0.3.2:cli-v0.1.9"></a>
 ## cli-v0.3.2:cli-v0.1.9 (2015-08-08)
 
@@ -33,10 +56,10 @@
 <a name="cli-v0.3.0:cli-v0.1.7"></a>
 ## cli-v0.3.0:api-v0.1.7 (2015-06-19)
 
-This release allows both API and CLI to be built on stable (verified with 
+This release allows both API and CLI to be built on stable (verified with
 *rustc 1.0.0 (a59de37e9 2015-05-13) (built 2015-05-14)*).
 
-The CLI additionally builds against the latest [clap-rs][clap], which 
+The CLI additionally builds against the latest [clap-rs][clap], which
 brings color support next to other improvements.
 
 <a name="cli-v0.2.0"></a>
@@ -55,17 +78,17 @@ The first release [you can actually use][youtube-workflow]!
 
 #### Improvements
   * **Usage-to-Manual Backlinks**
-    * Sometimes even the extended usage, e.g. `youtube3 videos insert --help`, is not enough. Now a 
+    * Sometimes even the extended usage, e.g. `youtube3 videos insert --help`, is not enough. Now a
       URL to the exact method manual is provided as well to help filling in [complex information][youtube3-example].
   * ***(More)* Human JSON Output**
-    * Previously obtained JSON information would contain `null` values, adding unwanted noise. These are now 
+    * Previously obtained JSON information would contain `null` values, adding unwanted noise. These are now
       filtered out. Thanks to [@erickt][erickt] [for the hint][json-value-null-filtering].
     * *Did you know ...* that you can use [JQ][jq-homepage] to filter the JSON output and extract data ?
 
 #### Bug Fixes
   * **Out-of-memory during Uploads**
     * When uploading anything over SSL (the default for Google Services), due to an [issue in rust-openssl][openssl-blocker-bug]
-      all data would first be cached in-memory before sending it with ulta-high CPU usage. Now that the aforementioned 
+      all data would first be cached in-memory before sending it with ulta-high CPU usage. Now that the aforementioned
       bug is fixed, you can easily saturate a 1Gb link for encrypted uploads.
   * **YouTube uploads didn't work**
     * Any YouTube upload was rejected as the server didn't want to see `null` values within the request structure. Thanks
